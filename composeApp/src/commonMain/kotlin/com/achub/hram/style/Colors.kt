@@ -1,4 +1,4 @@
-package com.achub.hram
+package com.achub.hram.style
 
 import androidx.compose.ui.graphics.Color
 

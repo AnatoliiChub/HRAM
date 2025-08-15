@@ -1,4 +1,4 @@
-package com.achub.hram
+package com.achub.hram.view
 
 import hram.composeapp.generated.resources.Res
 import hram.composeapp.generated.resources.ic_activities
