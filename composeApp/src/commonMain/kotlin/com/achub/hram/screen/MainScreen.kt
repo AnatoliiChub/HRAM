@@ -9,9 +9,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -25,7 +27,6 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun MainScreen() {
     MaterialTheme {
-        val scope = rememberCoroutineScope()
         val pagerState = rememberPagerState(pageCount = { MainTab.entries.size })
         val selectedTabIndex = remember { derivedStateOf { pagerState.currentPage } }
 
@@ -45,13 +46,22 @@ fun MainScreen() {
                     MainTab.Record -> RecordScreen()
                 }
             }
-            Row(modifier = Modifier.fillMaxWidth()) {
-                MainTab.entries.forEachIndexed { index, tab ->
-                    MainTabLayout(tab, index == selectedTabIndex.value) {
-                        scope.launch {
-                            pagerState.animateScrollToPage(index)
-                        }
-                    }
+            MainTabRow(selectedTabIndex, pagerState)
+        }
+    }
+}
+
+@Composable
+private fun MainTabRow(
+    selectedTabIndex: State<Int>,
+    pagerState: PagerState
+) {
+    Row(modifier = Modifier.fillMaxWidth()) {
+        MainTab.entries.forEachIndexed { index, tab ->
+            val scope = rememberCoroutineScope()
+            MainTabLayout(tab, index == selectedTabIndex.value) {
+                scope.launch {
+                    pagerState.animateScrollToPage(index)
                 }
             }
         }
