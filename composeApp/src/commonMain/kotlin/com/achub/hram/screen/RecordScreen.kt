@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight.Companion.W500
@@ -17,6 +19,7 @@ import com.achub.hram.style.Red
 import com.achub.hram.style.White
 import com.achub.hram.view.ImageLabelRow
 import com.achub.hram.view.RecordRow
+import com.achub.hram.view.RecordingState
 import hram.composeapp.generated.resources.Res
 import hram.composeapp.generated.resources.ic_distance
 import hram.composeapp.generated.resources.ic_heart
@@ -28,10 +31,10 @@ fun RecordScreen() {
         modifier = Modifier.fillMaxSize().padding(top = 32.dp),
         horizontalAlignment = CenterHorizontally
     ) {
-        val isPlaying = remember { mutableStateOf(false) }
+        var recordingState by remember { mutableStateOf(RecordingState.Init) }
 
         Column {
-            ImageLabelRow("88", Res.drawable.ic_heart, )
+            ImageLabelRow("88", Res.drawable.ic_heart)
             ImageLabelRow("1.43 km", Res.drawable.ic_distance, Red)
             Text(
                 modifier = Modifier.align(CenterHorizontally),
@@ -40,7 +43,13 @@ fun RecordScreen() {
             )
         }
         Spacer(Modifier.weight(1f))
-        RecordRow(isPlaying.value, onPlay = { isPlaying.value = !isPlaying.value })
+        RecordRow(recordingState, onPlay = {
+            recordingState = if (recordingState == RecordingState.Recording) {
+                RecordingState.Paused
+            } else {
+                RecordingState.Recording
+            }
+        }, onStop = { recordingState = RecordingState.Init })
     }
 }
 

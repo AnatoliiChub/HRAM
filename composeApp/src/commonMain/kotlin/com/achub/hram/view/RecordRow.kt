@@ -22,11 +22,12 @@ import hram.composeapp.generated.resources.ic_stop
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun RecordRow(isPlaying: Boolean = false, onPlay: () -> Unit = {}, onStop: () -> Unit = {}) {
+fun RecordRow(recordingState: RecordingState, onPlay: () -> Unit = {}, onStop: () -> Unit = {}) {
     Row(modifier = Modifier.padding(16.dp)) {
-        val icon = if (isPlaying) Res.drawable.ic_pause else Res.drawable.ic_play
-        val first by animateFloatAsState(if (!isPlaying) 0.5f else 1f)
-        val second by animateFloatAsState(if (!isPlaying) 1f else 0f)
+        val icon = if (recordingState == RecordingState.Recording) Res.drawable.ic_pause
+        else Res.drawable.ic_play
+        val first by animateFloatAsState(if (recordingState == RecordingState.Paused) 0.5f else 1f)
+        val second by animateFloatAsState(if (recordingState == RecordingState.Paused) 1f else 0f)
         FilledIconButton(
             modifier = Modifier.height(48.dp).fillMaxWidth(first).padding(end = 8.dp),
             onClick = onPlay,
@@ -40,7 +41,6 @@ fun RecordRow(isPlaying: Boolean = false, onPlay: () -> Unit = {}, onStop: () ->
         }
         FilledIconButton(
             modifier = Modifier.height(48.dp).fillMaxWidth(second).padding(start = 8.dp),
-
             onClick = onStop,
             shape = RoundedCornerShape(8.dp),
             colors = IconButtonColors(Red, White, Red, White)
@@ -51,4 +51,8 @@ fun RecordRow(isPlaying: Boolean = false, onPlay: () -> Unit = {}, onStop: () ->
             )
         }
     }
+}
+
+enum class RecordingState {
+    Recording, Paused, Init
 }
