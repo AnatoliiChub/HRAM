@@ -32,24 +32,20 @@ fun MainScreen() {
         Column(
             modifier = Modifier
                 .background(color = Black)
+                .windowInsetsPadding(WindowInsets.safeDrawing)
                 .fillMaxSize()
         ) {
             HorizontalPager(
                 state = pagerState,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-
+                userScrollEnabled = false,
+                modifier = Modifier.fillMaxWidth().weight(1f)
             ) {
                 when (MainTab.entries[selectedTabIndex.value]) {
                     MainTab.Activities -> ActivitiesScreen()
                     MainTab.Record -> RecordScreen()
                 }
             }
-            Row(
-                modifier = Modifier.fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.safeDrawing)
-            ) {
+            Row(modifier = Modifier.fillMaxWidth()) {
                 MainTab.entries.forEachIndexed { index, tab ->
                     MainTabLayout(tab, index == selectedTabIndex.value) {
                         scope.launch {
