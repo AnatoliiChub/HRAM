@@ -13,12 +13,27 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontWeight.Companion.W700
 import androidx.compose.ui.unit.dp
 import com.achub.hram.style.HeadingLarge
+import com.achub.hram.style.Red
 import com.achub.hram.style.White
+import hram.composeapp.generated.resources.Res
+import hram.composeapp.generated.resources.ic_distance
+import hram.composeapp.generated.resources.ic_heart
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.vectorResource
 
+
 @Composable
-fun ImageLabelRow(label: String, drawable: DrawableResource, color: Color = White) {
+fun HeartLabelRow(label: String) {
+    ImageLabelRow(label, Res.drawable.ic_heart)
+}
+
+@Composable
+fun DistanceLabelRow(label: String) {
+    ImageLabelRow(label, Res.drawable.ic_distance, Red)
+}
+
+@Composable
+private fun ImageLabelRow(label: String, drawable: DrawableResource, color: Color = White) {
     Row {
         Image(
             modifier = Modifier.size(80.dp).padding(16.dp),
@@ -32,4 +47,6 @@ fun ImageLabelRow(label: String, drawable: DrawableResource, color: Color = Whit
             style = HeadingLarge.copy(color = White, fontWeight = W700)
         )
     }
+    ImageLabelRow("88", Res.drawable.ic_heart)
+    ImageLabelRow("1.43 km", Res.drawable.ic_distance, Red)
 }

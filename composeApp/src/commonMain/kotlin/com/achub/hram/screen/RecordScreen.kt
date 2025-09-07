@@ -15,14 +15,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight.Companion.W500
 import androidx.compose.ui.unit.dp
 import com.achub.hram.style.Heading1
-import com.achub.hram.style.Red
 import com.achub.hram.style.White
-import com.achub.hram.view.ImageLabelRow
+import com.achub.hram.view.DistanceLabelRow
+import com.achub.hram.view.HeartLabelRow
 import com.achub.hram.view.RecordRow
 import com.achub.hram.view.RecordingState
-import hram.composeapp.generated.resources.Res
-import hram.composeapp.generated.resources.ic_distance
-import hram.composeapp.generated.resources.ic_heart
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -34,8 +31,8 @@ fun RecordScreen() {
         var recordingState by remember { mutableStateOf(RecordingState.Init) }
 
         Column {
-            ImageLabelRow("88", Res.drawable.ic_heart)
-            ImageLabelRow("1.43 km", Res.drawable.ic_distance, Red)
+            HeartLabelRow("88")
+            DistanceLabelRow("1.43 km")
             Text(
                 modifier = Modifier.align(CenterHorizontally),
                 text = "15:53",
