@@ -22,7 +22,7 @@ import org.jetbrains.compose.resources.vectorResource
 
 @Composable
 fun RowScope.MainTabLayout(
-    tab: MainTab,
+    tab: TabType,
     isSelected: Boolean,
     onTap: () -> Unit,
 ) {

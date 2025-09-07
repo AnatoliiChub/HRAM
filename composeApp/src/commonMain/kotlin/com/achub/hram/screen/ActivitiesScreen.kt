@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import com.achub.hram.style.LabelMedium
-import com.achub.hram.view.MainTab
+import com.achub.hram.view.TabType
 
 @Composable
 fun ActivitiesScreen() {
@@ -16,7 +16,7 @@ fun ActivitiesScreen() {
         contentAlignment = Center
     ) {
         Text(
-            text = MainTab.Activities.name,
+            text = TabType.Activities.name,
             style = LabelMedium
         )
     }

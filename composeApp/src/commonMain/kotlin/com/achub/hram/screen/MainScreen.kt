@@ -19,15 +19,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import com.achub.hram.style.Black
-import com.achub.hram.view.MainTab
 import com.achub.hram.view.MainTabLayout
+import com.achub.hram.view.TabType
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun MainScreen() {
     MaterialTheme {
-        val pagerState = rememberPagerState(pageCount = { MainTab.entries.size })
+        val pagerState = rememberPagerState(pageCount = { TabType.entries.size })
         val selectedTabIndex = remember { derivedStateOf { pagerState.currentPage } }
 
         Column(
@@ -41,9 +41,9 @@ fun MainScreen() {
                 userScrollEnabled = false,
                 modifier = Modifier.fillMaxWidth().weight(1f)
             ) {
-                when (MainTab.entries[selectedTabIndex.value]) {
-                    MainTab.Activities -> ActivitiesScreen()
-                    MainTab.Record -> RecordScreen()
+                when (TabType.entries[selectedTabIndex.value]) {
+                    TabType.Activities -> ActivitiesScreen()
+                    TabType.Record -> RecordScreen()
                 }
             }
             MainTabRow(selectedTabIndex, pagerState)
@@ -57,7 +57,7 @@ private fun MainTabRow(
     pagerState: PagerState
 ) {
     Row(modifier = Modifier.fillMaxWidth()) {
-        MainTab.entries.forEachIndexed { index, tab ->
+        TabType.entries.forEachIndexed { index, tab ->
             val scope = rememberCoroutineScope()
             MainTabLayout(tab, index == selectedTabIndex.value) {
                 scope.launch {
