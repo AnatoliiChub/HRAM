@@ -47,6 +47,4 @@ private fun ImageLabelRow(label: String, drawable: DrawableResource, color: Colo
             style = HeadingLarge.copy(color = White, fontWeight = W700)
         )
     }
-    ImageLabelRow("88", Res.drawable.ic_heart)
-    ImageLabelRow("1.43 km", Res.drawable.ic_distance, Red)
 }
