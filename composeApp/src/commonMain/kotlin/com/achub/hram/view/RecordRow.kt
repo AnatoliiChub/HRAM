@@ -22,7 +22,12 @@ import hram.composeapp.generated.resources.ic_stop
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun RecordRow(recordingState: RecordingState, onPlay: () -> Unit = {}, onStop: () -> Unit = {}) {
+fun RecordRow(
+    recordingState: RecordingState,
+    isRecordingAvailable: Boolean,
+    onPlay: () -> Unit = {},
+    onStop: () -> Unit = {}
+) {
     Row(modifier = Modifier.padding(16.dp)) {
         val icon = if (recordingState == RecordingState.Recording) Res.drawable.ic_pause
         else Res.drawable.ic_play
@@ -32,7 +37,8 @@ fun RecordRow(recordingState: RecordingState, onPlay: () -> Unit = {}, onStop: (
             modifier = Modifier.height(48.dp).fillMaxWidth(first).padding(end = 8.dp),
             onClick = onPlay,
             shape = RoundedCornerShape(8.dp),
-            colors = IconButtonColors(Red, White, Red, White)
+            colors = IconButtonColors(Red, White, Red.copy(alpha = 0.2f), White),
+            enabled = (recordingState == RecordingState.Init && isRecordingAvailable.not()).not()
         ) {
             Icon(
                 painter = painterResource(icon),

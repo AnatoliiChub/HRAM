@@ -1,35 +1,47 @@
 package com.achub.hram.screen.record
 
-import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.achub.hram.screen.base.BaseActionHandler
+import com.achub.hram.screen.base.BaseViewModel
 import com.achub.hram.view.RecordingState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
-class RecordViewModel : ScreenModel {
+class RecordViewModel : BaseViewModel<RecordActionHandler, RecordScreenState>() {
 
     private val _uiState = MutableStateFlow(
-        RecordScreenState("83", "1.2 km", "00:12:34", RecordingState.Init)
+        RecordScreenState(
+            heartRate = 83,
+            distance = 1.2f,
+            duration = "00:12:34",
+            recordingState = RecordingState.Init
+        )
     )
 
-    val uiState = _uiState.stateIn(
-        scope = screenModelScope,
-        started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5_000),
-        initialValue = RecordScreenState()
-    )
-
-    fun onPlay() =
-        _uiState.update {
-            val recordingState = if (_uiState.value.recordingState == RecordingState.Recording) {
+    override var actionHandler: RecordActionHandler? = object : RecordActionHandler {
+        override fun onPlay() = _uiState.update {
+            val recordingState = if (it.recordingState == RecordingState.Recording) {
                 RecordingState.Paused
             } else {
                 RecordingState.Recording
             }
-            _uiState.value.copy(recordingState = recordingState)
+            it.copy(recordingState = recordingState)
         }
+        override fun onStop() = _uiState.update { it.copy(recordingState = RecordingState.Init) }
+        override fun toggleHRTracking() = _uiState.update { it.copy(trackHR = it.trackHR.not()) }
+        override fun toggleLocationTracking() = _uiState.update { it.copy(trackLocation = it.trackLocation.not()) }
+    }
+    override val uiState = _uiState.stateIn(
+        scope = screenModelScope,
+        started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5_000),
+        initialValue = RecordScreenState()
+    )
+}
 
-    fun onStop() =
-        _uiState.update { _uiState.value.copy(recordingState = RecordingState.Init) }
-
+interface RecordActionHandler: BaseActionHandler {
+    fun onPlay()
+    fun onStop()
+    fun toggleHRTracking()
+    fun toggleLocationTracking()
 }
