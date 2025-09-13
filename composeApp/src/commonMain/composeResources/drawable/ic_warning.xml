@@ -1,0 +1,30 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Triangle with rounded corners -->
+    <path
+        android:fillColor="#FFFF0000"
+        android:pathData="M24,6
+            Q26,6 44,42
+            Q45,44 42,44
+            H6
+            Q3,44 4,42
+            Q22,6 23,6
+            Z" />
+    <!-- Bold exclamation mark: vertical bar -->
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M22,18
+            H26
+            V32
+            H22
+            Z" />
+    <!-- Bold exclamation mark: dot -->
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M22,36
+            a2,2 0 1,0 4,0
+            a2,2 0 1,0 -4,0" />
+</vector>

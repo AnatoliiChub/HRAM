@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -25,6 +26,8 @@ import com.achub.hram.view.HeartLabelRow
 import com.achub.hram.view.LocationCheckBoxLabel
 import com.achub.hram.view.RecordRow
 import com.achub.hram.view.RecordingState
+import com.achub.hram.view.WarningLabelRow
+import com.achub.hram.view.dialog.ChooseHRDeviceDialog
 import hram.composeapp.generated.resources.Res
 import hram.composeapp.generated.resources.ic_record
 import org.jetbrains.compose.resources.vectorResource
@@ -35,7 +38,21 @@ object RecordScreen : Tab {
     override fun Content() {
         val viewModel = koinScreenModel<RecordViewModel>()
         val state = viewModel.uiState.collectAsStateWithLifecycle().value
-        RecordScreenContent(state, viewModel.actionHandler!!)
+        with(viewModel) {
+            RecordScreenContent(
+                state,
+                onHrCheckBox = ::toggleHRTracking,
+                onLocationCheckBox = ::toggleLocationTracking,
+                onPlay = ::onPlay,
+                onStop = ::onStop,
+                onDismissDialog = {
+                    dismissDialog()
+                    cancelScanning()
+                },
+                onDeviceSelected = ::onDeviceSelected,
+                onRequestScanning = ::onRequestScanning
+            )
+        }
     }
 
     override val options: TabOptions
@@ -54,12 +71,21 @@ object RecordScreen : Tab {
         }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun RecordScreenContent(
     state: RecordScreenState,
-    action: RecordActionHandler
+    onHrCheckBox: () -> Unit,
+    onLocationCheckBox: () -> Unit,
+    onPlay: () -> Unit,
+    onStop: () -> Unit,
+    onDismissDialog: () -> Unit,
+    onDeviceSelected: (String) -> Unit,
+    onRequestScanning: () -> Unit
 ) {
+
     val isCheckBoxEnabled = state.recordingState == RecordingState.Init
+    val atLeastOneTrackingEnabled = state.trackHR || state.trackLocation
     Column(
         modifier = Modifier.fillMaxSize().padding(top = 32.dp),
         horizontalAlignment = CenterHorizontally
@@ -74,38 +100,83 @@ private fun RecordScreenContent(
             )
         }
         Spacer(Modifier.weight(1f))
+        if (atLeastOneTrackingEnabled.not()) {
+            WarningLabelRow("Enable HR or Location tracking")
+        }
         Column {
-            HRCheckBoxLabel(state.trackHR, isCheckBoxEnabled) { action.toggleHRTracking() }
-            LocationCheckBoxLabel(state.trackLocation, isCheckBoxEnabled) {
-                action.toggleLocationTracking()
-            }
+            HRCheckBoxLabel(
+                isChecked = state.trackHR,
+                isEnabled = isCheckBoxEnabled,
+                connectedDevice = state.connectedDevice
+            ) { onHrCheckBox() }
+            LocationCheckBoxLabel(
+                isChecked = state.trackLocation,
+                isEnabled = isCheckBoxEnabled
+            ) { onLocationCheckBox() }
             Spacer(Modifier.height(32.dp))
         }
         RecordRow(
             recordingState = state.recordingState,
-            isRecordingAvailable = state.trackHR || state.trackLocation,
-            onPlay = action::onPlay,
-            onStop = action::onStop
+            isRecordingAvailable = atLeastOneTrackingEnabled,
+            onPlay = onPlay,
+            onStop = onStop
+        )
+    }
+    if (state.dialog is RecordScreenDialog.ChooseHRDevice) {
+        state.dialog
+        ChooseHRDeviceDialog(
+            onConfirmClick = onDeviceSelected,
+            onDismissRequest = onDismissDialog,
+            isLoading = state.dialog.isLoading,
+            onRefresh = onRequestScanning,
+            devices = state.scannedDevices
         )
     }
 }
-
 
 @Composable
 @Preview
 fun RecordScreenPreview() {
     RecordScreenContent(
-        RecordScreenState(
-            recordingState = RecordingState.Recording,
-            heartRate = 123,
-            distance = 0.65f,
-            duration = "00:02:30",
-            trackHR = true,
-            trackLocation = false
-        ), action = object : RecordActionHandler {
-            override fun onPlay() {}
-            override fun onStop() {}
-            override fun toggleHRTracking() {}
-            override fun toggleLocationTracking() {}
-        })
+        state = RecordScreenState(
+            heartRate = 83,
+            distance = 1.2f,
+            duration = "00:12:34",
+            recordingState = RecordingState.Init,
+            trackHR = false,
+            trackLocation = false,
+        ),
+        onHrCheckBox = {},
+        onLocationCheckBox = {},
+        onPlay = {},
+        onStop = {},
+        onDismissDialog = {},
+        onDeviceSelected = {},
+        onRequestScanning = {}
+    )
+}
+
+@Composable
+@Preview
+fun RecordScreenChooseDeviceDialogPreview() {
+    RecordScreenContent(
+        state = RecordScreenState(
+            heartRate = 83,
+            distance = 1.2f,
+            duration = "00:12:34",
+            recordingState = RecordingState.Init,
+            trackHR = false,
+            trackLocation = false,
+            scannedDevices = listOf("Device 1", "Device 2", "Device 3"),
+            dialog = RecordScreenDialog.ChooseHRDevice(isLoading = true)
+
+        ),
+        onHrCheckBox = {},
+        onLocationCheckBox = {},
+        onPlay = {},
+        onStop = {},
+        onDismissDialog = {},
+        onDeviceSelected = {},
+        onRequestScanning = {}
+    )
 }
