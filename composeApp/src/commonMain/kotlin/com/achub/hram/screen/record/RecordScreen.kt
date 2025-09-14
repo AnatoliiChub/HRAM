@@ -3,31 +3,25 @@ package com.achub.hram.screen.record
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.text.font.FontWeight.Companion.W500
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
-import com.achub.hram.style.Heading1
-import com.achub.hram.style.White
-import com.achub.hram.view.DistanceLabelRow
-import com.achub.hram.view.HRCheckBoxLabel
-import com.achub.hram.view.HeartLabelRow
-import com.achub.hram.view.LocationCheckBoxLabel
+import com.achub.hram.data.model.TrackingIndications
+import com.achub.hram.data.model.TrackingStatus
 import com.achub.hram.view.RecordRow
 import com.achub.hram.view.RecordingState
-import com.achub.hram.view.WarningLabelRow
 import com.achub.hram.view.dialog.ChooseHRDeviceDialog
+import com.achub.hram.view.section.TrackingIndicationsSection
+import com.achub.hram.view.section.TrackingStatusCheckBoxSection
 import hram.composeapp.generated.resources.Res
 import hram.composeapp.generated.resources.ic_record
 import org.jetbrains.compose.resources.vectorResource
@@ -83,55 +77,41 @@ private fun RecordScreenContent(
     onDeviceSelected: (String) -> Unit,
     onRequestScanning: () -> Unit
 ) {
-
     val isCheckBoxEnabled = state.recordingState == RecordingState.Init
     val indications = state.indications
-    val checkboxes = state.checkboxes
-    val atLeastOneTrackingEnabled = checkboxes.trackHR || checkboxes.trackGps
+    val trackingStatus = state.trackingStatus
     Column(
         modifier = Modifier.fillMaxSize().padding(top = 32.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
         horizontalAlignment = CenterHorizontally
     ) {
-        Column {
-            HeartLabelRow(hrBpm = indications.heartRate)
-            DistanceLabelRow(distance = indications.distance)
-            Text(
-                modifier = Modifier.align(CenterHorizontally),
-                text = indications.duration,
-                style = Heading1.copy(color = White, fontWeight = W500)
-            )
-        }
+        TrackingIndicationsSection(indications)
         Spacer(Modifier.weight(1f))
-        if (atLeastOneTrackingEnabled.not()) {
-            WarningLabelRow(label = "Choose at least one tracking option")
-        }
-        Column {
-            HRCheckBoxLabel(
-                isChecked = checkboxes.trackHR,
-                isEnabled = isCheckBoxEnabled,
-                connectedDevice = checkboxes.hrDevice
-            ) { onHrCheckBox() }
-            LocationCheckBoxLabel(
-                isChecked = checkboxes.trackGps,
-                isEnabled = isCheckBoxEnabled
-            ) { onLocationCheckBox() }
-            Spacer(Modifier.height(32.dp))
-        }
+        TrackingStatusCheckBoxSection(trackingStatus, isCheckBoxEnabled, onHrCheckBox, onLocationCheckBox)
         RecordRow(
             recordingState = state.recordingState,
-            isRecordingAvailable = atLeastOneTrackingEnabled,
+            isRecordingAvailable = trackingStatus.atLeastOneTrackingEnabled,
             onPlay = onPlay,
             onStop = onStop
         )
     }
-    if (state.dialog is RecordScreenDialog.ChooseHRDevice) {
-        state.dialog
+    Dialogs(state.dialog, onDeviceSelected, onDismissDialog, onRequestScanning)
+}
+
+@Composable
+private fun Dialogs(
+    dialog: RecordScreenDialog?,
+    onDeviceSelected: (String) -> Unit,
+    onDismissDialog: () -> Unit,
+    onRequestScanning: () -> Unit
+) {
+    if (dialog is RecordScreenDialog.ChooseHRDevice) {
+        dialog
         ChooseHRDeviceDialog(
             onConfirmClick = onDeviceSelected,
             onDismissRequest = onDismissDialog,
-            isLoading = state.dialog.isLoading,
+            isLoading = dialog.isLoading,
             onRefresh = onRequestScanning,
-            devices = state.dialog.scannedDevices
+            devices = dialog.scannedDevices
         )
     }
 }
@@ -141,12 +121,12 @@ private fun RecordScreenContent(
 private fun RecordScreenPreview() {
     RecordScreenContent(
         state = RecordScreenState(
-            indications = RecordScreenIndications(
+            indications = TrackingIndications(
                 heartRate = 83,
                 distance = 1.2f,
                 duration = "00:12:34",
             ),
-            checkboxes = RecordScreenCheckboxes(
+            trackingStatus = TrackingStatus(
                 trackHR = true,
                 trackGps = true,
                 hrDevice = "Polar H10"
@@ -168,12 +148,12 @@ private fun RecordScreenPreview() {
 private fun RecordScreenChooseDeviceDialogPreview() {
     RecordScreenContent(
         state = RecordScreenState(
-            indications = RecordScreenIndications(
+            indications = TrackingIndications(
                 heartRate = 83,
                 distance = 1.2f,
                 duration = "00:12:34",
             ),
-            checkboxes = RecordScreenCheckboxes(
+            trackingStatus = TrackingStatus(
                 trackHR = false,
                 trackGps = false,
                 hrDevice = null

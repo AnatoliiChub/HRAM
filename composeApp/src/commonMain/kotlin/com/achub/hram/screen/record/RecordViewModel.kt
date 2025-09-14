@@ -3,6 +3,8 @@ package com.achub.hram.screen.record
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.achub.hram.data.BleRepo
+import com.achub.hram.data.model.TrackingIndications
+import com.achub.hram.data.model.TrackingStatus
 import com.achub.hram.stateInExt
 import com.achub.hram.view.RecordingState
 import io.github.aakira.napier.Napier
@@ -25,12 +27,12 @@ class RecordViewModel(val bleRepo: BleRepo) : ScreenModel {
     var scanJob: Job? = null
     private val _uiState = MutableStateFlow(
         RecordScreenState(
-            indications = RecordScreenIndications(
+            indications = TrackingIndications(
                 heartRate = 83,
                 distance = 1.2f,
                 duration = "00:12:34",
             ),
-            checkboxes = RecordScreenCheckboxes(
+            trackingStatus = TrackingStatus(
                 trackHR = false,
                 trackGps = false,
                 hrDevice = null
@@ -51,17 +53,12 @@ class RecordViewModel(val bleRepo: BleRepo) : ScreenModel {
 
     fun onStop() = _uiState.update { it.copy(recordingState = RecordingState.Init) }
     fun toggleHRTracking() {
-        val trackHR = _uiState.value.checkboxes.trackHR
+        val trackHR = _uiState.value.trackingStatus.trackHR
         if (trackHR.not()) {
             onRequestScanning()
         } else {
             _uiState.update {
-                it.copy(
-                    checkboxes = it.checkboxes.copy(
-                        trackHR = trackHR.not(),
-                        hrDevice = null
-                    )
-                )
+                it.copy(trackingStatus = it.trackingStatus.copy(trackHR = trackHR.not(), hrDevice = null))
             }
         }
     }
@@ -71,10 +68,7 @@ class RecordViewModel(val bleRepo: BleRepo) : ScreenModel {
         //TODO IMPLEMENT CONNECTING TO DEVICE before set the value
         _uiState.update {
             it.copy(
-                checkboxes = it.checkboxes.copy(
-                    trackHR = true,
-                    hrDevice = null
-                ),
+                trackingStatus = it.trackingStatus.copy(trackHR = true, hrDevice = deviceId),
                 dialog = null
             )
         }
@@ -95,12 +89,9 @@ class RecordViewModel(val bleRepo: BleRepo) : ScreenModel {
         scanJob = bleRepo.scanHrDevices()
             .flowOn(Dispatchers.IO)
             .onCompletion {
-                Napier.d { "OnCompletion" }
                 if (_uiState.value.dialog is RecordScreenDialog.ChooseHRDevice) {
                     _uiState.update {
-                        it.copy(
-                            dialog = RecordScreenDialog.ChooseHRDevice(isLoading = false)
-                        )
+                        it.copy(dialog = RecordScreenDialog.ChooseHRDevice(isLoading = false))
                     }
                 }
             }.timeout(15.seconds)
@@ -111,10 +102,7 @@ class RecordViewModel(val bleRepo: BleRepo) : ScreenModel {
                         _uiState.update {
                             val newList = scannedDevices + device
                             it.copy(
-                                dialog = RecordScreenDialog.ChooseHRDevice(
-                                    isLoading = true,
-                                    scannedDevices = newList
-                                ),
+                                dialog = RecordScreenDialog.ChooseHRDevice(isLoading = true, scannedDevices = newList)
                             )
                         }
                     }
@@ -124,7 +112,7 @@ class RecordViewModel(val bleRepo: BleRepo) : ScreenModel {
     }
 
     fun toggleLocationTracking() =
-        _uiState.update { it.copy(checkboxes = it.checkboxes.copy(trackGps = it.checkboxes.trackGps.not())) }
+        _uiState.update { it.copy(trackingStatus = it.trackingStatus.copy(trackGps = it.trackingStatus.trackGps.not())) }
 
     fun dismissDialog() = _uiState.update { it.copy(dialog = null) }
 }
