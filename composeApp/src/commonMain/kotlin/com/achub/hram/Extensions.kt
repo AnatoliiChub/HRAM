@@ -1,5 +1,9 @@
 package com.achub.hram
 
+import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlin.math.round
 
 /**
@@ -13,3 +17,12 @@ fun Float.format(): String {
     val fracPart = parts.getOrElse(1) { "0" }.padEnd(2, '0').take(2)
     return "$intPart.$fracPart"
 }
+
+context(screenModel: ScreenModel)
+fun <T> MutableStateFlow<T>.stateInExt(
+    initialValue: T
+) = stateIn(
+    scope = screenModel.screenModelScope,
+    started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5_000),
+    initialValue = initialValue
+)

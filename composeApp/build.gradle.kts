@@ -52,6 +52,9 @@ kotlin {
             implementation(libs.kotlin.test)
         }
     }
+    compilerOptions {
+        freeCompilerArgs.add("-Xcontext-parameters")
+    }
 }
 
 android {

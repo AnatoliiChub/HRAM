@@ -85,32 +85,34 @@ private fun RecordScreenContent(
 ) {
 
     val isCheckBoxEnabled = state.recordingState == RecordingState.Init
-    val atLeastOneTrackingEnabled = state.trackHR || state.trackLocation
+    val indications = state.indications
+    val checkboxes = state.checkboxes
+    val atLeastOneTrackingEnabled = checkboxes.trackHR || checkboxes.trackGps
     Column(
-        modifier = Modifier.fillMaxSize().padding(top = 32.dp),
+        modifier = Modifier.fillMaxSize().padding(top = 32.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
         horizontalAlignment = CenterHorizontally
     ) {
         Column {
-            HeartLabelRow(state.heartRate)
-            DistanceLabelRow(state.distance)
+            HeartLabelRow(hrBpm = indications.heartRate)
+            DistanceLabelRow(distance = indications.distance)
             Text(
                 modifier = Modifier.align(CenterHorizontally),
-                text = state.duration,
+                text = indications.duration,
                 style = Heading1.copy(color = White, fontWeight = W500)
             )
         }
         Spacer(Modifier.weight(1f))
         if (atLeastOneTrackingEnabled.not()) {
-            WarningLabelRow("Enable HR or Location tracking")
+            WarningLabelRow(label = "Choose at least one tracking option")
         }
         Column {
             HRCheckBoxLabel(
-                isChecked = state.trackHR,
+                isChecked = checkboxes.trackHR,
                 isEnabled = isCheckBoxEnabled,
-                connectedDevice = state.connectedDevice
+                connectedDevice = checkboxes.hrDevice
             ) { onHrCheckBox() }
             LocationCheckBoxLabel(
-                isChecked = state.trackLocation,
+                isChecked = checkboxes.trackGps,
                 isEnabled = isCheckBoxEnabled
             ) { onLocationCheckBox() }
             Spacer(Modifier.height(32.dp))
@@ -129,22 +131,27 @@ private fun RecordScreenContent(
             onDismissRequest = onDismissDialog,
             isLoading = state.dialog.isLoading,
             onRefresh = onRequestScanning,
-            devices = state.scannedDevices
+            devices = state.dialog.scannedDevices
         )
     }
 }
 
 @Composable
 @Preview
-fun RecordScreenPreview() {
+private fun RecordScreenPreview() {
     RecordScreenContent(
         state = RecordScreenState(
-            heartRate = 83,
-            distance = 1.2f,
-            duration = "00:12:34",
-            recordingState = RecordingState.Init,
-            trackHR = false,
-            trackLocation = false,
+            indications = RecordScreenIndications(
+                heartRate = 83,
+                distance = 1.2f,
+                duration = "00:12:34",
+            ),
+            checkboxes = RecordScreenCheckboxes(
+                trackHR = true,
+                trackGps = true,
+                hrDevice = "Polar H10"
+            ),
+            recordingState = RecordingState.Recording
         ),
         onHrCheckBox = {},
         onLocationCheckBox = {},
@@ -158,17 +165,24 @@ fun RecordScreenPreview() {
 
 @Composable
 @Preview
-fun RecordScreenChooseDeviceDialogPreview() {
+private fun RecordScreenChooseDeviceDialogPreview() {
     RecordScreenContent(
         state = RecordScreenState(
-            heartRate = 83,
-            distance = 1.2f,
-            duration = "00:12:34",
+            indications = RecordScreenIndications(
+                heartRate = 83,
+                distance = 1.2f,
+                duration = "00:12:34",
+            ),
+            checkboxes = RecordScreenCheckboxes(
+                trackHR = false,
+                trackGps = false,
+                hrDevice = null
+            ),
             recordingState = RecordingState.Init,
-            trackHR = false,
-            trackLocation = false,
-            scannedDevices = listOf("Device 1", "Device 2", "Device 3"),
-            dialog = RecordScreenDialog.ChooseHRDevice(isLoading = true)
+            dialog = RecordScreenDialog.ChooseHRDevice(
+                isLoading = true,
+                scannedDevices = listOf("Device 1", "Device 2", "Device 3"),
+            )
 
         ),
         onHrCheckBox = {},

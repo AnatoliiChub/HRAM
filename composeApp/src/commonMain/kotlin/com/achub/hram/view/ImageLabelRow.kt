@@ -3,6 +3,7 @@ package com.achub.hram.view
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
@@ -32,24 +33,30 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 
 @Composable
-fun HeartLabelRow(hrBpm: Int) {
-    ImageLabelRow(label = "$hrBpm BPM", drawable = Res.drawable.ic_heart, color = Red)
+fun HeartLabelRow(modifier: Modifier = Modifier, hrBpm: Int) {
+    ImageLabelRow(modifier = modifier, label = "$hrBpm BPM", drawable = Res.drawable.ic_heart, color = Red)
 }
 
 @Composable
-fun DistanceLabelRow(distance: Float) {
-    ImageLabelRow(label = "${distance.format()} km", drawable = Res.drawable.ic_distance)
+fun DistanceLabelRow(modifier: Modifier = Modifier, distance: Float) {
+    ImageLabelRow(modifier = modifier, label = "${distance.format()} km", drawable = Res.drawable.ic_distance)
 }
 
 @Composable
-fun WarningLabelRow(label: String) {
+fun WarningLabelRow(modifier: Modifier = Modifier, label: String) {
     ImageLabelRow(
-        label = label, drawable = Res.drawable.ic_warning, imageSize = 48.dp, textSize = 20.sp, fontWeight = W400
+        modifier = modifier,
+        label = label,
+        drawable = Res.drawable.ic_warning,
+        imageSize = 48.dp,
+        textSize = 18.sp,
+        fontWeight = W400
     )
 }
 
 @Composable
 private fun ImageLabelRow(
+    modifier: Modifier = Modifier,
     label: String,
     drawable: DrawableResource,
     color: Color? = null,
@@ -57,7 +64,7 @@ private fun ImageLabelRow(
     textSize: TextUnit = 36.sp,
     fontWeight: FontWeight = W700
 ) {
-    Row {
+    Row(modifier) {
         Image(
             modifier = Modifier.size(imageSize).padding(imageSize / 5),
             imageVector = vectorResource(drawable),
@@ -75,9 +82,9 @@ private fun ImageLabelRow(
 @Composable
 @Preview
 fun PreviewImageLabelRow() {
-    Column {
-        HeartLabelRow(120)
-        DistanceLabelRow(5.329f)
-        WarningLabelRow("Choose at least one tracking option")
+    Column(Modifier.fillMaxWidth()) {
+        HeartLabelRow(hrBpm = 120)
+        DistanceLabelRow(distance = 5.329f)
+        WarningLabelRow(label = "Choose at least one tracking option")
     }
 }
