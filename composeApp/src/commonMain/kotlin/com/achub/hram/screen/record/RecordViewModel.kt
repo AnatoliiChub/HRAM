@@ -90,9 +90,7 @@ class RecordViewModel(val bleRepo: BleRepo) : ScreenModel {
             .flowOn(Dispatchers.IO)
             .onCompletion {
                 if (_uiState.value.dialog is RecordScreenDialog.ChooseHRDevice) {
-                    _uiState.update {
-                        it.copy(dialog = RecordScreenDialog.ChooseHRDevice(isLoading = false))
-                    }
+                    _uiState.update { it.copy(dialog = RecordScreenDialog.ChooseHRDevice(isLoading = false)) }
                 }
             }.timeout(15.seconds)
             .onEach { device ->
