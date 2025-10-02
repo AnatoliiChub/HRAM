@@ -5,6 +5,6 @@ import com.achub.hram.screen.record.RecordViewModel
 import org.koin.dsl.module
 
 val viewModelModule = module {
-    factory { RecordViewModel(get()) }
+    factory { params -> RecordViewModel(bleRepo = get(), permissionController = params.get()) }
     factory { ActivitiesViewModel() }
 }

@@ -47,6 +47,10 @@ kotlin {
             implementation(libs.voyager.navigator)
             implementation(libs.voyager.tab.navigator)
             implementation(libs.logger)
+            implementation(libs.kable)
+            api(libs.moko.compose)
+            api(libs.moko.main)
+            api(libs.moko.ble)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

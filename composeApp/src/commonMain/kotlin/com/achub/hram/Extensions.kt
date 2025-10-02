@@ -1,7 +1,11 @@
 package com.achub.hram
 
+import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import dev.icerock.moko.permissions.PermissionsController
+import dev.icerock.moko.permissions.compose.BindEffect
+import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlin.math.round
@@ -26,3 +30,11 @@ fun <T> MutableStateFlow<T>.stateInExt(
     started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5_000),
     initialValue = initialValue
 )
+
+@Composable
+fun permissionController(): PermissionsController {
+    val permissionsFactory = rememberPermissionsControllerFactory()
+    val controller =  permissionsFactory.createPermissionsController()
+    BindEffect(controller)
+    return controller
+}

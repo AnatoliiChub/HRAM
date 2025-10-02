@@ -25,7 +25,7 @@ fun TrackingStatusCheckBoxSection(
         HRCheckBoxLabel(
             isChecked = trackingStatus.trackHR,
             isEnabled = isCheckBoxEnabled,
-            connectedDevice = trackingStatus.hrDevice
+            connectedDevice = trackingStatus.hrDevice?.name
         ) { onHrCheckBox() }
         LocationCheckBoxLabel(
             isChecked = trackingStatus.trackGps,

@@ -1,14 +1,27 @@
 package com.achub.hram.data
 
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.asFlow
+import com.achub.hram.data.model.BleDevice
+import com.juul.kable.ExperimentalApi
+import com.juul.kable.Scanner
+import com.juul.kable.service
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 class HramBleRepo : BleRepo {
+    @OptIn(ExperimentalApi::class, ExperimentalUuidApi::class)
+    val HR_SERVICE_UUID = Uuid.service("heart_rate")
 
-    override fun scanHrDevices() = (0..30)
-        .asFlow()
-        .onEach { delay((300L..700L).random()) }
-        .map { "Device ${it.mod(5)}" }
+    @OptIn(ExperimentalUuidApi::class, FlowPreview::class)
+    override fun scanHrDevices() = Scanner {
+        filters {
+            match {
+                services = listOf(HR_SERVICE_UUID) // SensorTag
+            }
+        }
+    }.advertisements
+        .map { BleDevice(name = it.peripheralName ?: "", identifier = it.identifier.toString()) }
+
 }
+

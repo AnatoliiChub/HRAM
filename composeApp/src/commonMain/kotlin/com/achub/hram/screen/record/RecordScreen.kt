@@ -15,8 +15,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import com.achub.hram.data.model.BleDevice
 import com.achub.hram.data.model.TrackingIndications
 import com.achub.hram.data.model.TrackingStatus
+import com.achub.hram.permissionController
 import com.achub.hram.view.RecordRow
 import com.achub.hram.view.RecordingState
 import com.achub.hram.view.dialog.ChooseHRDeviceDialog
@@ -26,11 +28,13 @@ import hram.composeapp.generated.resources.Res
 import hram.composeapp.generated.resources.ic_record
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.core.parameter.parametersOf
 
 object RecordScreen : Tab {
     @Composable
     override fun Content() {
-        val viewModel = koinScreenModel<RecordViewModel>()
+        val controller = permissionController()
+        val viewModel = koinScreenModel<RecordViewModel>(parameters = { parametersOf(controller) })
         val state = viewModel.uiState.collectAsStateWithLifecycle().value
         with(viewModel) {
             RecordScreenContent(
@@ -44,7 +48,7 @@ object RecordScreen : Tab {
                     cancelScanning()
                 },
                 onDeviceSelected = ::onDeviceSelected,
-                onRequestScanning = ::onRequestScanning
+                onRequestScanning = ::requestScanning
             )
         }
     }
@@ -74,7 +78,7 @@ private fun RecordScreenContent(
     onPlay: () -> Unit,
     onStop: () -> Unit,
     onDismissDialog: () -> Unit,
-    onDeviceSelected: (String) -> Unit,
+    onDeviceSelected: (BleDevice) -> Unit,
     onRequestScanning: () -> Unit
 ) {
     val isCheckBoxEnabled = state.recordingState == RecordingState.Init
@@ -100,7 +104,7 @@ private fun RecordScreenContent(
 @Composable
 private fun Dialogs(
     dialog: RecordScreenDialog?,
-    onDeviceSelected: (String) -> Unit,
+    onDeviceSelected: (BleDevice) -> Unit,
     onDismissDialog: () -> Unit,
     onRequestScanning: () -> Unit
 ) {
@@ -111,7 +115,7 @@ private fun Dialogs(
             onDismissRequest = onDismissDialog,
             isLoading = dialog.isLoading,
             onRefresh = onRequestScanning,
-            devices = dialog.scannedDevices
+            devices = dialog.scannedDevices,
         )
     }
 }
@@ -129,7 +133,7 @@ private fun RecordScreenPreview() {
             trackingStatus = TrackingStatus(
                 trackHR = true,
                 trackGps = true,
-                hrDevice = "Polar H10"
+                hrDevice = BleDevice("Hrm 1", "00:11:22:33:44:55")
             ),
             recordingState = RecordingState.Recording
         ),
@@ -161,7 +165,13 @@ private fun RecordScreenChooseDeviceDialogPreview() {
             recordingState = RecordingState.Init,
             dialog = RecordScreenDialog.ChooseHRDevice(
                 isLoading = true,
-                scannedDevices = listOf("Device 1", "Device 2", "Device 3"),
+                scannedDevices = listOf(
+                    BleDevice("Hrm1", "00:11:22:33:44:55"),
+                    BleDevice("Hrm2", "66:77:88:99:AA:BB"),
+                    BleDevice("Hrm3", "CC:DD:EE:FF:00:11"),
+                    BleDevice("Hrm4", "22:33:44:55:66:77"),
+                    BleDevice("Hrm5", "88:99:AA:BB:CC:DD"),
+                ),
             )
 
         ),

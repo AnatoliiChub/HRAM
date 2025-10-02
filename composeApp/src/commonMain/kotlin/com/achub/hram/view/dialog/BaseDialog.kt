@@ -7,6 +7,7 @@ import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -28,8 +29,8 @@ fun BaseDialog(
     title: String,
     onDismissRequest: () -> Unit,
     buttonTitle: String = "OK",
-    isButtonEnabled: Boolean = true,
-    onConfirmClick: () -> Unit,
+    isButtonVisible: Boolean = true,
+    onButtonClick: () -> Unit,
     content: @Composable () -> Unit
 ) {
     BasicAlertDialog(
@@ -37,6 +38,7 @@ fun BaseDialog(
     ) {
         val backgroundCardColor = DarkGray
         ElevatedCard(
+            elevation = CardDefaults.cardElevation(16.dp),
             modifier = Modifier.fillMaxWidth().padding(vertical = 48.dp),
             colors = CardColors(
                 contentColor = White,
@@ -56,19 +58,20 @@ fun BaseDialog(
                     textAlign = TextAlign.Center
                 )
                 content()
-                Button(
-                    modifier = Modifier
-                        .padding(16.dp),
-                    onClick = onConfirmClick,
-                    enabled = isButtonEnabled,
-                    colors = ButtonColors(
-                        containerColor = Red,
-                        contentColor = White,
-                        disabledContainerColor = Red.copy(alpha = 0.25f),
-                        disabledContentColor = White.copy(alpha = 0.25f)
-                    )
-                ) {
-                    Text(text = buttonTitle, style = LabelLarge)
+                if (isButtonVisible) {
+                    Button(
+                        modifier = Modifier
+                            .padding(16.dp),
+                        onClick = onButtonClick,
+                        colors = ButtonColors(
+                            containerColor = Red,
+                            contentColor = White,
+                            disabledContainerColor = Red.copy(alpha = 0.25f),
+                            disabledContentColor = White.copy(alpha = 0.25f)
+                        )
+                    ) {
+                        Text(text = buttonTitle, style = LabelLarge)
+                    }
                 }
             }
         }
@@ -82,7 +85,7 @@ private fun BaseDialogPreview() {
         title = "Title",
         buttonTitle = "Confirm",
         onDismissRequest = {},
-        onConfirmClick = {}
+        onButtonClick = {}
     ) {
         Text(
             text = "This is the content of the dialog. It can be multiple lines long.",

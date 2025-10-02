@@ -1,15 +1,17 @@
 [versions]
 agp = "8.13.0"
 android-compileSdk = "36"
-android-minSdk = "24"
+android-minSdk = "31"
 android-targetSdk = "36"
 androidx-activity = "1.11.0"
 androidx-lifecycle = "2.9.4"
-composeMultiplatform = "1.9.0"
+composeMultiplatform = "1.10.0-alpha01"
 kotlin = "2.2.20"
 koin = "4.1.1"
+kable = "0.40.0"
 voyagerVersion = "1.1.0-beta03"
 logger = "2.7.1"
+moko = "0.20.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -22,6 +24,10 @@ voyager-koin = { module = "cafe.adriel.voyager:voyager-koin", version.ref = "voy
 voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyagerVersion" }
 voyager-tab-navigator = { module = "cafe.adriel.voyager:voyager-tab-navigator", version.ref = "voyagerVersion" }
 logger = { module = "io.github.aakira:napier", version.ref = "logger" }
+kable = { module = "com.juul.kable:kable-core", version.ref = "kable" }
+moko-compose = { module = "dev.icerock.moko:permissions-compose", version.ref = "moko" }
+moko-main = { module = "dev.icerock.moko:permissions", version.ref = "moko" }
+moko-ble = { module = "dev.icerock.moko:permissions-bluetooth", version.ref = "moko" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
