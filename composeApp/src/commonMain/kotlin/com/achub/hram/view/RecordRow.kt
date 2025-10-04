@@ -60,5 +60,7 @@ fun RecordRow(
 }
 
 enum class RecordingState {
-    Recording, Paused, Init
+    Recording, Paused, Init;
+
+    fun isRecording() = this == Recording
 }

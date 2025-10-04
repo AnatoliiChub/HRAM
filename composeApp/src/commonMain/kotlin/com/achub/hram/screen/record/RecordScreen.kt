@@ -6,15 +6,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cafe.adriel.voyager.koin.koinScreenModel
-import cafe.adriel.voyager.navigator.tab.Tab
-import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.achub.hram.data.model.BleDevice
 import com.achub.hram.data.model.TrackingIndications
 import com.achub.hram.data.model.TrackingStatus
@@ -24,49 +19,31 @@ import com.achub.hram.view.RecordingState
 import com.achub.hram.view.dialog.ChooseHRDeviceDialog
 import com.achub.hram.view.section.TrackingIndicationsSection
 import com.achub.hram.view.section.TrackingStatusCheckBoxSection
-import hram.composeapp.generated.resources.Res
-import hram.composeapp.generated.resources.ic_record
-import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import kotlin.time.Duration.Companion.seconds
 
-object RecordScreen : Tab {
-    @Composable
-    override fun Content() {
-        val controller = permissionController()
-        val viewModel = koinScreenModel<RecordViewModel>(parameters = { parametersOf(controller) })
-        val state = viewModel.uiState.collectAsStateWithLifecycle().value
-        with(viewModel) {
-            RecordScreenContent(
-                state,
-                onHrCheckBox = ::toggleHRTracking,
-                onLocationCheckBox = ::toggleLocationTracking,
-                onPlay = ::onPlay,
-                onStop = ::onStop,
-                onDismissDialog = {
-                    dismissDialog()
-                    cancelScanning()
-                },
-                onDeviceSelected = ::onDeviceSelected,
-                onRequestScanning = ::requestScanning
-            )
-        }
+@Composable
+fun RecordScreen() {
+    val controller = permissionController()
+    val viewModel = koinViewModel<RecordViewModel>(parameters = { parametersOf(controller) })
+    val state = viewModel.uiState.collectAsStateWithLifecycle().value
+    with(viewModel) {
+        RecordScreenContent(
+            state,
+            onHrCheckBox = ::toggleHRTracking,
+            onLocationCheckBox = ::toggleLocationTracking,
+            onPlay = ::onPlay,
+            onStop = ::onStop,
+            onDismissDialog = {
+                dismissDialog()
+                cancelScanning()
+            },
+            onDeviceSelected = ::onDeviceSelected,
+            onRequestScanning = ::requestScanning
+        )
     }
-
-    override val options: TabOptions
-        @Composable
-        get() {
-            val title = "Recording"
-            val icon = rememberVectorPainter(vectorResource(Res.drawable.ic_record))
-
-            return remember {
-                TabOptions(
-                    index = 1u,
-                    title = title,
-                    icon = icon
-                )
-            }
-        }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -109,13 +86,13 @@ private fun Dialogs(
     onRequestScanning: () -> Unit
 ) {
     if (dialog is RecordScreenDialog.ChooseHRDevice) {
-        dialog
         ChooseHRDeviceDialog(
-            onConfirmClick = onDeviceSelected,
-            onDismissRequest = onDismissDialog,
             isLoading = dialog.isLoading,
-            onRefresh = onRequestScanning,
             devices = dialog.scannedDevices,
+            loadingDuration = dialog.loadingDuration,
+            onConfirmClick = onDeviceSelected,
+            onRefresh = onRequestScanning,
+            onDismissRequest = onDismissDialog,
         )
     }
 }
@@ -172,6 +149,7 @@ private fun RecordScreenChooseDeviceDialogPreview() {
                     BleDevice("Hrm4", "22:33:44:55:66:77"),
                     BleDevice("Hrm5", "88:99:AA:BB:CC:DD"),
                 ),
+                loadingDuration = 5.seconds
             )
 
         ),

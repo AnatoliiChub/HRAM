@@ -1,14 +1,17 @@
 package com.achub.hram
 
 import androidx.compose.runtime.Composable
-import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dev.icerock.moko.permissions.PermissionsController
 import dev.icerock.moko.permissions.compose.BindEffect
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlin.math.round
+import kotlin.time.Duration
 
 /**
  * round numbers to 2 decimal places and format as string
@@ -22,11 +25,11 @@ fun Float.format(): String {
     return "$intPart.$fracPart"
 }
 
-context(screenModel: ScreenModel)
+context(screenModel: ViewModel)
 fun <T> MutableStateFlow<T>.stateInExt(
     initialValue: T
 ) = stateIn(
-    scope = screenModel.screenModelScope,
+    scope = screenModel.viewModelScope,
     started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5_000),
     initialValue = initialValue
 )
@@ -37,4 +40,13 @@ fun permissionController(): PermissionsController {
     val controller =  permissionsFactory.createPermissionsController()
     BindEffect(controller)
     return controller
+}
+
+fun interval(period: Duration, initialDelay: Duration = Duration.ZERO) = flow {
+    delay(initialDelay)
+    while (true) {
+        emit(Unit)
+        delay(period)
+    }
+    1
 }

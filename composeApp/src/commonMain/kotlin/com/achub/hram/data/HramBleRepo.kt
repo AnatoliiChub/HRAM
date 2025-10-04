@@ -10,14 +10,12 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 class HramBleRepo : BleRepo {
-    @OptIn(ExperimentalApi::class, ExperimentalUuidApi::class)
-    val HR_SERVICE_UUID = Uuid.service("heart_rate")
 
-    @OptIn(ExperimentalUuidApi::class, FlowPreview::class)
+    @OptIn(ExperimentalUuidApi::class, FlowPreview::class, ExperimentalApi::class)
     override fun scanHrDevices() = Scanner {
         filters {
             match {
-                services = listOf(HR_SERVICE_UUID) // SensorTag
+                services = listOf(Uuid.service("heart_rate")) // SensorTag
             }
         }
     }.advertisements
