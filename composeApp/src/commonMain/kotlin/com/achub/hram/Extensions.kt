@@ -6,12 +6,9 @@ import androidx.lifecycle.viewModelScope
 import dev.icerock.moko.permissions.PermissionsController
 import dev.icerock.moko.permissions.compose.BindEffect
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlin.math.round
-import kotlin.time.Duration
 
 /**
  * round numbers to 2 decimal places and format as string
@@ -40,13 +37,4 @@ fun permissionController(): PermissionsController {
     val controller =  permissionsFactory.createPermissionsController()
     BindEffect(controller)
     return controller
-}
-
-fun interval(period: Duration, initialDelay: Duration = Duration.ZERO) = flow {
-    delay(initialDelay)
-    while (true) {
-        emit(Unit)
-        delay(period)
-    }
-    1
 }

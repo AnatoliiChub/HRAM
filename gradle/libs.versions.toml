@@ -9,7 +9,6 @@ composeMultiplatform = "1.10.0-alpha01"
 kotlin = "2.2.20"
 koin = "4.1.1"
 kable = "0.40.0"
-voyagerVersion = "1.1.0-beta03"
 logger = "2.7.1"
 moko = "0.20.1"
 
