@@ -1,8 +1,8 @@
 package com.achub.hram.view.dialog
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandIn
-import androidx.compose.animation.shrinkOut
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.achub.hram.data.model.BleDevice
+import com.achub.hram.smoothOut
 import com.achub.hram.style.DarkGray
 import com.achub.hram.view.DeviceListItem
 import com.achub.hram.view.HRProgress
@@ -43,17 +44,18 @@ fun ChooseHRDeviceDialog(
     onDismissRequest: () -> Unit,
 ) {
     var selected by rememberSaveable { mutableStateOf<BleDevice?>(null) }
-    val retryState = selected == null
+    val retryState = !isLoading && selected == null
     val title = if (isLoading) "Scanning for HR-devices" else "Please, choose a heart rate device to Pair:"
     val backgroundCardColor = DarkGray
     BasicAlertDialog(
         onDismissRequest = onDismissRequest
     ) {
-        val onClick: () -> Unit = {
+        val btnText = if (retryState) "Retry" else "Confirm"
+        val onBtnClick: () -> Unit = {
             when {
                 isLoading -> {}
+                selected != null -> selected?.let { onConfirmClick(it) }
                 retryState -> onRefresh()
-                else -> selected?.let { onConfirmClick(it) }
             }
         }
         DialogElevatedCard(backgroundCardColor) {
@@ -61,19 +63,18 @@ fun ChooseHRDeviceDialog(
                 modifier = Modifier.padding(24.dp),
                 horizontalAlignment = CenterHorizontally
             ) {
-                DialogTitle(title)
-                Spacer(Modifier.height(24.dp))
-                AnimatedVisibility(isLoading) {
-                    HRProgress(isLoading, cycleDuration = loadingDuration)
-                }
-                Spacer(Modifier.height(24.dp))
-                DeviceList(devices, selected, isLoading) {
+                DialogTitle(modifier = Modifier.animateContentSize(), title = title)
+                Spacer(Modifier.height(12.dp))
+                HRProgress(isLoading, cycleDuration = loadingDuration)
+                Spacer(Modifier.height(12.dp))
+                DeviceList(devices, selected) {
                     selected = if (selected == it) null else it
                 }
                 Spacer(Modifier.height(24.dp))
-                AnimatedVisibility(!isLoading, enter = expandIn(), exit = shrinkOut()) {
-                    DialogButton(text = if (retryState) "Retry" else "Connect", onClick = onClick)
-                }
+                AnimatedVisibility(
+                    visible = !isLoading || selected != null,
+                    enter = scaleIn(), exit = smoothOut()
+                ) { DialogButton(text = btnText, onClick = onBtnClick) }
             }
         }
     }
@@ -83,14 +84,12 @@ fun ChooseHRDeviceDialog(
 private fun DeviceList(
     devices: List<BleDevice>,
     selected: BleDevice?,
-    isLoading: Boolean,
     onClick: ((BleDevice) -> Unit) = {},
 ) {
     LazyColumn(Modifier.fillMaxWidth()) {
         items(items = devices, key = { it.identifier }) { device ->
             val isSelected = selected?.identifier == device.identifier
             DeviceListItem(modifier = Modifier.animateItem(), isSelected = isSelected, device = device) {
-                if (isLoading) return@DeviceListItem
                 onClick(it)
             }
         }

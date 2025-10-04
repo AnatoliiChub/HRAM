@@ -2,6 +2,8 @@ package com.achub.hram.view
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -12,7 +14,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color.Companion.Transparent
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.achub.hram.style.Red
 import kotlin.time.Duration
@@ -25,9 +30,9 @@ private const val MAX_PROGRESS = 1.1f
 fun HRProgress(isLoading: Boolean, cycleDuration: Duration) {
     val progress = remember { Animatable(MAX_PROGRESS) }
 
-    val reset = derivedStateOf { progress.value == MAX_PROGRESS }
-    LaunchedEffect(reset.value) {
-        if (reset.value) progress.snapTo(MIN_PROGRESS)
+    val reset = derivedStateOf { progress.value >= MAX_PROGRESS }
+    LaunchedEffect(reset.value, isLoading) {
+        if (reset.value || isLoading) progress.snapTo(MIN_PROGRESS)
         if (isLoading) {
             progress.animateTo(
                 targetValue = MAX_PROGRESS,
@@ -36,14 +41,33 @@ fun HRProgress(isLoading: Boolean, cycleDuration: Duration) {
         }
     }
 
+    val isVisible = progress.value > MIN_PROGRESS && progress.value < MAX_PROGRESS - 0.05f
+
+    val heightInDp = animateDpAsState(
+        targetValue = if (isLoading) 48.dp else 0.dp,
+        animationSpec = tween(
+            durationMillis = 300,
+        )
+    )
+    val alpha = animateFloatAsState(
+        targetValue = if (isVisible) 1f else 0f,
+        animationSpec = tween(
+            durationMillis = 300,
+        )
+    )
     LinearWavyProgressIndicator(
-        modifier = Modifier.height(48.dp).fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().height(heightInDp.value).alpha(alpha.value),
         trackColor = Transparent,
         color = Red,
         gapSize = 8.dp,
         stopSize = 0.dp,
-        wavelength = 34.dp,
+        wavelength = 24.dp,
         waveSpeed = 2.dp,
-        progress = { progress.value }
+        progress = { progress.value },
     )
+}
+
+@Composable
+fun Dp.toPx(): Float {
+    return with(LocalDensity.current) { this@toPx.toPx() }
 }
