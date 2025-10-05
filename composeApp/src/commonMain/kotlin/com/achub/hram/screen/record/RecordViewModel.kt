@@ -15,7 +15,6 @@ import com.juul.kable.Advertisement
 import com.juul.kable.ExperimentalApi
 import dev.icerock.moko.permissions.Permission
 import dev.icerock.moko.permissions.PermissionsController
-import dev.icerock.moko.permissions.RequestCanceledException
 import dev.icerock.moko.permissions.bluetooth.BLUETOOTH_CONNECT
 import dev.icerock.moko.permissions.bluetooth.BLUETOOTH_SCAN
 import io.github.aakira.napier.Napier
@@ -184,10 +183,7 @@ class RecordViewModel(
             permissionController.providePermission(Permission.BLUETOOTH_SCAN)
             permissionController.providePermission(Permission.BLUETOOTH_CONNECT)
             action()
-        } catch (e: RequestCanceledException) {
-            Napier.d { "BlePermission request was canceled" }
         } catch (e: Exception) {
-            Napier.e { "exception : $e" }
             onFailure()
         }
     }
