@@ -12,6 +12,7 @@ data class RecordScreenState(
     val indications: TrackingIndications = TrackingIndications(),
     val trackingStatus: TrackingStatus = TrackingStatus(),
     val recordingState: RecordingState = RecordingState.Init,
+    val requestBluetooth: Boolean = false,
     val dialog: RecordScreenDialog? = null,
 )
 
@@ -24,6 +25,8 @@ sealed class RecordScreenDialog {
     ) : RecordScreenDialog()
 
     data class DeviceConnectedDialog(val name: String, val manufacturer: String) : RecordScreenDialog()
+
+    data object OpenSettingsDialog: RecordScreenDialog()
 }
 
 
@@ -32,4 +35,3 @@ fun MutableStateFlow<RecordScreenState>.updateHrDeviceDialogIfExists(
 ) = (value.dialog as? RecordScreenDialog.ChooseHRDevice)?.let {
     update { state -> state.copy(dialog = updatedDialog(it)) }
 }
-

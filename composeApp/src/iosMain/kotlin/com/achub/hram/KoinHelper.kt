@@ -1,11 +1,6 @@
 package com.achub.hram
 
-import com.achub.hram.di.dataModule
-import com.achub.hram.di.viewModelModule
-import org.koin.core.context.startKoin
+import com.achub.hram.di.initKoin
 
-fun init(){
-    startKoin {
-        modules(viewModelModule, dataModule)
-    }
-}
+fun init() =initKoin()
+

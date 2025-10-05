@@ -1,5 +1,6 @@
 package com.achub.hram
 
+import androidx.compose.runtime.Composable
 import com.juul.kable.ExperimentalApi
 import com.juul.kable.Peripheral
 import com.juul.kable.characteristic
@@ -59,3 +60,7 @@ suspend fun Peripheral.read(service: String, char: String): ByteArray {
         )
     )
 }
+
+@Suppress("ComposableNaming")
+@Composable
+expect fun requestBluetooth()

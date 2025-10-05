@@ -23,7 +23,9 @@ import com.achub.hram.view.dialog.base.DialogTitle
 fun InfoDialog(
     title: String,
     message: String,
-    onDismiss: () -> Unit
+    buttonText: String = "Ok",
+    onDismiss: () -> Unit,
+    onButonClick: () -> Unit = { onDismiss() }
 ) {
     BasicAlertDialog(
         onDismissRequest = onDismiss
@@ -42,7 +44,7 @@ fun InfoDialog(
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
                 )
                 Spacer(Modifier.height(12.dp))
-                DialogButton(text = "Ok", onClick = onDismiss)
+                DialogButton(text = buttonText, onClick = onButonClick)
             }
         }
     }

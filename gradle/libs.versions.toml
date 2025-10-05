@@ -11,6 +11,8 @@ koin = "4.1.1"
 kable = "0.40.0"
 logger = "2.7.1"
 moko = "0.20.1"
+ksp = "2.2.20-2.0.3"
+koin-annotations = "2.1.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -24,10 +26,15 @@ kable = { module = "com.juul.kable:kable-core", version.ref = "kable" }
 moko-compose = { module = "dev.icerock.moko:permissions-compose", version.ref = "moko" }
 moko-main = { module = "dev.icerock.moko:permissions", version.ref = "moko" }
 moko-ble = { module = "dev.icerock.moko:permissions-bluetooth", version.ref = "moko" }
+koin-annotations = {module = "io.insert-koin:koin-annotations", version.ref = "koin-annotations"}
+koin-ksp-compiler = {module = "io.insert-koin:koin-ksp-compiler", version.ref = "koin-annotations"}
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
-composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
-composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlinComposeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlinxSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

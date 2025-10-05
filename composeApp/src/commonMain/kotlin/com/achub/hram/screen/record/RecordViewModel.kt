@@ -15,6 +15,7 @@ import com.juul.kable.Advertisement
 import com.juul.kable.ExperimentalApi
 import dev.icerock.moko.permissions.Permission
 import dev.icerock.moko.permissions.PermissionsController
+import dev.icerock.moko.permissions.RequestCanceledException
 import dev.icerock.moko.permissions.bluetooth.BLUETOOTH_CONNECT
 import dev.icerock.moko.permissions.bluetooth.BLUETOOTH_SCAN
 import io.github.aakira.napier.Napier
@@ -34,16 +35,19 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.koin.android.annotation.KoinViewModel
+import org.koin.core.annotation.InjectedParam
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 import kotlin.uuid.ExperimentalUuidApi
 
 private const val SCAN_DURATION = 5_000L
 
+@KoinViewModel
 class RecordViewModel(
     val bleConnectionRepo: BleConnectionRepo,
     val bleHrDataRepo: BleHrDataRepo,
-    val permissionController: PermissionsController
+    @InjectedParam val permissionController: PermissionsController
 ) :
     ViewModel() {
 
@@ -54,6 +58,10 @@ class RecordViewModel(
     val advertisements: MutableList<Advertisement> = mutableListOf()
     fun onPlay() = _uiState.update {
         it.copy(recordingState = if (it.recordingState.isRecording()) Paused else Recording)
+    }
+
+    init {
+        bleConnectionRepo.init()
     }
 
     fun onStop() = _uiState.update { it.copy(recordingState = RecordingState.Init) }
@@ -72,7 +80,7 @@ class RecordViewModel(
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class, ExperimentalApi::class,ExperimentalUuidApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class, ExperimentalApi::class, ExperimentalUuidApi::class)
     fun onDeviceSelected(device: BleDevice) {
         cancelScanning()
         cancelConnection()
@@ -111,21 +119,20 @@ class RecordViewModel(
     }
 
     fun requestScanning() {
-        if (false) {
-            //TODO Check if Bluetooth is enabled, if not - request to enable it
-        } else {
-            viewModelScope.launch {
-                try {
-                    permissionController.providePermission(Permission.BLUETOOTH_SCAN)
-                    permissionController.providePermission(Permission.BLUETOOTH_CONNECT)
-                    scan()
-                } catch (e: Exception) {
-                    //TODO HANDLE DeniedAlwaysException
-                    Napier.d { "Permission not granted: $e" }
-                }
+        viewModelScope.launch {
+            if (bleConnectionRepo.isBluetoothOn.value.not()) {
+                requestBlePermissionBeforeAction(
+                    action = { _uiState.update { it.copy(requestBluetooth = true) } },
+                    onFailure = { _uiState.update { it.copy(dialog = RecordScreenDialog.OpenSettingsDialog) } })
+            } else {
+                requestBlePermissionBeforeAction(
+                    action = ::scan,
+                    onFailure = { _uiState.update { it.copy(dialog = RecordScreenDialog.OpenSettingsDialog) } })
             }
         }
     }
+
+    fun openSettings() = permissionController.openAppSettings()
 
     @OptIn(FlowPreview::class, ExperimentalUuidApi::class)
     private fun scan() {
@@ -165,5 +172,23 @@ class RecordViewModel(
         super.onCleared()
         cancelScanning()
         cancelConnection()
+        bleConnectionRepo.release()
+    }
+
+    fun clearRequestBluetooth() {
+        _uiState.update { it.copy(requestBluetooth = false) }
+    }
+
+    suspend fun requestBlePermissionBeforeAction(action: () -> Unit, onFailure: () -> Unit) {
+        try {
+            permissionController.providePermission(Permission.BLUETOOTH_SCAN)
+            permissionController.providePermission(Permission.BLUETOOTH_CONNECT)
+            action()
+        } catch (e: RequestCanceledException) {
+            Napier.d { "BlePermission request was canceled" }
+        } catch (e: Exception) {
+            Napier.e { "exception : $e" }
+            onFailure()
+        }
     }
 }

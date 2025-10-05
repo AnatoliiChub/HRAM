@@ -15,6 +15,7 @@ import com.achub.hram.data.model.BleDevice
 import com.achub.hram.data.model.TrackingIndications
 import com.achub.hram.data.model.TrackingStatus
 import com.achub.hram.permissionController
+import com.achub.hram.requestBluetooth
 import com.achub.hram.view.RecordRow
 import com.achub.hram.view.RecordingState
 import com.achub.hram.view.dialog.ChooseHRDeviceDialog
@@ -32,6 +33,10 @@ fun RecordScreen() {
     val viewModel = koinViewModel<RecordViewModel>(parameters = { parametersOf(controller) })
     val state = viewModel.uiState.collectAsStateWithLifecycle().value
     with(viewModel) {
+        if (state.requestBluetooth) {
+            requestBluetooth()
+            clearRequestBluetooth()
+        }
         RecordScreenContent(
             state,
             onHrCheckBox = ::toggleHRTracking,
@@ -41,7 +46,8 @@ fun RecordScreen() {
             onDismissDialog = ::dismissDialog,
             onCancelScanning = ::cancelScanning,
             onDeviceSelected = ::onDeviceSelected,
-            onRequestScanning = ::requestScanning
+            onRequestScanning = ::requestScanning,
+            openSettings = ::openSettings
         )
     }
 }
@@ -57,7 +63,8 @@ private fun RecordScreenContent(
     onCancelScanning: () -> Unit,
     onDismissDialog: () -> Unit,
     onDeviceSelected: (BleDevice) -> Unit,
-    onRequestScanning: () -> Unit
+    onRequestScanning: () -> Unit,
+    openSettings: () -> Unit
 ) {
     val isCheckBoxEnabled = state.recordingState == RecordingState.Init
     val indications = state.indications
@@ -99,6 +106,17 @@ private fun RecordScreenContent(
             onDismiss = onDismissDialog
         )
 
+        is RecordScreenDialog.OpenSettingsDialog -> InfoDialog(
+            title = "Provide permission please",
+            message = "It looks like you denied ble permission explicitly. Please provide ble permission for the app in the settings.",
+            buttonText = "Open Settings",
+            onDismiss = onDismissDialog,
+            onButonClick = {
+                openSettings()
+                onDismissDialog
+            }
+        )
+
         else -> {}
     }
 }
@@ -129,6 +147,7 @@ private fun RecordScreenPreview() {
         onDeviceSelected = {},
         onRequestScanning = {},
         onCancelScanning = {},
+        openSettings = {}
     )
 }
 
@@ -169,5 +188,6 @@ private fun RecordScreenChooseDeviceDialogPreview() {
         onDeviceSelected = {},
         onRequestScanning = {},
         onCancelScanning = {},
+        openSettings = {}
     )
 }

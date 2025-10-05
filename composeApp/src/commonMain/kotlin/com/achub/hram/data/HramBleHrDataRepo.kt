@@ -11,8 +11,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import org.koin.core.annotation.Single
 import kotlin.uuid.ExperimentalUuidApi
 
+@Single
 class HramBleHrDataRepo: BleHrDataRepo {
     @OptIn(ExperimentalUuidApi::class)
     override fun observeHeartRate(peripheral: Peripheral): Flow<Int> = flow {
