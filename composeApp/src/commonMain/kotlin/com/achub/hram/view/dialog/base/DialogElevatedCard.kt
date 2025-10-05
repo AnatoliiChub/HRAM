@@ -10,10 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.achub.hram.style.DarkGray
 import com.achub.hram.style.White
 
 @Composable
-fun DialogElevatedCard(backgroundCardColor: Color, content: @Composable (ColumnScope) -> Unit) {
+fun DialogElevatedCard(backgroundCardColor: Color =  DarkGray, content: @Composable (ColumnScope) -> Unit) {
     ElevatedCard(
         elevation = CardDefaults.cardElevation(16.dp),
         modifier = Modifier.fillMaxWidth().padding(vertical = 48.dp),

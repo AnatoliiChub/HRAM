@@ -2,18 +2,24 @@ package com.achub.hram.screen.record
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.achub.hram.data.BleRepo
+import com.achub.hram.data.BleConnectionRepo
+import com.achub.hram.data.BleHrDataRepo
 import com.achub.hram.data.model.BleDevice
+import com.achub.hram.launchIn
+import com.achub.hram.readManufacturerName
 import com.achub.hram.stateInExt
 import com.achub.hram.view.RecordingState
 import com.achub.hram.view.RecordingState.Paused
 import com.achub.hram.view.RecordingState.Recording
+import com.juul.kable.Advertisement
+import com.juul.kable.ExperimentalApi
 import dev.icerock.moko.permissions.Permission
 import dev.icerock.moko.permissions.PermissionsController
 import dev.icerock.moko.permissions.bluetooth.BLUETOOTH_CONNECT
 import dev.icerock.moko.permissions.bluetooth.BLUETOOTH_SCAN
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.Job
@@ -21,8 +27,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -32,12 +39,18 @@ import kotlin.time.toDuration
 
 private const val SCAN_DURATION = 5_000L
 
-class RecordViewModel(val bleRepo: BleRepo, val permissionController: PermissionsController) : ViewModel() {
+class RecordViewModel(
+    val bleConnectionRepo: BleConnectionRepo,
+    val bleHrDataRepo: BleHrDataRepo,
+    val permissionController: PermissionsController
+) :
+    ViewModel() {
 
     var scanJob: Job? = null
+    var listenJob: Job? = null
     private val _uiState = MutableStateFlow(RecordScreenState())
     val uiState = _uiState.stateInExt(initialValue = RecordScreenState())
-
+    val advertisements: MutableList<Advertisement> = mutableListOf()
     fun onPlay() = _uiState.update {
         it.copy(recordingState = if (it.recordingState.isRecording()) Paused else Recording)
     }
@@ -48,26 +61,52 @@ class RecordViewModel(val bleRepo: BleRepo, val permissionController: Permission
         if (trackHR.not()) {
             requestScanning()
         } else {
-            _uiState.update {
-                it.copy(trackingStatus = it.trackingStatus.copy(trackHR = trackHR.not(), hrDevice = null))
+            viewModelScope.launch(Dispatchers.Default) {
+                bleConnectionRepo.disconnect()
+                _uiState.update {
+                    it.copy(trackingStatus = it.trackingStatus.copy(trackHR = trackHR.not(), hrDevice = null))
+                }
             }
+
         }
     }
 
-    fun onDeviceSelected(deviceId: BleDevice) {
+    @OptIn(ExperimentalCoroutinesApi::class, ExperimentalApi::class)
+    fun onDeviceSelected(device: BleDevice) {
         cancelScanning()
-        //TODO IMPLEMENT CONNECTING TO DEVICE before set the value
-        _uiState.update {
-            it.copy(
-                trackingStatus = it.trackingStatus.copy(trackHR = true, hrDevice = deviceId),
-                dialog = null
-            )
+        cancelConnection()
+        advertisements.firstOrNull { it.identifier.toString() == device.identifier }?.let { advertisement ->
+            _uiState.updateHrDeviceDialogIfExists { it.copy(isDeviceConfirmed = true, isLoading = true) }
+            listenJob = bleConnectionRepo.connectToDevice(advertisement)
+                .onEach { peripheral ->
+                    val manufacturer = peripheral.readManufacturerName()
+                    _uiState.update {
+                        it.copy(
+                            trackingStatus = it.trackingStatus.copy(trackHR = true, hrDevice = device),
+                            dialog = RecordScreenDialog.DeviceConnectedDialog(
+                                name = peripheral.name ?: peripheral.identifier.toString(),
+                                manufacturer = manufacturer
+                            )
+                        )
+                    }
+                }
+                .flatMapLatest { device -> bleHrDataRepo.observeHeartRate(device) }
+                .onEach { heartRate -> _uiState.update { it.copy(indications = it.indications.copy(heartRate = heartRate)) } }
+                .catch { Napier.e { "Error: $it" } }
+                .launchIn(viewModelScope, Dispatchers.Default)
+            //TODO IMPLEMENT CONNECTING TO DEVICE before set the value
+
         }
     }
 
     fun cancelScanning() {
         scanJob?.cancel()
         scanJob = null
+    }
+
+    fun cancelConnection() {
+        listenJob?.cancel()
+        listenJob = null
     }
 
     fun requestScanning() {
@@ -89,26 +128,28 @@ class RecordViewModel(val bleRepo: BleRepo, val permissionController: Permission
 
     @OptIn(FlowPreview::class)
     private fun scan() {
-        cancelScanning()
-        val scannedDevices = mutableListOf<BleDevice>()
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
+            cancelScanning()
+            val scannedDevices = mutableSetOf<BleDevice>()
             _uiState.value = _uiState.value.copy(
                 dialog = RecordScreenDialog.ChooseHRDevice(
                     isLoading = true,
                     loadingDuration = SCAN_DURATION.toDuration(DurationUnit.MILLISECONDS)
                 )
             )
-            scanJob = bleRepo.scanHrDevices()
+            scanJob = bleConnectionRepo.scanHrDevices()
+                .onEach { advertisements.add(it) }
+                .map {
+                    BleDevice(name = it.peripheralName ?: "", identifier = it.identifier.toString())
+                }
                 .flowOn(Dispatchers.IO)
                 .distinctUntilChanged()
-                .onCompletion { _uiState.updateHrDeviceIfExists { it.copy(isLoading = false) } }
+                .onCompletion { _uiState.updateHrDeviceDialogIfExists { it.copy(isLoading = it.isDeviceConfirmed) } }
                 .onEach { device ->
-                    if (scannedDevices.contains(device).not()) {
-                        scannedDevices.add(device)
-                        _uiState.updateHrDeviceIfExists { it.copy(scannedDevices = scannedDevices) }
-                    }
+                    scannedDevices.add(device)
+                    _uiState.updateHrDeviceDialogIfExists { it.copy(scannedDevices = scannedDevices.toList()) }
                 }.catch { Napier.d { "Error: $it" } }
-                .launchIn(viewModelScope)
+                .launchIn(scope = viewModelScope, context = Dispatchers.Default)
             delay(SCAN_DURATION)
             cancelScanning()
         }
@@ -118,4 +159,10 @@ class RecordViewModel(val bleRepo: BleRepo, val permissionController: Permission
         _uiState.update { it.copy(trackingStatus = it.trackingStatus.copy(trackGps = it.trackingStatus.trackGps.not())) }
 
     fun dismissDialog() = _uiState.update { it.copy(dialog = null) }
+
+    override fun onCleared() {
+        super.onCleared()
+        cancelScanning()
+        cancelConnection()
+    }
 }

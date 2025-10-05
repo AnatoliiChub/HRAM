@@ -11,8 +11,13 @@ import androidx.lifecycle.viewModelScope
 import dev.icerock.moko.permissions.PermissionsController
 import dev.icerock.moko.permissions.compose.BindEffect
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 import kotlin.math.round
 
 /**
@@ -39,9 +44,17 @@ fun <T> MutableStateFlow<T>.stateInExt(
 @Composable
 fun permissionController(): PermissionsController {
     val permissionsFactory = rememberPermissionsControllerFactory()
-    val controller =  permissionsFactory.createPermissionsController()
+    val controller = permissionsFactory.createPermissionsController()
     BindEffect(controller)
     return controller
 }
 
 fun smoothOut(): ExitTransition = shrinkOut(tween(300, easing = LinearEasing)) + fadeOut()
+
+expect fun currentThread(): String
+
+fun  <T> Flow<T>.launchIn(
+    scope: CoroutineScope,
+    context: CoroutineContext
+) = scope.launch(context) { collect() }
+

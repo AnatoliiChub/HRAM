@@ -12,18 +12,22 @@ data class RecordScreenState(
     val indications: TrackingIndications = TrackingIndications(),
     val trackingStatus: TrackingStatus = TrackingStatus(),
     val recordingState: RecordingState = RecordingState.Init,
-    val dialog: RecordScreenDialog? = null
+    val dialog: RecordScreenDialog? = null,
 )
 
 sealed class RecordScreenDialog {
     data class ChooseHRDevice(
         val isLoading: Boolean = false,
         val scannedDevices: List<BleDevice> = emptyList(),
-        val loadingDuration: Duration
+        val loadingDuration: Duration,
+        val isDeviceConfirmed: Boolean = false
     ) : RecordScreenDialog()
+
+    data class DeviceConnectedDialog(val name: String, val manufacturer: String) : RecordScreenDialog()
 }
 
-fun MutableStateFlow<RecordScreenState>.updateHrDeviceIfExists(
+
+fun MutableStateFlow<RecordScreenState>.updateHrDeviceDialogIfExists(
     updatedDialog: (RecordScreenDialog.ChooseHRDevice) -> RecordScreenDialog.ChooseHRDevice
 ) = (value.dialog as? RecordScreenDialog.ChooseHRDevice)?.let {
     update { state -> state.copy(dialog = updatedDialog(it)) }

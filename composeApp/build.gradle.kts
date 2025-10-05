@@ -15,6 +15,8 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
+
+    val sharedName = "ComposeApp"
     
     listOf(
         iosX64(),
@@ -22,8 +24,7 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "ComposeApp"
-            isStatic = true
+            baseName = sharedName
         }
     }
     

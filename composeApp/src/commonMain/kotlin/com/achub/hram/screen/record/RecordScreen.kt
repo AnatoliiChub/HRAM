@@ -1,5 +1,6 @@
 package com.achub.hram.screen.record
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,6 +18,7 @@ import com.achub.hram.permissionController
 import com.achub.hram.view.RecordRow
 import com.achub.hram.view.RecordingState
 import com.achub.hram.view.dialog.ChooseHRDeviceDialog
+import com.achub.hram.view.dialog.InfoDialog
 import com.achub.hram.view.section.TrackingIndicationsSection
 import com.achub.hram.view.section.TrackingStatusCheckBoxSection
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -36,10 +38,8 @@ fun RecordScreen() {
             onLocationCheckBox = ::toggleLocationTracking,
             onPlay = ::onPlay,
             onStop = ::onStop,
-            onDismissDialog = {
-                dismissDialog()
-                cancelScanning()
-            },
+            onDismissDialog = ::dismissDialog,
+            onCancelScanning = ::cancelScanning,
             onDeviceSelected = ::onDeviceSelected,
             onRequestScanning = ::requestScanning
         )
@@ -54,6 +54,7 @@ private fun RecordScreenContent(
     onLocationCheckBox: () -> Unit,
     onPlay: () -> Unit,
     onStop: () -> Unit,
+    onCancelScanning: () -> Unit,
     onDismissDialog: () -> Unit,
     onDeviceSelected: (BleDevice) -> Unit,
     onRequestScanning: () -> Unit
@@ -61,41 +62,47 @@ private fun RecordScreenContent(
     val isCheckBoxEnabled = state.recordingState == RecordingState.Init
     val indications = state.indications
     val trackingStatus = state.trackingStatus
-    Column(
-        modifier = Modifier.fillMaxSize().padding(top = 32.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
-        horizontalAlignment = CenterHorizontally
-    ) {
-        TrackingIndicationsSection(indications)
-        Spacer(Modifier.weight(1f))
-        TrackingStatusCheckBoxSection(trackingStatus, isCheckBoxEnabled, onHrCheckBox, onLocationCheckBox)
-        RecordRow(
-            recordingState = state.recordingState,
-            isRecordingAvailable = trackingStatus.atLeastOneTrackingEnabled,
-            onPlay = onPlay,
-            onStop = onStop
-        )
+    Box(Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(top = 32.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
+            horizontalAlignment = CenterHorizontally
+        ) {
+            TrackingIndicationsSection(indications)
+            Spacer(Modifier.weight(1f))
+            TrackingStatusCheckBoxSection(trackingStatus, isCheckBoxEnabled, onHrCheckBox, onLocationCheckBox)
+            RecordRow(
+                recordingState = state.recordingState,
+                isRecordingAvailable = trackingStatus.atLeastOneTrackingEnabled,
+                onPlay = onPlay,
+                onStop = onStop
+            )
+        }
     }
-    Dialogs(state.dialog, onDeviceSelected, onDismissDialog, onRequestScanning)
-}
-
-@Composable
-private fun Dialogs(
-    dialog: RecordScreenDialog?,
-    onDeviceSelected: (BleDevice) -> Unit,
-    onDismissDialog: () -> Unit,
-    onRequestScanning: () -> Unit
-) {
-    if (dialog is RecordScreenDialog.ChooseHRDevice) {
-        ChooseHRDeviceDialog(
+    val dialog = state.dialog
+    when (dialog) {
+        is RecordScreenDialog.ChooseHRDevice -> ChooseHRDeviceDialog(
             isLoading = dialog.isLoading,
             devices = dialog.scannedDevices,
+            isDeviceConfirmed = dialog.isDeviceConfirmed,
             loadingDuration = dialog.loadingDuration,
             onConfirmClick = onDeviceSelected,
             onRefresh = onRequestScanning,
-            onDismissRequest = onDismissDialog,
+            onDismissRequest = {
+                onDismissDialog()
+                onCancelScanning()
+            },
         )
+
+        is RecordScreenDialog.DeviceConnectedDialog -> InfoDialog(
+            title = "Device connected",
+            message = "${dialog.name} from ${dialog.manufacturer} successfully connected",
+            onDismiss = onDismissDialog
+        )
+
+        else -> {}
     }
 }
+
 
 @Composable
 @Preview
@@ -120,7 +127,8 @@ private fun RecordScreenPreview() {
         onStop = {},
         onDismissDialog = {},
         onDeviceSelected = {},
-        onRequestScanning = {}
+        onRequestScanning = {},
+        onCancelScanning = {},
     )
 }
 
@@ -159,6 +167,7 @@ private fun RecordScreenChooseDeviceDialogPreview() {
         onStop = {},
         onDismissDialog = {},
         onDeviceSelected = {},
-        onRequestScanning = {}
+        onRequestScanning = {},
+        onCancelScanning = {},
     )
 }

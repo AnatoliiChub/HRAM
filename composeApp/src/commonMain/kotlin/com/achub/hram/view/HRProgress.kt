@@ -27,7 +27,7 @@ private const val MAX_PROGRESS = 1.1f
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun HRProgress(isLoading: Boolean, cycleDuration: Duration) {
+fun HRProgress(isLoading: Boolean, cycleDuration: Duration, height: Dp = 48.dp) {
     val progress = remember { Animatable(MAX_PROGRESS) }
 
     val reset = derivedStateOf { progress.value >= MAX_PROGRESS }
@@ -44,7 +44,7 @@ fun HRProgress(isLoading: Boolean, cycleDuration: Duration) {
     val isVisible = progress.value > MIN_PROGRESS && progress.value < MAX_PROGRESS - 0.05f
 
     val heightInDp = animateDpAsState(
-        targetValue = if (isLoading) 48.dp else 0.dp,
+        targetValue = if (isLoading) height else 0.dp,
         animationSpec = tween(
             durationMillis = 300,
         )
