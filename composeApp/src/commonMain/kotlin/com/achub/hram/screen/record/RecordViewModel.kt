@@ -5,14 +5,15 @@ import androidx.lifecycle.viewModelScope
 import com.achub.hram.data.BleConnectionRepo
 import com.achub.hram.data.BleHrDataRepo
 import com.achub.hram.data.model.BleDevice
+import com.achub.hram.data.model.HrNotifications
 import com.achub.hram.launchIn
-import com.achub.hram.readManufacturerName
 import com.achub.hram.stateInExt
 import com.achub.hram.view.RecordingState
 import com.achub.hram.view.RecordingState.Paused
 import com.achub.hram.view.RecordingState.Recording
 import com.juul.kable.Advertisement
 import com.juul.kable.ExperimentalApi
+import com.juul.kable.State
 import dev.icerock.moko.permissions.Permission
 import dev.icerock.moko.permissions.PermissionsController
 import dev.icerock.moko.permissions.bluetooth.BLUETOOTH_CONNECT
@@ -26,6 +27,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
@@ -36,7 +38,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.InjectedParam
+import kotlin.time.Clock.System.now
 import kotlin.time.DurationUnit
+import kotlin.time.ExperimentalTime
 import kotlin.time.toDuration
 import kotlin.uuid.ExperimentalUuidApi
 
@@ -79,7 +83,10 @@ class RecordViewModel(
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class, ExperimentalApi::class, ExperimentalUuidApi::class)
+    @OptIn(
+        ExperimentalCoroutinesApi::class, ExperimentalApi::class, ExperimentalUuidApi::class,
+        ExperimentalTime::class
+    )
     fun onDeviceSelected(device: BleDevice) {
         cancelScanning()
         cancelConnection()
@@ -87,7 +94,7 @@ class RecordViewModel(
             _uiState.updateHrDeviceDialogIfExists { it.copy(isDeviceConfirmed = true, isLoading = true) }
             listenJob = bleConnectionRepo.connectToDevice(advertisement)
                 .onEach { peripheral ->
-                    val manufacturer = peripheral.readManufacturerName()
+                    val manufacturer = bleHrDataRepo.readManufacturerName(peripheral)
                     _uiState.update {
                         it.copy(
                             trackingStatus = it.trackingStatus.copy(trackHR = true, hrDevice = device),
@@ -98,8 +105,20 @@ class RecordViewModel(
                         )
                     }
                 }
-                .flatMapLatest { device -> bleHrDataRepo.observeHeartRate(device) }
-                .onEach { heartRate -> _uiState.update { it.copy(indications = it.indications.copy(heartRate = heartRate)) } }
+                .flatMapLatest { device ->
+                    combine(
+                        bleHrDataRepo.observeHeartRate(device),
+                        bleHrDataRepo.observeBatteryLevel(device),
+                        device.state
+                    ) { hrRate, battery, state ->
+                        if (state !is State.Connected) {
+                            HrNotifications.Empty
+                        } else {
+                            HrNotifications(hrRate, battery, now().toEpochMilliseconds())
+                        }
+                    }
+                }
+                .onEach { indications -> _uiState.update { it.copy(indications = it.indications.copy(indications)) } }
                 .catch { Napier.e { "Error: $it" } }
                 .launchIn(viewModelScope, Dispatchers.Default)
             //TODO IMPLEMENT CONNECTING TO DEVICE before set the value

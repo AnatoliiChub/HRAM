@@ -1,7 +1,7 @@
 package com.achub.hram.screen.record
 
 import com.achub.hram.data.model.BleDevice
-import com.achub.hram.data.model.TrackingIndications
+import com.achub.hram.data.model.IndicationSection
 import com.achub.hram.data.model.TrackingStatus
 import com.achub.hram.view.RecordingState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.update
 import kotlin.time.Duration
 
 data class RecordScreenState(
-    val indications: TrackingIndications = TrackingIndications(),
+    val indications: IndicationSection = IndicationSection(),
     val trackingStatus: TrackingStatus = TrackingStatus(),
     val recordingState: RecordingState = RecordingState.Init,
     val requestBluetooth: Boolean = false,

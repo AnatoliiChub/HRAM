@@ -9,7 +9,7 @@ import androidx.compose.ui.unit.dp
 import com.achub.hram.data.model.TrackingStatus
 import com.achub.hram.view.HRCheckBoxLabel
 import com.achub.hram.view.LocationCheckBoxLabel
-import com.achub.hram.view.WarningLabelRow
+import com.achub.hram.view.indications.WarningLabelRow
 
 @Composable
 fun TrackingStatusCheckBoxSection(

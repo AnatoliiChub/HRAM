@@ -12,7 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.achub.hram.data.model.BleDevice
-import com.achub.hram.data.model.TrackingIndications
+import com.achub.hram.data.model.HrNotifications
+import com.achub.hram.data.model.IndicationSection
 import com.achub.hram.data.model.TrackingStatus
 import com.achub.hram.permissionController
 import com.achub.hram.requestBluetooth
@@ -127,9 +128,36 @@ private fun RecordScreenContent(
 private fun RecordScreenPreview() {
     RecordScreenContent(
         state = RecordScreenState(
-            indications = TrackingIndications(
-                heartRate = 83,
-                distance = 1.2f,
+            indications = IndicationSection(
+                hrNotifications = HrNotifications(hrBpm = 83, batteryLevel = 75, timestamp = 0),
+                duration = "00:12:34",
+            ),
+            trackingStatus = TrackingStatus(
+                trackHR = true,
+                trackGps = true,
+                hrDevice = BleDevice("Hrm 1", "00:11:22:33:44:55")
+            ),
+            recordingState = RecordingState.Recording
+        ),
+        onHrCheckBox = {},
+        onLocationCheckBox = {},
+        onPlay = {},
+        onStop = {},
+        onDismissDialog = {},
+        onDeviceSelected = {},
+        onRequestScanning = {},
+        onCancelScanning = {},
+        openSettings = {}
+    )
+}
+
+@Composable
+@Preview
+private fun RecordScreenEmptyPreview() {
+    RecordScreenContent(
+        state = RecordScreenState(
+            indications = IndicationSection(
+                hrNotifications = HrNotifications.Empty,
                 duration = "00:12:34",
             ),
             trackingStatus = TrackingStatus(
@@ -156,9 +184,8 @@ private fun RecordScreenPreview() {
 private fun RecordScreenChooseDeviceDialogPreview() {
     RecordScreenContent(
         state = RecordScreenState(
-            indications = TrackingIndications(
-                heartRate = 83,
-                distance = 1.2f,
+            indications = IndicationSection(
+                hrNotifications = HrNotifications(hrBpm = 83, batteryLevel = 75, timestamp = 0),
                 duration = "00:12:34",
             ),
             trackingStatus = TrackingStatus(
