@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
+import kotlin.uuid.ExperimentalUuidApi
 
 private const val SCAN_DURATION = 5_000L
 
@@ -71,7 +72,7 @@ class RecordViewModel(
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class, ExperimentalApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class, ExperimentalApi::class,ExperimentalUuidApi::class)
     fun onDeviceSelected(device: BleDevice) {
         cancelScanning()
         cancelConnection()
@@ -126,7 +127,7 @@ class RecordViewModel(
         }
     }
 
-    @OptIn(FlowPreview::class)
+    @OptIn(FlowPreview::class, ExperimentalUuidApi::class)
     private fun scan() {
         viewModelScope.launch(Dispatchers.Default) {
             cancelScanning()
