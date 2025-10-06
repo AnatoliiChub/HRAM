@@ -17,6 +17,7 @@ import com.achub.hram.data.model.IndicationSection
 import com.achub.hram.data.model.TrackingStatus
 import com.achub.hram.permissionController
 import com.achub.hram.requestBluetooth
+import com.achub.hram.style.BlackPreview
 import com.achub.hram.view.RecordRow
 import com.achub.hram.view.RecordingState
 import com.achub.hram.view.dialog.ChooseHRDeviceDialog
@@ -122,9 +123,8 @@ private fun RecordScreenContent(
     }
 }
 
-
 @Composable
-@Preview
+@Preview(backgroundColor = BlackPreview, showBackground = true)
 private fun RecordScreenPreview() {
     RecordScreenContent(
         state = RecordScreenState(
@@ -152,7 +152,7 @@ private fun RecordScreenPreview() {
 }
 
 @Composable
-@Preview
+@Preview(backgroundColor = 0xFF000000, showBackground = true)
 private fun RecordScreenEmptyPreview() {
     RecordScreenContent(
         state = RecordScreenState(
@@ -180,7 +180,7 @@ private fun RecordScreenEmptyPreview() {
 }
 
 @Composable
-@Preview
+@Preview()
 private fun RecordScreenChooseDeviceDialogPreview() {
     RecordScreenContent(
         state = RecordScreenState(

@@ -1,8 +1,8 @@
 package com.achub.hram.view.dialog
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.scaleIn
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -66,12 +66,13 @@ fun ChooseHRDeviceDialog(
                 retryState -> onRefresh()
             }
         }
-        DialogElevatedCard {
+
+        DialogElevatedCard(animate = isLoading) {
             Column(
                 modifier = Modifier.padding(24.dp),
                 horizontalAlignment = CenterHorizontally
             ) {
-                DialogTitle(modifier = Modifier.animateContentSize(), title = title)
+                DialogTitle(title = title)
                 Spacer(Modifier.height(12.dp))
                 HRProgress(isLoading, cycleDuration = loadingDuration)
                 Spacer(Modifier.height(12.dp))
@@ -110,18 +111,27 @@ private fun DeviceList(
 }
 
 @Composable
-@Preview
+@Preview()
 fun ChooseHRDeviceDialogPreview() {
-    ChooseHRDeviceDialog(
-        onConfirmClick = {},
-        onDismissRequest = {},
-        onRefresh = {},
-        isLoading = true,
-        devices = listOf(
-            BleDevice("Hrm1", "00:11:22:33:44:55"),
-            BleDevice("Hrm2", "66:77:88:99:AA:BB"),
-            BleDevice("Hrm3", "CC:DD:EE:FF:00:11"),
-        ),
-        loadingDuration = 5.seconds
-    )
+    Box(modifier = Modifier.padding().fillMaxWidth()) {
+
+        ChooseHRDeviceDialog(
+            onConfirmClick = {},
+            onDismissRequest = {},
+            onRefresh = {},
+            isLoading = true,
+            devices = listOf(
+                BleDevice("Hrm1", "00:11:22:33:44:55"),
+                BleDevice("Hrm2", "66:77:88:99:AA:BB"),
+                BleDevice("Hrm3", "CC:DD:EE:FF:00:11"),
+            ),
+            loadingDuration = 5.seconds
+        )
+    }
+}
+
+// Define breathing states
+enum class BreathingState {
+    Inhaling,
+    Exhaling
 }

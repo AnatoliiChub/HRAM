@@ -9,7 +9,7 @@ import com.achub.hram.style.LabelLarge
 import com.achub.hram.style.White
 
 @Composable
-fun DialogTitle(modifier: Modifier, title: String) {
+fun DialogTitle(modifier: Modifier = Modifier, title: String) {
     Text(
         text = title,
         style = LabelLarge.copy(color = White, fontWeight = W600),

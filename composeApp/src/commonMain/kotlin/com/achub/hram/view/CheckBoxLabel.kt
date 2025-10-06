@@ -69,10 +69,10 @@ fun LocationCheckBoxLabel(
     CheckBoxLabel("Location tracking", isChecked, isEnabled, onCheckedChange)
 }
 
-@Preview
+@Preview()
 @Composable
 private fun CheckBoxLabelPreview() {
-    Column {
+    Column() {
         HRCheckBoxLabel(isChecked = true, isEnabled = true, connectedDevice = "Hr monitor", onCheckedChange = {})
         LocationCheckBoxLabel(isChecked = false, isEnabled = false, onCheckedChange = {})
     }

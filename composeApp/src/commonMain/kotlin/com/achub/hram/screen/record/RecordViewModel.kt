@@ -3,7 +3,7 @@ package com.achub.hram.screen.record
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.achub.hram.data.BleConnectionRepo
-import com.achub.hram.data.BleHrDataRepo
+import com.achub.hram.data.BleDataRepo
 import com.achub.hram.data.model.BleDevice
 import com.achub.hram.data.model.HrNotifications
 import com.achub.hram.launchIn
@@ -49,7 +49,7 @@ private const val SCAN_DURATION = 5_000L
 @KoinViewModel
 class RecordViewModel(
     val bleConnectionRepo: BleConnectionRepo,
-    val bleHrDataRepo: BleHrDataRepo,
+    val bleDataRepo: BleDataRepo,
     @InjectedParam val permissionController: PermissionsController
 ) :
     ViewModel() {
@@ -94,7 +94,7 @@ class RecordViewModel(
             _uiState.updateHrDeviceDialogIfExists { it.copy(isDeviceConfirmed = true, isLoading = true) }
             listenJob = bleConnectionRepo.connectToDevice(advertisement)
                 .onEach { peripheral ->
-                    val manufacturer = bleHrDataRepo.readManufacturerName(peripheral)
+                    val manufacturer = bleDataRepo.readManufacturerName(peripheral)
                     _uiState.update {
                         it.copy(
                             trackingStatus = it.trackingStatus.copy(trackHR = true, hrDevice = device),
@@ -107,8 +107,8 @@ class RecordViewModel(
                 }
                 .flatMapLatest { device ->
                     combine(
-                        bleHrDataRepo.observeHeartRate(device),
-                        bleHrDataRepo.observeBatteryLevel(device),
+                        bleDataRepo.observeHeartRate(device),
+                        bleDataRepo.observeBatteryLevel(device),
                         device.state
                     ) { hrRate, battery, state ->
                         if (state !is State.Connected) {

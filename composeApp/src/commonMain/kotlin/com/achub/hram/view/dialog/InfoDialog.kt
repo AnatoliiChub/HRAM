@@ -1,6 +1,5 @@
 package com.achub.hram.view.dialog
 
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -35,7 +34,7 @@ fun InfoDialog(
                 modifier = Modifier.padding(24.dp),
                 horizontalAlignment = CenterHorizontally
             ) {
-                DialogTitle(modifier = Modifier.animateContentSize(), title = title)
+                DialogTitle(title = title)
                 Spacer(Modifier.height(12.dp))
                 Text(
                     text = message,
