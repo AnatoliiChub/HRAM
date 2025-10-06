@@ -115,7 +115,7 @@ private fun RecordScreenContent(
             onDismiss = onDismissDialog,
             onButonClick = {
                 openSettings()
-                onDismissDialog
+                onDismissDialog()
             }
         )
 

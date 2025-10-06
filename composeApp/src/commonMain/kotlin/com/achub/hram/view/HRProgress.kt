@@ -2,7 +2,6 @@ package com.achub.hram.view
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -43,12 +42,6 @@ fun HRProgress(isLoading: Boolean, cycleDuration: Duration, height: Dp = 48.dp) 
 
     val isVisible = progress.value > MIN_PROGRESS && progress.value < MAX_PROGRESS - 0.05f
 
-    val heightInDp = animateDpAsState(
-        targetValue = if (isLoading) height else 0.dp,
-        animationSpec = tween(
-            durationMillis = 300,
-        )
-    )
     val alpha = animateFloatAsState(
         targetValue = if (isVisible) 1f else 0f,
         animationSpec = tween(
@@ -56,7 +49,7 @@ fun HRProgress(isLoading: Boolean, cycleDuration: Duration, height: Dp = 48.dp) 
         )
     )
     LinearWavyProgressIndicator(
-        modifier = Modifier.fillMaxWidth().height(heightInDp.value).alpha(alpha.value),
+        modifier = Modifier.fillMaxWidth().height(height).alpha(alpha.value),
         trackColor = Transparent,
         color = Red,
         gapSize = 8.dp,

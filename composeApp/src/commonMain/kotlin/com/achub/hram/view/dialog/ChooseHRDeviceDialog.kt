@@ -70,11 +70,12 @@ fun ChooseHRDeviceDialog(
         DialogElevatedCard(animate = isLoading) {
             Column(
                 modifier = Modifier.padding(24.dp),
-                horizontalAlignment = CenterHorizontally
             ) {
                 DialogTitle(title = title)
                 Spacer(Modifier.height(12.dp))
-                HRProgress(isLoading, cycleDuration = loadingDuration)
+                AnimatedVisibility(isLoading,   enter = scaleIn(), exit = smoothOut()) {
+                    HRProgress(isLoading, cycleDuration = loadingDuration)
+                }
                 Spacer(Modifier.height(12.dp))
                 AnimatedVisibility(!isDeviceConfirmed, enter = scaleIn(), exit = smoothOut()) {
                     Column(horizontalAlignment = CenterHorizontally) {
@@ -114,7 +115,6 @@ private fun DeviceList(
 @Preview()
 fun ChooseHRDeviceDialogPreview() {
     Box(modifier = Modifier.padding().fillMaxWidth()) {
-
         ChooseHRDeviceDialog(
             onConfirmClick = {},
             onDismissRequest = {},

@@ -69,7 +69,7 @@ fun DialogElevatedCard(
     val dropShadowShape = RoundedCornerShape(12.dp)
     val innerShadowShape = RoundedCornerShape(8.dp)
 
-    Box(Modifier.padding(48.dp), contentAlignment = Center) {
+    Box(Modifier.padding(vertical = 48.dp), contentAlignment = Center) {
         ElevatedCard(
             elevation = CardDefaults.cardElevation(24.dp),
             modifier = modifier.fillMaxWidth()

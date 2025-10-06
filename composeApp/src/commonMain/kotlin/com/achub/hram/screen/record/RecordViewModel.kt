@@ -184,7 +184,7 @@ class RecordViewModel(
     fun toggleLocationTracking() =
         _uiState.update { it.copy(trackingStatus = it.trackingStatus.copy(trackGps = it.trackingStatus.trackGps.not())) }
 
-    fun dismissDialog() = _uiState.update { it.copy(dialog = null) }
+    fun dismissDialog() { _uiState.value = _uiState.value.copy(dialog = null)}
 
     override fun onCleared() {
         super.onCleared()

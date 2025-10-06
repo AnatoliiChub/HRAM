@@ -4,7 +4,7 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -52,7 +52,7 @@ fun permissionController(): PermissionsController {
     return controller
 }
 
-fun smoothOut(): ExitTransition = shrinkOut(tween(300, easing = LinearEasing)) + fadeOut()
+fun smoothOut(): ExitTransition = shrinkVertically(tween(300, easing = LinearEasing)) + fadeOut()
 
 expect fun currentThread(): String
 
