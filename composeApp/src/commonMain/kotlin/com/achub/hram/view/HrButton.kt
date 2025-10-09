@@ -40,7 +40,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.map
 import kotlin.time.ExperimentalTime
 
-const val PRESS_ANIMATION_DURATION = 150L
+const val PRESS_ANIMATION_DURATION = 70L
 val redDropShadowColor = Color(0x80FF0000)
 val darkRedDropShadowColor = Color(0xCCFF0000)
 val rippleColor = Color(0x40777777)
@@ -87,18 +87,16 @@ fun HrButton(
             }
 
     }
-    Napier.d { "Clicker: $clicked, pressed, $pressed" }
     val transition = updateTransition(targetState = pressed || clicked, label = "button_press_transition")
     val buttonContentAlpha by transition.animateFloat(
         label = "buttonContentAlpha",
         transitionSpec = { buttonPressAnimation() }) { pressed ->
-        if (pressed || !enabled) 0.3f else 0.6f
+        if (pressed || !enabled) 0.4f else 1f
     }
     val shadowAlpha by transition.animateFloat(label = "shadowAlpha", transitionSpec = { buttonPressAnimation() }
     ) { pressed ->
-        if (pressed || !enabled) 0.2f else 1f
+        if (pressed || !enabled) 0.5f else 1f
     }
-    Napier.d { "shadowAlpha = $shadowAlpha" }
     val backgroundColor = if (enabled) DarkGray else White20
     val shape = RoundedCornerShape(16.dp)
 
@@ -149,6 +147,6 @@ fun HrButton(
                         color = Black
                     },
                 ), contentAlignment = Center
-        ) { content(buttonContentAlpha) }
+        ) { content(buttonContentAlpha / 3f) }
     }
 }
