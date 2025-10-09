@@ -28,12 +28,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.achub.hram.EventsCutter
 import com.achub.hram.get
 import com.achub.hram.style.Black
 import com.achub.hram.style.DarkGray
 import com.achub.hram.style.White20
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce
@@ -62,15 +62,32 @@ fun HrButton(
     val eventsCutter = remember { EventsCutter.Companion.get(PRESS_ANIMATION_DURATION * 3) }
     val interactionSource = remember { MutableInteractionSource() }
     var clicked by remember { mutableStateOf(false) }
-    val pressed by interactionSource.interactions.map { it is PressInteraction.Press }.debounce {
-        PRESS_ANIMATION_DURATION
-    }.collectAsStateWithLifecycle(false)
-    LaunchedEffect(clicked, pressed) {
-        if (!pressed) {
-            delay(PRESS_ANIMATION_DURATION)
-            clicked = pressed
+    var pressed by remember { mutableStateOf(false) }
+
+    LaunchedEffect(interactionSource) {
+        try {
+            interactionSource.interactions.map {
+                when (it) {
+                    is PressInteraction.Release -> false
+                    is PressInteraction.Press -> true
+                    else -> false
+                }
+            }.debounce {
+                if (it) 0L else PRESS_ANIMATION_DURATION
+            }.collect { pressed = it }
+        } catch (e: Exception) {
+            Napier.d { "ERROR : $e" }
         }
     }
+    LaunchedEffect(clicked, pressed) {
+
+            if (!pressed) {
+                delay(PRESS_ANIMATION_DURATION)
+                clicked = false
+            }
+
+    }
+    Napier.d { "Clicker: $clicked, pressed, $pressed" }
     val transition = updateTransition(targetState = pressed || clicked, label = "button_press_transition")
     val buttonContentAlpha by transition.animateFloat(
         label = "buttonContentAlpha",
@@ -81,6 +98,7 @@ fun HrButton(
     ) { pressed ->
         if (pressed || !enabled) 0.2f else 1f
     }
+    Napier.d { "shadowAlpha = $shadowAlpha" }
     val backgroundColor = if (enabled) DarkGray else White20
     val shape = RoundedCornerShape(16.dp)
 
@@ -94,17 +112,16 @@ fun HrButton(
                 offset = DpOffset(x = 0.dp, -(1).dp),
                 alpha = shadowAlpha
             )
-        )
-            .dropShadow(
-                shape = shape,
-                shadow = Shadow(
-                    radius = 8.dp,
-                    spread = 1.dp,
-                    color = darkRedDropShadowColor,
-                    offset = DpOffset(x = 2.dp, 3.dp),
-                    alpha = shadowAlpha
-                )
+        ).dropShadow(
+            shape = shape,
+            shadow = Shadow(
+                radius = 8.dp,
+                spread = 1.dp,
+                color = darkRedDropShadowColor,
+                offset = DpOffset(x = 2.dp, 3.dp),
+                alpha = shadowAlpha
             )
+        )
             // note that the background needs to be defined before defining the inner shadow
             .background(
                 color = Black,
