@@ -91,11 +91,11 @@ fun HrButton(
     val buttonContentAlpha by transition.animateFloat(
         label = "buttonContentAlpha",
         transitionSpec = { buttonPressAnimation() }) { pressed ->
-        if (pressed || !enabled) 0.4f else 1f
+        if (pressed) 0.4f else 1f
     }
     val shadowAlpha by transition.animateFloat(label = "shadowAlpha", transitionSpec = { buttonPressAnimation() }
     ) { pressed ->
-        if (pressed || !enabled) 0.5f else 1f
+        if (pressed) 0.5f else 1f
     }
     val backgroundColor = if (enabled) DarkGray else White20
     val shape = RoundedCornerShape(16.dp)
@@ -108,7 +108,7 @@ fun HrButton(
                 spread = 1.dp,
                 color = redDropShadowColor,
                 offset = DpOffset(x = 0.dp, -(1).dp),
-                alpha = shadowAlpha
+                alpha = if (!enabled) 0.2f else shadowAlpha
             )
         ).dropShadow(
             shape = shape,
@@ -117,9 +117,9 @@ fun HrButton(
                 spread = 1.dp,
                 color = darkRedDropShadowColor,
                 offset = DpOffset(x = 2.dp, 3.dp),
-                alpha = shadowAlpha
+                alpha = if (!enabled) 0.2f else shadowAlpha
+                )
             )
-        )
             // note that the background needs to be defined before defining the inner shadow
             .background(
                 color = Black,
@@ -147,6 +147,6 @@ fun HrButton(
                         color = Black
                     },
                 ), contentAlignment = Center
-        ) { content(buttonContentAlpha / 3f) }
+        ) { content(if (!enabled) 0.15f else buttonContentAlpha) }
     }
 }
