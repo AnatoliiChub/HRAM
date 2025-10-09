@@ -1,7 +1,5 @@
 package com.achub.hram.view.dialog
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -22,11 +20,11 @@ import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.achub.hram.data.model.BleDevice
-import com.achub.hram.smoothOut
 import com.achub.hram.view.DeviceListItem
 import com.achub.hram.view.HRProgress
 import com.achub.hram.view.dialog.base.DialogButton
 import com.achub.hram.view.dialog.base.DialogElevatedCard
+import com.achub.hram.view.dialog.base.DialogMessage
 import com.achub.hram.view.dialog.base.DialogTitle
 import io.github.aakira.napier.Napier
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -35,7 +33,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun ChooseHRDeviceDialog(
+fun HrConnectDialog(
     isLoading: Boolean,
     devices: List<BleDevice>,
     loadingDuration: Duration,
@@ -46,11 +44,11 @@ fun ChooseHRDeviceDialog(
 ) {
     var selected by remember { mutableStateOf<BleDevice?>(null) }
     val retryState = !isLoading && selected == null
-    val title = when {
-        isDeviceConfirmed -> "Connecting to device..."
+    val title = "Connect to device."
+    val message = when {
         isLoading -> "Scanning for devices..."
         devices.isEmpty() -> "No devices found, please try again."
-        else -> "Select your Heart rate device:"
+        else -> "Select your Heart rate device from the list or try to scan again."
     }
     BasicAlertDialog(
         onDismissRequest = onDismissRequest
@@ -70,24 +68,24 @@ fun ChooseHRDeviceDialog(
         DialogElevatedCard(animate = isLoading) {
             Column(
                 modifier = Modifier.padding(24.dp),
+                horizontalAlignment = CenterHorizontally
             ) {
                 DialogTitle(title = title)
-                Spacer(Modifier.height(12.dp))
-                AnimatedVisibility(isLoading,   enter = scaleIn(), exit = smoothOut()) {
+                Spacer(Modifier.height(24.dp))
+                if (isLoading) {
                     HRProgress(isLoading, cycleDuration = loadingDuration)
+                } else {
+                    DialogMessage(message = message)
                 }
-                Spacer(Modifier.height(12.dp))
-                AnimatedVisibility(!isDeviceConfirmed, enter = scaleIn(), exit = smoothOut()) {
+                if (!isDeviceConfirmed) {
                     Column(horizontalAlignment = CenterHorizontally) {
+                        if (devices.isNotEmpty()) Spacer(Modifier.height(24.dp))
                         DeviceList(devices, selected) {
                             Napier.d { "selected: $selected, it: $it" }
                             selected = if (selected == it) null else it
                         }
-                        Spacer(Modifier.height(24.dp))
-                        AnimatedVisibility(
-                            visible = !isLoading || selected != null,
-                            enter = scaleIn(), exit = smoothOut()
-                        ) { DialogButton(text = btnText, onClick = onBtnClick) }
+                        Spacer(Modifier.height(32.dp))
+                        if (!isLoading || selected != null) DialogButton(text = btnText, onClick = onBtnClick)
                     }
                 }
             }
@@ -115,7 +113,7 @@ private fun DeviceList(
 @Preview()
 fun ChooseHRDeviceDialogPreview() {
     Box(modifier = Modifier.padding().fillMaxWidth()) {
-        ChooseHRDeviceDialog(
+        HrConnectDialog(
             onConfirmClick = {},
             onDismissRequest = {},
             onRefresh = {},
@@ -128,10 +126,4 @@ fun ChooseHRDeviceDialogPreview() {
             loadingDuration = 5.seconds
         )
     }
-}
-
-// Define breathing states
-enum class BreathingState {
-    Inhaling,
-    Exhaling
 }

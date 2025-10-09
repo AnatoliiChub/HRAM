@@ -20,7 +20,7 @@ import com.achub.hram.requestBluetooth
 import com.achub.hram.style.BlackPreview
 import com.achub.hram.view.RecordRow
 import com.achub.hram.view.RecordingState
-import com.achub.hram.view.dialog.ChooseHRDeviceDialog
+import com.achub.hram.view.dialog.HrConnectDialog
 import com.achub.hram.view.dialog.InfoDialog
 import com.achub.hram.view.section.TrackingIndicationsSection
 import com.achub.hram.view.section.TrackingStatusCheckBoxSection
@@ -89,7 +89,7 @@ private fun RecordScreenContent(
     }
     val dialog = state.dialog
     when (dialog) {
-        is RecordScreenDialog.ChooseHRDevice -> ChooseHRDeviceDialog(
+        is RecordScreenDialog.ChooseHRDevice -> HrConnectDialog(
             isLoading = dialog.isLoading,
             devices = dialog.scannedDevices,
             isDeviceConfirmed = dialog.isDeviceConfirmed,

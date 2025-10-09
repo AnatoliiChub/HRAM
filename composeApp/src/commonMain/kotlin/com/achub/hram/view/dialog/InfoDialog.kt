@@ -35,14 +35,14 @@ fun InfoDialog(
                 horizontalAlignment = CenterHorizontally
             ) {
                 DialogTitle(title = title)
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(24.dp))
                 Text(
                     text = message,
                     color = White,
                     style = LabelMedium,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
                 )
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(24.dp))
                 DialogButton(text = buttonText, onClick = onButonClick)
             }
         }
