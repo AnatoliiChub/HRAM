@@ -203,7 +203,8 @@ class RecordViewModel(
             permissionController.providePermission(Permission.BLUETOOTH_SCAN)
             permissionController.providePermission(Permission.BLUETOOTH_CONNECT)
             action()
-        } catch (e: Exception) {
+        } catch (exception: Exception) {
+            Napier.e { "requestBlePermissionBeforeAction Error : $exception" }
             onFailure()
         }
     }
