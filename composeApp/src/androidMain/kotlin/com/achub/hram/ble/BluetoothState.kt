@@ -1,4 +1,4 @@
-package com.achub.hram
+package com.achub.hram.ble
 
 import android.bluetooth.BluetoothAdapter.ACTION_STATE_CHANGED
 import android.bluetooth.BluetoothAdapter.EXTRA_STATE
@@ -12,7 +12,9 @@ import android.content.IntentFilter
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import org.koin.core.annotation.Single
 
+@Single
 class BluetoothStateAndroid(val context: Context) : BluetoothState {
     override val isBluetoothOn: StateFlow<Boolean> = MutableStateFlow(getBluetoothAdapterOrNull()?.state == STATE_ON)
 

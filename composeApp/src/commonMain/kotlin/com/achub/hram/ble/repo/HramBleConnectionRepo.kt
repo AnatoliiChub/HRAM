@@ -1,7 +1,7 @@
-package com.achub.hram.data
+package com.achub.hram.ble.repo
 
-import com.achub.hram.BluetoothState
 import com.achub.hram.HR_SERVICE_UUID
+import com.achub.hram.ble.BluetoothState
 import com.juul.kable.Advertisement
 import com.juul.kable.Peripheral
 import com.juul.kable.Scanner

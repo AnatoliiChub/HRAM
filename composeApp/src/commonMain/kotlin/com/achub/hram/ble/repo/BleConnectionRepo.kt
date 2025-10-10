@@ -1,4 +1,4 @@
-package com.achub.hram.data
+package com.achub.hram.ble.repo
 
 import com.juul.kable.Advertisement
 import com.juul.kable.Peripheral

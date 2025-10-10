@@ -1,4 +1,4 @@
-package com.achub.hram.data
+package com.achub.hram.ble.repo
 
 import com.achub.hram.BATTERY_LEVEL_CHAR_UUID
 import com.achub.hram.BATTERY_SERVICE_UUID
@@ -21,7 +21,7 @@ import org.koin.core.annotation.Single
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-@Single
+@Single(binds = [BleDataRepo::class])
 class HramBleDataRepo : BleDataRepo {
     @OptIn(ExperimentalUuidApi::class)
     override fun observeHeartRate(peripheral: Peripheral): Flow<Int> = flow {

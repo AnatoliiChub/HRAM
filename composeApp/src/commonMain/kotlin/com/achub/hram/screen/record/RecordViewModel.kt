@@ -2,8 +2,8 @@ package com.achub.hram.screen.record
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.achub.hram.data.BleConnectionRepo
-import com.achub.hram.data.BleDataRepo
+import com.achub.hram.ble.repo.BleConnectionRepo
+import com.achub.hram.ble.repo.BleDataRepo
 import com.achub.hram.data.model.BleDevice
 import com.achub.hram.data.model.HrNotifications
 import com.achub.hram.launchIn
@@ -51,8 +51,7 @@ class RecordViewModel(
     val bleConnectionRepo: BleConnectionRepo,
     val bleDataRepo: BleDataRepo,
     @InjectedParam val permissionController: PermissionsController
-) :
-    ViewModel() {
+) : ViewModel() {
 
     var scanJob: Job? = null
     var listenJob: Job? = null
@@ -184,7 +183,9 @@ class RecordViewModel(
     fun toggleLocationTracking() =
         _uiState.update { it.copy(trackingStatus = it.trackingStatus.copy(trackGps = it.trackingStatus.trackGps.not())) }
 
-    fun dismissDialog() { _uiState.value = _uiState.value.copy(dialog = null)}
+    fun dismissDialog() {
+        _uiState.value = _uiState.value.copy(dialog = null)
+    }
 
     override fun onCleared() {
         super.onCleared()
