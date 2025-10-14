@@ -105,7 +105,7 @@ tasks {
             this.dependsOn("generateActualResourceCollectorsForAndroidMain")
             this.dependsOn("kspCommonMainKotlinMetadata")
         }
-        if (this.name.contains("kspKotlinIosSimulatorArm64")) {
+        if (this.name.contains("kspKotlinIos")) {
             // Ensure it depends on the metadata task that contains all common metadata for KSP to work.
             this.dependsOn("kspCommonMainKotlinMetadata")
         }
