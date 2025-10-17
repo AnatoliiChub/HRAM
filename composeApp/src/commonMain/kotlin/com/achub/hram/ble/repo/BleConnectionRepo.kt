@@ -2,6 +2,7 @@ package com.achub.hram.ble.repo
 
 import com.juul.kable.Advertisement
 import com.juul.kable.Peripheral
+import com.juul.kable.State
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -11,6 +12,8 @@ interface BleConnectionRepo {
     var connected: Peripheral?
 
     var isBluetoothOn: StateFlow<Boolean>
+
+    val state: StateFlow<State>
 
     fun scanHrDevices(): Flow<Advertisement>
 

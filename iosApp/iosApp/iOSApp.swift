@@ -5,7 +5,7 @@ import SwiftUI
 struct iOSApp: App {
 
     init() {
-        KoinHelperKt.doInit()
+        InitHelperKt.doInit()
     }
 
 

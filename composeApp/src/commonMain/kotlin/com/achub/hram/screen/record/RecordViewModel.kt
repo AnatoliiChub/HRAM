@@ -29,6 +29,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -103,7 +105,12 @@ class RecordViewModel(
                             )
                         )
                     }
-                }
+                }.launchIn(viewModelScope, Dispatchers.Default)
+            bleConnectionRepo.state
+                .filter { it is State.Connected }
+                .distinctUntilChanged()
+                .map { bleConnectionRepo.connected }
+                .filterNotNull()
                 .flatMapLatest { device ->
                     combine(
                         bleDataRepo.observeHeartRate(device),
@@ -120,8 +127,6 @@ class RecordViewModel(
                 .onEach { indications -> _uiState.update { it.copy(indications = it.indications.copy(indications)) } }
                 .catch { Napier.e { "Error: $it" } }
                 .launchIn(viewModelScope, Dispatchers.Default)
-            //TODO IMPLEMENT CONNECTING TO DEVICE before set the value
-
         }
     }
 
@@ -191,6 +196,7 @@ class RecordViewModel(
         super.onCleared()
         cancelScanning()
         cancelConnection()
+        Napier.d { "RELEASE 1 3123123 12312" }
         bleConnectionRepo.release()
     }
 
