@@ -1,4 +1,4 @@
-package com.achub.hram.view
+package com.achub.hram.view.components
 
 import androidx.compose.foundation.IndicationNodeFactory
 import androidx.compose.foundation.interaction.InteractionSource
@@ -15,7 +15,7 @@ import androidx.compose.ui.node.DelegatingNode
 import androidx.compose.ui.node.currentValueOf
 import androidx.compose.ui.unit.Dp
 
-private const val RIPPLE_ALPHA = 0.7f
+private const val RIPPLE_ALPHA = 0.45f
 
 @Stable
 fun customRipple(

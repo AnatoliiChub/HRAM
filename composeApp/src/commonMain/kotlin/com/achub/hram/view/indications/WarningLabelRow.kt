@@ -2,9 +2,9 @@ package com.achub.hram.view.indications
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight.Companion.W400
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.achub.hram.style.Dimen48
+import com.achub.hram.style.LabelMedium
+import com.achub.hram.view.components.ImageLabelRow
 import hram.composeapp.generated.resources.Res
 import hram.composeapp.generated.resources.ic_warning
 
@@ -14,8 +14,7 @@ fun WarningLabelRow(modifier: Modifier = Modifier, label: String) {
         modifier = modifier,
         label = label,
         drawable = Res.drawable.ic_warning,
-        imageSize = 48.dp,
-        textSize = 18.sp,
-        fontWeight = W400
+        imageSize = Dimen48,
+        textStyle = LabelMedium
     )
 }

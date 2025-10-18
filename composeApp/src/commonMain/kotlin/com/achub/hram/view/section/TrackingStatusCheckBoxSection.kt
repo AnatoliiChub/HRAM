@@ -1,14 +1,10 @@
 package com.achub.hram.view.section
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.achub.hram.data.model.TrackingStatus
-import com.achub.hram.view.HRCheckBoxLabel
-import com.achub.hram.view.LocationCheckBoxLabel
+import com.achub.hram.view.components.HRCheckBoxLabel
+import com.achub.hram.view.components.LocationCheckBoxLabel
 import com.achub.hram.view.indications.WarningLabelRow
 
 @Composable
@@ -31,6 +27,5 @@ fun TrackingStatusCheckBoxSection(
             isChecked = trackingStatus.trackGps,
             isEnabled = isCheckBoxEnabled
         ) { onLocationCheckBox() }
-        Spacer(Modifier.height(32.dp))
     }
 }

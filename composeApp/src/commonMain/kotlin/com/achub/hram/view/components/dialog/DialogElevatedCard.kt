@@ -1,4 +1,4 @@
-package com.achub.hram.view.dialog.base
+package com.achub.hram.view.components.dialog
 
 import androidx.compose.animation.core.KeyframesSpec
 import androidx.compose.animation.core.LinearEasing
@@ -30,11 +30,17 @@ import androidx.compose.ui.draw.innerShadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.shadow.Shadow
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.achub.hram.style.Black
 import com.achub.hram.style.Dark
 import com.achub.hram.style.DarkGray
+import com.achub.hram.style.Dimen12
+import com.achub.hram.style.Dimen120
+import com.achub.hram.style.Dimen16
+import com.achub.hram.style.Dimen2
+import com.achub.hram.style.Dimen24
+import com.achub.hram.style.Dimen48
+import com.achub.hram.style.Dimen8
 import com.achub.hram.style.White
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -66,20 +72,19 @@ fun DialogElevatedCard(
         )
     )
 
-    val dropShadowShape = RoundedCornerShape(12.dp)
-    val innerShadowShape = RoundedCornerShape(8.dp)
+    val dropShadowShape = RoundedCornerShape(Dimen12)
+    val innerShadowShape = RoundedCornerShape(Dimen8)
 
-    Box(Modifier.padding(vertical = 48.dp), contentAlignment = Center) {
+    Box(Modifier.padding(vertical =  Dimen48), contentAlignment = Center) {
         ElevatedCard(
-            elevation = CardDefaults.cardElevation(24.dp),
+            elevation = CardDefaults.cardElevation(Dimen24),
             modifier = modifier.fillMaxWidth()
                 .dropShadow(
                     shape = dropShadowShape,
                     shadow = Shadow(
-                        radius = 8.dp,
+                        radius = Dimen8,
                         spread = animatedSpread.dp,
                         brush = Brush.sweepGradient(Gradient),
-                        offset = DpOffset(x = 0.dp, y = 0.dp),
                         alpha = if (animate) animatedSpread / 4f else 0f
                     )
                 ).clip(dropShadowShape),
@@ -92,10 +97,10 @@ fun DialogElevatedCard(
         ) {
             Column(
                 modifier.fillMaxWidth()
-                    .padding(2.dp)
+                    .padding(Dimen2)
                     .clip(innerShadowShape)
                     .background(color = DarkGray, shape = innerShadowShape)
-                    .border(2.dp, Dark.copy(alpha = 0.3f), innerShadowShape)
+                    .border(Dimen2, Dark.copy(alpha = 0.3f), innerShadowShape)
                     .innerShadow(
                         shape = innerShadowShape,
                         block = {
@@ -115,7 +120,7 @@ fun DialogCardPreview() {
     Box(Modifier.fillMaxWidth()) {
         DialogElevatedCard(animate = true) {
             Text(
-                modifier = Modifier.padding(16.dp).width(120.dp),
+                modifier = Modifier.padding(Dimen16).width(Dimen120),
                 text = "Short med assd d asasdd a d  da sa sd asd  dasas dda  dads a ads addad ada dasssage"
             )
         }

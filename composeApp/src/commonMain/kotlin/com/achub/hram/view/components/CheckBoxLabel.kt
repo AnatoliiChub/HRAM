@@ -1,4 +1,4 @@
-package com.achub.hram.view
+package com.achub.hram.view.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -10,8 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
-import com.achub.hram.style.LabelLarge
 import com.achub.hram.style.LabelMedium
+import com.achub.hram.style.LabelSmall
 import com.achub.hram.style.Red
 import com.achub.hram.style.White
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -38,7 +38,7 @@ private fun CheckBoxLabel(
             enabled = isEnabled
         )
         val textColor = if (isEnabled) White else White.copy(alpha = 0.3f)
-        Text(text = title, style = LabelLarge.copy(color = textColor))
+        Text(text = title, style = LabelMedium.copy(color = textColor))
     }
 }
 
@@ -54,7 +54,7 @@ fun HRCheckBoxLabel(
         connectedDevice?.let {
             Text(
                 text = "Device: $connectedDevice",
-                style = LabelMedium.copy(color = White.copy(alpha = 0.3f))
+                style = LabelSmall.copy(color = White.copy(alpha = 0.3f))
             )
         }
     }

@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.onEach
 import org.koin.core.annotation.Single
 import kotlin.uuid.ExperimentalUuidApi
 
-private val TAG = "HramBleDataRepo"
+private const val TAG = "HramBleDataRepo"
 
 @OptIn(ExperimentalUuidApi::class)
 private val HR_CHAR = characteristicOf(HR_SERVICE_UUID, HR_MEASUREMENT_CHAR_UUID)

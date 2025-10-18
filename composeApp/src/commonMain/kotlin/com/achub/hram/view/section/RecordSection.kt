@@ -1,4 +1,4 @@
-package com.achub.hram.view
+package com.achub.hram.view.section
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Row
@@ -11,8 +11,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import com.achub.hram.style.Dimen16
+import com.achub.hram.style.Dimen2
+import com.achub.hram.style.Dimen48
 import com.achub.hram.style.Red
+import com.achub.hram.view.components.HrButton
 import hram.composeapp.generated.resources.Res
 import hram.composeapp.generated.resources.ic_pause
 import hram.composeapp.generated.resources.ic_play
@@ -21,28 +24,28 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun RecordRow(
+fun RecordSection(
     recordingState: RecordingState,
     isRecordingAvailable: Boolean,
     onPlay: () -> Unit = {},
     onStop: () -> Unit = {}
 ) {
-    Row(modifier = Modifier.padding(16.dp)) {
+    Row(modifier = Modifier.padding(Dimen16)) {
         val icon = if (recordingState == RecordingState.Recording) Res.drawable.ic_pause
         else Res.drawable.ic_play
         val first by animateFloatAsState(if (recordingState == RecordingState.Paused) 0.5f else 1f)
         val second by animateFloatAsState(if (recordingState == RecordingState.Paused) 1f else 0f)
 
         HrButton(
-            modifier = Modifier.height(48.dp).fillMaxWidth(first),
+            modifier = Modifier.height(Dimen48).fillMaxWidth(first),
             onClick = onPlay,
             enabled = (recordingState == RecordingState.Init && isRecordingAvailable.not()).not()
         ) { Icon(icon, it) }
 
-        Spacer(Modifier.size(16.dp))
+        Spacer(Modifier.size(Dimen16))
 
         HrButton(
-            modifier = Modifier.height(48.dp).fillMaxWidth(second),
+            modifier = Modifier.height(Dimen48).fillMaxWidth(second),
             onClick = onStop,
         ) { Icon(Res.drawable.ic_stop, it) }
     }
@@ -51,7 +54,7 @@ fun RecordRow(
 @Composable
 private fun Icon(icon: DrawableResource, f: Float) {
     Icon(
-        modifier = Modifier.padding(2.dp),
+        modifier = Modifier.padding(Dimen2),
         painter = painterResource(icon),
         tint = Red.copy(alpha = f),
         contentDescription = null

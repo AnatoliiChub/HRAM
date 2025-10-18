@@ -1,4 +1,4 @@
-package com.achub.hram.view
+package com.achub.hram.view.components
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
@@ -15,9 +15,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color.Companion.Transparent
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import com.achub.hram.style.Dimen2
+import com.achub.hram.style.Dimen24
+import com.achub.hram.style.Dimen48
+import com.achub.hram.style.Dimen8
+import com.achub.hram.style.DimenZero
 import com.achub.hram.style.Red
 import kotlin.time.Duration
 
@@ -26,7 +29,7 @@ private const val MAX_PROGRESS = 1.1f
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun HRProgress(isLoading: Boolean, cycleDuration: Duration, height: Dp = 48.dp) {
+fun HRProgress(isLoading: Boolean, cycleDuration: Duration, height: Dp = Dimen48) {
     val progress = remember { Animatable(MAX_PROGRESS) }
 
     val reset = derivedStateOf { progress.value >= MAX_PROGRESS }
@@ -52,15 +55,10 @@ fun HRProgress(isLoading: Boolean, cycleDuration: Duration, height: Dp = 48.dp) 
         modifier = Modifier.fillMaxWidth().height(height).alpha(alpha.value),
         trackColor = Transparent,
         color = Red,
-        gapSize = 8.dp,
-        stopSize = 0.dp,
-        wavelength = 24.dp,
-        waveSpeed = 2.dp,
+        gapSize = Dimen8,
+        stopSize = DimenZero,
+        wavelength = Dimen24,
+        waveSpeed = Dimen2,
         progress = { progress.value },
     )
-}
-
-@Composable
-fun Dp.toPx(): Float {
-    return with(LocalDensity.current) { this@toPx.toPx() }
 }

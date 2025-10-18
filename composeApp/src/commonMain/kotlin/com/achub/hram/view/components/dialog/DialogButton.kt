@@ -1,4 +1,4 @@
-package com.achub.hram.view.dialog.base
+package com.achub.hram.view.components.dialog
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
@@ -6,10 +6,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight.Companion.W600
-import androidx.compose.ui.unit.dp
-import com.achub.hram.style.LabelLarge
+import com.achub.hram.style.Dimen12
+import com.achub.hram.style.Dimen24
+import com.achub.hram.style.LabelMedium
 import com.achub.hram.style.White
-import com.achub.hram.view.HrButton
+import com.achub.hram.view.components.HrButton
 
 @Composable
 fun DialogButton(text: String, onClick: () -> Unit) {
@@ -18,9 +19,9 @@ fun DialogButton(text: String, onClick: () -> Unit) {
         onClick = onClick,
     ) {
         Text(
-            modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
+            modifier = Modifier.padding(horizontal = Dimen24, vertical = Dimen12),
             text = text,
-            style = LabelLarge.copy(color = White, fontWeight = W600),
+            style = LabelMedium.copy(color = White, fontWeight = W600),
         )
     }
 }

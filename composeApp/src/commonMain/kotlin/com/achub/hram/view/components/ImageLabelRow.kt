@@ -1,4 +1,4 @@
-package com.achub.hram.view.indications
+package com.achub.hram.view.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -8,19 +8,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.FontWeight.Companion.W700
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.achub.hram.data.model.HrNotifications
-import com.achub.hram.style.White
+import com.achub.hram.style.Dimen64
+import com.achub.hram.style.HeadingMediumBold
+import com.achub.hram.view.indications.DistanceLabelRow
+import com.achub.hram.view.indications.HeartLabelRow
+import com.achub.hram.view.indications.WarningLabelRow
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -31,17 +31,12 @@ fun ImageLabelRow(
     label: String,
     drawable: DrawableResource,
     color: Color? = null,
-    imageSize: Dp = 80.dp,
-    textSize: TextUnit = 36.sp,
-    fontWeight: FontWeight = W700
+    imageSize: Dp = Dimen64,
+    textStyle: TextStyle = HeadingMediumBold,
 ) {
     Row(modifier) {
         IndicationImage(imageSize = imageSize, drawable = drawable, color = color)
-        Text(
-            modifier = Modifier.align(CenterVertically),
-            text = label,
-            style = TextStyle(color = White, fontWeight = fontWeight, fontSize = textSize)
-        )
+        Text(modifier = Modifier.align(CenterVertically), text = label, style = textStyle)
     }
 }
 
@@ -53,7 +48,7 @@ fun IndicationImage(
     color: Color?
 ) {
     Image(
-        modifier = modifier.size(imageSize).padding(imageSize / 5),
+        modifier = modifier.size(imageSize).padding(imageSize / 10),
         imageVector = vectorResource(drawable),
         colorFilter = color?.let { ColorFilter.tint(it) },
         contentDescription = null
@@ -63,8 +58,8 @@ fun IndicationImage(
 @Composable
 @Preview
 fun PreviewImageLabelRow() {
-    Column(Modifier.fillMaxWidth()) {
-        HeartLabelRow(hrNotifications = HrNotifications(hrBpm = 180, batteryLevel = 76))
+    Column(Modifier.fillMaxWidth(), horizontalAlignment = CenterHorizontally) {
+        HeartLabelRow(hrNotifications = HrNotifications(hrBpm = 80, batteryLevel = 76))
         DistanceLabelRow(distance = 5.329f)
         WarningLabelRow(label = "Choose at least one tracking option")
     }

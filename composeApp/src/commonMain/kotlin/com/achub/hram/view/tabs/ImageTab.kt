@@ -1,4 +1,4 @@
-package com.achub.hram.view
+package com.achub.hram.view.tabs
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -13,16 +13,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.unit.dp
+import com.achub.hram.style.Dimen32
 import com.achub.hram.style.Dimen4
-import com.achub.hram.style.LabelMedium
+import com.achub.hram.style.LabelMediumBold
 import com.achub.hram.style.Red
 import com.achub.hram.style.White
 import org.jetbrains.compose.resources.vectorResource
 
 @Composable
-fun RowScope.MainTabLayout(
-    tab: TabType,
+fun RowScope.ImageTab(
+    tab: MainTabType,
     isSelected: Boolean,
     onTap: () -> Unit,
 ) {
@@ -32,12 +32,12 @@ fun RowScope.MainTabLayout(
     ) {
         val color = if (isSelected) Red else White
         Image(
-            modifier = Modifier.size(32.dp).clickable(onClick = onTap),
+            modifier = Modifier.size(Dimen32).clickable(onClick = onTap),
             imageVector = vectorResource(tab.icon),
             colorFilter = ColorFilter.tint(color = color),
             contentDescription = null
         )
         Spacer(modifier = Modifier.height(Dimen4))
-        Text(text = tab.name, style = LabelMedium.copy(color = color))
+        Text(text = tab.name, style = LabelMediumBold.copy(color = color))
     }
 }

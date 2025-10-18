@@ -3,10 +3,13 @@ package com.achub.hram.view
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import com.achub.hram.data.model.BleDevice
+import com.achub.hram.style.Dimen4
 import com.achub.hram.style.LabelMedium
 import com.achub.hram.style.LabelMediumBold
 import com.achub.hram.style.Red
@@ -22,6 +25,7 @@ fun DeviceListItem(
     val color = if (isSelected) Red else White
     Column(
         modifier = modifier
+            .clip(RoundedCornerShape(Dimen4))
             .fillMaxWidth()
             .clickable { onSelected(device) }) {
         Text(

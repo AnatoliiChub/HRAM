@@ -45,7 +45,7 @@ import org.koin.core.annotation.Provided
 import org.koin.core.annotation.Single
 import kotlin.uuid.ExperimentalUuidApi
 
-private val TAG = "HramBleConnectionRepo"
+private const val TAG = "HramBleConnectionRepo"
 
 @Single
 class HramBleConnectionRepo(

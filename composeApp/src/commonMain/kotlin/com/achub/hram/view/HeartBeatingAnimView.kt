@@ -12,17 +12,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import com.achub.hram.view.indications.IndicationImage
+import com.achub.hram.style.Dimen76
+import com.achub.hram.view.components.IndicationImage
 import hram.composeapp.generated.resources.Res
 import hram.composeapp.generated.resources.ic_heart
 
 private const val MIN_HEART_SCALE = 0.75f
 private const val MAX_HEART_SCALE = 1.25f
 private const val DEFAULT_HEART_SCALE = 1f
+private const val HEART_BEATING_CYCLE_MS = 1000
 
 @Composable
-fun HeartBeatingAnim(
+fun HeartBeatingAnimView(
     hrBpm: Int,
     modifier: Modifier,
     color: Color
@@ -39,14 +40,14 @@ fun HeartBeatingAnim(
     val isBeating = hrBpm > 0
     IndicationImage(
         modifier = modifier.scale(if (isBeating) animatedScale else DEFAULT_HEART_SCALE),
-        imageSize = 96.dp,
+        imageSize = Dimen76,
         drawable = Res.drawable.ic_heart,
         color = color
     )
 }
 
 private fun heartBeatingSpec(): KeyframesSpec<Float> {
-    val duration = 1000
+    val duration = HEART_BEATING_CYCLE_MS
     val second = (duration * 0.24f).toInt()
     val third = (duration * 0.42f).toInt()
     val fourth = (duration * 0.58f).toInt()

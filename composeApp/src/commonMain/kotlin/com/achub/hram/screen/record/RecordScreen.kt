@@ -4,12 +4,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.achub.hram.data.model.BleDevice
 import com.achub.hram.data.model.HrNotifications
@@ -18,10 +18,11 @@ import com.achub.hram.data.model.TrackingStatus
 import com.achub.hram.permissionController
 import com.achub.hram.requestBluetooth
 import com.achub.hram.style.BlackPreview
-import com.achub.hram.view.RecordRow
-import com.achub.hram.view.RecordingState
-import com.achub.hram.view.dialog.HrConnectDialog
-import com.achub.hram.view.dialog.InfoDialog
+import com.achub.hram.style.Dimen16
+import com.achub.hram.view.dialogs.HrConnectDialog
+import com.achub.hram.view.dialogs.InfoDialog
+import com.achub.hram.view.section.RecordSection
+import com.achub.hram.view.section.RecordingState
 import com.achub.hram.view.section.TrackingIndicationsSection
 import com.achub.hram.view.section.TrackingStatusCheckBoxSection
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -43,11 +44,11 @@ fun RecordScreen() {
             state,
             onHrCheckBox = ::toggleHRTracking,
             onLocationCheckBox = ::toggleLocationTracking,
-            onPlay = ::onPlay,
-            onStop = ::onStop,
+            onPlay = ::toggleRecording,
+            onStop = ::stopRecording,
             onDismissDialog = ::dismissDialog,
             onCancelScanning = ::cancelScanning,
-            onDeviceSelected = ::onDeviceSelected,
+            onDeviceSelected = ::onHrDeviceSelected,
             onRequestScanning = ::requestScanning,
             openSettings = ::openSettings
         )
@@ -73,13 +74,14 @@ private fun RecordScreenContent(
     val trackingStatus = state.trackingStatus
     Box(Modifier.fillMaxSize()) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(top = 32.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
+            modifier = Modifier.fillMaxSize().padding(Dimen16),
             horizontalAlignment = CenterHorizontally
         ) {
             TrackingIndicationsSection(indications)
             Spacer(Modifier.weight(1f))
             TrackingStatusCheckBoxSection(trackingStatus, isCheckBoxEnabled, onHrCheckBox, onLocationCheckBox)
-            RecordRow(
+            Spacer(Modifier.height(Dimen16))
+            RecordSection(
                 recordingState = state.recordingState,
                 isRecordingAvailable = trackingStatus.atLeastOneTrackingEnabled,
                 onPlay = onPlay,

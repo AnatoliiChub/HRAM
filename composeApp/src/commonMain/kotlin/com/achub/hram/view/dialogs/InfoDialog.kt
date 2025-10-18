@@ -1,4 +1,4 @@
-package com.achub.hram.view.dialog
+package com.achub.hram.view.dialogs
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,12 +10,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextAlign
+import com.achub.hram.style.Dimen24
 import com.achub.hram.style.LabelMedium
 import com.achub.hram.style.White
-import com.achub.hram.view.dialog.base.DialogButton
-import com.achub.hram.view.dialog.base.DialogElevatedCard
-import com.achub.hram.view.dialog.base.DialogTitle
+import com.achub.hram.view.components.dialog.DialogButton
+import com.achub.hram.view.components.dialog.DialogElevatedCard
+import com.achub.hram.view.components.dialog.DialogTitle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,23 +27,13 @@ fun InfoDialog(
     onDismiss: () -> Unit,
     onButonClick: () -> Unit = { onDismiss() }
 ) {
-    BasicAlertDialog(
-        onDismissRequest = onDismiss
-    ) {
+    BasicAlertDialog(onDismissRequest = onDismiss) {
         DialogElevatedCard {
-            Column(
-                modifier = Modifier.padding(24.dp),
-                horizontalAlignment = CenterHorizontally
-            ) {
+            Column(modifier = Modifier.padding(Dimen24), horizontalAlignment = CenterHorizontally) {
                 DialogTitle(title = title)
-                Spacer(Modifier.height(24.dp))
-                Text(
-                    text = message,
-                    color = White,
-                    style = LabelMedium,
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                )
-                Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height(Dimen24))
+                Text(text = message, color = White, style = LabelMedium, textAlign = TextAlign.Center)
+                Spacer(Modifier.height(Dimen24))
                 DialogButton(text = buttonText, onClick = onButonClick)
             }
         }

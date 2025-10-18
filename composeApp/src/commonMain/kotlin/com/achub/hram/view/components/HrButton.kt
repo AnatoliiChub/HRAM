@@ -1,4 +1,4 @@
-package com.achub.hram.view
+package com.achub.hram.view.components
 
 import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.animateFloat
@@ -31,6 +31,8 @@ import com.achub.hram.EventsCutter
 import com.achub.hram.get
 import com.achub.hram.style.Black
 import com.achub.hram.style.DarkGray
+import com.achub.hram.style.Dimen16
+import com.achub.hram.style.Dimen2
 import com.achub.hram.style.White20
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
@@ -91,7 +93,7 @@ fun HrButton(
         if (pressed) 0.2f else 1f
     }
     val backgroundColor = if (enabled) DarkGray else White20
-    val shape = RoundedCornerShape(16.dp)
+    val shape = RoundedCornerShape(Dimen16)
 
     Box(
         Modifier.dropShadow(
@@ -134,7 +136,7 @@ fun HrButton(
                         clicked = true
                         onClick()
                     }
-                }.border(2.dp, DarkGray, shape)
+                }.border(Dimen2, DarkGray, shape)
                 .background(color = backgroundColor, shape = shape)
                 .innerShadow(
                     shape = shape,
