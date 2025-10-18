@@ -60,7 +60,8 @@ class RecordViewModel(
     fun requestScanning() {
         viewModelScope.launch(Dispatchers.Default) {
             val action = if (isBluetoothOn.value.not()) _uiState::requestBluetooth else ::scan
-            permissionController.requestBleBefore(action = action, onFailure = { _uiState.settingsDialog() })
+            val onFailure = if (isBluetoothOn.value.not()) null else _uiState::settingsDialog
+            permissionController.requestBleBefore(action = action, onFailure = { onFailure?.invoke() })
         }
     }
 
