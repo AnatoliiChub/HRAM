@@ -1,9 +1,12 @@
 package com.achub.hram.screen.record
 
 import com.achub.hram.data.model.BleDevice
+import com.achub.hram.data.model.HrNotifications
 import com.achub.hram.data.model.IndicationSection
 import com.achub.hram.data.model.TrackingStatus
 import com.achub.hram.view.RecordingState
+import com.achub.hram.view.RecordingState.Paused
+import com.achub.hram.view.RecordingState.Recording
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlin.time.Duration
@@ -14,7 +17,20 @@ data class RecordScreenState(
     val recordingState: RecordingState = RecordingState.Init,
     val requestBluetooth: Boolean = false,
     val dialog: RecordScreenDialog? = null,
-)
+) {
+    fun deviceConnectedDialog(device: BleDevice) = this.copy(
+        trackingStatus = this.trackingStatus.copy(trackHR = true, hrDevice = device),
+        dialog = RecordScreenDialog.DeviceConnectedDialog(device)
+    )
+
+    fun chooseHrDeviceDialog(duration: Duration) = this.copy(
+        dialog = RecordScreenDialog.ChooseHRDevice(
+            isLoading = true,
+            loadingDuration = duration
+        )
+    )
+
+}
 
 sealed class RecordScreenDialog {
     data class ChooseHRDevice(
@@ -24,9 +40,9 @@ sealed class RecordScreenDialog {
         val isDeviceConfirmed: Boolean = false
     ) : RecordScreenDialog()
 
-    data class DeviceConnectedDialog(val name: String, val manufacturer: String) : RecordScreenDialog()
+    data class DeviceConnectedDialog(val bleDevice: BleDevice) : RecordScreenDialog()
 
-    data object OpenSettingsDialog: RecordScreenDialog()
+    data object OpenSettingsDialog : RecordScreenDialog()
 }
 
 
@@ -35,3 +51,23 @@ fun MutableStateFlow<RecordScreenState>.updateHrDeviceDialogIfExists(
 ) = (value.dialog as? RecordScreenDialog.ChooseHRDevice)?.let {
     update { state -> state.copy(dialog = updatedDialog(it)) }
 }
+
+fun MutableStateFlow<RecordScreenState>.settingsDialog() =
+    this.update { it.copy(dialog = RecordScreenDialog.OpenSettingsDialog) }
+
+fun MutableStateFlow<RecordScreenState>.toggleGpsTracking() =
+    this.update { it.copy(trackingStatus = it.trackingStatus.copy(trackGps = it.trackingStatus.trackGps.not())) }
+
+fun MutableStateFlow<RecordScreenState>.toggleHrTracking() = this.update {
+    it.copy(trackingStatus = it.trackingStatus.copy(trackHR = it.trackingStatus.trackHR.not(), hrDevice = null))
+}
+
+fun MutableStateFlow<RecordScreenState>.toggleRecordingState() =
+    this.update { it.copy(recordingState = if (it.recordingState.isRecording()) Paused else Recording) }
+
+fun MutableStateFlow<RecordScreenState>.stop() = this.update { it.copy(recordingState = RecordingState.Init) }
+
+fun MutableStateFlow<RecordScreenState>.requestBluetooth() = this.update { it.copy(requestBluetooth = true) }
+
+fun MutableStateFlow<RecordScreenState>.indications(indications: HrNotifications) =
+    this.update { it.copy(indications = it.indications.copy(indications)) }

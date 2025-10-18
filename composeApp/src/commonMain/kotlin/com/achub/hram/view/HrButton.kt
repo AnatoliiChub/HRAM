@@ -12,7 +12,6 @@ import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -33,7 +32,6 @@ import com.achub.hram.get
 import com.achub.hram.style.Black
 import com.achub.hram.style.DarkGray
 import com.achub.hram.style.White20
-import io.github.aakira.napier.Napier
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce
@@ -43,7 +41,8 @@ import kotlin.time.ExperimentalTime
 const val PRESS_ANIMATION_DURATION = 70L
 val redDropShadowColor = Color(0x80FF0000)
 val darkRedDropShadowColor = Color(0xCCFF0000)
-val rippleColor = Color(0x40777777)
+val rippleColor = Black
+
 
 @Composable
 fun <T> buttonPressAnimation() = tween<T>(
@@ -65,27 +64,21 @@ fun HrButton(
     var pressed by remember { mutableStateOf(false) }
 
     LaunchedEffect(interactionSource) {
-        try {
-            interactionSource.interactions.map {
-                when (it) {
-                    is PressInteraction.Release -> false
-                    is PressInteraction.Press -> true
-                    else -> false
-                }
-            }.debounce {
-                if (it) 0L else PRESS_ANIMATION_DURATION
-            }.collect { pressed = it }
-        } catch (e: Exception) {
-            Napier.d { "ERROR : $e" }
-        }
+        interactionSource.interactions.map {
+            when (it) {
+                is PressInteraction.Release -> false
+                is PressInteraction.Press -> true
+                else -> false
+            }
+        }.debounce {
+            if (it) 0L else PRESS_ANIMATION_DURATION
+        }.collect { pressed = it }
     }
     LaunchedEffect(clicked, pressed) {
-
-            if (!pressed) {
-                delay(PRESS_ANIMATION_DURATION)
-                clicked = false
-            }
-
+        if (!pressed) {
+            delay(PRESS_ANIMATION_DURATION)
+            clicked = false
+        }
     }
     val transition = updateTransition(targetState = pressed || clicked, label = "button_press_transition")
     val buttonContentAlpha by transition.animateFloat(
@@ -95,7 +88,7 @@ fun HrButton(
     }
     val shadowAlpha by transition.animateFloat(label = "shadowAlpha", transitionSpec = { buttonPressAnimation() }
     ) { pressed ->
-        if (pressed) 0.5f else 1f
+        if (pressed) 0.2f else 1f
     }
     val backgroundColor = if (enabled) DarkGray else White20
     val shape = RoundedCornerShape(16.dp)
@@ -118,8 +111,8 @@ fun HrButton(
                 color = darkRedDropShadowColor,
                 offset = DpOffset(x = 2.dp, 3.dp),
                 alpha = if (!enabled) 0.2f else shadowAlpha
-                )
             )
+        )
             // note that the background needs to be defined before defining the inner shadow
             .background(
                 color = Black,
@@ -132,7 +125,10 @@ fun HrButton(
                 .clickable(
                     enabled = enabled,
                     interactionSource = interactionSource,
-                    indication = ripple(color = rippleColor)
+                    indication = customRipple(
+                        color = rippleColor,
+                        bounded = true,
+                    )
                 ) {
                     eventsCutter.processEvent {
                         clicked = true

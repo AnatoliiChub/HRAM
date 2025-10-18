@@ -1,7 +1,10 @@
 package com.achub.hram.ble
 
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
+import com.achub.hram.logger
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.onFailure
+import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.flow.callbackFlow
 import org.koin.core.annotation.Single
 import platform.CoreBluetooth.CBCentralManager
 import platform.CoreBluetooth.CBCentralManagerDelegateProtocol
@@ -12,27 +15,25 @@ import platform.darwin.NSObject
 //Suppress "turn on bluetooth" popup
 private val options = mapOf<Any?, Any>(CBCentralManagerOptionShowPowerAlertKey to false)
 
+private const val TAG = "BluetoothStateIos"
 @Single
 class BluetoothStateIos : BluetoothState {
 
     private var manager: CBCentralManager? = null
-    private var delegate: NSObject? = null
+    private var delegate: CBCentralManagerDelegateProtocol? = null
 
-    override val isBluetoothOn = MutableStateFlow(manager?.state == CBManagerStatePoweredOn)
-
-    override fun init() {
-        val delegate = object : NSObject(), CBCentralManagerDelegateProtocol {
+    override val isBluetoothOn = callbackFlow {
+        delegate = object : NSObject(), CBCentralManagerDelegateProtocol {
             override fun centralManagerDidUpdateState(central: CBCentralManager) {
-                isBluetoothOn.update { central.state == CBManagerStatePoweredOn }
+                trySendBlocking(central.state == CBManagerStatePoweredOn)
+                    .onFailure { logger(TAG) { "BluetoothState: failed: $it" } }
             }
         }
         manager = CBCentralManager(delegate, null, options)
-        this.delegate = delegate
 
-    }
-
-    override fun release() {
-        manager = null
-        delegate = null
+        awaitClose {
+            manager = null
+            delegate = null
+        }
     }
 }

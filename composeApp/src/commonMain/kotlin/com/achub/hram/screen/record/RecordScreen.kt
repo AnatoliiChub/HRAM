@@ -104,7 +104,7 @@ private fun RecordScreenContent(
 
         is RecordScreenDialog.DeviceConnectedDialog -> InfoDialog(
             title = "Device connected",
-            message = "${dialog.name} from ${dialog.manufacturer} successfully connected",
+            message = "${dialog.bleDevice.name} from ${dialog.bleDevice.manufacturer.orEmpty()} successfully connected",
             onDismiss = onDismissDialog
         )
 

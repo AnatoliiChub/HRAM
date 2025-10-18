@@ -1,27 +1,26 @@
 package com.achub.hram.ble.repo
 
+import com.achub.hram.data.model.BleDevice
 import com.juul.kable.Advertisement
+import com.juul.kable.Identifier
 import com.juul.kable.Peripheral
 import com.juul.kable.State
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
+import kotlin.uuid.ExperimentalUuidApi
 
 interface BleConnectionRepo {
 
-    //TODO should be a state instead of the field. Connected state should contain Peripheral
-    var connected: Peripheral?
+    var isBluetoothOn: Flow<Boolean>
 
-    var isBluetoothOn: StateFlow<Boolean>
+    val state: Channel<State>
 
-    val state: StateFlow<State>
+    val onConnected: Flow<Peripheral>
 
     fun scanHrDevices(): Flow<Advertisement>
 
-    fun connectToDevice(advertisement: Advertisement): Flow<Peripheral>
+    @OptIn(ExperimentalUuidApi::class)
+    fun connectToDevice(identifier: Identifier): Flow<BleDevice>
 
     suspend fun disconnect()
-
-    fun init()
-
-    fun release()
 }

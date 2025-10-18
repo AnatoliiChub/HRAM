@@ -7,36 +7,33 @@ import com.achub.hram.ble.repo.BleDataRepo
 import com.achub.hram.data.model.BleDevice
 import com.achub.hram.data.model.HrNotifications
 import com.achub.hram.launchIn
+import com.achub.hram.logger
+import com.achub.hram.loggerE
+import com.achub.hram.requestBleBefore
 import com.achub.hram.stateInExt
-import com.achub.hram.view.RecordingState
-import com.achub.hram.view.RecordingState.Paused
-import com.achub.hram.view.RecordingState.Recording
 import com.juul.kable.Advertisement
 import com.juul.kable.ExperimentalApi
+import com.juul.kable.Peripheral
 import com.juul.kable.State
-import dev.icerock.moko.permissions.Permission
 import dev.icerock.moko.permissions.PermissionsController
-import dev.icerock.moko.permissions.bluetooth.BLUETOOTH_CONNECT
-import dev.icerock.moko.permissions.bluetooth.BLUETOOTH_SCAN
-import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.InjectedParam
@@ -47,6 +44,7 @@ import kotlin.time.toDuration
 import kotlin.uuid.ExperimentalUuidApi
 
 private const val SCAN_DURATION = 5_000L
+private val TAG = "RecordViewModel"
 
 @KoinViewModel
 class RecordViewModel(
@@ -56,36 +54,38 @@ class RecordViewModel(
 ) : ViewModel() {
 
     var scanJob: Job? = null
-    var listenJob: Job? = null
+    val listenJob = mutableListOf<Job>()
+    var bleStateJob: Job? = null
     private val _uiState = MutableStateFlow(RecordScreenState())
     val uiState = _uiState.stateInExt(initialValue = RecordScreenState())
     val advertisements: MutableList<Advertisement> = mutableListOf()
-    fun onPlay() = _uiState.update {
-        it.copy(recordingState = if (it.recordingState.isRecording()) Paused else Recording)
-    }
+    val isBluetoothOn = MutableStateFlow(false)
 
     init {
-        bleConnectionRepo.init()
+        bleStateJob = bleConnectionRepo.isBluetoothOn
+            .onEach { isBluetoothOn.value = it }
+            .launchIn(viewModelScope, Dispatchers.Default)
     }
 
-    fun onStop() = _uiState.update { it.copy(recordingState = RecordingState.Init) }
+    fun onPlay() = _uiState.toggleRecordingState()
+    fun onStop() = _uiState.stop()
+    fun dismissDialog() = _uiState.update { it.copy(dialog = null) }
+    fun toggleLocationTracking() = _uiState.toggleGpsTracking()
     fun toggleHRTracking() {
-        val trackHR = _uiState.value.trackingStatus.trackHR
-        if (trackHR.not()) {
+        if (_uiState.value.trackingStatus.trackHR.not()) {
             requestScanning()
         } else {
             viewModelScope.launch(Dispatchers.Default) {
                 bleConnectionRepo.disconnect()
-                _uiState.update {
-                    it.copy(trackingStatus = it.trackingStatus.copy(trackHR = trackHR.not(), hrDevice = null))
-                }
+                _uiState.toggleHrTracking()
             }
-
         }
     }
 
     @OptIn(
-        ExperimentalCoroutinesApi::class, ExperimentalApi::class, ExperimentalUuidApi::class,
+        ExperimentalCoroutinesApi::class,
+        ExperimentalApi::class,
+        ExperimentalUuidApi::class,
         ExperimentalTime::class
     )
     fun onDeviceSelected(device: BleDevice) {
@@ -93,64 +93,41 @@ class RecordViewModel(
         cancelConnection()
         advertisements.firstOrNull { it.identifier.toString() == device.identifier }?.let { advertisement ->
             _uiState.updateHrDeviceDialogIfExists { it.copy(isDeviceConfirmed = true, isLoading = true) }
-            listenJob = bleConnectionRepo.connectToDevice(advertisement)
-                .onEach { peripheral ->
-                    val manufacturer = bleDataRepo.readManufacturerName(peripheral)
-                    _uiState.update {
-                        it.copy(
-                            trackingStatus = it.trackingStatus.copy(trackHR = true, hrDevice = device),
-                            dialog = RecordScreenDialog.DeviceConnectedDialog(
-                                name = peripheral.name ?: peripheral.identifier.toString(),
-                                manufacturer = manufacturer
-                            )
-                        )
-                    }
-                }.launchIn(viewModelScope, Dispatchers.Default)
-            bleConnectionRepo.state
-                .filter { it is State.Connected }
-                .distinctUntilChanged()
-                .map { bleConnectionRepo.connected }
-                .filterNotNull()
-                .flatMapLatest { device ->
-                    combine(
-                        bleDataRepo.observeHeartRate(device),
-                        bleDataRepo.observeBatteryLevel(device),
-                        device.state
-                    ) { hrRate, battery, state ->
-                        if (state !is State.Connected) {
-                            HrNotifications.Empty
-                        } else {
-                            HrNotifications(hrRate, battery, now().toEpochMilliseconds())
-                        }
-                    }
-                }
-                .onEach { indications -> _uiState.update { it.copy(indications = it.indications.copy(indications)) } }
-                .catch { Napier.e { "Error: $it" } }
+            bleConnectionRepo.connectToDevice(advertisement.identifier)
+                .withIndex()
+                .onEach { (index, device) ->
+                    if (index > 0) return@onEach
+                    _uiState.update { it.deviceConnectedDialog(device) }
+                }.catch { loggerE(TAG) { "Error while connecting to device: $it" } }
+                .onCompletion { logger(TAG) { "ConnectToDevice job completed" } }
                 .launchIn(viewModelScope, Dispatchers.Default)
+                .let { listenJob.add(it) }
+            bleConnectionRepo.onConnected
+                .flatMapLatest { device -> hrIndicationCombiner(device) }
+                .onEach { _uiState.indications(it) }
+                .catch { loggerE(TAG) { "Error: $it" } }
+                .launchIn(viewModelScope, Dispatchers.Default)
+                .let { listenJob.add(it) }
         }
     }
 
-    fun cancelScanning() {
-        scanJob?.cancel()
-        scanJob = null
-    }
-
-    fun cancelConnection() {
-        listenJob?.cancel()
-        listenJob = null
+    @OptIn(ExperimentalTime::class)
+    private fun hrIndicationCombiner(device: Peripheral): Flow<HrNotifications> = combine(
+        bleDataRepo.observeHeartRate(device),
+        bleDataRepo.observeBatteryLevel(device),
+        device.state
+    ) { hrRate, battery, state ->
+        if (state !is State.Connected) {
+            HrNotifications.Empty
+        } else {
+            HrNotifications(hrRate, battery, now().toEpochMilliseconds())
+        }
     }
 
     fun requestScanning() {
-        viewModelScope.launch {
-            if (bleConnectionRepo.isBluetoothOn.value.not()) {
-                requestBlePermissionBeforeAction(
-                    action = { _uiState.update { it.copy(requestBluetooth = true) } },
-                    onFailure = { _uiState.update { it.copy(dialog = RecordScreenDialog.OpenSettingsDialog) } })
-            } else {
-                requestBlePermissionBeforeAction(
-                    action = ::scan,
-                    onFailure = { _uiState.update { it.copy(dialog = RecordScreenDialog.OpenSettingsDialog) } })
-            }
+        viewModelScope.launch(Dispatchers.Default) {
+            val action = if (isBluetoothOn.value.not()) _uiState::requestBluetooth else ::scan
+            permissionController.requestBleBefore(action = action, onFailure = { _uiState.settingsDialog() })
         }
     }
 
@@ -161,57 +138,44 @@ class RecordViewModel(
         viewModelScope.launch(Dispatchers.Default) {
             cancelScanning()
             val scannedDevices = mutableSetOf<BleDevice>()
-            _uiState.value = _uiState.value.copy(
-                dialog = RecordScreenDialog.ChooseHRDevice(
-                    isLoading = true,
-                    loadingDuration = SCAN_DURATION.toDuration(DurationUnit.MILLISECONDS)
-                )
-            )
+            _uiState.update { it.chooseHrDeviceDialog(SCAN_DURATION.toDuration(DurationUnit.MILLISECONDS)) }
             scanJob = bleConnectionRepo.scanHrDevices()
                 .onEach { advertisements.add(it) }
-                .map {
-                    BleDevice(name = it.peripheralName ?: "", identifier = it.identifier.toString())
-                }
+                .map { BleDevice(name = it.peripheralName ?: "", identifier = it.identifier.toString()) }
                 .flowOn(Dispatchers.IO)
                 .distinctUntilChanged()
                 .onCompletion { _uiState.updateHrDeviceDialogIfExists { it.copy(isLoading = it.isDeviceConfirmed) } }
                 .onEach { device ->
                     scannedDevices.add(device)
                     _uiState.updateHrDeviceDialogIfExists { it.copy(scannedDevices = scannedDevices.toList()) }
-                }.catch { Napier.d { "Error: $it" } }
+                }.catch { loggerE(TAG) { "Error: $it" } }
                 .launchIn(scope = viewModelScope, context = Dispatchers.Default)
             delay(SCAN_DURATION)
             cancelScanning()
         }
     }
 
-    fun toggleLocationTracking() =
-        _uiState.update { it.copy(trackingStatus = it.trackingStatus.copy(trackGps = it.trackingStatus.trackGps.not())) }
-
-    fun dismissDialog() {
-        _uiState.value = _uiState.value.copy(dialog = null)
-    }
-
     override fun onCleared() {
         super.onCleared()
         cancelScanning()
         cancelConnection()
-        Napier.d { "RELEASE 1 3123123 12312" }
-        bleConnectionRepo.release()
+        cancelBleStateObservation()
     }
 
-    fun clearRequestBluetooth() {
-        _uiState.update { it.copy(requestBluetooth = false) }
+    fun clearRequestBluetooth() = _uiState.update { it.copy(requestBluetooth = false) }
+
+    fun cancelScanning() {
+        scanJob?.cancel()
+        scanJob = null
     }
 
-    suspend fun requestBlePermissionBeforeAction(action: () -> Unit, onFailure: () -> Unit) {
-        try {
-            permissionController.providePermission(Permission.BLUETOOTH_SCAN)
-            permissionController.providePermission(Permission.BLUETOOTH_CONNECT)
-            action()
-        } catch (exception: Exception) {
-            Napier.e { "requestBlePermissionBeforeAction Error : $exception" }
-            onFailure()
-        }
+    fun cancelConnection() {
+        listenJob.forEach { it.cancel() }
+        listenJob.clear()
+    }
+
+    fun cancelBleStateObservation() {
+        bleStateJob?.cancel()
+        bleStateJob = null
     }
 }

@@ -1,11 +1,8 @@
 package com.achub.hram.ble
 
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
 
 interface BluetoothState {
-    val isBluetoothOn : StateFlow<Boolean>
+    val isBluetoothOn : Flow<Boolean>
 
-    fun init()
-
-    fun release()
 }

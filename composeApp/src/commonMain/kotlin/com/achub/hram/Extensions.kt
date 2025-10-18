@@ -8,9 +8,13 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dev.icerock.moko.permissions.Permission
 import dev.icerock.moko.permissions.PermissionsController
+import dev.icerock.moko.permissions.bluetooth.BLUETOOTH_CONNECT
+import dev.icerock.moko.permissions.bluetooth.BLUETOOTH_SCAN
 import dev.icerock.moko.permissions.compose.BindEffect
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -35,14 +39,31 @@ fun Float.format(): String {
     return "$intPart.$fracPart"
 }
 
-context(screenModel: ViewModel)
+context(viewModel: ViewModel)
 fun <T> MutableStateFlow<T>.stateInExt(
     initialValue: T
 ) = stateIn(
-    scope = screenModel.viewModelScope,
+    scope = viewModel.viewModelScope,
     started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5_000),
     initialValue = initialValue
 )
+
+context(viewModel: ViewModel)
+fun <T> Flow<T>.stateInExt(
+    initialValue: T
+) = stateIn(
+    scope = viewModel.viewModelScope,
+    started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5_000),
+    initialValue = initialValue
+)
+
+fun logger(tag: String?, message: () -> String) {
+    Napier.d { "[$tag] ${message()}" }
+}
+
+fun loggerE(tag: String?, message: () -> String) {
+    Napier.e { "[$tag] ${message()}" }
+}
 
 @Composable
 fun permissionController(): PermissionsController {
@@ -56,7 +77,7 @@ fun smoothOut(): ExitTransition = shrinkVertically(tween(300, easing = LinearEas
 
 expect fun currentThread(): String
 
-fun  <T> Flow<T>.launchIn(
+fun <T> Flow<T>.launchIn(
     scope: CoroutineScope,
     context: CoroutineContext
 ) = scope.launch(context) { collect() }
@@ -66,5 +87,16 @@ fun tickerFlow(period: Duration, initialDelay: Duration = Duration.ZERO) = flow 
     while (true) {
         emit(Unit)
         delay(period)
+    }
+}
+
+suspend fun PermissionsController.requestBleBefore(action: () -> Unit, onFailure: () -> Unit) {
+    try {
+        providePermission(Permission.BLUETOOTH_SCAN)
+        providePermission(Permission.BLUETOOTH_CONNECT)
+        action()
+    } catch (exception: Exception) {
+        loggerE("PermissionsController") { "requestBlePermissionBeforeAction Error : $exception" }
+        onFailure()
     }
 }

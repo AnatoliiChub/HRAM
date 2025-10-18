@@ -20,16 +20,18 @@ import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.achub.hram.data.model.BleDevice
+import com.achub.hram.logger
 import com.achub.hram.view.DeviceListItem
 import com.achub.hram.view.HRProgress
 import com.achub.hram.view.dialog.base.DialogButton
 import com.achub.hram.view.dialog.base.DialogElevatedCard
 import com.achub.hram.view.dialog.base.DialogMessage
 import com.achub.hram.view.dialog.base.DialogTitle
-import io.github.aakira.napier.Napier
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+
+private val TAG = "HrConnectDialog"
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -44,7 +46,7 @@ fun HrConnectDialog(
 ) {
     var selected by remember { mutableStateOf<BleDevice?>(null) }
     val retryState = !isLoading && selected == null
-    val title = "Connect to device."
+    val title = if (isDeviceConfirmed) "Connecting..." else if (isLoading) "Scanning..." else "Connect Device"
     val message = when {
         isLoading -> "Scanning for devices..."
         devices.isEmpty() -> "No devices found, please try again."
@@ -57,7 +59,7 @@ fun HrConnectDialog(
         val onBtnClick: () -> Unit = {
             when {
                 selected != null -> selected?.let {
-                    Napier.d { "confirmed device: $it" }
+                    logger(TAG) { "confirmed device: $it" }
                     onConfirmClick(it)
                 }
 
@@ -81,7 +83,7 @@ fun HrConnectDialog(
                     Column(horizontalAlignment = CenterHorizontally) {
                         if (devices.isNotEmpty()) Spacer(Modifier.height(24.dp))
                         DeviceList(devices, selected) {
-                            Napier.d { "selected: $selected, it: $it" }
+                            logger(TAG) { "selected: $selected, it: $it" }
                             selected = if (selected == it) null else it
                         }
                         Spacer(Modifier.height(32.dp))
