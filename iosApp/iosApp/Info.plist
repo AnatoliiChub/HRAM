@@ -6,5 +6,9 @@
 	<true/>
     <key>NSBluetoothAlwaysUsageDescription</key>
     <string>This app uses Bluetooth to scan and connect to Heart rate monitor</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>bluetooth-central</string>
+	</array>
 </dict>
 </plist>
