@@ -33,20 +33,20 @@ class StopWatch {
 
     private val accumulatedOnLastPaused = AtomicLong(0L)
 
-    suspend fun start() {
+    fun start() {
         startedTimestamp = now().toEpochMilliseconds()
-        isRunning.send(true)
+        isRunning.trySend(true)
     }
 
-    suspend fun pause() {
+    fun pause() {
         accumulatedOnLastPaused.update { it + now().toEpochMilliseconds() - startedTimestamp }
-        isRunning.send(false)
+        isRunning.trySend(false)
 
     }
 
-    suspend fun  reset() {
+    fun  reset() {
         accumulatedOnLastPaused.update { 0L }
-        isRunning.send(null)
+        isRunning.trySend(null)
     }
 
     fun listen() = isRunning.receiveAsFlow()

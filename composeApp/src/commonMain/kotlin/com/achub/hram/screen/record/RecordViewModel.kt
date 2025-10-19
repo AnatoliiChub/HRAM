@@ -9,7 +9,7 @@ import com.achub.hram.data.model.BleDevice
 import com.achub.hram.launchIn
 import com.achub.hram.requestBleBefore
 import com.achub.hram.stateInExt
-import com.achub.hram.tracking.HramTrackingManager
+import com.achub.hram.tracking.HramActivityTrackingService
 import dev.icerock.moko.permissions.PermissionsController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -25,7 +25,7 @@ import kotlin.time.toDuration
 @KoinViewModel
 class RecordViewModel(
     val bleConnectionRepo: BleConnectionRepo,
-    val trackingManager: HramTrackingManager,
+    val trackingManager: HramActivityTrackingService,
     @InjectedParam val permissionController: PermissionsController
 ) : ViewModel() {
 
@@ -63,7 +63,7 @@ class RecordViewModel(
             requestScanning()
         } else {
             viewModelScope.launch(Dispatchers.Default) {
-                bleConnectionRepo.disconnect()
+                trackingManager.disconect()
                 _uiState.toggleHrTracking()
             }
         }
@@ -96,6 +96,5 @@ class RecordViewModel(
     override fun onCleared() {
         super.onCleared()
         jobs.cancelAndClear()
-        trackingManager.release()
     }
 }

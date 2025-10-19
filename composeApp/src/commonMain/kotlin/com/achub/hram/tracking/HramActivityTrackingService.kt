@@ -2,6 +2,7 @@ package com.achub.hram.tracking
 
 import com.achub.hram.ble.repo.HrDeviceRepo
 import com.achub.hram.data.model.BleDevice
+import com.achub.hram.data.model.HrIndication
 import com.achub.hram.data.model.Indications
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -11,8 +12,10 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
 import org.koin.core.annotation.Single
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.koin.core.parameter.parametersOf
 import kotlin.concurrent.atomics.AtomicInt
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.concurrent.atomics.update
@@ -27,8 +30,10 @@ import kotlin.uuid.ExperimentalUuidApi
     ExperimentalAtomicApi::class
 )
 @Single
-class HramTrackingManager(val stopWatch: StopWatch, val hrDeviceRepo: HrDeviceRepo) : TrackingManager {
+class HramActivityTrackingService : ActivityTrackingService, KoinComponent {
 
+    val stopWatch: StopWatch by inject()
+    val hrDeviceRepo: HrDeviceRepo by inject(parameters = { parametersOf(scope) })
     private var scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private val trackingState = AtomicInt(TRACKING_INIT_STATE)
 
@@ -36,17 +41,17 @@ class HramTrackingManager(val stopWatch: StopWatch, val hrDeviceRepo: HrDeviceRe
 
     override fun startTracking() {
         trackingState.update { ACTIVE_TRACKING_STATE }
-        scope.launch { stopWatch.start() }
+        stopWatch.start()
     }
 
     override fun pauseTracking() {
         trackingState.update { PAUSED_TRACKING_STATE }
-        scope.launch { stopWatch.pause() }
+        stopWatch.pause()
     }
 
     override fun finishTracking() {
         trackingState.update { TRACKING_INIT_STATE }
-        scope.launch { stopWatch.reset() }
+        stopWatch.reset()
     }
 
     override fun scan(onInit: () -> Unit, onUpdate: (List<BleDevice>) -> Unit, onComplete: () -> Unit) =
@@ -58,7 +63,9 @@ class HramTrackingManager(val stopWatch: StopWatch, val hrDeviceRepo: HrDeviceRe
         onConnected: (BleDevice) -> Unit
     ) = hrDeviceRepo.connect(device, onInitConnection, onConnected)
 
-    override fun listen() = hrDeviceRepo.latestIndications.receiveAsFlow()
+    override fun listen() = hrDeviceRepo.latestIndications
+        .receiveAsFlow()
+        .onStart { emit(HrIndication.Empty) }
         .combine(stopWatch.listen().onStart { emit(0) }) { hrIndications, elapsedTime ->
             if (isRecording) {
                 //TODO store indication data with timestamp
@@ -68,8 +75,7 @@ class HramTrackingManager(val stopWatch: StopWatch, val hrDeviceRepo: HrDeviceRe
 
     override fun cancelScanning() = hrDeviceRepo.cancelScanning()
 
-    override fun release() {
-        hrDeviceRepo.release()
-    }
+    override fun disconect() = hrDeviceRepo.disconnect()
+
 
 }

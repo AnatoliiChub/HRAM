@@ -15,8 +15,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -30,6 +28,7 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
+import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.Single
 import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
@@ -38,11 +37,14 @@ const val SCAN_DURATION = 5_000L
 private const val TAG = "HramHrDeviceRepo"
 
 @Single
-class HramHrDeviceRepo(val bleDataRepo: BleDataRepo, val bleConnectionRepo: BleConnectionRepo) : HrDeviceRepo {
+class HramHrDeviceRepo(
+    @InjectedParam val scope: CoroutineScope,
+    val bleDataRepo: BleDataRepo,
+    val bleConnectionRepo: BleConnectionRepo
+) : HrDeviceRepo {
     private val advertisements: MutableList<Advertisement> = mutableListOf()
     private var scanJobs = mutableListOf<Job>()
     private val connectionJobs = mutableListOf<Job>()
-    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     override val latestIndications = Channel<HrIndication>()
 
     @OptIn(FlowPreview::class, ExperimentalUuidApi::class)
@@ -72,7 +74,8 @@ class HramHrDeviceRepo(val bleDataRepo: BleDataRepo, val bleConnectionRepo: BleC
     override fun connect(
         device: BleDevice,
         onInitConnection: () -> Unit,
-        onConnected: (BleDevice) -> Unit) {
+        onConnected: (BleDevice) -> Unit
+    ) {
         cancelScanning()
         cancelConnection()
         advertisements.firstOrNull { it.identifier.toString() == device.identifier }?.let { advertisement ->
@@ -93,10 +96,12 @@ class HramHrDeviceRepo(val bleDataRepo: BleDataRepo, val bleConnectionRepo: BleC
         }
     }
 
-    override fun release() {
-        cancelScanning()
-        cancelConnection()
-        scope.cancel()
+    override fun disconnect() {
+        scope.launch {
+            bleConnectionRepo.disconnect()
+            cancelScanning()
+            cancelConnection()
+        }
     }
 
     @OptIn(ExperimentalTime::class)

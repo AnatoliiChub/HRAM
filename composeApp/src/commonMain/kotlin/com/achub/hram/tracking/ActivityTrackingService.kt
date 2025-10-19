@@ -8,7 +8,7 @@ const val TRACKING_INIT_STATE = 0
 const val ACTIVE_TRACKING_STATE = 1
 const val PAUSED_TRACKING_STATE = 2
 
-interface TrackingManager {
+interface ActivityTrackingService {
 
     fun startTracking()
     fun pauseTracking()
@@ -23,5 +23,5 @@ interface TrackingManager {
 
     fun listen(): Flow<Indications>
     fun cancelScanning()
-    fun release()
+    fun disconect()
 }

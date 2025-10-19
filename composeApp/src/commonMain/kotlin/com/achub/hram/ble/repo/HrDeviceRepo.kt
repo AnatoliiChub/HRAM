@@ -20,5 +20,5 @@ interface HrDeviceRepo {
     )
 
     fun cancelScanning()
-    fun release()
+    fun disconnect()
 }

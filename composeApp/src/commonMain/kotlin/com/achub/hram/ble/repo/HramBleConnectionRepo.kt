@@ -128,7 +128,7 @@ class HramBleConnectionRepo(
         connectionJob = null
         connectionScope?.cancel()
         connectionScope = CoroutineScope(Dispatchers.Default + SupervisorJob()).apply {
-            connectionJob = peripheral.state.onEach { state.send(it)  }
+            connectionJob = peripheral.state.onEach { state.trySend(it) }
                 .onEach { logger(TAG) { "current state $it" } }
                 .map { currentState -> CONNECT_STATES.any { it == currentState::class }.not() }
                 .combine(isBluetoothOn) { notConnected, isBtOn -> notConnected && isBtOn }
@@ -137,7 +137,7 @@ class HramBleConnectionRepo(
                 .catch {
                     if (it !is UnmetRequirementException) {
                         loggerE(TAG) { "Reconnection requested because of: $it" }
-                        isKeepConnection.send(true)
+                        isKeepConnection.trySend(true)
                     } else {
                         loggerE(TAG) { "Ignored: $it" }
                     }
@@ -154,12 +154,13 @@ class HramBleConnectionRepo(
     }
 
     override suspend fun disconnect() {
-        isKeepConnection.send(false)
+        isKeepConnection.trySend(false)
+        connected?.disconnect()
+        connected = null
         connectionJob?.cancel()
         connectionJob = null
         connectionScope?.cancel()
-        connected?.disconnect()
-        connected = null
+        connectionScope = null
     }
 
 }
