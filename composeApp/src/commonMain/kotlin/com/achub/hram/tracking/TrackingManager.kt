@@ -1,7 +1,7 @@
 package com.achub.hram.tracking
 
 import com.achub.hram.data.model.BleDevice
-import com.achub.hram.data.model.HrNotifications
+import com.achub.hram.data.model.Indications
 import kotlinx.coroutines.flow.Flow
 
 const val TRACKING_INIT_STATE = 0
@@ -13,15 +13,15 @@ interface TrackingManager {
     fun startTracking()
     fun pauseTracking()
     fun finishTracking()
-    fun listenTrackingTime(): Flow<Long>
     fun scan(onInit: () -> Unit, onUpdate: (List<BleDevice>) -> Unit, onComplete: () -> Unit)
-    fun listen(
+
+    fun connect(
         device: BleDevice,
         onInitConnection: () -> Unit,
         onConnected: (BleDevice) -> Unit,
-        onNewIndications: (HrNotifications) -> Unit
     )
 
+    fun listen(): Flow<Indications>
     fun cancelScanning()
     fun release()
 }

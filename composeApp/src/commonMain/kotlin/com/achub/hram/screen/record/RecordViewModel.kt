@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.achub.hram.ble.repo.BleConnectionRepo
 import com.achub.hram.ble.repo.SCAN_DURATION
+import com.achub.hram.cancelAndClear
 import com.achub.hram.data.model.BleDevice
 import com.achub.hram.launchIn
 import com.achub.hram.requestBleBefore
@@ -31,15 +32,17 @@ class RecordViewModel(
     private val _uiState = MutableStateFlow(RecordScreenState())
     val uiState = _uiState.stateInExt(initialValue = RecordScreenState())
     private val isBluetoothOn = MutableStateFlow(false)
-    private var bleStateJob: Job? = null
+    private var jobs = mutableListOf<Job>()
 
     init {
-        bleStateJob = bleConnectionRepo.isBluetoothOn
+        bleConnectionRepo.isBluetoothOn
             .onEach { isBluetoothOn.value = it }
             .launchIn(viewModelScope, Dispatchers.Default)
-        trackingManager.listenTrackingTime()
-            .onEach { current -> _uiState.update { it.copy(indications = it.indications.copy(duration = current)) } }
+            .let { jobs.add(it) }
+        trackingManager.listen()
+            .onEach(_uiState::indications)
             .launchIn(viewModelScope, Dispatchers.Default)
+            .let { jobs.add(it) }
     }
 
     fun toggleRecording() = _uiState.toggleRecordingState().also {
@@ -83,22 +86,16 @@ class RecordViewModel(
     }
 
     fun onHrDeviceSelected(device: BleDevice) {
-        trackingManager.listen(
+        trackingManager.connect(
             device,
             onInitConnection = _uiState::updateHrDeviceDialogConnecting,
             onConnected = _uiState::deviceConnectedDialog,
-            onNewIndications = _uiState::indications
         )
     }
 
     override fun onCleared() {
         super.onCleared()
-        cancelBleStateObservation()
+        jobs.cancelAndClear()
         trackingManager.release()
-    }
-
-    fun cancelBleStateObservation() {
-        bleStateJob?.cancel()
-        bleStateJob = null
     }
 }

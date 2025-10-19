@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-import com.achub.hram.data.model.HrNotifications
+import com.achub.hram.data.model.HrIndication
 import com.achub.hram.style.Dimen132
 import com.achub.hram.style.Dimen32
 import com.achub.hram.style.Gray
@@ -30,22 +30,22 @@ import org.jetbrains.compose.resources.vectorResource
 @Composable
 fun HeartLabelRow(
     modifier: Modifier = Modifier,
-    hrNotifications: HrNotifications
+    hrIndication: HrIndication
 ) {
-    val isEmpty = hrNotifications.isEmpty()
-    val hrBpm = hrNotifications.hrBpm
-    val batteryLevel = hrNotifications.batteryLevel
+    val isEmpty = hrIndication.isEmpty()
+    val hrBpm = hrIndication.hrBpm
+    val batteryLevel = hrIndication.batteryLevel
     val heartColor = if (isEmpty) Gray else Red
     Row(verticalAlignment = CenterVertically) {
         HeartBeatingAnimView(hrBpm, modifier, heartColor)
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 modifier = Modifier.align(Alignment.CenterHorizontally).widthIn(min = Dimen132),
-                text = "${if (hrNotifications.isEmpty()) "--" else hrBpm} BPM",
+                text = "${if (hrIndication.isEmpty()) "--" else hrBpm} BPM",
                 textAlign = TextAlign.Center,
                 style = HeadingMediumBold
             )
-            val hasBatteryLevel = batteryLevel != HrNotifications.NO_BATTERY_LEVEL
+            val hasBatteryLevel = batteryLevel != HrIndication.NO_BATTERY_LEVEL
             val secondaryLabel = if (isEmpty) " No connection" else "  :  $batteryLevel %"
             val secondaryLabelColor = if (isEmpty) Red else White
             Row(verticalAlignment = CenterVertically) {

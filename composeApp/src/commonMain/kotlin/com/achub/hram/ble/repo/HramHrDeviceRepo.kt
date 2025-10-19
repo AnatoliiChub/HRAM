@@ -2,7 +2,7 @@ package com.achub.hram.ble.repo
 
 import com.achub.hram.cancelAndClear
 import com.achub.hram.data.model.BleDevice
-import com.achub.hram.data.model.HrNotifications
+import com.achub.hram.data.model.HrIndication
 import com.achub.hram.launchIn
 import com.achub.hram.logger
 import com.achub.hram.loggerE
@@ -17,6 +17,7 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -30,7 +31,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.Single
-import kotlin.time.Clock.System.now
 import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 
@@ -43,6 +43,7 @@ class HramHrDeviceRepo(val bleDataRepo: BleDataRepo, val bleConnectionRepo: BleC
     private var scanJobs = mutableListOf<Job>()
     private val connectionJobs = mutableListOf<Job>()
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    override val latestIndications = Channel<HrIndication>()
 
     @OptIn(FlowPreview::class, ExperimentalUuidApi::class)
     override fun scan(onInit: () -> Unit, onUpdate: (List<BleDevice>) -> Unit, onComplete: () -> Unit) {
@@ -68,12 +69,10 @@ class HramHrDeviceRepo(val bleDataRepo: BleDataRepo, val bleConnectionRepo: BleC
     }
 
     @OptIn(ExperimentalCoroutinesApi::class, ExperimentalUuidApi::class)
-    override fun listen(
+    override fun connect(
         device: BleDevice,
         onInitConnection: () -> Unit,
-        onConnected: (BleDevice) -> Unit,
-        onNewIndications: (HrNotifications) -> Unit
-    ) {
+        onConnected: (BleDevice) -> Unit) {
         cancelScanning()
         cancelConnection()
         advertisements.firstOrNull { it.identifier.toString() == device.identifier }?.let { advertisement ->
@@ -87,7 +86,7 @@ class HramHrDeviceRepo(val bleDataRepo: BleDataRepo, val bleConnectionRepo: BleC
                 .let { connectionJobs.add(it) }
             bleConnectionRepo.onConnected
                 .flatMapLatest { device -> hrIndicationCombiner(device) }
-                .onEach { onNewIndications(it) }
+                .onEach { latestIndications.send(it) }
                 .catch { loggerE(TAG) { "Error: $it" } }
                 .launchIn(scope, Dispatchers.Default)
                 .let { connectionJobs.add(it) }
@@ -101,15 +100,15 @@ class HramHrDeviceRepo(val bleDataRepo: BleDataRepo, val bleConnectionRepo: BleC
     }
 
     @OptIn(ExperimentalTime::class)
-    private fun hrIndicationCombiner(device: Peripheral): Flow<HrNotifications> = combine(
+    private fun hrIndicationCombiner(device: Peripheral): Flow<HrIndication> = combine(
         bleDataRepo.observeHeartRate(device),
         bleDataRepo.observeBatteryLevel(device),
         device.state
     ) { hrRate, battery, state ->
         if (state !is State.Connected) {
-            HrNotifications.Empty
+            HrIndication.Empty
         } else {
-            HrNotifications(hrRate, battery, now().toEpochMilliseconds())
+            HrIndication(hrRate, battery)
         }
     }
 

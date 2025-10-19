@@ -5,7 +5,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
-import com.achub.hram.data.model.IndicationSection
+import com.achub.hram.data.model.Indications
 import com.achub.hram.style.Heading3
 import com.achub.hram.view.indications.DistanceLabelRow
 import com.achub.hram.view.indications.HeartLabelRow
@@ -22,9 +22,9 @@ val dateFormat = LocalTime.Format {
 }
 
 @Composable
-fun TrackingIndicationsSection(indications: IndicationSection) {
+fun TrackingIndicationsSection(indications: Indications) {
     Column(horizontalAlignment = CenterHorizontally) {
-        HeartLabelRow(hrNotifications = indications.hrNotifications)
+        HeartLabelRow(hrIndication = indications.hrIndication)
         DistanceLabelRow(distance = indications.distance)
         Text(
             modifier = Modifier.align(CenterHorizontally),

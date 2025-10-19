@@ -12,8 +12,8 @@ import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.achub.hram.data.model.BleDevice
-import com.achub.hram.data.model.HrNotifications
-import com.achub.hram.data.model.IndicationSection
+import com.achub.hram.data.model.HrIndication
+import com.achub.hram.data.model.Indications
 import com.achub.hram.data.model.TrackingStatus
 import com.achub.hram.permissionController
 import com.achub.hram.requestBluetooth
@@ -130,8 +130,8 @@ private fun RecordScreenContent(
 private fun RecordScreenPreview() {
     RecordScreenContent(
         state = RecordScreenState(
-            indications = IndicationSection(
-                hrNotifications = HrNotifications(hrBpm = 83, batteryLevel = 75, timestamp = 0),
+            indications = Indications(
+                hrIndication = HrIndication(hrBpm = 83, batteryLevel = 75),
                 duration = 235L,
             ),
             trackingStatus = TrackingStatus(
@@ -158,8 +158,8 @@ private fun RecordScreenPreview() {
 private fun RecordScreenEmptyPreview() {
     RecordScreenContent(
         state = RecordScreenState(
-            indications = IndicationSection(
-                hrNotifications = HrNotifications.Empty,
+            indications = Indications(
+                hrIndication = HrIndication.Empty,
                 duration = 754L,
             ),
             trackingStatus = TrackingStatus(
@@ -186,8 +186,8 @@ private fun RecordScreenEmptyPreview() {
 private fun RecordScreenChooseDeviceDialogPreview() {
     RecordScreenContent(
         state = RecordScreenState(
-            indications = IndicationSection(
-                hrNotifications = HrNotifications(hrBpm = 83, batteryLevel = 75, timestamp = 0),
+            indications = Indications(
+                hrIndication = HrIndication(hrBpm = 83, batteryLevel = 75),
                 duration = 754L,
             ),
             trackingStatus = TrackingStatus(

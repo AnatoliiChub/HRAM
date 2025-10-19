@@ -15,7 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
-import com.achub.hram.data.model.HrNotifications
+import com.achub.hram.data.model.HrIndication
 import com.achub.hram.style.Dimen64
 import com.achub.hram.style.HeadingMediumBold
 import com.achub.hram.view.indications.DistanceLabelRow
@@ -59,7 +59,7 @@ fun IndicationImage(
 @Preview
 fun PreviewImageLabelRow() {
     Column(Modifier.fillMaxWidth(), horizontalAlignment = CenterHorizontally) {
-        HeartLabelRow(hrNotifications = HrNotifications(hrBpm = 80, batteryLevel = 76))
+        HeartLabelRow(hrIndication = HrIndication(hrBpm = 80, batteryLevel = 76))
         DistanceLabelRow(distance = 5.329f)
         WarningLabelRow(label = "Choose at least one tracking option")
     }
