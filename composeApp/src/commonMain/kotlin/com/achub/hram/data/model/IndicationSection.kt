@@ -5,7 +5,7 @@ import kotlin.time.ExperimentalTime
 data class IndicationSection(
     val hrNotifications: HrNotifications = HrNotifications.Empty,
     val distance: Float = 0f,
-    val duration: String = "00:00:00",
+    val duration: Long = 0L,
 )
 
 data class HrNotifications(val hrBpm: Int, val batteryLevel: Int, val timestamp: Long = 0) {

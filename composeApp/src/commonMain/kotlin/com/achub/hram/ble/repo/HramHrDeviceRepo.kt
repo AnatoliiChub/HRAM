@@ -1,10 +1,11 @@
-package com.achub.hram.tracking
+package com.achub.hram.ble.repo
 
-import com.achub.hram.ble.repo.BleConnectionRepo
-import com.achub.hram.ble.repo.BleDataRepo
+import com.achub.hram.cancelAndClear
 import com.achub.hram.data.model.BleDevice
 import com.achub.hram.data.model.HrNotifications
 import com.achub.hram.launchIn
+import com.achub.hram.logger
+import com.achub.hram.loggerE
 import com.juul.kable.Advertisement
 import com.juul.kable.Peripheral
 import com.juul.kable.State
@@ -34,13 +35,13 @@ import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 
 const val SCAN_DURATION = 5_000L
-private const val TAG = "HrTracker"
+private const val TAG = "HramHrDeviceRepo"
 
 @Single
-class HramHrTracker(val bleDataRepo: BleDataRepo, val bleConnectionRepo: BleConnectionRepo) : HrTracker {
+class HramHrDeviceRepo(val bleDataRepo: BleDataRepo, val bleConnectionRepo: BleConnectionRepo) : HrDeviceRepo {
     private val advertisements: MutableList<Advertisement> = mutableListOf()
     private var scanJobs = mutableListOf<Job>()
-    private val listenJobs = mutableListOf<Job>()
+    private val connectionJobs = mutableListOf<Job>()
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     @OptIn(FlowPreview::class, ExperimentalUuidApi::class)
@@ -58,7 +59,7 @@ class HramHrTracker(val bleDataRepo: BleDataRepo, val bleConnectionRepo: BleConn
                     scannedDevices.add(device)
                     onUpdate(scannedDevices.toList())
                 }.onCompletion { onComplete() }
-                .catch { _root_ide_package_.com.achub.hram.loggerE(TAG) { "Error: $it" } }
+                .catch { loggerE(TAG) { "Error: $it" } }
                 .launchIn(scope = scope, context = Dispatchers.Default)
                 .let { scanJobs.add(it) }
             delay(SCAN_DURATION)
@@ -80,16 +81,16 @@ class HramHrTracker(val bleDataRepo: BleDataRepo, val bleConnectionRepo: BleConn
             bleConnectionRepo.connectToDevice(advertisement.identifier)
                 .withIndex()
                 .onEach { (index, device) -> if (index == 0) onConnected(device) }
-                .catch { _root_ide_package_.com.achub.hram.loggerE(TAG) { "Error while connecting to device: $it" } }
-                .onCompletion { _root_ide_package_.com.achub.hram.logger(TAG) { "ConnectToDevice job completed" } }
+                .catch { loggerE(TAG) { "Error while connecting to device: $it" } }
+                .onCompletion { logger(TAG) { "ConnectToDevice job completed" } }
                 .launchIn(scope, Dispatchers.Default)
-                .let { listenJobs.add(it) }
+                .let { connectionJobs.add(it) }
             bleConnectionRepo.onConnected
                 .flatMapLatest { device -> hrIndicationCombiner(device) }
                 .onEach { onNewIndications(it) }
-                .catch { _root_ide_package_.com.achub.hram.loggerE(TAG) { "Error: $it" } }
+                .catch { loggerE(TAG) { "Error: $it" } }
                 .launchIn(scope, Dispatchers.Default)
-                .let { listenJobs.add(it) }
+                .let { connectionJobs.add(it) }
         }
     }
 
@@ -112,13 +113,7 @@ class HramHrTracker(val bleDataRepo: BleDataRepo, val bleConnectionRepo: BleConn
         }
     }
 
-    override fun cancelScanning() {
-        scanJobs.forEach { it.cancel() }
-        scanJobs.clear()
-    }
+    override fun cancelScanning() = scanJobs.cancelAndClear()
 
-    private fun cancelConnection() {
-        listenJobs.forEach { it.cancel() }
-        listenJobs.clear()
-    }
+    private fun cancelConnection() = connectionJobs.cancelAndClear()
 }

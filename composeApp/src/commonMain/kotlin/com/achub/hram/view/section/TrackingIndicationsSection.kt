@@ -9,6 +9,17 @@ import com.achub.hram.data.model.IndicationSection
 import com.achub.hram.style.Heading3
 import com.achub.hram.view.indications.DistanceLabelRow
 import com.achub.hram.view.indications.HeartLabelRow
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.format
+import kotlinx.datetime.format.char
+
+val dateFormat = LocalTime.Format {
+    hour()
+    char(':')
+    minute()
+    char(':')
+    second()
+}
 
 @Composable
 fun TrackingIndicationsSection(indications: IndicationSection) {
@@ -17,7 +28,7 @@ fun TrackingIndicationsSection(indications: IndicationSection) {
         DistanceLabelRow(distance = indications.distance)
         Text(
             modifier = Modifier.align(CenterHorizontally),
-            text = indications.duration,
+            text = LocalTime.fromSecondOfDay(indications.duration.toInt()).format(dateFormat),
             style = Heading3
         )
     }

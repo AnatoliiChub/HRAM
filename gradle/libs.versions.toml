@@ -14,6 +14,7 @@ moko = "0.20.1"
 ksp = "2.2.20-2.0.3"
 koin-annotations = "2.1.0"
 datastore ="1.1.7"
+kotlinx-datetime = "0.7.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -32,6 +33,7 @@ koin-ksp-compiler = {module = "io.insert-koin:koin-ksp-compiler", version.ref = 
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 datastore = {module ="androidx.datastore:datastore", version.ref ="datastore"}
 datastore-preferences = {module ="androidx.datastore:datastore-preferences", version.ref ="datastore"}
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 
 
 [plugins]

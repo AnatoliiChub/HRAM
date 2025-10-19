@@ -3,12 +3,12 @@ package com.achub.hram.screen.record
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.achub.hram.ble.repo.BleConnectionRepo
+import com.achub.hram.ble.repo.SCAN_DURATION
 import com.achub.hram.data.model.BleDevice
 import com.achub.hram.launchIn
 import com.achub.hram.requestBleBefore
 import com.achub.hram.stateInExt
-import com.achub.hram.tracking.HrTracker
-import com.achub.hram.tracking.SCAN_DURATION
+import com.achub.hram.tracking.HramTrackingManager
 import dev.icerock.moko.permissions.PermissionsController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -24,7 +24,7 @@ import kotlin.time.toDuration
 @KoinViewModel
 class RecordViewModel(
     val bleConnectionRepo: BleConnectionRepo,
-    val hrTracker: HrTracker,
+    val trackingManager: HramTrackingManager,
     @InjectedParam val permissionController: PermissionsController
 ) : ViewModel() {
 
@@ -37,13 +37,22 @@ class RecordViewModel(
         bleStateJob = bleConnectionRepo.isBluetoothOn
             .onEach { isBluetoothOn.value = it }
             .launchIn(viewModelScope, Dispatchers.Default)
+        trackingManager.listenTrackingTime()
+            .onEach { current -> _uiState.update { it.copy(indications = it.indications.copy(duration = current)) } }
+            .launchIn(viewModelScope, Dispatchers.Default)
     }
 
-    fun toggleRecording() = _uiState.toggleRecordingState()
-    fun stopRecording() = _uiState.stop()
+    fun toggleRecording() = _uiState.toggleRecordingState().also {
+        if (_uiState.isRecording) trackingManager.startTracking() else trackingManager.pauseTracking()
+    }
+
+    fun stopRecording() = _uiState.stop().also {
+        trackingManager.finishTracking()
+    }
+
     fun dismissDialog() = _uiState.update { it.copy(dialog = null) }
     fun toggleLocationTracking() = _uiState.toggleGpsTracking()
-    fun cancelScanning() = hrTracker.cancelScanning()
+    fun cancelScanning() = trackingManager.cancelScanning()
     fun clearRequestBluetooth() = _uiState.update { it.copy(requestBluetooth = false) }
     fun openSettings() = permissionController.openAppSettings()
     fun toggleHRTracking() {
@@ -66,7 +75,7 @@ class RecordViewModel(
     }
 
     private fun scan() {
-        hrTracker.scan(
+        trackingManager.scan(
             onInit = { _uiState.update { it.chooseHrDeviceDialog(SCAN_DURATION.toDuration(DurationUnit.MILLISECONDS)) } },
             onUpdate = { devices -> _uiState.updateHrDeviceDialogIfExists { it.copy(scannedDevices = devices) } },
             onComplete = { _uiState.updateHrDeviceDialogIfExists { it.copy(isLoading = it.isDeviceConfirmed) } }
@@ -74,7 +83,7 @@ class RecordViewModel(
     }
 
     fun onHrDeviceSelected(device: BleDevice) {
-        hrTracker.listen(
+        trackingManager.listen(
             device,
             onInitConnection = _uiState::updateHrDeviceDialogConnecting,
             onConnected = _uiState::deviceConnectedDialog,
@@ -85,7 +94,7 @@ class RecordViewModel(
     override fun onCleared() {
         super.onCleared()
         cancelBleStateObservation()
-        hrTracker.release()
+        trackingManager.release()
     }
 
     fun cancelBleStateObservation() {

@@ -18,7 +18,6 @@ data class RecordScreenState(
     val requestBluetooth: Boolean = false,
     val dialog: RecordScreenDialog? = null,
 ) {
-
     fun chooseHrDeviceDialog(duration: Duration) = this.copy(
         dialog = RecordScreenDialog.ChooseHRDevice(
             isLoading = true,
@@ -78,3 +77,5 @@ fun MutableStateFlow<RecordScreenState>.indications(indications: HrNotifications
 
 fun MutableStateFlow<RecordScreenState>.updateHrDeviceDialogConnecting() =
     this.updateHrDeviceDialogIfExists { it.copy(isDeviceConfirmed = true, isLoading = true) }
+
+val MutableStateFlow<RecordScreenState>.isRecording: Boolean get() = value.recordingState.isRecording()

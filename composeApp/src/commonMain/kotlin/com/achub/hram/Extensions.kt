@@ -16,6 +16,7 @@ import dev.icerock.moko.permissions.compose.BindEffect
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -99,4 +100,9 @@ suspend fun PermissionsController.requestBleBefore(action: () -> Unit, onFailure
         loggerE("PermissionsController") { "requestBlePermissionBeforeAction Error : $exception" }
         onFailure()
     }
+}
+
+fun MutableList<Job>.cancelAndClear() {
+    this.forEach { it.cancel() }
+    this.clear()
 }
