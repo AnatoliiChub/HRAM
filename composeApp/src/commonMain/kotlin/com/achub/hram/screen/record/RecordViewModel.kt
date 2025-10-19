@@ -6,15 +6,20 @@ import com.achub.hram.ble.repo.BleConnectionRepo
 import com.achub.hram.ble.repo.SCAN_DURATION
 import com.achub.hram.cancelAndClear
 import com.achub.hram.data.model.BleDevice
+import com.achub.hram.data.model.HrIndication
+import com.achub.hram.data.model.Indications
 import com.achub.hram.launchIn
 import com.achub.hram.requestBleBefore
 import com.achub.hram.stateInExt
-import com.achub.hram.tracking.HramActivityTrackingService
+import com.achub.hram.tracking.HramActivityTrackingManager
 import dev.icerock.moko.permissions.PermissionsController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
@@ -25,7 +30,7 @@ import kotlin.time.toDuration
 @KoinViewModel
 class RecordViewModel(
     val bleConnectionRepo: BleConnectionRepo,
-    val trackingManager: HramActivityTrackingService,
+    val trackingManager: HramActivityTrackingManager,
     @InjectedParam val permissionController: PermissionsController
 ) : ViewModel() {
 
@@ -39,7 +44,10 @@ class RecordViewModel(
             .onEach { isBluetoothOn.value = it }
             .launchIn(viewModelScope, Dispatchers.Default)
             .let { jobs.add(it) }
-        trackingManager.listen()
+        trackingManager.hrIndication.receiveAsFlow().onStart { emit(HrIndication.Empty) }
+            .combine(trackingManager.elapsedTime()) { hrIndication, elapsedTime ->
+                Indications(hrIndication = hrIndication, elapsedTime = elapsedTime)
+            }
             .onEach(_uiState::indications)
             .launchIn(viewModelScope, Dispatchers.Default)
             .let { jobs.add(it) }
@@ -63,7 +71,7 @@ class RecordViewModel(
             requestScanning()
         } else {
             viewModelScope.launch(Dispatchers.Default) {
-                trackingManager.disconect()
+                trackingManager.disconnect()
                 _uiState.toggleHrTracking()
             }
         }

@@ -28,7 +28,7 @@ fun TrackingIndicationsSection(indications: Indications) {
         DistanceLabelRow(distance = indications.distance)
         Text(
             modifier = Modifier.align(CenterHorizontally),
-            text = LocalTime.fromSecondOfDay(indications.duration.toInt()).format(dateFormat),
+            text = LocalTime.fromSecondOfDay(indications.elapsedTime.toInt()).format(dateFormat),
             style = Heading3
         )
     }

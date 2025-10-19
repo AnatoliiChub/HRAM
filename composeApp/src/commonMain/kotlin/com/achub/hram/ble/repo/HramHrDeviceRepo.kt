@@ -15,7 +15,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -45,7 +44,6 @@ class HramHrDeviceRepo(
     private val advertisements: MutableList<Advertisement> = mutableListOf()
     private var scanJobs = mutableListOf<Job>()
     private val connectionJobs = mutableListOf<Job>()
-    override val latestIndications = Channel<HrIndication>()
 
     @OptIn(FlowPreview::class, ExperimentalUuidApi::class)
     override fun scan(onInit: () -> Unit, onUpdate: (List<BleDevice>) -> Unit, onComplete: () -> Unit) {
@@ -70,7 +68,7 @@ class HramHrDeviceRepo(
         }.let { scanJobs.add(it) }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class, ExperimentalUuidApi::class)
+    @OptIn(ExperimentalUuidApi::class)
     override fun connect(
         device: BleDevice,
         onInitConnection: () -> Unit,
@@ -87,14 +85,13 @@ class HramHrDeviceRepo(
                 .onCompletion { logger(TAG) { "ConnectToDevice job completed" } }
                 .launchIn(scope, Dispatchers.Default)
                 .let { connectionJobs.add(it) }
-            bleConnectionRepo.onConnected
-                .flatMapLatest { device -> hrIndicationCombiner(device) }
-                .onEach { latestIndications.send(it) }
-                .catch { loggerE(TAG) { "Error: $it" } }
-                .launchIn(scope, Dispatchers.Default)
-                .let { connectionJobs.add(it) }
         }
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun listen() = bleConnectionRepo.onConnected
+        .flatMapLatest { device -> hrIndicationCombiner(device) }
+        .catch { loggerE(TAG) { "Error: $it" } }
 
     override fun disconnect() {
         scope.launch {

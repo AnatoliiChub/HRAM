@@ -132,7 +132,7 @@ private fun RecordScreenPreview() {
         state = RecordScreenState(
             indications = Indications(
                 hrIndication = HrIndication(hrBpm = 83, batteryLevel = 75),
-                duration = 235L,
+                elapsedTime = 235L,
             ),
             trackingStatus = TrackingStatus(
                 trackHR = true,
@@ -160,7 +160,7 @@ private fun RecordScreenEmptyPreview() {
         state = RecordScreenState(
             indications = Indications(
                 hrIndication = HrIndication.Empty,
-                duration = 754L,
+                elapsedTime = 754L,
             ),
             trackingStatus = TrackingStatus(
                 trackHR = true,
@@ -188,7 +188,7 @@ private fun RecordScreenChooseDeviceDialogPreview() {
         state = RecordScreenState(
             indications = Indications(
                 hrIndication = HrIndication(hrBpm = 83, batteryLevel = 75),
-                duration = 754L,
+                elapsedTime = 754L,
             ),
             trackingStatus = TrackingStatus(
                 trackHR = false,
