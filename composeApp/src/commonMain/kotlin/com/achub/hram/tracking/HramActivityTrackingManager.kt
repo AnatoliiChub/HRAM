@@ -1,6 +1,11 @@
 package com.achub.hram.tracking
 
 import com.achub.hram.ble.repo.HrDeviceRepo
+import com.achub.hram.cancelAndClear
+import com.achub.hram.createActivity
+import com.achub.hram.data.HrActivityRepo
+import com.achub.hram.data.db.entity.ACTIVE_ACTIVITY
+import com.achub.hram.data.db.entity.HeartRateEntity
 import com.achub.hram.data.model.BleDevice
 import com.achub.hram.data.model.HrIndication
 import com.achub.hram.launchIn
@@ -15,8 +20,10 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.launch
 import org.koin.core.annotation.Single
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -24,6 +31,7 @@ import org.koin.core.parameter.parametersOf
 import kotlin.concurrent.atomics.AtomicInt
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.concurrent.atomics.update
+import kotlin.time.Clock.System.now
 import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 
@@ -41,16 +49,26 @@ class HramActivityTrackingManager : ActivityTrackingService, KoinComponent {
 
     val stopWatch: StopWatch by inject()
     val hrDeviceRepo: HrDeviceRepo by inject(parameters = { parametersOf(scope) })
+    val hrActivityRepo: HrActivityRepo by inject()
     private var scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private val trackingState = AtomicInt(TRACKING_INIT_STATE)
-    private var listenJob: Job? = null
+    private var jobs = mutableListOf<Job>()
     override val hrIndication = Channel<HrIndication>()
     override fun elapsedTime(): Flow<Long> = stopWatch.listen()
     private val isRecording get() = trackingState.load() == ACTIVE_TRACKING_STATE
+    private var currentActId: String? = null
 
     override fun startTracking() {
-        trackingState.update { ACTIVE_TRACKING_STATE }
-        stopWatch.start()
+        scope.launch(Dispatchers.Default) {
+            if (currentActId == null) {
+                val currentTime = now().epochSeconds
+                val activity = createActivity(ACTIVE_ACTIVITY, currentTime)
+                currentActId = activity.id
+                hrActivityRepo.insert(activity)
+            }
+            trackingState.update { ACTIVE_TRACKING_STATE }
+            stopWatch.start()
+        }.let { jobs.add(it) }
     }
 
     override fun pauseTracking() {
@@ -59,8 +77,14 @@ class HramActivityTrackingManager : ActivityTrackingService, KoinComponent {
     }
 
     override fun finishTracking() {
-        trackingState.update { TRACKING_INIT_STATE }
-        stopWatch.reset()
+        scope.launch(Dispatchers.Default) {
+            trackingState.update { TRACKING_INIT_STATE }
+            val duration = stopWatch.elapsedTimeSeconds()
+            stopWatch.reset()
+            val newName = "${now().epochSeconds}__$duration"
+            currentActId = null
+            hrActivityRepo.updateByName(name = ACTIVE_ACTIVITY, newName = newName, duration = duration)
+        }.let { jobs.add(it) }
     }
 
     override fun scan(onInit: () -> Unit, onUpdate: (List<BleDevice>) -> Unit, onComplete: () -> Unit) =
@@ -71,23 +95,29 @@ class HramActivityTrackingManager : ActivityTrackingService, KoinComponent {
         onInitConnection: () -> Unit,
         onConnected: (BleDevice) -> Unit
     ) = hrDeviceRepo.connect(device, onInitConnection, onConnected).also {
-        listen().launchIn(scope, Dispatchers.Default).let { listenJob = it }
+        listen().flowOn(Dispatchers.Default).launchIn(scope).let { jobs.add(it) }
     }
 
     private fun listen() = hrDeviceRepo.listen().onStart { emit(HrIndication.Empty) }
-            .onEach { hrIndication.send(it) }
-            .filter { isRecording && it.isEmpty().not() }
-            .onEach {
-                //TODO store to DB
-            }.catch { logger(TAG) { "listen error : $it" } }
+        .onEach { hrIndication.send(it) }
+        .filter { isRecording && it.isEmpty().not() }
+        .onEach { hr ->
+            currentActId?.let {
+                val entity = HeartRateEntity(
+                    activityId = it,
+                    heartRate = hr.hrBpm,
+                    timeStamp = stopWatch.elapsedTimeSeconds()
+                )
+                hrActivityRepo.insert(entity)
+            }
+        }.catch { logger(TAG) { "listen error : $it" } }
 
 
     override fun cancelScanning() = hrDeviceRepo.cancelScanning()
 
     override fun disconnect() {
         hrDeviceRepo.disconnect()
-        listenJob?.cancel()
-        listenJob = null
+        jobs.cancelAndClear()
         hrIndication.trySend(HrIndication.Empty)
     }
 }

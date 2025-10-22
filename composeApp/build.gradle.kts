@@ -11,10 +11,10 @@ plugins {
     alias(libs.plugins.kotlinComposeCompiler)
     alias(libs.plugins.kotlinxSerialization)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.androidx.room)
 }
 
 kotlin {
-
     androidTarget {
         compilerOptions {
             freeCompilerArgs.add("-Xexpect-actual-classes")
@@ -22,7 +22,7 @@ kotlin {
     }
 
     val sharedName = "ComposeApp"
-    
+
     listOf(
         iosX64(),
         iosArm64(),
@@ -34,10 +34,12 @@ kotlin {
             compilerOptions {
                 freeCompilerArgs.add("-Xexpect-actual-classes")
             }
+            // Required when using NativeSQLiteDriver
+            linkerOpts.add("-lsqlite3")
         }
 
     }
-    
+
     sourceSets {
         androidMain.dependencies {
             implementation(compose.preview)
@@ -54,16 +56,26 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.logger)
-            implementation(libs.kable)
-            api(libs.moko.compose)
-            api(libs.moko.main)
-            api(libs.moko.ble)
+            implementation(libs.kotlinx.datetime)
+
+            // Dependency Injection
             implementation(libs.koin.core)
             implementation(libs.koin.compose.viewmodel)
             api(libs.koin.annotations)
+
+            // BLE
+            implementation(libs.kable)
+
+            // Permission
+            api(libs.moko.compose)
+            api(libs.moko.main)
+            api(libs.moko.ble)
+
+            // Data store
             implementation(libs.datastore)
             implementation(libs.datastore.preferences)
-            implementation(libs.kotlinx.datetime)
+            implementation(libs.androidx.room.runtime)
+            implementation(libs.androidx.sqlite.bundled)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -85,12 +97,20 @@ dependencies {
     add("kspIosX64", libs.koin.ksp.compiler)
     add("kspIosArm64", libs.koin.ksp.compiler)
     add("kspIosSimulatorArm64", libs.koin.ksp.compiler)
+    add("kspAndroid", libs.androidx.room.compiler)
+    add("kspIosSimulatorArm64", libs.androidx.room.compiler)
+    add("kspIosX64", libs.androidx.room.compiler)
+    add("kspIosArm64", libs.androidx.room.compiler)
     debugImplementation(compose.uiTooling)
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }
 
 // KSP Metadata Trigger
 project.tasks.withType(KotlinCompilationTask::class.java).configureEach {
-    if(name != "kspCommonMainKotlinMetadata") {
+    if (name != "kspCommonMainKotlinMetadata") {
         dependsOn("kspCommonMainKotlinMetadata")
     }
 }
@@ -114,8 +134,8 @@ tasks {
 }
 
 ksp {
-    arg("KOIN_CONFIG_CHECK","true")
-    arg("KOIN_LOG_TIMES","true")
+    arg("KOIN_CONFIG_CHECK", "true")
+    arg("KOIN_LOG_TIMES", "true")
 }
 
 android {

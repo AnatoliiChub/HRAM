@@ -61,7 +61,8 @@ class HramHrDeviceRepo(
                     onUpdate(scannedDevices.toList())
                 }.onCompletion { onComplete() }
                 .catch { loggerE(TAG) { "Error: $it" } }
-                .launchIn(scope = scope, context = Dispatchers.Default)
+                .flowOn(Dispatchers.Default)
+                .launchIn(scope = scope)
                 .let { scanJobs.add(it) }
             delay(SCAN_DURATION)
             cancelScanning()
@@ -83,7 +84,8 @@ class HramHrDeviceRepo(
                 .onEach { (index, device) -> if (index == 0) onConnected(device) }
                 .catch { loggerE(TAG) { "Error while connecting to device: $it" } }
                 .onCompletion { logger(TAG) { "ConnectToDevice job completed" } }
-                .launchIn(scope, Dispatchers.Default)
+                .flowOn(Dispatchers.Default)
+                .launchIn(scope)
                 .let { connectionJobs.add(it) }
         }
     }

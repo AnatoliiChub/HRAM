@@ -50,16 +50,14 @@ class StopWatch {
     }
 
     fun listen() = tickerFlow(STOP_WATCH_TICK_DURATION)
-        .map {
-            elapsedTime().toDuration(DurationUnit.MILLISECONDS).inWholeSeconds
-        }
+        .map { elapsedTimeSeconds() }
         .distinctUntilChanged()
         .onEach { elapsedTime.trySend(it) }
 
-    fun elapsedTime(): Long = when (isRunning) {
+    fun elapsedTimeSeconds(): Long = when (isRunning) {
         true -> accumulatedOnLastPaused.load() + (now().toEpochMilliseconds() - startedTimestamp)
         false -> accumulatedOnLastPaused.load()
         null -> 0
-    }
+    }.toDuration(DurationUnit.MILLISECONDS).inWholeSeconds
 
 }

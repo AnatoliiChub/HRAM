@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalTime::class, ExperimentalUuidApi::class)
+
 package com.achub.hram.screen.record
 
 import androidx.lifecycle.ViewModel
@@ -17,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -25,7 +28,9 @@ import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.InjectedParam
 import kotlin.time.DurationUnit
+import kotlin.time.ExperimentalTime
 import kotlin.time.toDuration
+import kotlin.uuid.ExperimentalUuidApi
 
 @KoinViewModel
 class RecordViewModel(
@@ -42,18 +47,21 @@ class RecordViewModel(
     init {
         bleConnectionRepo.isBluetoothOn
             .onEach { isBluetoothOn.value = it }
-            .launchIn(viewModelScope, Dispatchers.Default)
+            .flowOn(Dispatchers.Default)
+            .launchIn(viewModelScope)
             .let { jobs.add(it) }
         trackingManager.hrIndication.receiveAsFlow().onStart { emit(HrIndication.Empty) }
             .combine(trackingManager.elapsedTime()) { hrIndication, elapsedTime ->
                 Indications(hrIndication = hrIndication, elapsedTime = elapsedTime)
             }
             .onEach(_uiState::indications)
-            .launchIn(viewModelScope, Dispatchers.Default)
+            .flowOn(Dispatchers.Default)
+            .launchIn(viewModelScope)
             .let { jobs.add(it) }
     }
 
-    fun toggleRecording() = _uiState.toggleRecordingState().also {
+    fun toggleRecording() {
+        _uiState.toggleRecordingState()
         if (_uiState.isRecording) trackingManager.startTracking() else trackingManager.pauseTracking()
     }
 

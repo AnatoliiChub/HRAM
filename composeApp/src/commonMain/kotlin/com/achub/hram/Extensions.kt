@@ -8,6 +8,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.achub.hram.data.db.entity.ActivityEntity
 import dev.icerock.moko.permissions.Permission
 import dev.icerock.moko.permissions.PermissionsController
 import dev.icerock.moko.permissions.bluetooth.BLUETOOTH_CONNECT
@@ -24,9 +25,14 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlin.math.round
 import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 /**
  * round numbers to 2 decimal places and format as string
@@ -80,8 +86,7 @@ expect fun currentThread(): String
 
 fun <T> Flow<T>.launchIn(
     scope: CoroutineScope,
-    context: CoroutineContext
-) = scope.launch(context) { collect() }
+) = scope.launch { collect() }
 
 fun tickerFlow(period: Duration, initialDelay: Duration = Duration.ZERO) = flow {
     delay(initialDelay)
@@ -106,3 +111,18 @@ fun MutableList<Job>.cancelAndClear() {
     this.forEach { it.cancel() }
     this.clear()
 }
+
+
+@OptIn(ExperimentalUuidApi::class)
+fun createActivity(name: String, currentTime: Long): ActivityEntity {
+    val activity = ActivityEntity(
+        Uuid.Companion.random().toString() + currentTime,
+        name,
+        0L,
+        currentTime
+    )
+    return activity
+}
+
+@OptIn(ExperimentalTime::class)
+fun Long.fromEpochSeconds() = Instant.fromEpochSeconds(this).toLocalDateTime(TimeZone.currentSystemDefault())

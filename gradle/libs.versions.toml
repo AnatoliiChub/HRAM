@@ -13,8 +13,10 @@ logger = "2.7.1"
 moko = "0.20.1"
 ksp = "2.2.20-2.0.3"
 koin-annotations = "2.1.0"
-datastore ="1.1.7"
+datastore = "1.1.7"
 kotlinx-datetime = "0.7.1"
+room = "2.8.2"
+sqlite = "2.6.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -28,12 +30,15 @@ kable = { module = "com.juul.kable:kable-core", version.ref = "kable" }
 moko-compose = { module = "dev.icerock.moko:permissions-compose", version.ref = "moko" }
 moko-main = { module = "dev.icerock.moko:permissions", version.ref = "moko" }
 moko-ble = { module = "dev.icerock.moko:permissions-bluetooth", version.ref = "moko" }
-koin-annotations = {module = "io.insert-koin:koin-annotations", version.ref = "koin-annotations"}
-koin-ksp-compiler = {module = "io.insert-koin:koin-ksp-compiler", version.ref = "koin-annotations"}
+koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "koin-annotations" }
+koin-ksp-compiler = { module = "io.insert-koin:koin-ksp-compiler", version.ref = "koin-annotations" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
-datastore = {module ="androidx.datastore:datastore", version.ref ="datastore"}
-datastore-preferences = {module ="androidx.datastore:datastore-preferences", version.ref ="datastore"}
+datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
+datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
+androidx-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 
 
 [plugins]
@@ -44,3 +49,4 @@ kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref =
 kotlinComposeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinxSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+androidx-room = { id = "androidx.room", version.ref = "room" }
