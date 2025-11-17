@@ -30,8 +30,6 @@ import com.achub.hram.view.components.dialog.DialogTitle
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-private const val TAG = "HrConnectDialog"
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HrConnectDialog(
@@ -59,11 +57,10 @@ fun HrConnectDialog(
             Column(modifier = Modifier.padding(Dimen24), horizontalAlignment = CenterHorizontally) {
                 DialogTitle(title = title)
                 Spacer(Modifier.height(Dimen24))
-                if (isLoading) {
-                    HRProgress(isLoading, cycleDuration = loadingDuration)
-                } else {
-                    DialogMessage(message = message)
-                }
+
+                if (isLoading) HRProgress(isLoading, cycleDuration = loadingDuration)
+                else DialogMessage(message = message)
+
                 if (!isDeviceConfirmed) {
                     Column(horizontalAlignment = CenterHorizontally) {
                         if (devices.isNotEmpty()) Spacer(Modifier.height(Dimen24))
