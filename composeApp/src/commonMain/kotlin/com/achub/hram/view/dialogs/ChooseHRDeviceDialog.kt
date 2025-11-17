@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import com.achub.hram.data.model.BleDevice
 import com.achub.hram.style.Dimen24
 import com.achub.hram.style.Dimen32
@@ -27,13 +27,12 @@ import com.achub.hram.view.components.dialog.DialogButton
 import com.achub.hram.view.components.dialog.DialogElevatedCard
 import com.achub.hram.view.components.dialog.DialogMessage
 import com.achub.hram.view.components.dialog.DialogTitle
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 private const val TAG = "HrConnectDialog"
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HrConnectDialog(
     isLoading: Boolean,
@@ -97,7 +96,7 @@ private fun DeviceList(devices: List<BleDevice>, selected: BleDevice?, onClick: 
 }
 
 @Composable
-@Preview()
+@Preview
 fun ChooseHRDeviceDialogPreview() {
     Box(modifier = Modifier.padding().fillMaxWidth()) {
         HrConnectDialog(

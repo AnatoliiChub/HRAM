@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.Provided
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -27,23 +26,25 @@ class HramHrActivityRepo(@Provided val actDao: ActivityDao, @Provided val hrDao:
 
     override fun getActivityByName(name: String): ActivityEntity? = getActivityByName(name)
 
-    override fun getActivitiesGraph(): Flow<List<ActivityGraphInfo>> {
-        return actDao.getAll().flatMapLatest { activities ->
-            if (activities.isEmpty()) return@flatMapLatest flowOf(emptyList())
-
+    override fun getActivitiesGraph(): Flow<List<ActivityGraphInfo>> = actDao.getAll().flatMapLatest { activities ->
+        if (activities.isNotEmpty()) {
             val flows = activities.map { activity ->
-                hrDao
-                    .getAggregatedHeartRateForActivity(activity.id, activity.duration)
-                    .map { hrBuckets ->
-                        ActivityGraphInfo(
-                            activity = activity,
-                            buckets = hrBuckets,
-                        )
-                    }
+                combine(
+                    hrDao.getAggregatedHeartRateForActivity(activity.id, activity.duration),
+                    hrDao.getAll()
+                ) { aggregated, all ->
+                    ActivityGraphInfo(
+                        activity = activity,
+                        buckets = aggregated,
+                        totalRecords = all.count {
+                            it.activityId == activity.id
+                        }
+                    )
+                }
             }
 
             combine(flows) { it.toList() }
-        }
+        } else flowOf(emptyList())
     }
 
     override fun getActivityWithHeartRates(id: String): Flow<ActivityWithHeartRates> =

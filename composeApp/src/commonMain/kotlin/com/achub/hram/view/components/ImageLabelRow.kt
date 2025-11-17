@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.achub.hram.data.model.HrIndication
 import com.achub.hram.style.Dimen64
@@ -23,7 +24,6 @@ import com.achub.hram.view.indications.HeartLabelRow
 import com.achub.hram.view.indications.WarningLabelRow
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.vectorResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun ImageLabelRow(

@@ -30,6 +30,7 @@ import androidx.compose.ui.draw.innerShadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.shadow.Shadow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.achub.hram.style.Black
 import com.achub.hram.style.Dark
@@ -42,7 +43,6 @@ import com.achub.hram.style.Dimen24
 import com.achub.hram.style.Dimen48
 import com.achub.hram.style.Dimen8
 import com.achub.hram.style.White
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 val Gradient = listOf(
     Color(0xFFE60000),

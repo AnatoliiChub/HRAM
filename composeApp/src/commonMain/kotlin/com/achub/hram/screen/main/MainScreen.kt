@@ -12,12 +12,12 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import com.achub.hram.screen.activities.ActivitiesScreen
 import com.achub.hram.screen.record.RecordScreen
 import com.achub.hram.style.Black
 import com.achub.hram.view.tabs.MainTabLayout
 import com.achub.hram.view.tabs.MainTabType
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun MainScreen() {

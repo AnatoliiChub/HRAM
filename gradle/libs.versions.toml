@@ -1,24 +1,27 @@
 [versions]
-agp = "8.13.0"
+agp = "8.13.1"
 android-compileSdk = "36"
 android-minSdk = "31"
 android-targetSdk = "36"
 androidx-activity = "1.11.0"
-androidx-lifecycle = "2.9.4"
-composeMultiplatform = "1.10.0-alpha02"
-kotlin = "2.2.20"
+androidx-lifecycle = "2.9.6"
+composeMultiplatform = "1.10.0-beta01"
+material3 = "1.10.0-alpha04"
+kotlin = "2.2.21"
 koin = "4.1.1"
 kable = "0.40.0"
 logger = "2.7.1"
 moko = "0.20.1"
 ksp = "2.2.20-2.0.3"
-koin-annotations = "2.1.0"
+koin-annotations = "2.3.1"
 datastore = "1.1.7"
 kotlinx-datetime = "0.7.1"
-room = "2.8.2"
+room = "2.8.3"
 sqlite = "2.6.1"
 
 [libraries]
+components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "composeMultiplatform" }
+foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "composeMultiplatform" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 androidx-lifecycle-viewmodelCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
@@ -27,6 +30,7 @@ koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
 logger = { module = "io.github.aakira:napier", version.ref = "logger" }
 kable = { module = "com.juul.kable:kable-core", version.ref = "kable" }
+material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "material3" }
 moko-compose = { module = "dev.icerock.moko:permissions-compose", version.ref = "moko" }
 moko-main = { module = "dev.icerock.moko:permissions", version.ref = "moko" }
 moko-ble = { module = "dev.icerock.moko:permissions-bluetooth", version.ref = "moko" }
@@ -39,7 +43,9 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 androidx-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
-
+runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "composeMultiplatform" }
+ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "composeMultiplatform" }
+ui-tooling-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "composeMultiplatform" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

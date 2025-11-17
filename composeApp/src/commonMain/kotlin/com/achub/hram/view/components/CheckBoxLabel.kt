@@ -10,11 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import com.achub.hram.style.LabelMedium
 import com.achub.hram.style.LabelSmall
 import com.achub.hram.style.Red
 import com.achub.hram.style.White
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 private fun CheckBoxLabel(
@@ -69,7 +69,7 @@ fun LocationCheckBoxLabel(
     CheckBoxLabel("Location tracking", isChecked, isEnabled, onCheckedChange)
 }
 
-@Preview()
+@Preview
 @Composable
 private fun CheckBoxLabelPreview() {
     Column() {

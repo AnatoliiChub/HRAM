@@ -10,6 +10,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.achub.hram.data.model.BleDevice
 import com.achub.hram.data.model.HrIndication
@@ -25,7 +26,6 @@ import com.achub.hram.view.section.RecordSection
 import com.achub.hram.view.section.RecordingState
 import com.achub.hram.view.section.TrackingIndicationsSection
 import com.achub.hram.view.section.TrackingStatusCheckBoxSection
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import kotlin.time.Duration.Companion.seconds

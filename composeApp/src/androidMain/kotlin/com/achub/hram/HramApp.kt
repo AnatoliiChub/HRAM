@@ -5,8 +5,6 @@ import com.achub.hram.di.initKoin
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import org.koin.android.ext.koin.androidContext
-import org.koin.ksp.generated.defaultModule
-
 
 class HramApp : Application() {
 
@@ -15,7 +13,6 @@ class HramApp : Application() {
         Napier.base(DebugAntilog())
         initKoin {
             androidContext(this@HramApp)
-                .defaultModule()
         }
     }
 }

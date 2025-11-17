@@ -86,6 +86,11 @@ fun ActivityCard(activityInfo: ActivityGraphInfo) {
             )
 
             Text(
+                text = "Total: ${activityInfo.totalRecords}",
+                style = LabelMedium
+            )
+
+            Text(
                 text = "Average HR: $avgHr bpm",
                 style = LabelMedium.copy(color = Red)
             )

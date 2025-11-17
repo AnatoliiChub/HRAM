@@ -16,5 +16,6 @@ data class AvgHrBucketByActivity(
 
 data class ActivityGraphInfo(
     val activity: ActivityEntity,
-    val buckets: List<AvgHrBucketByActivity>
+    val buckets: List<AvgHrBucketByActivity>,
+    val totalRecords: Int,
 )
