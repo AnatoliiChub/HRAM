@@ -1,7 +1,7 @@
 package com.achub.hram.ble.repo
 
-import com.achub.hram.data.model.BleDevice
-import com.achub.hram.data.model.HrIndication
+import com.achub.hram.data.models.BleDevice
+import com.achub.hram.data.models.HrIndication
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow

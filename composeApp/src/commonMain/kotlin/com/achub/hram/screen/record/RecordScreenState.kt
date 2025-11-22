@@ -1,8 +1,8 @@
 package com.achub.hram.screen.record
 
-import com.achub.hram.data.model.BleDevice
-import com.achub.hram.data.model.Indications
-import com.achub.hram.data.model.TrackingStatus
+import com.achub.hram.data.models.BleDevice
+import com.achub.hram.data.models.Indications
+import com.achub.hram.data.models.TrackingStatus
 import com.achub.hram.view.section.RecordingState
 import com.achub.hram.view.section.RecordingState.Paused
 import com.achub.hram.view.section.RecordingState.Recording
@@ -23,7 +23,6 @@ data class RecordScreenState(
             loadingDuration = duration
         )
     )
-
 }
 
 sealed class RecordScreenDialog {

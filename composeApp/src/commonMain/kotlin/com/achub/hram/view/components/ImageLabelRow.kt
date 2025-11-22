@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import com.achub.hram.data.model.HrIndication
+import com.achub.hram.data.models.HrIndication
 import com.achub.hram.style.Dimen64
 import com.achub.hram.style.HeadingMediumBold
 import com.achub.hram.view.indications.DistanceLabelRow

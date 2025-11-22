@@ -5,7 +5,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
-import com.achub.hram.data.model.Indications
+import com.achub.hram.data.models.Indications
 import com.achub.hram.style.Heading3
 import com.achub.hram.view.indications.DistanceLabelRow
 import com.achub.hram.view.indications.HeartLabelRow

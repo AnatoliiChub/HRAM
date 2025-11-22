@@ -12,10 +12,10 @@ import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.achub.hram.data.model.BleDevice
-import com.achub.hram.data.model.HrIndication
-import com.achub.hram.data.model.Indications
-import com.achub.hram.data.model.TrackingStatus
+import com.achub.hram.data.models.BleDevice
+import com.achub.hram.data.models.HrIndication
+import com.achub.hram.data.models.Indications
+import com.achub.hram.data.models.TrackingStatus
 import com.achub.hram.permissionController
 import com.achub.hram.requestBluetooth
 import com.achub.hram.style.BlackPreview

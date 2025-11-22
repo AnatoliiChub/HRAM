@@ -6,8 +6,8 @@ import com.achub.hram.createActivity
 import com.achub.hram.data.HrActivityRepo
 import com.achub.hram.data.db.entity.ACTIVE_ACTIVITY
 import com.achub.hram.data.db.entity.HeartRateEntity
-import com.achub.hram.data.model.BleDevice
-import com.achub.hram.data.model.HrIndication
+import com.achub.hram.data.models.BleDevice
+import com.achub.hram.data.models.HrIndication
 import com.achub.hram.launchIn
 import com.achub.hram.logger
 import kotlinx.coroutines.CoroutineScope
@@ -45,7 +45,7 @@ private const val TAG = "HramActivityTrackingManager"
     ExperimentalAtomicApi::class
 )
 @Single
-class HramActivityTrackingManager : ActivityTrackingService, KoinComponent {
+class HramActivityTrackingManager : ActivityTrackingManager, KoinComponent {
 
     val stopWatch: StopWatch by inject()
     val hrDeviceRepo: HrDeviceRepo by inject(parameters = { parametersOf(scope) })

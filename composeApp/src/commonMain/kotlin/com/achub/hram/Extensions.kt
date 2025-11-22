@@ -6,6 +6,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.achub.hram.data.db.entity.ActivityEntity
@@ -126,3 +128,18 @@ fun createActivity(name: String, currentTime: Long): ActivityEntity {
 
 @OptIn(ExperimentalTime::class)
 fun Long.fromEpochSeconds() = Instant.fromEpochSeconds(this).toLocalDateTime(TimeZone.currentSystemDefault())
+
+@Composable
+fun Dp.dpToPx() = with(LocalDensity.current) { this@dpToPx.toPx() }
+
+@Composable
+fun Int.pxToDp() = with(LocalDensity.current) { this@pxToDp.toDp() }
+
+fun formatTime(seconds: Long): String {
+    fun formatSixty(seconds: Long) = "${if (seconds < 10) "0" else ""}${seconds}"
+    return when {
+        seconds < 60L -> "$seconds s"
+        seconds < 3600L -> "${seconds / 60}:${formatSixty(seconds % 60)}"
+        else -> "${seconds / 3600}:${formatSixty(seconds / 60 % 60)}:${formatSixty(seconds % 60)}"
+    }
+}

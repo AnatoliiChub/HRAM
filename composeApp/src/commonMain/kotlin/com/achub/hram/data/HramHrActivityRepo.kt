@@ -6,13 +6,18 @@ import com.achub.hram.data.db.entity.ActivityEntity
 import com.achub.hram.data.db.entity.ActivityGraphInfo
 import com.achub.hram.data.db.entity.ActivityWithHeartRates
 import com.achub.hram.data.db.entity.HeartRateEntity
+import com.achub.hram.data.models.GraphLimits
+import com.achub.hram.logger
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.onEach
 import org.koin.core.annotation.Provided
+
+private const val TAG = "HramHrActivityRepo"
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HramHrActivityRepo(@Provided val actDao: ActivityDao, @Provided val hrDao: HeartRateDao) : HrActivityRepo {
@@ -38,9 +43,20 @@ class HramHrActivityRepo(@Provided val actDao: ActivityDao, @Provided val hrDao:
                         buckets = aggregated,
                         totalRecords = all.count {
                             it.activityId == activity.id
-                        }
+                        },
+                        limits = GraphLimits(
+                            0f,
+                            aggregated.maxOfOrNull { it.timestamp }?.toFloat() ?: 1f,
+                            0f,
+                            (aggregated.maxOfOrNull { it.avgHr } ?: 1f) * 1.2f
+                        ),
+                        avgHr = if (aggregated.isNotEmpty()) {
+                            aggregated.map { it.avgHr }.average().toInt()
+                        } else 0,
+                        maxHr = aggregated.maxOfOrNull { it.avgHr }?.toInt() ?: 0,
+                        minHr = aggregated.minOfOrNull { it.avgHr }?.toInt() ?: 0,
                     )
-                }
+                }.onEach { logger(TAG) { "ActivityGraphInfo for ${activity.name}: ${it.limits}" } }
             }
 
             combine(flows) { it.toList() }

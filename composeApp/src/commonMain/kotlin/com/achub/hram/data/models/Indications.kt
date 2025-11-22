@@ -1,4 +1,4 @@
-package com.achub.hram.data.model
+package com.achub.hram.data.models
 
 import kotlin.time.ExperimentalTime
 

@@ -8,7 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import com.achub.hram.data.model.BleDevice
+import com.achub.hram.data.models.BleDevice
 import com.achub.hram.style.Dimen4
 import com.achub.hram.style.LabelMedium
 import com.achub.hram.style.LabelMediumBold
@@ -28,15 +28,7 @@ fun DeviceListItem(
             .clip(RoundedCornerShape(Dimen4))
             .fillMaxWidth()
             .clickable { onSelected(device) }) {
-        Text(
-            text = device.name,
-            color = color,
-            style = LabelMediumBold,
-        )
-        Text(
-            text = device.identifier,
-            color = color,
-            style = LabelMedium,
-        )
+        Text(text = device.name, color = color, style = LabelMediumBold)
+        Text(text = device.identifier, color = color, style = LabelMedium)
     }
 }

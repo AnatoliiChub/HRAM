@@ -1,7 +1,7 @@
 package com.achub.hram.tracking
 
-import com.achub.hram.data.model.BleDevice
-import com.achub.hram.data.model.HrIndication
+import com.achub.hram.data.models.BleDevice
+import com.achub.hram.data.models.HrIndication
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 
@@ -9,7 +9,7 @@ const val TRACKING_INIT_STATE = 0
 const val ACTIVE_TRACKING_STATE = 1
 const val PAUSED_TRACKING_STATE = 2
 
-interface ActivityTrackingService {
+interface ActivityTrackingManager {
 
     val hrIndication: Channel<HrIndication>
 

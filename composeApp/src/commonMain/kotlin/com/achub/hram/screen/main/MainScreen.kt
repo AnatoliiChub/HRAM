@@ -31,7 +31,7 @@ fun MainScreen() {
         ) {
             HorizontalPager(
                 state = pagerState,
-                userScrollEnabled = true,
+                userScrollEnabled = false,
                 modifier = Modifier.fillMaxWidth().weight(1f)
             ) { index ->
                 when (MainTabType.entries[index]) {

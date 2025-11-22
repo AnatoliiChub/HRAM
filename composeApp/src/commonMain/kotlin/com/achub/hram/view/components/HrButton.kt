@@ -31,9 +31,12 @@ import com.achub.hram.EventsCutter
 import com.achub.hram.get
 import com.achub.hram.style.Black
 import com.achub.hram.style.DarkGray
+import com.achub.hram.style.Dimen1
 import com.achub.hram.style.Dimen16
 import com.achub.hram.style.Dimen2
-import com.achub.hram.style.White20
+import com.achub.hram.style.Dimen3
+import com.achub.hram.style.Dimen8
+import com.achub.hram.style.White10
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce
@@ -92,15 +95,15 @@ fun HrButton(
     ) { pressed ->
         if (pressed) 0.2f else 1f
     }
-    val backgroundColor = if (enabled) DarkGray else White20
+    val backgroundColor = if (enabled) DarkGray else White10
     val shape = RoundedCornerShape(Dimen16)
 
     Box(
         Modifier.dropShadow(
             shape = shape,
             shadow = Shadow(
-                radius = 8.dp,
-                spread = 1.dp,
+                radius = Dimen8,
+                spread = Dimen1,
                 color = redDropShadowColor,
                 offset = DpOffset(x = 0.dp, -(1).dp),
                 alpha = if (!enabled) 0.2f else shadowAlpha
@@ -108,10 +111,10 @@ fun HrButton(
         ).dropShadow(
             shape = shape,
             shadow = Shadow(
-                radius = 8.dp,
-                spread = 1.dp,
+                radius = Dimen8,
+                spread = Dimen1,
                 color = darkRedDropShadowColor,
-                offset = DpOffset(x = 2.dp, 3.dp),
+                offset = DpOffset(x = 2.dp, Dimen3),
                 alpha = if (!enabled) 0.2f else shadowAlpha
             )
         )
