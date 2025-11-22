@@ -103,7 +103,7 @@ class HramBleConnectionRepo(
                 }
             }.retry(3) {
                 it.printStackTrace()
-                loggerE(TAG) { "${it}" }
+                loggerE(TAG) { "$it" }
                 val tryToReconnect =
                     it is BleConnectionsException.DeviceNotConnectedException || it is NotConnectedException
                 logger(TAG) { "try to reconnect: $tryToReconnect" }
@@ -162,5 +162,4 @@ class HramBleConnectionRepo(
         connectionScope?.cancel()
         connectionScope = null
     }
-
 }

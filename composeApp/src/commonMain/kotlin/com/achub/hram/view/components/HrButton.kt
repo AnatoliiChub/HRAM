@@ -63,7 +63,7 @@ fun HrButton(
     enabled: Boolean = true,
     content: @Composable BoxScope.(contentAlpha: Float) -> Unit
 ) {
-    val eventsCutter = remember { EventsCutter.Companion.get(PRESS_ANIMATION_DURATION * 3) }
+    val eventsCutter = remember { EventsCutter.get(PRESS_ANIMATION_DURATION * 3) }
     val interactionSource = remember { MutableInteractionSource() }
     var clicked by remember { mutableStateOf(false) }
     var pressed by remember { mutableStateOf(false) }

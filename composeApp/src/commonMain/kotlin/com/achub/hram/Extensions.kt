@@ -118,7 +118,7 @@ fun MutableList<Job>.cancelAndClear() {
 @OptIn(ExperimentalUuidApi::class)
 fun createActivity(name: String, currentTime: Long): ActivityEntity {
     val activity = ActivityEntity(
-        Uuid.Companion.random().toString() + currentTime,
+        Uuid.random().toString() + currentTime,
         name,
         0L,
         currentTime
