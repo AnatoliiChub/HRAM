@@ -4,7 +4,6 @@ import kotlin.time.ExperimentalTime
 
 data class Indications(
     val hrIndication: HrIndication = HrIndication.Empty,
-    val distance: Float = 0f,
     val elapsedTime: Long = 0L,
 )
 

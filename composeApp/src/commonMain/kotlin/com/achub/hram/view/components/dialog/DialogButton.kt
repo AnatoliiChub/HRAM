@@ -13,10 +13,11 @@ import com.achub.hram.style.White
 import com.achub.hram.view.components.HrButton
 
 @Composable
-fun DialogButton(text: String, onClick: () -> Unit) {
+fun DialogButton(text: String, enabled: Boolean = true, onClick: () -> Unit) {
     HrButton(
         modifier = Modifier.wrapContentSize(),
         onClick = onClick,
+        enabled = enabled,
     ) {
         Text(
             modifier = Modifier.padding(horizontal = Dimen24, vertical = Dimen12),

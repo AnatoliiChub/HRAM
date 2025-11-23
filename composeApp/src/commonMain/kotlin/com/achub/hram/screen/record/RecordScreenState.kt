@@ -33,6 +33,8 @@ sealed class RecordScreenDialog {
         val isDeviceConfirmed: Boolean = false
     ) : RecordScreenDialog()
 
+    data class NameActivity(val activityName: String, val error: String? = null) : RecordScreenDialog()
+
     data class DeviceConnectedDialog(val bleDevice: BleDevice) : RecordScreenDialog()
 
     data object OpenSettingsDialog : RecordScreenDialog()

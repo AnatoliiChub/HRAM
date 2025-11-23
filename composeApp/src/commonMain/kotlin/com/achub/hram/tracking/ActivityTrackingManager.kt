@@ -15,7 +15,7 @@ interface ActivityTrackingManager {
 
     fun startTracking()
     fun pauseTracking()
-    fun finishTracking()
+    fun finishTracking(name: String?)
     fun scan(onInit: () -> Unit, onUpdate: (List<BleDevice>) -> Unit, onComplete: () -> Unit)
     fun cancelScanning()
     fun disconnect()

@@ -4,6 +4,7 @@ package com.achub.hram.screen.record
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.achub.hram.domain.ActivityNameValidationUseCase
 import com.achub.hram.ble.repo.BleConnectionRepo
 import com.achub.hram.ble.repo.SCAN_DURATION
 import com.achub.hram.cancelAndClear
@@ -36,6 +37,7 @@ import kotlin.uuid.ExperimentalUuidApi
 class RecordViewModel(
     val bleConnectionRepo: BleConnectionRepo,
     val trackingManager: HramActivityTrackingManager,
+    val activityNameValidationUseCase: ActivityNameValidationUseCase,
     @InjectedParam val permissionController: PermissionsController
 ) : ViewModel() {
 
@@ -65,12 +67,19 @@ class RecordViewModel(
         if (_uiState.isRecording) trackingManager.startTracking() else trackingManager.pauseTracking()
     }
 
-    fun stopRecording() = _uiState.stop().also {
-        trackingManager.finishTracking()
+    fun stopRecording(name: String?) =
+        _uiState.stop().also { trackingManager.finishTracking(name) }.also { dismissDialog() }
+
+    fun showNameActivityDialog() =
+        _uiState.update { it.copy(dialog = RecordScreenDialog.NameActivity(activityName = "")) }
+
+    fun onActivityNameChanged(name: String) = _uiState.update { state ->
+        val currentDialog = state.dialog as? RecordScreenDialog.NameActivity
+        val error = activityNameValidationUseCase(name)
+        currentDialog?.let { state.copy(dialog = currentDialog.copy(activityName = name, error = error)) } ?: state
     }
 
     fun dismissDialog() = _uiState.update { it.copy(dialog = null) }
-    fun toggleLocationTracking() = _uiState.toggleGpsTracking()
     fun cancelScanning() = trackingManager.cancelScanning()
     fun clearRequestBluetooth() = _uiState.update { it.copy(requestBluetooth = false) }
     fun openSettings() = permissionController.openAppSettings()

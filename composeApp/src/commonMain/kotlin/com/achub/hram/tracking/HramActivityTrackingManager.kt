@@ -76,12 +76,12 @@ class HramActivityTrackingManager : ActivityTrackingManager, KoinComponent {
         stopWatch.pause()
     }
 
-    override fun finishTracking() {
+    override fun finishTracking(name: String?) {
         scope.launch(Dispatchers.Default) {
             trackingState.update { TRACKING_INIT_STATE }
             val duration = stopWatch.elapsedTimeSeconds()
             stopWatch.reset()
-            val newName = "${now().epochSeconds}__$duration"
+            val newName = name ?: "${now().epochSeconds}__$duration"
             currentActId = null
             hrActivityRepo.updateByName(name = ACTIVE_ACTIVITY, newName = newName, duration = duration)
         }.let { jobs.add(it) }

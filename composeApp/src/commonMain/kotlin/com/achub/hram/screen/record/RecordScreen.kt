@@ -22,6 +22,7 @@ import com.achub.hram.style.BlackPreview
 import com.achub.hram.style.Dimen16
 import com.achub.hram.view.dialogs.HrConnectDialog
 import com.achub.hram.view.dialogs.InfoDialog
+import com.achub.hram.view.dialogs.NameActivityDialog
 import com.achub.hram.view.section.RecordSection
 import com.achub.hram.view.section.RecordingState
 import com.achub.hram.view.section.TrackingIndicationsSection
@@ -43,14 +44,15 @@ fun RecordScreen() {
         RecordScreenContent(
             state,
             onHrCheckBox = ::toggleHRTracking,
-            onLocationCheckBox = ::toggleLocationTracking,
             onPlay = ::toggleRecording,
-            onStop = ::stopRecording,
+            onStop = ::showNameActivityDialog,
             onDismissDialog = ::dismissDialog,
             onCancelScanning = ::cancelScanning,
             onDeviceSelected = ::onHrDeviceSelected,
             onRequestScanning = ::requestScanning,
-            openSettings = ::openSettings
+            openSettings = ::openSettings,
+            onActivityNameChanged = ::onActivityNameChanged,
+            onActivityNameConfirmed = ::stopRecording,
         )
     }
 }
@@ -60,14 +62,15 @@ fun RecordScreen() {
 private fun RecordScreenContent(
     state: RecordScreenState,
     onHrCheckBox: () -> Unit,
-    onLocationCheckBox: () -> Unit,
     onPlay: () -> Unit,
     onStop: () -> Unit,
     onCancelScanning: () -> Unit,
     onDismissDialog: () -> Unit,
     onDeviceSelected: (BleDevice) -> Unit,
     onRequestScanning: () -> Unit,
-    openSettings: () -> Unit
+    openSettings: () -> Unit,
+    onActivityNameChanged: (String) -> Unit,
+    onActivityNameConfirmed: (String) -> Unit,
 ) {
     val isCheckBoxEnabled = state.recordingState == RecordingState.Init
     val indications = state.indications
@@ -79,7 +82,7 @@ private fun RecordScreenContent(
         ) {
             TrackingIndicationsSection(indications)
             Spacer(Modifier.weight(1f))
-            TrackingStatusCheckBoxSection(trackingStatus, isCheckBoxEnabled, onHrCheckBox, onLocationCheckBox)
+            TrackingStatusCheckBoxSection(trackingStatus, isCheckBoxEnabled, onHrCheckBox)
             Spacer(Modifier.height(Dimen16))
             RecordSection(
                 recordingState = state.recordingState,
@@ -89,8 +92,7 @@ private fun RecordScreenContent(
             )
         }
     }
-    val dialog = state.dialog
-    when (dialog) {
+    when (val dialog = state.dialog) {
         is RecordScreenDialog.ChooseHRDevice -> HrConnectDialog(
             isLoading = dialog.isLoading,
             devices = dialog.scannedDevices,
@@ -121,6 +123,18 @@ private fun RecordScreenContent(
             }
         )
 
+        is RecordScreenDialog.NameActivity -> {
+            NameActivityDialog(
+                title = "Name your activity",
+                message = "Please enter a name for your activity before saving.",
+                name = dialog.activityName,
+                error = dialog.error,
+                onNameChanged = onActivityNameChanged,
+                onDismiss = onDismissDialog,
+                onButonClick = onActivityNameConfirmed
+            )
+        }
+
         else -> {}
     }
 }
@@ -142,14 +156,15 @@ private fun RecordScreenPreview() {
             recordingState = RecordingState.Recording
         ),
         onHrCheckBox = {},
-        onLocationCheckBox = {},
         onPlay = {},
         onStop = {},
         onDismissDialog = {},
         onDeviceSelected = {},
         onRequestScanning = {},
         onCancelScanning = {},
-        openSettings = {}
+        openSettings = {},
+        onActivityNameChanged = {},
+        onActivityNameConfirmed = {}
     )
 }
 
@@ -170,19 +185,20 @@ private fun RecordScreenEmptyPreview() {
             recordingState = RecordingState.Recording
         ),
         onHrCheckBox = {},
-        onLocationCheckBox = {},
         onPlay = {},
         onStop = {},
         onDismissDialog = {},
         onDeviceSelected = {},
         onRequestScanning = {},
         onCancelScanning = {},
-        openSettings = {}
+        openSettings = {},
+        onActivityNameChanged = {},
+        onActivityNameConfirmed = {}
     )
 }
 
 @Composable
-@Preview()
+@Preview
 private fun RecordScreenChooseDeviceDialogPreview() {
     RecordScreenContent(
         state = RecordScreenState(
@@ -210,13 +226,14 @@ private fun RecordScreenChooseDeviceDialogPreview() {
 
         ),
         onHrCheckBox = {},
-        onLocationCheckBox = {},
         onPlay = {},
         onStop = {},
         onDismissDialog = {},
         onDeviceSelected = {},
         onRequestScanning = {},
         onCancelScanning = {},
-        openSettings = {}
+        openSettings = {},
+        onActivityNameChanged = {},
+        onActivityNameConfirmed = {}
     )
 }
