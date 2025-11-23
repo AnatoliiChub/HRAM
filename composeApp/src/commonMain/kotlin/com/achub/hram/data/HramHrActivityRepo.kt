@@ -26,8 +26,8 @@ class HramHrActivityRepo(@Provided val actDao: ActivityDao, @Provided val hrDao:
 
     override suspend fun insert(item: ActivityEntity) = actDao.insert(item)
 
-    override suspend fun updateByName(name: String, newName: String, duration: Long) =
-        actDao.updateByName(name = name, newName = newName, duration = duration)
+    override suspend fun updateByName(id: String, name: String, duration: Long) =
+        actDao.updateNameById(id = id, name = name, duration = duration)
 
     override fun getActivityByName(name: String): ActivityEntity? = getActivityByName(name)
 

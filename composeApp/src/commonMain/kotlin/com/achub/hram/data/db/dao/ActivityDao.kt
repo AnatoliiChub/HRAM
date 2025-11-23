@@ -18,8 +18,8 @@ interface ActivityDao {
     @Insert
     suspend fun insertAll(items: List<ActivityEntity>)
 
-    @Query("UPDATE ActivityEntity SET duration = :duration, name = :newName WHERE name = :name")
-    suspend fun updateByName(name: String, newName: String, duration: Long)
+    @Query("UPDATE ActivityEntity SET duration = :duration, name = :name WHERE id = :id")
+    suspend fun updateNameById(id: String, name: String, duration: Long)
 
     @Query("SELECT * FROM ActivityEntity ORDER BY startDate DESC")
     fun getAll(): Flow<List<ActivityEntity>>

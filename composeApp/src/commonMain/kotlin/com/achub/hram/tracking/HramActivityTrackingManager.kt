@@ -82,8 +82,8 @@ class HramActivityTrackingManager : ActivityTrackingManager, KoinComponent {
             val duration = stopWatch.elapsedTimeSeconds()
             stopWatch.reset()
             val newName = name ?: "${now().epochSeconds}__$duration"
+            currentActId?.let { hrActivityRepo.updateByName(id = it, name = newName, duration = duration) }
             currentActId = null
-            hrActivityRepo.updateByName(name = ACTIVE_ACTIVITY, newName = newName, duration = duration)
         }.let { jobs.add(it) }
     }
 
