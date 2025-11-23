@@ -7,7 +7,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import org.koin.android.annotation.KoinViewModel
 
 class ActivitiesViewModel(val hrActivityRepo: HrActivityRepo) : ViewModel() {
 
