@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import org.koin.android.annotation.KoinViewModel
 
-@KoinViewModel
 class ActivitiesViewModel(val hrActivityRepo: HrActivityRepo) : ViewModel() {
 
     private val _uiState = hrActivityRepo.getActivitiesGraph()

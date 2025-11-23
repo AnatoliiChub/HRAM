@@ -3,7 +3,7 @@ package com.achub.hram.domain
 private const val MIN_NAME_LENGTH = 3
 private const val MAX_NAME_LENGTH = 50
 
-class ActivityNameValidationUseCase {
+class ActivityNameValidator {
 
     operator fun invoke(name: String) = when {
         name.isBlank() -> "Activity name cannot be empty"

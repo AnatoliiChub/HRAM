@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
-import org.koin.core.annotation.Single
 import kotlin.uuid.ExperimentalUuidApi
 
 private const val TAG = "HramBleDataRepo"
@@ -28,7 +27,6 @@ private val HR_CHAR = characteristicOf(HR_SERVICE_UUID, HR_MEASUREMENT_CHAR_UUID
 private val BATTERY_CHAR = characteristicOf(BATTERY_SERVICE_UUID, BATTERY_LEVEL_CHAR_UUID)
 
 @OptIn(ExperimentalUuidApi::class)
-@Single(binds = [BleDataRepo::class])
 class HramBleDataRepo : BleDataRepo {
 
     override fun observeHeartRate(peripheral: Peripheral): Flow<Int> = peripheral.observe(HR_CHAR)

@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
-import org.koin.core.annotation.Single
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.parameter.parametersOf
@@ -44,7 +43,6 @@ private const val TAG = "HramActivityTrackingManager"
     ExperimentalTime::class,
     ExperimentalAtomicApi::class
 )
-@Single
 class HramActivityTrackingManager : ActivityTrackingManager, KoinComponent {
 
     val stopWatch: StopWatch by inject()

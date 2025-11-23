@@ -1,13 +1,17 @@
-package com.achub.hram.data.db
+package com.achub.hram.di.data
 
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.driver.NativeSQLiteDriver
+import com.achub.hram.data.db.HramDatabase
+import com.achub.hram.data.db.getRoomDatabase
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import org.koin.core.annotation.Module
+import org.koin.core.annotation.Provided
 import org.koin.core.annotation.Single
+import org.koin.core.scope.Scope
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
@@ -15,10 +19,11 @@ import platform.Foundation.NSUserDomainMask
 @Module
 actual class DatabaseModule actual constructor() {
     @Single
-    fun provideDatabaseBuilder(): RoomDatabase.Builder<HramDatabase> = getDatabaseBuilder()
+    actual fun provideDatabaseBuilder(scope: Scope): RoomDatabase.Builder<HramDatabase> = getDatabaseBuilder()
 
-    @Single()
-    fun provideDatabase(builder: RoomDatabase.Builder<HramDatabase>): HramDatabase = getRoomDatabase(builder)
+    @Single
+    actual fun provideDatabase(@Provided builder: RoomDatabase.Builder<HramDatabase>): HramDatabase =
+        getRoomDatabase(builder)
 }
 
 fun getDatabaseBuilder(): RoomDatabase.Builder<HramDatabase> {

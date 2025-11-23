@@ -5,7 +5,6 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.onFailure
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.callbackFlow
-import org.koin.core.annotation.Single
 import platform.CoreBluetooth.CBCentralManager
 import platform.CoreBluetooth.CBCentralManagerDelegateProtocol
 import platform.CoreBluetooth.CBCentralManagerOptionShowPowerAlertKey
@@ -16,7 +15,7 @@ import platform.darwin.NSObject
 private val options = mapOf<Any?, Any>(CBCentralManagerOptionShowPowerAlertKey to false)
 
 private const val TAG = "BluetoothStateIos"
-@Single
+
 class BluetoothStateIos : BluetoothState {
 
     private var manager: CBCentralManager? = null

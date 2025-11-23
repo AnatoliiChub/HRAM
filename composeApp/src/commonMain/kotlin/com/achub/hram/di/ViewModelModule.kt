@@ -1,0 +1,33 @@
+package com.achub.hram.di
+
+import com.achub.hram.data.HrActivityRepo
+import com.achub.hram.domain.ActivityNameValidator
+import com.achub.hram.screen.activities.ActivitiesViewModel
+import com.achub.hram.screen.record.RecordViewModel
+import com.achub.hram.tracking.HramActivityTrackingManager
+import dev.icerock.moko.permissions.PermissionsController
+import org.koin.android.annotation.KoinViewModel
+import org.koin.core.annotation.Factory
+import org.koin.core.annotation.InjectedParam
+import org.koin.core.annotation.Module
+
+@Module
+class ViewModelModule {
+
+    @Factory
+    @KoinViewModel
+    fun recordViewModel(
+        trackingManager: HramActivityTrackingManager,
+        activityNameValidator: ActivityNameValidator,
+        @InjectedParam permissionsController: PermissionsController
+    ) = RecordViewModel(
+        trackingManager = trackingManager,
+        activityNameValidator = activityNameValidator,
+        permissionController = permissionsController,
+    )
+
+    @Factory
+    @KoinViewModel
+    fun activitiesViewModel(hrActivityRepo: HrActivityRepo) = ActivitiesViewModel(hrActivityRepo)
+
+}

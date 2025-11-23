@@ -28,14 +28,12 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.InjectedParam
-import org.koin.core.annotation.Single
 import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 
 const val SCAN_DURATION = 5_000L
 private const val TAG = "HramHrDeviceRepo"
 
-@Single
 class HramHrDeviceRepo(
     @InjectedParam val scope: CoroutineScope,
     val bleDataRepo: BleDataRepo,

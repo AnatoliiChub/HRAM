@@ -16,10 +16,9 @@ import kotlinx.coroutines.channels.onFailure
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import org.koin.core.annotation.Single
 
 private const val TAG = "BluetoothStateAndroid"
-@Single
+
 class BluetoothStateAndroid(context: Context) : BluetoothState {
 
     override val isBluetoothOn: Flow<Boolean> = callbackFlow {

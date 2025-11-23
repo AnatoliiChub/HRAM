@@ -4,13 +4,13 @@ package com.achub.hram.screen.record
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.achub.hram.domain.ActivityNameValidationUseCase
 import com.achub.hram.ble.repo.BleConnectionRepo
 import com.achub.hram.ble.repo.SCAN_DURATION
 import com.achub.hram.cancelAndClear
 import com.achub.hram.data.models.BleDevice
 import com.achub.hram.data.models.HrIndication
 import com.achub.hram.data.models.Indications
+import com.achub.hram.domain.ActivityNameValidator
 import com.achub.hram.launchIn
 import com.achub.hram.requestBleBefore
 import com.achub.hram.stateInExt
@@ -26,21 +26,21 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.InjectedParam
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.koin.core.parameter.parametersOf
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.toDuration
 import kotlin.uuid.ExperimentalUuidApi
 
-@KoinViewModel
 class RecordViewModel(
-    val bleConnectionRepo: BleConnectionRepo,
     val trackingManager: HramActivityTrackingManager,
-    val activityNameValidationUseCase: ActivityNameValidationUseCase,
+    val activityNameValidator: ActivityNameValidator,
     @InjectedParam val permissionController: PermissionsController
-) : ViewModel() {
-
+) : ViewModel(), KoinComponent {
+    val bleConnectionRepo: BleConnectionRepo by inject(parameters = { parametersOf(viewModelScope) })
     private val _uiState = MutableStateFlow(RecordScreenState())
     val uiState = _uiState.stateInExt(initialValue = RecordScreenState())
     private val isBluetoothOn = MutableStateFlow(false)
@@ -75,7 +75,7 @@ class RecordViewModel(
 
     fun onActivityNameChanged(name: String) = _uiState.update { state ->
         val currentDialog = state.dialog as? RecordScreenDialog.NameActivity
-        val error = activityNameValidationUseCase(name)
+        val error = activityNameValidator(name)
         currentDialog?.let { state.copy(dialog = currentDialog.copy(activityName = name, error = error)) } ?: state
     }
 

@@ -6,7 +6,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import org.koin.core.annotation.Single
 import kotlin.concurrent.atomics.AtomicLong
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.concurrent.atomics.update
@@ -18,7 +17,6 @@ import kotlin.time.toDuration
 private const val STOP_WATCH_TICK_MS = 100L
 
 @OptIn(ExperimentalTime::class, ExperimentalAtomicApi::class, ExperimentalCoroutinesApi::class)
-@Single
 class StopWatch {
 
     companion object {
