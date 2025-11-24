@@ -10,11 +10,11 @@ import com.achub.hram.cancelAndClear
 import com.achub.hram.data.models.BleDevice
 import com.achub.hram.data.models.HrIndication
 import com.achub.hram.data.models.Indications
-import com.achub.hram.domain.ActivityNameValidator
 import com.achub.hram.launchIn
 import com.achub.hram.requestBleBefore
 import com.achub.hram.stateInExt
 import com.achub.hram.tracking.HramActivityTrackingManager
+import com.achub.hram.utils.ActivityNameValidation
 import dev.icerock.moko.permissions.PermissionsController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -37,7 +37,7 @@ import kotlin.uuid.ExperimentalUuidApi
 
 class RecordViewModel(
     val trackingManager: HramActivityTrackingManager,
-    val activityNameValidator: ActivityNameValidator,
+    val activityNameValidation: ActivityNameValidation,
     @InjectedParam val permissionController: PermissionsController
 ) : ViewModel(), KoinComponent {
     val bleConnectionRepo: BleConnectionRepo by inject(parameters = { parametersOf(viewModelScope) })
@@ -75,7 +75,7 @@ class RecordViewModel(
 
     fun onActivityNameChanged(name: String) = _uiState.update { state ->
         val currentDialog = state.dialog as? RecordScreenDialog.NameActivity
-        val error = activityNameValidator(name)
+        val error = activityNameValidation(name)
         currentDialog?.let { state.copy(dialog = currentDialog.copy(activityName = name, error = error)) } ?: state
     }
 

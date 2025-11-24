@@ -1,9 +1,9 @@
-package com.achub.hram.domain
+package com.achub.hram.utils
 
 private const val MIN_NAME_LENGTH = 3
 private const val MAX_NAME_LENGTH = 50
 
-class ActivityNameValidator {
+class ActivityNameValidation {
 
     operator fun invoke(name: String) = when {
         name.isBlank() -> "Activity name cannot be empty"

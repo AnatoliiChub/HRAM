@@ -31,6 +31,7 @@ fun AreaChart(
     modifier: Modifier,
     chartData: ChartData,
     style: ChartStyle,
+    onHighLight: (Pair<Float, Float>?) -> Unit,
     bubble: @Composable (xText: String, yText: String) -> Unit
 ) {
     with(style) {
@@ -90,6 +91,7 @@ fun AreaChart(
                 Pair(xValue, maxYLabelWidth + ratio * plotWidth)
             }
         }
+        selectedPoint = chartData.highLighted
 
         fun mapToPixel(p: Pair<Float, Float>): Offset {
             val x = p.first
@@ -158,13 +160,13 @@ fun AreaChart(
                 modifier = Modifier.matchParentSize()
                     .onSizeChanged { canvasSize -> size.value = IntSize(canvasSize.width, canvasSize.height) }
                     .pointerInput(Unit) {
-                        detectTapGestures(onTap = { selectedPoint = mapPixelToData(it) })
+                        detectTapGestures(onTap = { onHighLight(mapPixelToData(it)) })
                     }
                     .pointerInput(Unit) {
                         detectDragGesturesAfterLongPress(
-                            onDragStart = { selectedPoint = mapPixelToData(it) },
-                            onDrag = { change, _ -> selectedPoint = mapPixelToData(change.position) },
-                            onDragEnd = { selectedPoint = null }
+                            onDragStart = { onHighLight(mapPixelToData(it)) },
+                            onDrag = { change, _ -> onHighLight(mapPixelToData(change.position)) },
+                            onDragEnd = { onHighLight(null) }
                         )
                     }
             ) {

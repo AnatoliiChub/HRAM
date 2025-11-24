@@ -17,14 +17,21 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun ActivitiesScreen() {
     val viewModel = koinViewModel<ActivitiesViewModel>()
-    val state = viewModel.uiState.collectAsStateWithLifecycle()
-    val list = state.value.list
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Center) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(Dimen8),
-            verticalArrangement = Arrangement.spacedBy(Dimen8)
-        ) { items(items = list, key = { it.activity.id }) { activityInfo -> ActivityCard(activityInfo) } }
+    with(viewModel.uiState.collectAsStateWithLifecycle().value) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Center) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(Dimen8),
+                verticalArrangement = Arrangement.spacedBy(Dimen8)
+            ) {
+                items(items = list, key = { it.activity.id }) { activityInfo ->
+                    ActivityCard(
+                        activityInfo,
+                        highLighted = highlightedItem,
+                        onHighlighted = { viewModel.onHighlighted(it) })
+                }
+            }
+        }
     }
 }

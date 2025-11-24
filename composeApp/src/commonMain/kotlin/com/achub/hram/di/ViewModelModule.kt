@@ -1,7 +1,7 @@
 package com.achub.hram.di
 
 import com.achub.hram.data.HrActivityRepo
-import com.achub.hram.domain.ActivityNameValidator
+import com.achub.hram.utils.ActivityNameValidation
 import com.achub.hram.screen.activities.ActivitiesViewModel
 import com.achub.hram.screen.record.RecordViewModel
 import com.achub.hram.tracking.HramActivityTrackingManager
@@ -18,11 +18,11 @@ class ViewModelModule {
     @KoinViewModel
     fun recordViewModel(
         trackingManager: HramActivityTrackingManager,
-        activityNameValidator: ActivityNameValidator,
+        activityNameValidation: ActivityNameValidation,
         @InjectedParam permissionsController: PermissionsController
     ) = RecordViewModel(
         trackingManager = trackingManager,
-        activityNameValidator = activityNameValidator,
+        activityNameValidation = activityNameValidation,
         permissionController = permissionsController,
     )
 

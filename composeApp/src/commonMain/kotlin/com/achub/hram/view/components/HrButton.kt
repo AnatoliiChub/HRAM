@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.draw.innerShadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -37,6 +36,8 @@ import com.achub.hram.style.Dimen2
 import com.achub.hram.style.Dimen3
 import com.achub.hram.style.Dimen8
 import com.achub.hram.style.White10
+import com.achub.hram.style.hrButtonDarkRedDropShadowColor
+import com.achub.hram.style.hrButtonRedDropShadowColor
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce
@@ -44,8 +45,8 @@ import kotlinx.coroutines.flow.map
 import kotlin.time.ExperimentalTime
 
 const val PRESS_ANIMATION_DURATION = 70L
-val redDropShadowColor = Color(0x80FF0000)
-val darkRedDropShadowColor = Color(0xCCFF0000)
+
+const val PRESS_BUTTON_DEBOUNCE_DURATION = 250L
 val rippleColor = Black
 
 
@@ -63,7 +64,7 @@ fun HrButton(
     enabled: Boolean = true,
     content: @Composable BoxScope.(contentAlpha: Float) -> Unit
 ) {
-    val eventsCutter = remember { EventsCutter.get(PRESS_ANIMATION_DURATION * 3) }
+    val eventsCutter = remember { EventsCutter.get(PRESS_BUTTON_DEBOUNCE_DURATION) }
     val interactionSource = remember { MutableInteractionSource() }
     var clicked by remember { mutableStateOf(false) }
     var pressed by remember { mutableStateOf(false) }
@@ -104,7 +105,7 @@ fun HrButton(
             shadow = Shadow(
                 radius = Dimen8,
                 spread = Dimen1,
-                color = redDropShadowColor,
+                color = hrButtonRedDropShadowColor,
                 offset = DpOffset(x = 0.dp, -(1).dp),
                 alpha = if (!enabled) 0.2f else shadowAlpha
             )
@@ -113,7 +114,7 @@ fun HrButton(
             shadow = Shadow(
                 radius = Dimen8,
                 spread = Dimen1,
-                color = darkRedDropShadowColor,
+                color = hrButtonDarkRedDropShadowColor,
                 offset = DpOffset(x = 2.dp, Dimen3),
                 alpha = if (!enabled) 0.2f else shadowAlpha
             )

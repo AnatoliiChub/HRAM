@@ -80,8 +80,9 @@ private fun RecordScreenContent(
             modifier = Modifier.fillMaxSize().padding(Dimen16),
             horizontalAlignment = CenterHorizontally
         ) {
+            Spacer(Modifier.weight(0.33f))
             TrackingIndicationsSection(indications)
-            Spacer(Modifier.weight(1f))
+            Spacer(Modifier.weight(0.66f))
             TrackingStatusCheckBoxSection(trackingStatus, isCheckBoxEnabled, onHrCheckBox)
             Spacer(Modifier.height(Dimen16))
             RecordSection(

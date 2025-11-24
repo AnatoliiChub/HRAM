@@ -17,4 +17,7 @@ val Red = Color.Red
 val Red20 = Color.Red.copy(alpha = 0.2f)
 val LightRed = Color(0xFFFF8F8F)
 
+val hrButtonRedDropShadowColor = Color(0x80FF0000)
+val hrButtonDarkRedDropShadowColor = Color(0xCCFF0000)
+
 const val BlackPreview = 0xFF0E1111
