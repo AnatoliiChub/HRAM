@@ -6,6 +6,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,8 +17,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -51,6 +54,8 @@ fun AreaChart(
         val gridLinePath = remember {
             PathEffect.dashPathEffect(floatArrayOf(gridLineDashLength, gridLineDashLength), 0f)
         }
+        val haptic = LocalHapticFeedback.current
+        LaunchedEffect(selectedPoint) { haptic.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick) }
         val (minX, maxX, minY, maxY) = chartData.limits
 
         val yLabelsWidth = remember(minY, maxY) {
@@ -251,7 +256,7 @@ fun AreaChart(
                     )
                 }
 
-                // Draw selected point vertical line
+                // Draw selected point and vertical line
                 selectedPoint?.let { sp ->
                     val spOffset = mapToPixel(sp)
                     drawLine(
@@ -259,6 +264,11 @@ fun AreaChart(
                         Offset(spOffset.x, spOffset.y),
                         Offset(spOffset.x, plotTop - bubbleYOffset),
                         strokeWidth = lineWidth
+                    )
+                    drawCircle(
+                        pathColor,
+                        radius = lineWidth * 2.5f,
+                        center = spOffset
                     )
                 }
             }

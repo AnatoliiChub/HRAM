@@ -8,8 +8,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.achub.hram.data.models.BleDevice
@@ -27,9 +30,12 @@ import com.achub.hram.view.section.RecordSection
 import com.achub.hram.view.section.RecordingState
 import com.achub.hram.view.section.TrackingIndicationsSection
 import com.achub.hram.view.section.TrackingStatusCheckBoxSection
+import kotlinx.coroutines.delay
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import kotlin.time.Duration.Companion.seconds
+
+const val DOUBLE_HAPTIC_INTERVAL = 150L
 
 @Composable
 fun RecordScreen() {
@@ -107,11 +113,19 @@ private fun RecordScreenContent(
             },
         )
 
-        is RecordScreenDialog.DeviceConnectedDialog -> InfoDialog(
-            title = "Device connected",
-            message = "${dialog.bleDevice.name} from ${dialog.bleDevice.manufacturer.orEmpty()} successfully connected",
-            onDismiss = onDismissDialog
-        )
+        is RecordScreenDialog.DeviceConnectedDialog -> {
+            InfoDialog(
+                title = "Device connected",
+                message = "${dialog.bleDevice.name} from ${dialog.bleDevice.manufacturer.orEmpty()} successfully connected",
+                onDismiss = onDismissDialog
+            )
+            val haptic = LocalHapticFeedback.current
+            LaunchedEffect(dialog) {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                delay(DOUBLE_HAPTIC_INTERVAL)
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            }
+        }
 
         is RecordScreenDialog.OpenSettingsDialog -> InfoDialog(
             title = "Provide permission please",

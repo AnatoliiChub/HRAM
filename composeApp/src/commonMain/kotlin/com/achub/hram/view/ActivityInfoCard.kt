@@ -1,7 +1,5 @@
 package com.achub.hram.view
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,8 +10,8 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -30,15 +28,21 @@ import com.achub.hram.style.Dimen2
 import com.achub.hram.style.Dimen32
 import com.achub.hram.style.Dimen320
 import com.achub.hram.style.Dimen8
+import com.achub.hram.style.Gray40
 import com.achub.hram.style.LabelBigBold
 import com.achub.hram.style.LabelMedium
 import com.achub.hram.style.LabelMediumBold
+import com.achub.hram.style.White80
 import com.achub.hram.view.chart.AreaChart
 import com.achub.hram.view.chart.ChartBubble
 import com.achub.hram.view.chart.ChartData
 import com.achub.hram.view.chart.defaultChartStyle
+import hram.composeapp.generated.resources.Res
+import hram.composeapp.generated.resources.ic_not_selected
+import hram.composeapp.generated.resources.ic_selected
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.format.char
+import org.jetbrains.compose.resources.painterResource
 
 const val Y_LABEL_COUNT = 5
 const val X_LABEL_COUNT = 4
@@ -58,6 +62,9 @@ val DATE_TIME_FORMAT = LocalDateTime.Format {
 
 @Composable
 fun ActivityCard(
+    modifier: Modifier,
+    selected: Boolean,
+    selectionEnabled: Boolean,
     activityInfo: ActivityGraphInfo,
     highLighted: HighlightedItem?,
     onHighlighted: (HighlightedItem?) -> Unit
@@ -73,22 +80,22 @@ fun ActivityCard(
     val date = remember { DATE_TIME_FORMAT.format(activity.startDate.fromEpochSeconds()) }
 
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
             .shadow(Dimen2, RoundedCornerShape(Dimen12))
-            .clip(RoundedCornerShape(Dimen12))
-            .clickable(
-                indication = if (activity.id == highLighted?.activityId) null else ripple(),
-                interactionSource = remember { MutableInteractionSource() },
-            ) {
-                onHighlighted(null)
-                /* TODO: navigate to details */
-            },
-        colors = CardDefaults.cardColors(containerColor = DarkGray)
+            .clip(RoundedCornerShape(Dimen12)),
+        colors = CardDefaults.cardColors(containerColor = if (selected) Gray40 else DarkGray)
     ) {
         Column(modifier = Modifier.padding(Dimen16)) {
-            Text(text = activity.name.ifBlank { "Unnamed Activity" }, style = LabelBigBold)
+            Row {
+                Text(text = activity.name.ifBlank { "Unnamed Activity" }, style = LabelBigBold)
+                Spacer(Modifier.weight(1f))
+                if (selectionEnabled) {
+                    val iconRes = if (selected) Res.drawable.ic_selected else Res.drawable.ic_not_selected
+                    Icon(painter = painterResource(iconRes), contentDescription = null, tint = White80)
+                }
+            }
             Spacer(Modifier.height(Dimen8))
             Text(text = "Created at $date", style = LabelMedium)
             Spacer(Modifier.height(Dimen8))

@@ -1,10 +1,10 @@
 package com.achub.hram.di
 
 import com.achub.hram.data.HrActivityRepo
-import com.achub.hram.utils.ActivityNameValidation
 import com.achub.hram.screen.activities.ActivitiesViewModel
 import com.achub.hram.screen.record.RecordViewModel
 import com.achub.hram.tracking.HramActivityTrackingManager
+import com.achub.hram.utils.ActivityNameValidation
 import dev.icerock.moko.permissions.PermissionsController
 import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.Factory
@@ -28,6 +28,9 @@ class ViewModelModule {
 
     @Factory
     @KoinViewModel
-    fun activitiesViewModel(hrActivityRepo: HrActivityRepo) = ActivitiesViewModel(hrActivityRepo)
+    fun activitiesViewModel(
+        hrActivityRepo: HrActivityRepo,
+        activityNameValidation: ActivityNameValidation
+    ) = ActivitiesViewModel(hrActivityRepo, activityNameValidation)
 
 }

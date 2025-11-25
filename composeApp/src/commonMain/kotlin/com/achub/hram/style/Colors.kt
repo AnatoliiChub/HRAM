@@ -3,6 +3,7 @@ package com.achub.hram.style
 import androidx.compose.ui.graphics.Color
 
 val Gray = Color.Gray
+val Gray40 = Gray.copy(alpha = 0.4f)
 val DarkGray = Color(0xFF222222)
 val Dark = Color(0xFF1f1f1f)
 

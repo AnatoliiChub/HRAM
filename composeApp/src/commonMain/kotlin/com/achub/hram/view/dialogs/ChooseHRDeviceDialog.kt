@@ -43,8 +43,14 @@ fun HrConnectDialog(
 ) {
     var selected by remember { mutableStateOf<BleDevice?>(null) }
     val retryState = !isLoading && selected == null
-    val title = if (isDeviceConfirmed) "Connecting..." else if (isLoading) "Scanning..." else "Connect Device"
+    val title = when {
+        isDeviceConfirmed -> "Connecting..."
+        isLoading -> "Scanning..."
+        devices.isNotEmpty() -> "Connect Device"
+        else -> "No Devices Found"
+    }
     val message = provideDialogMessage(isLoading, devices)
+
     BasicAlertDialog(onDismissRequest = onDismissRequest) {
         val btnText = if (retryState) "Retry" else "Connect"
         val onBtnClick: () -> Unit = {

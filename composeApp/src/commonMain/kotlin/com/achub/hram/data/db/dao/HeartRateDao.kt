@@ -32,4 +32,7 @@ interface HeartRateDao {
         activityId: String,
         activityDuration: Long
     ): Flow<List<AvgHrBucketByActivity>>
+
+    @Query("DELETE from HeartRateEntity where activityId in (:ids)")
+    fun deleteRecordsByIds(ids: Set<String>)
 }

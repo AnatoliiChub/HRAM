@@ -26,8 +26,12 @@ class HramHrActivityRepo(@Provided val actDao: ActivityDao, @Provided val hrDao:
 
     override suspend fun insert(item: ActivityEntity) = actDao.insert(item)
 
-    override suspend fun updateByName(id: String, name: String, duration: Long) =
+    override suspend fun updateNameById(id: String, name: String, duration: Long) =
         actDao.updateNameById(id = id, name = name, duration = duration)
+
+    override suspend fun updateNameById(id: String, name: String) {
+        actDao.updateNameById(id = id, name = name)
+    }
 
     override fun getActivityByName(name: String): ActivityEntity? = getActivityByName(name)
 
@@ -65,4 +69,8 @@ class HramHrActivityRepo(@Provided val actDao: ActivityDao, @Provided val hrDao:
 
     override fun getActivityWithHeartRates(id: String): Flow<ActivityWithHeartRates> =
         actDao.getActivityWithHeartRates(id).filterNotNull()
+
+    override suspend fun deleteActivitiesById(ids: Set<String>) {
+        actDao.deleteByIds(ids)
+    }
 }

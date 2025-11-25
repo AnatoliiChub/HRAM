@@ -12,11 +12,15 @@ interface HrActivityRepo {
 
     suspend fun insert(item: ActivityEntity)
 
-    suspend fun updateByName(id: String, name: String, duration: Long)
+    suspend fun updateNameById(id: String, name: String, duration: Long)
+
+    suspend fun updateNameById(id: String, name: String)
 
     fun getActivityByName(name: String): ActivityEntity?
 
     fun getActivitiesGraph(): Flow<List<ActivityGraphInfo>>
 
     fun getActivityWithHeartRates(id: String): Flow<ActivityWithHeartRates>
+
+    suspend fun deleteActivitiesById(ids: Set<String>)
 }
