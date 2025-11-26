@@ -4,6 +4,7 @@ import com.achub.hram.BATTERY_LEVEL_CHAR_UUID
 import com.achub.hram.BATTERY_SERVICE_UUID
 import com.achub.hram.HR_MEASUREMENT_CHAR_UUID
 import com.achub.hram.HR_SERVICE_UUID
+import com.achub.hram.data.models.HrIndication
 import com.achub.hram.logger
 import com.achub.hram.loggerE
 import com.achub.hram.uint16
@@ -29,23 +30,28 @@ private val BATTERY_CHAR = characteristicOf(BATTERY_SERVICE_UUID, BATTERY_LEVEL_
 @OptIn(ExperimentalUuidApi::class)
 class HramBleDataRepo : BleDataRepo {
 
-    override fun observeHeartRate(peripheral: Peripheral): Flow<Int> = peripheral.observe(HR_CHAR)
+    override fun observeHeartRate(peripheral: Peripheral): Flow<HrIndication> = peripheral.observe(HR_CHAR)
         .catch { loggerE(TAG) { "Error in observeHeartRate: $it" } }
-        .map { notification ->
-            val flags = notification.uint8(0)
-            val is8bitFormat = flags and 1 == 0
-            val heartRate = if (is8bitFormat)
-                notification.uint8(1)
-            else
-                notification.uint16(1)
-            heartRate
-        }
-        .onEach { logger(TAG) { "hr: $it" } }
-        .catch { loggerE(TAG) { "Error: $it" } }
+        .map(::parseHrIndication)
+        .onEach { logger(TAG) { "hrIndication: $it" } }
+        .catch { loggerE(TAG) { "Error after parsing Hr indication: $it" } }
 
     override fun observeBatteryLevel(peripheral: Peripheral) =
         BATTERY_CHAR.let { characteristic ->
             merge(peripheral.observe(characteristic), flow { emit(peripheral.read(characteristic)) })
                 .map { it.uint8(0) }
         }
+
+    private fun parseHrIndication(notification: ByteArray): HrIndication {
+        val flags = notification.uint8(0)
+        val is8bitFormat = flags and 1 == 0
+        val isSensorContactSupported = flags and 4 > 0
+        val sensorContacted = if (isSensorContactSupported) flags and 2 > 0 else true
+        val heartRate = if (is8bitFormat) notification.uint8(1) else notification.uint16(1)
+        return HrIndication(
+            hrBpm = heartRate,
+            isSensorContactSupported = isSensorContactSupported,
+            isContactOn = sensorContacted
+        )
+    }
 }

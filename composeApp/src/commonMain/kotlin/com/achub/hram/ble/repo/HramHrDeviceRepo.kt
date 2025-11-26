@@ -2,7 +2,7 @@ package com.achub.hram.ble.repo
 
 import com.achub.hram.cancelAndClear
 import com.achub.hram.data.models.BleDevice
-import com.achub.hram.data.models.HrIndication
+import com.achub.hram.data.models.BleIndication
 import com.achub.hram.launchIn
 import com.achub.hram.logger
 import com.achub.hram.loggerE
@@ -102,17 +102,11 @@ class HramHrDeviceRepo(
     }
 
     @OptIn(ExperimentalTime::class)
-    private fun hrIndicationCombiner(device: Peripheral): Flow<HrIndication> = combine(
+    private fun hrIndicationCombiner(device: Peripheral): Flow<BleIndication> = combine(
         bleDataRepo.observeHeartRate(device),
         bleDataRepo.observeBatteryLevel(device),
         device.state
-    ) { hrRate, battery, state ->
-        if (state !is State.Connected) {
-            HrIndication.Empty
-        } else {
-            HrIndication(hrRate, battery)
-        }
-    }
+    ) { hrIndication, battery, state -> BleIndication(hrIndication, battery, state is State.Connected) }
 
     override fun cancelScanning() = scanJobs.cancelAndClear()
 

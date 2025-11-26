@@ -36,8 +36,7 @@ class ActivitiesViewModel(
             selectedActivitiesId = selectedIds,
             dialog = dialog
         )
-    }
-        .flowOn(Dispatchers.Default)
+    }.flowOn(Dispatchers.Default)
     val uiState: StateFlow<ActivitiesUiState> = _uiState.stateInExt(initialValue = ActivitiesUiState(emptyList()))
 
     fun onHighlighted(highlightedItem: HighlightedItem?) = this.highlightedItem.update { highlightedItem }

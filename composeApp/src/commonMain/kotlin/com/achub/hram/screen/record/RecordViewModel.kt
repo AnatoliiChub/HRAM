@@ -8,8 +8,7 @@ import com.achub.hram.ble.repo.BleConnectionRepo
 import com.achub.hram.ble.repo.SCAN_DURATION
 import com.achub.hram.cancelAndClear
 import com.achub.hram.data.models.BleDevice
-import com.achub.hram.data.models.HrIndication
-import com.achub.hram.data.models.Indications
+import com.achub.hram.data.models.BleIndication
 import com.achub.hram.launchIn
 import com.achub.hram.requestBleBefore
 import com.achub.hram.stateInExt
@@ -19,7 +18,6 @@ import dev.icerock.moko.permissions.PermissionsController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
@@ -52,10 +50,7 @@ class RecordViewModel(
             .flowOn(Dispatchers.Default)
             .launchIn(viewModelScope)
             .let { jobs.add(it) }
-        trackingManager.hrIndication.receiveAsFlow().onStart { emit(HrIndication.Empty) }
-            .combine(trackingManager.elapsedTime()) { hrIndication, elapsedTime ->
-                Indications(hrIndication = hrIndication, elapsedTime = elapsedTime)
-            }
+        trackingManager.bleIndication.receiveAsFlow().onStart { emit(BleIndication.Empty) }
             .onEach(_uiState::indications)
             .flowOn(Dispatchers.Default)
             .launchIn(viewModelScope)

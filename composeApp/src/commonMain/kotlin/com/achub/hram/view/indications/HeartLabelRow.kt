@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-import com.achub.hram.data.models.HrIndication
+import com.achub.hram.data.models.BleIndication
 import com.achub.hram.style.Dimen132
 import com.achub.hram.style.Dimen32
 import com.achub.hram.style.Gray
@@ -30,26 +30,31 @@ import org.jetbrains.compose.resources.vectorResource
 @Composable
 fun HeartLabelRow(
     modifier: Modifier = Modifier,
-    hrIndication: HrIndication
+    bleIndication: BleIndication
 ) {
-    val isEmpty = hrIndication.isEmpty()
-    val hrBpm = hrIndication.hrBpm
-    val batteryLevel = hrIndication.batteryLevel
-    val heartColor = if (isEmpty) Gray else Red
+    val isEmpty = bleIndication.isEmpty()
+    val hrBpm = bleIndication.hrIndication?.hrBpm ?: 0
+    val isSensorContactSupported = bleIndication.hrIndication?.isSensorContactSupported == true
+    val isContactOn = bleIndication.hrIndication?.isContactOn == true
+    val batteryLevel = bleIndication.batteryLevel
+    val hrValueStub = isEmpty || bleIndication.isBleConnected.not()
+            || (isSensorContactSupported && isContactOn.not())
+    val heartColor = if (hrValueStub) Gray else Red
     Row(verticalAlignment = CenterVertically) {
-        HeartBeatingAnimView(hrBpm, modifier, heartColor)
+        HeartBeatingAnimView(hrValueStub.not(), modifier, heartColor)
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 modifier = Modifier.align(Alignment.CenterHorizontally).widthIn(min = Dimen132),
-                text = "${if (hrIndication.isEmpty()) "--" else hrBpm} BPM",
+                text = "${if (hrValueStub) "--" else hrBpm} BPM",
                 textAlign = TextAlign.Center,
                 style = HeadingMediumBold
             )
-            val hasBatteryLevel = batteryLevel != HrIndication.NO_BATTERY_LEVEL
-            val secondaryLabel = if (isEmpty) " No connection" else "  :  $batteryLevel %"
+            val secondaryLabel = if (bleIndication.isBleConnected.not()) " No Connection"
+            else if (isContactOn.not()) "Contact Off"
+            else "  :  $batteryLevel %"
             val secondaryLabelColor = if (isEmpty) Red else White
             Row(verticalAlignment = CenterVertically) {
-                AnimatedVisibility(hasBatteryLevel) {
+                AnimatedVisibility(bleIndication.isBleConnected && isContactOn) {
                     Image(
                         modifier = Modifier.size(Dimen32),
                         imageVector = vectorResource(Res.drawable.ic_battery_full),

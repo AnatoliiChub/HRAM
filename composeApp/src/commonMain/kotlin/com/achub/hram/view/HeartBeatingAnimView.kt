@@ -24,7 +24,7 @@ private const val HEART_BEATING_CYCLE_MS = 1000
 
 @Composable
 fun HeartBeatingAnimView(
-    hrBpm: Int,
+    isBeating: Boolean,
     modifier: Modifier,
     color: Color
 ) {
@@ -37,7 +37,6 @@ fun HeartBeatingAnimView(
             repeatMode = RepeatMode.Restart
         )
     )
-    val isBeating = hrBpm > 0
     IndicationImage(
         modifier = modifier.scale(if (isBeating) animatedScale else DEFAULT_HEART_SCALE),
         imageSize = Dimen76,

@@ -16,8 +16,8 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.achub.hram.data.models.BleDevice
+import com.achub.hram.data.models.BleIndication
 import com.achub.hram.data.models.HrIndication
-import com.achub.hram.data.models.Indications
 import com.achub.hram.data.models.TrackingStatus
 import com.achub.hram.permissionController
 import com.achub.hram.requestBluetooth
@@ -79,7 +79,7 @@ private fun RecordScreenContent(
     onActivityNameConfirmed: (String) -> Unit,
 ) {
     val isCheckBoxEnabled = state.recordingState == RecordingState.Init
-    val indications = state.indications
+    val indications = state.bleIndication
     val trackingStatus = state.trackingStatus
     Box(Modifier.fillMaxSize()) {
         Column(
@@ -159,8 +159,10 @@ private fun RecordScreenContent(
 private fun RecordScreenPreview() {
     RecordScreenContent(
         state = RecordScreenState(
-            indications = Indications(
-                hrIndication = HrIndication(hrBpm = 83, batteryLevel = 75),
+            bleIndication = BleIndication(
+                hrIndication = HrIndication(hrBpm = 83, isContactOn = true, isSensorContactSupported = true),
+                batteryLevel = 75,
+                isBleConnected = true,
                 elapsedTime = 235L,
             ),
             trackingStatus = TrackingStatus(
@@ -188,9 +190,11 @@ private fun RecordScreenPreview() {
 private fun RecordScreenEmptyPreview() {
     RecordScreenContent(
         state = RecordScreenState(
-            indications = Indications(
-                hrIndication = HrIndication.Empty,
-                elapsedTime = 754L,
+            bleIndication = BleIndication(
+                hrIndication = null,
+                batteryLevel = 75,
+                isBleConnected = false,
+                elapsedTime = 235L,
             ),
             trackingStatus = TrackingStatus(
                 trackHR = true,
@@ -217,9 +221,11 @@ private fun RecordScreenEmptyPreview() {
 private fun RecordScreenChooseDeviceDialogPreview() {
     RecordScreenContent(
         state = RecordScreenState(
-            indications = Indications(
-                hrIndication = HrIndication(hrBpm = 83, batteryLevel = 75),
-                elapsedTime = 754L,
+            bleIndication = BleIndication(
+                hrIndication = HrIndication(hrBpm = 83, isContactOn = true, isSensorContactSupported = true),
+                batteryLevel = 75,
+                isBleConnected = true,
+                elapsedTime = 235L,
             ),
             trackingStatus = TrackingStatus(
                 trackHR = false,
