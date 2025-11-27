@@ -7,12 +7,14 @@ import com.achub.hram.style.LabelMedium
 import com.achub.hram.view.components.ImageLabelRow
 import hram.composeapp.generated.resources.Res
 import hram.composeapp.generated.resources.ic_warning
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun WarningLabelRow(modifier: Modifier = Modifier, label: String) {
+fun WarningLabelRow(modifier: Modifier = Modifier, label: StringResource) {
     ImageLabelRow(
         modifier = modifier,
-        label = label,
+        label = stringResource(label),
         drawable = Res.drawable.ic_warning,
         imageSize = Dimen48,
         textStyle = LabelMedium

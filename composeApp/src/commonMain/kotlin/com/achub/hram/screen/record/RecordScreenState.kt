@@ -8,6 +8,7 @@ import com.achub.hram.view.section.RecordingState.Paused
 import com.achub.hram.view.section.RecordingState.Recording
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
+import org.jetbrains.compose.resources.StringResource
 import kotlin.time.Duration
 
 data class RecordScreenState(
@@ -33,7 +34,7 @@ sealed class RecordScreenDialog {
         val isDeviceConfirmed: Boolean = false
     ) : RecordScreenDialog()
 
-    data class NameActivity(val activityName: String, val error: String? = null) : RecordScreenDialog()
+    data class NameActivity(val activityName: String, val error: StringResource? = null) : RecordScreenDialog()
 
     data class DeviceConnectedDialog(val bleDevice: BleDevice) : RecordScreenDialog()
 

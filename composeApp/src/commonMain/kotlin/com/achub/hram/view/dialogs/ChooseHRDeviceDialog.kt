@@ -27,6 +27,17 @@ import com.achub.hram.view.components.dialog.DialogButton
 import com.achub.hram.view.components.dialog.DialogElevatedCard
 import com.achub.hram.view.components.dialog.DialogMessage
 import com.achub.hram.view.components.dialog.DialogTitle
+import hram.composeapp.generated.resources.Res
+import hram.composeapp.generated.resources.dialog_choose_hr_device_connect
+import hram.composeapp.generated.resources.dialog_choose_hr_device_connect_device
+import hram.composeapp.generated.resources.dialog_choose_hr_device_connecting
+import hram.composeapp.generated.resources.dialog_choose_hr_device_no_device_found
+import hram.composeapp.generated.resources.dialog_choose_hr_device_no_device_message
+import hram.composeapp.generated.resources.dialog_choose_hr_device_retry
+import hram.composeapp.generated.resources.dialog_choose_hr_device_scanning
+import hram.composeapp.generated.resources.dialog_choose_hr_device_scanning_message
+import hram.composeapp.generated.resources.dialog_choose_hr_device_select_device_message
+import org.jetbrains.compose.resources.stringResource
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -44,15 +55,16 @@ fun HrConnectDialog(
     var selected by remember { mutableStateOf<BleDevice?>(null) }
     val retryState = !isLoading && selected == null
     val title = when {
-        isDeviceConfirmed -> "Connecting..."
-        isLoading -> "Scanning..."
-        devices.isNotEmpty() -> "Connect Device"
-        else -> "No Devices Found"
+        isDeviceConfirmed -> Res.string.dialog_choose_hr_device_connecting
+        isLoading -> Res.string.dialog_choose_hr_device_scanning
+        devices.isNotEmpty() -> Res.string.dialog_choose_hr_device_connect_device
+        else -> Res.string.dialog_choose_hr_device_no_device_found
     }
     val message = provideDialogMessage(isLoading, devices)
 
     BasicAlertDialog(onDismissRequest = onDismissRequest) {
-        val btnText = if (retryState) "Retry" else "Connect"
+        val btnText = if (retryState) Res.string.dialog_choose_hr_device_retry
+        else Res.string.dialog_choose_hr_device_connect
         val onBtnClick: () -> Unit = {
             when {
                 selected != null -> selected?.let { onConfirmClick(it) }
@@ -65,14 +77,17 @@ fun HrConnectDialog(
                 Spacer(Modifier.height(Dimen24))
 
                 if (isLoading) HRProgress(isLoading, cycleDuration = loadingDuration)
-                else DialogMessage(message = message)
+                else DialogMessage(message = stringResource(message))
 
                 if (!isDeviceConfirmed) {
                     Column(horizontalAlignment = CenterHorizontally) {
                         if (devices.isNotEmpty()) Spacer(Modifier.height(Dimen24))
                         DeviceList(devices, selected) { selected = if (selected == it) null else it }
                         Spacer(Modifier.height(Dimen32))
-                        if (!isLoading || selected != null) DialogButton(text = btnText, onClick = onBtnClick)
+                        if (!isLoading || selected != null) DialogButton(
+                            text = stringResource(btnText),
+                            onClick = onBtnClick
+                        )
                     }
                 }
             }
@@ -81,9 +96,9 @@ fun HrConnectDialog(
 }
 
 private fun provideDialogMessage(isLoading: Boolean, devices: List<BleDevice>) = when {
-    isLoading -> "Scanning for devices..."
-    devices.isEmpty() -> "No devices found, please try again."
-    else -> "Select your Heart rate device from the list or try to scan again."
+    isLoading -> Res.string.dialog_choose_hr_device_scanning_message
+    devices.isEmpty() -> Res.string.dialog_choose_hr_device_no_device_message
+    else -> Res.string.dialog_choose_hr_device_select_device_message
 }
 
 @Composable

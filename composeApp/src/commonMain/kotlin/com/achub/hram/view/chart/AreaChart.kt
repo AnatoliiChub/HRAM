@@ -55,7 +55,9 @@ fun AreaChart(
             PathEffect.dashPathEffect(floatArrayOf(gridLineDashLength, gridLineDashLength), 0f)
         }
         val haptic = LocalHapticFeedback.current
-        LaunchedEffect(selectedPoint) { haptic.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick) }
+        LaunchedEffect(selectedPoint) {
+            if (selectedPoint != null) haptic.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)
+        }
         val (minX, maxX, minY, maxY) = chartData.limits
 
         val yLabelsWidth = remember(minY, maxY) {

@@ -25,10 +25,16 @@ import com.achub.hram.style.White
 import com.achub.hram.view.HeartBeatingAnimView
 import hram.composeapp.generated.resources.Res
 import hram.composeapp.generated.resources.ic_battery_full
+import hram.composeapp.generated.resources.record_screen_heart_indication_battery_level
+import hram.composeapp.generated.resources.record_screen_heart_indication_bpm
+import hram.composeapp.generated.resources.record_screen_heart_indication_contact_off
+import hram.composeapp.generated.resources.record_screen_heart_indication_no_connection
+import hram.composeapp.generated.resources.record_screen_heart_indication_stub
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
 @Composable
-fun HeartLabelRow(
+fun HeartIndicationRow(
     modifier: Modifier = Modifier,
     bleIndication: BleIndication
 ) {
@@ -37,22 +43,28 @@ fun HeartLabelRow(
     val isSensorContactSupported = bleIndication.hrIndication?.isSensorContactSupported == true
     val isContactOn = bleIndication.hrIndication?.isContactOn == true
     val batteryLevel = bleIndication.batteryLevel
-    val hrValueStub = isEmpty || bleIndication.isBleConnected.not()
+    val noBle = bleIndication.isBleConnected.not()
+    val hrValueStub = isEmpty || noBle
             || (isSensorContactSupported && isContactOn.not())
     val heartColor = if (hrValueStub) Gray else Red
+    val hrLabel = if (hrValueStub) stringResource(Res.string.record_screen_heart_indication_stub)
+    else stringResource(Res.string.record_screen_heart_indication_bpm, hrBpm)
+    val secondaryLabel = when {
+        noBle -> stringResource(Res.string.record_screen_heart_indication_no_connection)
+        isContactOn.not() -> stringResource(Res.string.record_screen_heart_indication_contact_off)
+        else -> stringResource(Res.string.record_screen_heart_indication_battery_level, batteryLevel)
+    }
+    val secondaryLabelColor = if (isEmpty) Red else White
+
     Row(verticalAlignment = CenterVertically) {
         HeartBeatingAnimView(hrValueStub.not(), modifier, heartColor)
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 modifier = Modifier.align(Alignment.CenterHorizontally).widthIn(min = Dimen132),
-                text = "${if (hrValueStub) "--" else hrBpm} BPM",
+                text = hrLabel,
                 textAlign = TextAlign.Center,
                 style = HeadingMediumBold
             )
-            val secondaryLabel = if (bleIndication.isBleConnected.not()) " No Connection"
-            else if (isContactOn.not()) "Contact Off"
-            else "  :  $batteryLevel %"
-            val secondaryLabelColor = if (isEmpty) Red else White
             Row(verticalAlignment = CenterVertically) {
                 AnimatedVisibility(bleIndication.isBleConnected && isContactOn) {
                     Image(

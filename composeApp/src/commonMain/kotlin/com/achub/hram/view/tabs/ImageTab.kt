@@ -18,6 +18,7 @@ import com.achub.hram.style.Dimen4
 import com.achub.hram.style.LabelMediumBold
 import com.achub.hram.style.Red
 import com.achub.hram.style.White
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
 @Composable
@@ -38,6 +39,6 @@ fun RowScope.ImageTab(
             contentDescription = null
         )
         Spacer(modifier = Modifier.height(Dimen4))
-        Text(text = tab.name, style = LabelMediumBold.copy(color = color))
+        Text(text = stringResource(tab.label), style = LabelMediumBold.copy(color = color))
     }
 }

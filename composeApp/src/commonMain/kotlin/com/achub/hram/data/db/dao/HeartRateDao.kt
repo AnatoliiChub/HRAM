@@ -34,5 +34,5 @@ interface HeartRateDao {
     ): Flow<List<AvgHrBucketByActivity>>
 
     @Query("DELETE from HeartRateEntity where activityId in (:ids)")
-    fun deleteRecordsByIds(ids: Set<String>)
+    suspend fun deleteRecordsByIds(ids: Set<String>)
 }

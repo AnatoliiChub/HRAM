@@ -17,13 +17,17 @@ import com.achub.hram.style.White
 import com.achub.hram.view.components.dialog.DialogButton
 import com.achub.hram.view.components.dialog.DialogElevatedCard
 import com.achub.hram.view.components.dialog.DialogTitle
+import hram.composeapp.generated.resources.Res
+import hram.composeapp.generated.resources.dialog_info_ok
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InfoDialog(
-    title: String,
+    title: StringResource,
     message: String,
-    buttonText: String = "Ok",
+    buttonText: StringResource = Res.string.dialog_info_ok,
     onDismiss: () -> Unit,
     onButonClick: () -> Unit = { onDismiss() }
 ) {
@@ -34,7 +38,7 @@ fun InfoDialog(
                 Spacer(Modifier.height(Dimen24))
                 Text(text = message, color = White, style = LabelMedium, textAlign = TextAlign.Center)
                 Spacer(Modifier.height(Dimen24))
-                DialogButton(text = buttonText, onClick = onButonClick)
+                DialogButton(text = stringResource(buttonText), onClick = onButonClick)
             }
         }
     }

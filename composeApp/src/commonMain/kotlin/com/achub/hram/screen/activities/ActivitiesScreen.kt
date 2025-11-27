@@ -22,6 +22,15 @@ import com.achub.hram.view.ActivityOptions
 import com.achub.hram.view.FloatingToolbar
 import com.achub.hram.view.dialogs.InfoDialog
 import com.achub.hram.view.dialogs.NameActivityDialog
+import hram.composeapp.generated.resources.Res
+import hram.composeapp.generated.resources.dialog_activity_deletion_button_text
+import hram.composeapp.generated.resources.dialog_activity_deletion_message
+import hram.composeapp.generated.resources.dialog_activity_deletion_title
+import hram.composeapp.generated.resources.dialog_rename_activity_message
+import hram.composeapp.generated.resources.dialog_rename_activity_title
+import hram.composeapp.generated.resources.text_activities
+import hram.composeapp.generated.resources.text_activity
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -72,8 +81,8 @@ fun ActivitiesScreen() {
             when (dialog) {
                 is ActivitiesScreenDialog.ReNameActivity -> {
                     NameActivityDialog(
-                        title = "Rename your activity",
-                        message = "Please enter a new name for your activity before saving.",
+                        title = Res.string.dialog_rename_activity_title,
+                        message = Res.string.dialog_rename_activity_message,
                         name = dialog.activityName,
                         error = dialog.error,
                         dismissable = true,
@@ -83,16 +92,20 @@ fun ActivitiesScreen() {
                     )
                 }
 
-                is ActivitiesScreenDialog.ActivityDeletionDialog -> InfoDialog(
-                    title = "Confirm Activity Deletion",
-                    message = "Are you sure you want to delete selected ${if (state.selectedActivitiesId.size > 1) "activities" else "activity"}?",
-                    buttonText = "Confirm",
-                    onDismiss = viewModel::dismissDialog,
-                    onButonClick = {
-                        viewModel.deleteActivities(selectedActivitiesId = state.selectedActivitiesId)
-                        viewModel.dismissDialog()
-                    }
-                )
+                is ActivitiesScreenDialog.ActivityDeletionDialog -> {
+                    val messageParam = if (state.selectedActivitiesId.size > 1) Res.string.text_activities
+                    else Res.string.text_activity
+                    InfoDialog(
+                        title = Res.string.dialog_activity_deletion_title,
+                        message = stringResource(Res.string.dialog_activity_deletion_message, stringResource(messageParam)),
+                        buttonText = Res.string.dialog_activity_deletion_button_text,
+                        onDismiss = viewModel::dismissDialog,
+                        onButonClick = {
+                            viewModel.deleteActivities(selectedActivitiesId = state.selectedActivitiesId)
+                            viewModel.dismissDialog()
+                        }
+                    )
+                }
             }
         }
     }

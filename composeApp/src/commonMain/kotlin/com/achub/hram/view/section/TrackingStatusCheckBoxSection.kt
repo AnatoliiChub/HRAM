@@ -5,6 +5,8 @@ import androidx.compose.runtime.Composable
 import com.achub.hram.data.models.TrackingStatus
 import com.achub.hram.view.components.HRCheckBoxLabel
 import com.achub.hram.view.indications.WarningLabelRow
+import hram.composeapp.generated.resources.Res
+import hram.composeapp.generated.resources.record_scree_choose_at_least_one_option
 
 @Composable
 fun TrackingStatusCheckBoxSection(
@@ -13,7 +15,7 @@ fun TrackingStatusCheckBoxSection(
     onHrCheckBox: () -> Unit,
 ) {
     if (trackingStatus.atLeastOneTrackingEnabled.not()) {
-        WarningLabelRow(label = "Choose at least one tracking option")
+        WarningLabelRow(label = Res.string.record_scree_choose_at_least_one_option)
     }
     Column {
         HRCheckBoxLabel(

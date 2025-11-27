@@ -10,11 +10,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.achub.hram.style.LabelMedium
 import com.achub.hram.style.LabelSmall
 import com.achub.hram.style.Red
 import com.achub.hram.style.White
+import hram.composeapp.generated.resources.Res
+import hram.composeapp.generated.resources.record_screen_connected_device_label
+import hram.composeapp.generated.resources.record_screen_hr_checkbox_label
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 private fun CheckBoxLabel(
@@ -50,30 +53,12 @@ fun HRCheckBoxLabel(
     onCheckedChange: () -> Unit
 ) {
     Column(horizontalAlignment = CenterHorizontally) {
-        CheckBoxLabel("Heart Rate tracking", isChecked, isEnabled, onCheckedChange)
+        CheckBoxLabel(stringResource(Res.string.record_screen_hr_checkbox_label), isChecked, isEnabled, onCheckedChange)
         connectedDevice?.let {
             Text(
-                text = "Device: $connectedDevice",
+                text = stringResource(Res.string.record_screen_connected_device_label, connectedDevice),
                 style = LabelSmall.copy(color = White.copy(alpha = 0.3f))
             )
         }
-    }
-}
-
-@Composable
-fun LocationCheckBoxLabel(
-    isChecked: Boolean,
-    isEnabled: Boolean,
-    onCheckedChange: () -> Unit
-) {
-    CheckBoxLabel("Location tracking", isChecked, isEnabled, onCheckedChange)
-}
-
-@Preview
-@Composable
-private fun CheckBoxLabelPreview() {
-    Column() {
-        HRCheckBoxLabel(isChecked = true, isEnabled = true, connectedDevice = "Hr monitor", onCheckedChange = {})
-        LocationCheckBoxLabel(isChecked = false, isEnabled = false, onCheckedChange = {})
     }
 }

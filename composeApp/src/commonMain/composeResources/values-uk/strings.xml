@@ -1,0 +1,66 @@
+<resources>
+    <!-- Main Screen -->
+    <string name="main_tab_record">Запис</string>
+    <string name="main_tab_activity">Активності</string>
+
+    <!-- Activity Screen -->
+    <string name="activity_screen_unnamed_act">Без назви</string>
+    <string name="activity_screen_created_at">Створено %1$s</string>
+    <string name="activity_screen_elapsed_time">Минуло часу: %1$s</string>
+    <string name="activity_screen_avg_hr">Ср. пульс:</string>
+    <string name="activity_screen_max_hr">Макс. пульс:</string>
+    <string name="activity_screen_min_hr">Мін. пульс:</string>
+
+    <string name="activity_screen_name_validation_empty">Назва активності не може бути порожньою</string>
+    <string name="activity_screen_name_validation_start_digit">Назва активності не може починатися з цифри</string>
+    <string name="activity_screen_name_validation_too_short">Назва активності надто коротка</string>
+    <string name="activity_screen_name_validation_too_long">Назва активності надто довга</string>
+
+    <!-- Chart bubble -->
+    <string name="chart_bubble_bpm">%1$s уд/хв</string>
+    <string name="activity_screen_heart_indication_bpm">%1$s уд/хв</string>
+
+    <!-- Record Screen -->
+    <string name="record_screen_hr_checkbox_label">Відстеження пульсу</string>
+    <string name="record_screen_connected_device_label">Пристрій: %1$s</string>
+    <string name="record_screen_heart_indication_stub">--</string>
+    <string name="record_screen_heart_indication_bpm">%1$s уд/хв</string>
+    <string name="record_screen_heart_indication_no_connection">Не підключено</string>
+    <string name="record_screen_heart_indication_contact_off">Немає контакту</string>
+    <string name="record_screen_heart_indication_battery_level"> %1$s %</string>
+    <string name="record_scree_choose_at_least_one_option">Оберіть хоча б один параметр для відстеження</string>
+
+    <!-- Dialogs -->
+    <string name="dialog_choose_hr_device_connecting">Підключення…</string>
+    <string name="dialog_choose_hr_device_scanning">Сканування…</string>
+    <string name="dialog_choose_hr_device_connect_device">Підключити пристрій</string>
+    <string name="dialog_choose_hr_device_no_device_found">Пристроїв не знайдено</string>
+    <string name="dialog_choose_hr_device_retry">Повторити</string>
+    <string name="dialog_choose_hr_device_connect">Підключити</string>
+
+    <string name="dialog_choose_hr_device_scanning_message">Пошук пристроїв…</string>
+    <string name="dialog_choose_hr_device_no_device_message">Пристроїв не знайдено. Спробуйте ще раз.</string>
+    <string name="dialog_choose_hr_device_select_device_message">Виберіть ваш датчик пульсу зі списку або проскануйте ще раз.</string>
+
+    <string name="dialog_info_ok">OK</string>
+
+    <string name="dialog_open_setting_title">Потрібен дозвіл</string>
+    <string name="dialog_open_setting_message">Здається, ви відхилили дозвіл BLE. Надати дозвіл можна в налаштуваннях системи.</string>
+    <string name="dialog_open_setting_button_text">Відкрити налаштування</string>
+
+    <string name="dialog_device_connected_title">Пристрій підключено</string>
+    <string name="dialog_device_connected_message">%1$s (%2$s) успішно підключено</string>
+
+    <string name="dialog_name_activity_title">Назвіть активність</string>
+    <string name="dialog_name_activity_message">Введіть назву активності перед збереженням.</string>
+
+    <string name="dialog_rename_activity_title">Перейменувати активність</string>
+    <string name="dialog_rename_activity_message">Введіть нову назву перед збереженням.</string>
+
+    <string name="dialog_activity_deletion_title">Підтвердити видалення активності</string>
+    <string name="dialog_activity_deletion_message">Ви впевнені, що хочете видалити вибрану %1$s?</string>
+    <string name="dialog_activity_deletion_button_text">Підтвердити</string>
+
+    <string name="text_activity">активність</string>
+    <string name="text_activities">активності</string>
+</resources>

@@ -30,7 +30,16 @@ import com.achub.hram.view.section.RecordSection
 import com.achub.hram.view.section.RecordingState
 import com.achub.hram.view.section.TrackingIndicationsSection
 import com.achub.hram.view.section.TrackingStatusCheckBoxSection
+import hram.composeapp.generated.resources.Res
+import hram.composeapp.generated.resources.dialog_device_connected_message
+import hram.composeapp.generated.resources.dialog_device_connected_title
+import hram.composeapp.generated.resources.dialog_name_activity_message
+import hram.composeapp.generated.resources.dialog_name_activity_title
+import hram.composeapp.generated.resources.dialog_open_setting_button_text
+import hram.composeapp.generated.resources.dialog_open_setting_message
+import hram.composeapp.generated.resources.dialog_open_setting_title
 import kotlinx.coroutines.delay
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import kotlin.time.Duration.Companion.seconds
@@ -115,8 +124,12 @@ private fun RecordScreenContent(
 
         is RecordScreenDialog.DeviceConnectedDialog -> {
             InfoDialog(
-                title = "Device connected",
-                message = "${dialog.bleDevice.name} from ${dialog.bleDevice.manufacturer.orEmpty()} successfully connected",
+                title = Res.string.dialog_device_connected_title,
+                message = stringResource(
+                    Res.string.dialog_device_connected_message,
+                    dialog.bleDevice.name,
+                    dialog.bleDevice.manufacturer.orEmpty()
+                ),
                 onDismiss = onDismissDialog
             )
             val haptic = LocalHapticFeedback.current
@@ -128,9 +141,9 @@ private fun RecordScreenContent(
         }
 
         is RecordScreenDialog.OpenSettingsDialog -> InfoDialog(
-            title = "Provide permission please",
-            message = "It looks like you denied ble permission explicitly. Please provide ble permission for the app in the settings.",
-            buttonText = "Open Settings",
+            title = Res.string.dialog_open_setting_title,
+            message = stringResource(Res.string.dialog_open_setting_message),
+            buttonText = Res.string.dialog_open_setting_button_text,
             onDismiss = onDismissDialog,
             onButonClick = {
                 openSettings()
@@ -140,8 +153,8 @@ private fun RecordScreenContent(
 
         is RecordScreenDialog.NameActivity -> {
             NameActivityDialog(
-                title = "Name your activity",
-                message = "Please enter a name for your activity before saving.",
+                title = Res.string.dialog_name_activity_title,
+                message = Res.string.dialog_name_activity_message,
                 name = dialog.activityName,
                 error = dialog.error,
                 onNameChanged = onActivityNameChanged,

@@ -1,11 +1,13 @@
 package com.achub.hram.view
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -14,9 +16,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.text.style.TextOverflow
 import com.achub.hram.data.db.entity.ActivityGraphInfo
 import com.achub.hram.data.models.HighlightedItem
 import com.achub.hram.formatTime
@@ -38,11 +42,20 @@ import com.achub.hram.view.chart.ChartBubble
 import com.achub.hram.view.chart.ChartData
 import com.achub.hram.view.chart.defaultChartStyle
 import hram.composeapp.generated.resources.Res
+import hram.composeapp.generated.resources.activity_screen_avg_hr
+import hram.composeapp.generated.resources.activity_screen_created_at
+import hram.composeapp.generated.resources.activity_screen_elapsed_time
+import hram.composeapp.generated.resources.activity_screen_heart_indication_bpm
+import hram.composeapp.generated.resources.activity_screen_max_hr
+import hram.composeapp.generated.resources.activity_screen_min_hr
+import hram.composeapp.generated.resources.activity_screen_unnamed_act
 import hram.composeapp.generated.resources.ic_not_selected
 import hram.composeapp.generated.resources.ic_selected
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.format.char
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 const val Y_LABEL_COUNT = 5
 const val X_LABEL_COUNT = 4
@@ -87,25 +100,40 @@ fun ActivityCard(
             .clip(RoundedCornerShape(Dimen12)),
         colors = CardDefaults.cardColors(containerColor = if (selected) Gray40 else DarkGray)
     ) {
+        val elapsedTime = formatTime(activity.duration)
         Column(modifier = Modifier.padding(Dimen16)) {
-            Row {
-                Text(text = activity.name.ifBlank { "Unnamed Activity" }, style = LabelBigBold)
-                Spacer(Modifier.weight(1f))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    modifier = Modifier.weight(1f).padding(vertical = Dimen8),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    text = activity.name.ifBlank { stringResource(Res.string.activity_screen_unnamed_act) },
+                    style = LabelBigBold,
+                )
                 if (selectionEnabled) {
                     val iconRes = if (selected) Res.drawable.ic_selected else Res.drawable.ic_not_selected
-                    Icon(painter = painterResource(iconRes), contentDescription = null, tint = White80)
+                    Icon(
+                        modifier = Modifier.size(Dimen32),
+                        painter = painterResource(iconRes),
+                        contentDescription = null,
+                        tint = White80
+                    )
                 }
             }
             Spacer(Modifier.height(Dimen8))
-            Text(text = "Created at $date", style = LabelMedium)
+            Text(text = stringResource(Res.string.activity_screen_created_at, date), style = LabelMedium)
             Spacer(Modifier.height(Dimen8))
-            Text(text = "Elapsed time: ${formatTime(activity.duration)}", style = LabelMedium)
+            Text(text = stringResource(Res.string.activity_screen_elapsed_time, elapsedTime), style = LabelMedium)
             Spacer(Modifier.height(Dimen16))
-            HeartRateLabel("Avg Heart Rate: ", activityInfo.avgHr)
+            HeartRateLabel(Res.string.activity_screen_avg_hr, activityInfo.avgHr)
             Spacer(Modifier.height(Dimen8))
-            HeartRateLabel("Max Heart Rate: ", activityInfo.maxHr)
+            HeartRateLabel(Res.string.activity_screen_max_hr, activityInfo.maxHr)
             Spacer(Modifier.height(Dimen8))
-            HeartRateLabel("Min Heart Rate: ", activityInfo.minHr)
+            HeartRateLabel(Res.string.activity_screen_min_hr, activityInfo.minHr)
             Spacer(Modifier.height(Dimen32))
             AreaChart(
                 modifier = Modifier
@@ -121,8 +149,8 @@ fun ActivityCard(
 }
 
 @Composable
-fun HeartRateLabel(labelText: String, value: Int?) = Row {
-    Text(text = labelText, style = LabelMedium)
+fun HeartRateLabel(stringRes: StringResource, value: Int) = Row {
+    Text(text = stringResource(stringRes), style = LabelMedium)
     Spacer(Modifier.weight(1f))
-    Text(text = "$value bpm", style = LabelMediumBold)
+    Text(text = stringResource(Res.string.activity_screen_heart_indication_bpm, value), style = LabelMediumBold)
 }

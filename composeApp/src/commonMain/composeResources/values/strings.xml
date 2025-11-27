@@ -1,0 +1,65 @@
+<resources>
+    <!-- Main Screen -->
+    <string name="main_tab_record">Record</string>
+    <string name="main_tab_activity">Activities</string>
+
+    <!-- Activity Screen -->
+    <string name="activity_screen_unnamed_act">Untitled Activity</string>
+    <string name="activity_screen_created_at">Created on %1$s</string>
+    <string name="activity_screen_elapsed_time">Elapsed time: %1$s</string>
+    <string name="activity_screen_avg_hr">Avg Heart Rate:</string>
+    <string name="activity_screen_max_hr">Max Heart Rate:</string>
+    <string name="activity_screen_min_hr">Min Heart Rate:</string>
+    <string name="activity_screen_name_validation_empty">Activity name cannot be empty</string>
+    <string name="activity_screen_name_validation_start_digit">Activity name cannot start with a number</string>
+    <string name="activity_screen_name_validation_too_short">Activity name is too short</string>
+    <string name="activity_screen_name_validation_too_long">Activity name is too long</string>
+
+    <!-- Chart bubble -->
+    <string name="chart_bubble_bpm">%1$s BPM</string>
+    <string name="activity_screen_heart_indication_bpm">%1$s BPM</string>
+
+    <!-- Record Screen -->
+    <string name="record_screen_hr_checkbox_label">Heart Rate tracking</string>
+    <string name="record_screen_connected_device_label">Device: %1$s</string>
+    <string name="record_screen_heart_indication_stub">--</string>
+    <string name="record_screen_heart_indication_bpm">%1$s BPM</string>
+    <string name="record_screen_heart_indication_no_connection">Not connected</string>
+    <string name="record_screen_heart_indication_contact_off">Contact Off</string>
+    <string name="record_screen_heart_indication_battery_level"> %1$s %</string>
+    <string name="record_scree_choose_at_least_one_option">Choose at least one tracking option</string>
+
+    <!-- Dialogs -->
+    <string name="dialog_choose_hr_device_connecting">Connecting...</string>
+    <string name="dialog_choose_hr_device_scanning">Scanning...</string>
+    <string name="dialog_choose_hr_device_connect_device">Connect Device</string>
+    <string name="dialog_choose_hr_device_no_device_found">No Devices Found</string>
+    <string name="dialog_choose_hr_device_retry">Retry</string>
+    <string name="dialog_choose_hr_device_connect">Connect</string>
+
+    <string name="dialog_choose_hr_device_scanning_message">Scanning for devices...</string>
+    <string name="dialog_choose_hr_device_no_device_message">No devices found. Please try again.</string>
+    <string name="dialog_choose_hr_device_select_device_message">Select your heart rate device from the list or scan again.</string>
+
+    <string name="dialog_info_ok">OK</string>
+
+    <string name="dialog_open_setting_title">Permission required</string>
+    <string name="dialog_open_setting_message">It looks like you denied the BLE permission. Please allow it for the app in system settings.</string>
+    <string name="dialog_open_setting_button_text">Open Settings</string>
+
+    <string name="dialog_device_connected_title">Device Connected</string>
+    <string name="dialog_device_connected_message">%1$s from %2$s successfully connected</string>
+
+    <string name="dialog_name_activity_title">Name your activity</string>
+    <string name="dialog_name_activity_message">Please enter a name for your activity before saving.</string>
+
+    <string name="dialog_rename_activity_title">Rename your activity</string>
+    <string name="dialog_rename_activity_message">Please enter a new name before saving.</string>
+
+    <string name="dialog_activity_deletion_title">Confirm Activity Deletion</string>
+    <string name="dialog_activity_deletion_message">Are you sure you want to delete the selected %1$s?</string>
+    <string name="dialog_activity_deletion_button_text">Confirm</string>
+
+    <string name="text_activity">activity</string>
+    <string name="text_activities">activities</string>
+</resources>

@@ -26,15 +26,22 @@ import com.achub.hram.view.HramTextField
 import com.achub.hram.view.components.dialog.DialogButton
 import com.achub.hram.view.components.dialog.DialogElevatedCard
 import com.achub.hram.view.components.dialog.DialogTitle
+import hram.composeapp.generated.resources.Res
+import hram.composeapp.generated.resources.activity_screen_name_validation_empty
+import hram.composeapp.generated.resources.dialog_info_ok
+import hram.composeapp.generated.resources.dialog_name_activity_message
+import hram.composeapp.generated.resources.dialog_name_activity_title
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NameActivityDialog(
-    title: String,
-    message: String,
-    buttonText: String = "Ok",
+    title: StringResource,
+    message: StringResource,
+    buttonText: StringResource = Res.string.dialog_info_ok,
     name: String,
-    error: String?,
+    error: StringResource?,
     dismissable: Boolean = false,
     onNameChanged: (String) -> Unit,
     onDismiss: () -> Unit,
@@ -51,7 +58,7 @@ fun NameActivityDialog(
             Column(modifier = Modifier.padding(Dimen24), horizontalAlignment = CenterHorizontally) {
                 DialogTitle(title = title)
                 Spacer(Modifier.height(Dimen24))
-                Text(text = message, color = White, style = LabelMedium, textAlign = TextAlign.Center)
+                Text(text = stringResource(message), color = White, style = LabelMedium, textAlign = TextAlign.Center)
                 Spacer(Modifier.height(Dimen24))
                 HramTextField(
                     modifier = Modifier,
@@ -64,7 +71,7 @@ fun NameActivityDialog(
                         error?.let {
                             Text(
                                 modifier = Modifier.fillMaxWidth(),
-                                text = error,
+                                text = stringResource(error),
                                 color = MaterialTheme.colorScheme.error
                             )
                         }
@@ -76,7 +83,7 @@ fun NameActivityDialog(
                 )
                 Spacer(Modifier.height(Dimen24))
                 DialogButton(
-                    text = buttonText,
+                    text = stringResource( buttonText),
                     enabled = error == null && name.isNotBlank(),
                     onClick = { onButonClick(name) })
             }
@@ -88,10 +95,10 @@ fun NameActivityDialog(
 @Composable
 fun PreviewNameActivityDialog() {
     NameActivityDialog(
-        title = "Name your activity",
-        message = "Please enter a name for your activity to help you identify it later.",
+        title = Res.string.dialog_name_activity_title,
+        message = Res.string.dialog_name_activity_message,
         name = "213",
-        error = "Name cannot be empty",
+        error = Res.string.activity_screen_name_validation_empty,
         onNameChanged = {},
         onDismiss = {}
     )

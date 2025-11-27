@@ -18,6 +18,9 @@ import com.achub.hram.style.Dimen8
 import com.achub.hram.style.LabelBigBold
 import com.achub.hram.style.LabelSmall
 import com.achub.hram.style.LightRed
+import hram.composeapp.generated.resources.Res
+import hram.composeapp.generated.resources.chart_bubble_bpm
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun ChartBubble(xLabel: String, yLabel: String) {
@@ -29,7 +32,7 @@ fun ChartBubble(xLabel: String, yLabel: String) {
         Column(Modifier.padding(Dimen16)) {
             Text(
                 modifier = Modifier.padding(bottom = Dimen8),
-                text = "$yLabel bpm",
+                text = stringResource(Res.string.chart_bubble_bpm, yLabel),
                 style = LabelBigBold.copy(color = Black)
             )
             Text(text = xLabel, style = LabelSmall.copy(color = Black))

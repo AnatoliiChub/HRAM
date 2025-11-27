@@ -11,6 +11,7 @@ import com.achub.hram.style.White80
 @Composable
 fun DialogMessage(modifier: Modifier = Modifier, message: String) {
     Text(
+        modifier = modifier,
         text = message,
         style = LabelSmall.copy(color = White80, fontWeight = W500),
         textAlign = TextAlign.Center

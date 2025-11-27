@@ -72,5 +72,6 @@ class HramHrActivityRepo(@Provided val actDao: ActivityDao, @Provided val hrDao:
 
     override suspend fun deleteActivitiesById(ids: Set<String>) {
         actDao.deleteByIds(ids)
+        hrDao.deleteRecordsByIds(ids)
     }
 }
