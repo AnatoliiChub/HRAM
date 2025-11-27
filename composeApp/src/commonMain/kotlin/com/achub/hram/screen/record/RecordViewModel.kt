@@ -38,7 +38,7 @@ class RecordViewModel(
     val activityNameValidation: ActivityNameValidation,
     @InjectedParam val permissionController: PermissionsController
 ) : ViewModel(), KoinComponent {
-    val bleConnectionRepo: BleConnectionRepo by inject(parameters = { parametersOf(viewModelScope) })
+    private val bleConnectionRepo: BleConnectionRepo by inject(parameters = { parametersOf(viewModelScope) })
     private val _uiState = MutableStateFlow(RecordScreenState())
     val uiState = _uiState.stateInExt(initialValue = RecordScreenState())
     private val isBluetoothOn = MutableStateFlow(false)

@@ -247,13 +247,14 @@ private fun RecordScreenChooseDeviceDialogPreview() {
             ),
             recordingState = RecordingState.Init,
             dialog = RecordScreenDialog.ChooseHRDevice(
-                isLoading = true,
+                isLoading = false,
                 scannedDevices = listOf(
                     BleDevice("Hrm1", "00:11:22:33:44:55"),
                     BleDevice("Hrm2", "66:77:88:99:AA:BB"),
                     BleDevice("Hrm3", "CC:DD:EE:FF:00:11"),
                     BleDevice("Hrm4", "22:33:44:55:66:77"),
                     BleDevice("Hrm5", "88:99:AA:BB:CC:DD"),
+
                 ),
                 loadingDuration = 5.seconds
             )

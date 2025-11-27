@@ -43,14 +43,15 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
             implementation(libs.koin.android)
+            implementation(libs.androidx.ui.tooling)
         }
         commonMain.dependencies {
             implementation(libs.runtime)
             implementation(libs.foundation)
             implementation(libs.material3)
             implementation(libs.ui)
-            implementation(libs.components.resources)
             implementation(libs.ui.tooling.preview)
+            implementation(libs.components.resources)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.logger)

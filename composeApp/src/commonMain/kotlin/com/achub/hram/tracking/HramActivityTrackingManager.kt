@@ -44,14 +44,13 @@ private const val TAG = "HramActivityTrackingManager"
     ExperimentalAtomicApi::class
 )
 class HramActivityTrackingManager : ActivityTrackingManager, KoinComponent {
-
-    val stopWatch: StopWatch by inject()
-    val hrDeviceRepo: HrDeviceRepo by inject(parameters = { parametersOf(scope) })
-    val hrActivityRepo: HrActivityRepo by inject()
+    override val bleIndication = Channel<BleIndication>()
+    private val stopWatch: StopWatch by inject()
+    private val hrDeviceRepo: HrDeviceRepo by inject(parameters = { parametersOf(scope) })
+    private val hrActivityRepo: HrActivityRepo by inject()
     private var scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private val trackingState = AtomicInt(TRACKING_INIT_STATE)
     private var jobs = mutableListOf<Job>()
-    override val bleIndication = Channel<BleIndication>()
     private val isRecording get() = trackingState.load() == ACTIVE_TRACKING_STATE
     private var currentActId: String? = null
 
@@ -72,6 +71,7 @@ class HramActivityTrackingManager : ActivityTrackingManager, KoinComponent {
         trackingState.update { PAUSED_TRACKING_STATE }
         stopWatch.pause()
     }
+
 
     override fun finishTracking(name: String?) {
         scope.launch(Dispatchers.Default) {

@@ -120,8 +120,7 @@ class HramBleConnectionRepo(
 
     @OptIn(ExperimentalUuidApi::class)
     private fun runConnectionJob(peripheral: Peripheral) {
-        connectionJob?.cancel()
-        connectionJob = null
+        clearConnectionJob()
         connectionJob = peripheral.state.onEach { state.trySend(it) }
             .onEach { logger(TAG) { "current state $it" } }
             .map { currentState -> CONNECT_STATES.any { it == currentState::class }.not() }
@@ -138,8 +137,7 @@ class HramBleConnectionRepo(
             }
             .onCompletion {
                 logger(TAG) { "connectionJob completed" }
-                connectionJob?.cancel()
-                connectionJob = null
+                clearConnectionJob()
             }
             .launchIn(scope)
     }
@@ -148,6 +146,10 @@ class HramBleConnectionRepo(
         isKeepConnection.trySend(false)
         connected?.disconnect()
         connected = null
+        clearConnectionJob()
+    }
+
+    private fun clearConnectionJob() {
         connectionJob?.cancel()
         connectionJob = null
     }

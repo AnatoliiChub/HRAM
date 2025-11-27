@@ -39,13 +39,13 @@ fun HeartIndicationRow(
     bleIndication: BleIndication
 ) {
     val isEmpty = bleIndication.isEmpty()
-    val hrBpm = bleIndication.hrIndication?.hrBpm ?: 0
-    val isSensorContactSupported = bleIndication.hrIndication?.isSensorContactSupported == true
-    val isContactOn = bleIndication.hrIndication?.isContactOn == true
+    val hrIndication = bleIndication.hrIndication
+    val hrBpm = hrIndication?.hrBpm ?: 0
+    val isSensorContactSupported = hrIndication?.isSensorContactSupported == true
+    val isContactOn = hrIndication?.isContactOn == true
     val batteryLevel = bleIndication.batteryLevel
     val noBle = bleIndication.isBleConnected.not()
-    val hrValueStub = isEmpty || noBle
-            || (isSensorContactSupported && isContactOn.not())
+    val hrValueStub = isEmpty || noBle || (isSensorContactSupported && isContactOn.not()) || hrIndication == null
     val heartColor = if (hrValueStub) Gray else Red
     val hrLabel = if (hrValueStub) stringResource(Res.string.record_screen_heart_indication_stub)
     else stringResource(Res.string.record_screen_heart_indication_bpm, hrBpm)
