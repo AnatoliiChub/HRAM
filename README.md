@@ -16,8 +16,7 @@ Status: **Work in progress / Prototype**
 
 No implied warranty or guarantee of functionality. Use at your own risk.  
 This project is for educational purposes in software development only.
-It is **not a medical application** and must **not be used for medical assessment, diagnosis, monitoring, or treatment
-**.
+It is **not a medical application** and must **not be used for medical assessment, diagnosis, monitoring, or treatment**.
 
 ---
 
@@ -67,11 +66,12 @@ flowchart LR
     B -->|identifier| C[CONNECT<br>Peripheral]
     C --> D[SUBSCRIBE:<br>HRM 0x2A37,<br>Battery 0x2A19]
     D --> E[PARSE<br>NOTIFICATIONS]
+    E --> F[UI<br>or<br>DATABASE]
 ```
 
 ---
 
-### 2\.2 Tracking \& stopwatch
+### 2\.2 Tracking
 
 Tracking is implemented in `hram/tracking`:
 
