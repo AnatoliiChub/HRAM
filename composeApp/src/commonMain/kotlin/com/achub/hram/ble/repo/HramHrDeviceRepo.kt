@@ -1,8 +1,8 @@
 package com.achub.hram.ble.repo
 
+import com.achub.hram.ble.model.BleDevice
+import com.achub.hram.ble.model.BleIndication
 import com.achub.hram.cancelAndClear
-import com.achub.hram.data.models.BleDevice
-import com.achub.hram.data.models.BleIndication
 import com.achub.hram.launchIn
 import com.achub.hram.logger
 import com.achub.hram.loggerE

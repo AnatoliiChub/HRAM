@@ -4,11 +4,11 @@ package com.achub.hram.screen.record
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.achub.hram.ble.model.BleDevice
+import com.achub.hram.ble.model.BleIndication
 import com.achub.hram.ble.repo.BleConnectionRepo
 import com.achub.hram.ble.repo.SCAN_DURATION
 import com.achub.hram.cancelAndClear
-import com.achub.hram.data.models.BleDevice
-import com.achub.hram.data.models.BleIndication
 import com.achub.hram.launchIn
 import com.achub.hram.requestBleBefore
 import com.achub.hram.stateInExt

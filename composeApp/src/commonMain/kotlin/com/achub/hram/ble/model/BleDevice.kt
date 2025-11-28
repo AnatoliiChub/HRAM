@@ -1,4 +1,4 @@
-package com.achub.hram.data.models
+package com.achub.hram.ble.model
 
 import com.achub.hram.ble.repo.HramBleConnectionRepo.Companion.MANUFACTURER_CHAR
 import com.juul.kable.ExperimentalApi

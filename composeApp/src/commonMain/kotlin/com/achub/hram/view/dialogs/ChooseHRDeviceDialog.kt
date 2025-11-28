@@ -18,7 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.achub.hram.data.models.BleDevice
+import com.achub.hram.ble.model.BleDevice
 import com.achub.hram.style.Dimen24
 import com.achub.hram.style.Dimen32
 import com.achub.hram.view.DeviceListItem

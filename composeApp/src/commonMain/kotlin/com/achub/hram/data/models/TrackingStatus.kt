@@ -1,5 +1,7 @@
 package com.achub.hram.data.models
 
+import com.achub.hram.ble.model.BleDevice
+
 data class TrackingStatus(
     val trackHR: Boolean = false,
     val trackGps: Boolean = false,

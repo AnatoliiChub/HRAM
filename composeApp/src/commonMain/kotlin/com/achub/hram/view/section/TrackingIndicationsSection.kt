@@ -5,7 +5,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
-import com.achub.hram.data.models.BleIndication
+import com.achub.hram.ble.model.BleIndication
 import com.achub.hram.style.Heading3
 import com.achub.hram.view.indications.HeartIndicationRow
 import kotlinx.datetime.LocalTime

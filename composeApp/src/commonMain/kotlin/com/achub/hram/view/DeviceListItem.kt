@@ -8,7 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import com.achub.hram.data.models.BleDevice
+import com.achub.hram.ble.model.BleDevice
 import com.achub.hram.style.Dimen4
 import com.achub.hram.style.LabelMedium
 import com.achub.hram.style.LabelMediumBold

@@ -6,8 +6,8 @@ import com.achub.hram.createActivity
 import com.achub.hram.data.HrActivityRepo
 import com.achub.hram.data.db.entity.ACTIVE_ACTIVITY
 import com.achub.hram.data.db.entity.HeartRateEntity
-import com.achub.hram.data.models.BleDevice
-import com.achub.hram.data.models.BleIndication
+import com.achub.hram.ble.model.BleDevice
+import com.achub.hram.ble.model.BleIndication
 import com.achub.hram.launchIn
 import com.achub.hram.logger
 import kotlinx.coroutines.CoroutineScope

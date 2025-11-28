@@ -4,7 +4,7 @@ import com.achub.hram.BATTERY_LEVEL_CHAR_UUID
 import com.achub.hram.BATTERY_SERVICE_UUID
 import com.achub.hram.HR_MEASUREMENT_CHAR_UUID
 import com.achub.hram.HR_SERVICE_UUID
-import com.achub.hram.data.models.HrIndication
+import com.achub.hram.ble.model.HrIndication
 import com.achub.hram.logger
 import com.achub.hram.loggerE
 import com.achub.hram.uint16

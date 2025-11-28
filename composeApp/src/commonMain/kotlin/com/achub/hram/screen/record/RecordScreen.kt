@@ -15,9 +15,9 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.achub.hram.data.models.BleDevice
-import com.achub.hram.data.models.BleIndication
-import com.achub.hram.data.models.HrIndication
+import com.achub.hram.ble.model.BleDevice
+import com.achub.hram.ble.model.BleIndication
+import com.achub.hram.ble.model.HrIndication
 import com.achub.hram.data.models.TrackingStatus
 import com.achub.hram.permissionController
 import com.achub.hram.requestBluetooth

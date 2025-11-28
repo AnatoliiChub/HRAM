@@ -1,4 +1,4 @@
-package com.achub.hram.data.models
+package com.achub.hram.ble.model
 
 data class BleIndication(
     val hrIndication: HrIndication? = null,
@@ -12,9 +12,3 @@ data class BleIndication(
 
     fun isEmpty() = this == Empty
 }
-
-data class HrIndication(
-    val hrBpm: Int,
-    val isSensorContactSupported: Boolean,
-    val isContactOn: Boolean,
-)

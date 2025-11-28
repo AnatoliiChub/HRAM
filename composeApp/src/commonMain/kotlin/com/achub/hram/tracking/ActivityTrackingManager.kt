@@ -1,7 +1,7 @@
 package com.achub.hram.tracking
 
-import com.achub.hram.data.models.BleDevice
-import com.achub.hram.data.models.BleIndication
+import com.achub.hram.ble.model.BleDevice
+import com.achub.hram.ble.model.BleIndication
 import kotlinx.coroutines.channels.Channel
 
 const val TRACKING_INIT_STATE = 0

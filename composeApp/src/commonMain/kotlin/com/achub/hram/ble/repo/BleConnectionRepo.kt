@@ -1,6 +1,6 @@
 package com.achub.hram.ble.repo
 
-import com.achub.hram.data.models.BleDevice
+import com.achub.hram.ble.model.BleDevice
 import com.juul.kable.Advertisement
 import com.juul.kable.Identifier
 import com.juul.kable.Peripheral

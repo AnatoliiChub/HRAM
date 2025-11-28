@@ -3,10 +3,10 @@ package com.achub.hram.ble.repo
 import com.achub.hram.HR_SERVICE_UUID
 import com.achub.hram.MANUFACTURER_NAME_CHAR_UUID
 import com.achub.hram.MANUFACTURER_SERVICE_UUID
-import com.achub.hram.ble.BleConnectionsException
 import com.achub.hram.ble.BluetoothState
-import com.achub.hram.data.models.BleDevice
-import com.achub.hram.data.models.toBleDevice
+import com.achub.hram.ble.model.BleConnectionsException
+import com.achub.hram.ble.model.BleDevice
+import com.achub.hram.ble.model.toBleDevice
 import com.achub.hram.logger
 import com.achub.hram.loggerE
 import com.juul.kable.ExperimentalApi

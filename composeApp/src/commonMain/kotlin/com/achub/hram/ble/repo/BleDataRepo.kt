@@ -1,6 +1,6 @@
 package com.achub.hram.ble.repo
 
-import com.achub.hram.data.models.HrIndication
+import com.achub.hram.ble.model.HrIndication
 import com.juul.kable.Peripheral
 import kotlinx.coroutines.flow.Flow
 
