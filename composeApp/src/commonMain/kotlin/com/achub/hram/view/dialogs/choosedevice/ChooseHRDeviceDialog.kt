@@ -1,4 +1,4 @@
-package com.achub.hram.view.dialogs
+package com.achub.hram.view.dialogs.choosedevice
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,7 +21,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.achub.hram.ble.model.BleDevice
 import com.achub.hram.style.Dimen24
 import com.achub.hram.style.Dimen32
-import com.achub.hram.view.DeviceListItem
 import com.achub.hram.view.components.HRProgress
 import com.achub.hram.view.components.dialog.DialogButton
 import com.achub.hram.view.components.dialog.DialogElevatedCard

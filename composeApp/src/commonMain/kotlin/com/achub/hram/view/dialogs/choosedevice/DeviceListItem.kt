@@ -1,4 +1,4 @@
-package com.achub.hram.view
+package com.achub.hram.view.dialogs.choosedevice
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -10,8 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import com.achub.hram.ble.model.BleDevice
 import com.achub.hram.style.Dimen4
-import com.achub.hram.style.LabelMedium
 import com.achub.hram.style.LabelMediumBold
+import com.achub.hram.style.LabelSmall
 import com.achub.hram.style.Red
 import com.achub.hram.style.White
 
@@ -29,6 +29,6 @@ fun DeviceListItem(
             .fillMaxWidth()
             .clickable { onSelected(device) }) {
         Text(text = device.name, color = color, style = LabelMediumBold)
-        Text(text = device.identifier, color = color, style = LabelMedium)
+        Text(text = device.identifier, color = color, style = LabelSmall)
     }
 }

@@ -31,10 +31,9 @@ private val BATTERY_CHAR = characteristicOf(BATTERY_SERVICE_UUID, BATTERY_LEVEL_
 class HramBleDataRepo : BleDataRepo {
 
     override fun observeHeartRate(peripheral: Peripheral): Flow<HrIndication> = peripheral.observe(HR_CHAR)
-        .catch { loggerE(TAG) { "Error in observeHeartRate: $it" } }
         .map(::parseHrIndication)
         .onEach { logger(TAG) { "hrIndication: $it" } }
-        .catch { loggerE(TAG) { "Error after parsing Hr indication: $it" } }
+        .catch { loggerE(TAG) { "Error in observeHeartRate: $it" } }
 
     override fun observeBatteryLevel(peripheral: Peripheral) =
         BATTERY_CHAR.let { characteristic ->

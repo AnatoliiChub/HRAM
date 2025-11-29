@@ -18,8 +18,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.achub.hram.style.Dimen16
 import com.achub.hram.style.Dimen8
 import com.achub.hram.view.ActivityCard
-import com.achub.hram.view.ActivityOptions
-import com.achub.hram.view.FloatingToolbar
+import com.achub.hram.view.components.ActivityOptions
+import com.achub.hram.view.components.FloatingToolbar
 import com.achub.hram.view.dialogs.InfoDialog
 import com.achub.hram.view.dialogs.NameActivityDialog
 import hram.composeapp.generated.resources.Res

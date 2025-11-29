@@ -88,6 +88,7 @@ class HramHrDeviceRepo(
         }
     }
 
+    //TODO SHOULD RETURN CONNECTED AND DISCONNECTED STATES
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun listen() = bleConnectionRepo.onConnected
         .flatMapLatest { device -> hrIndicationCombiner(device) }

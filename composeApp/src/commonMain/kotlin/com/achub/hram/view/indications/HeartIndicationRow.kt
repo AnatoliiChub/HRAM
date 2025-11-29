@@ -22,7 +22,7 @@ import com.achub.hram.style.HeadingMediumBold
 import com.achub.hram.style.LabelMedium
 import com.achub.hram.style.Red
 import com.achub.hram.style.White
-import com.achub.hram.view.HeartBeatingAnimView
+import com.achub.hram.view.components.HeartBeatingAnimView
 import hram.composeapp.generated.resources.Res
 import hram.composeapp.generated.resources.ic_battery_full
 import hram.composeapp.generated.resources.record_screen_heart_indication_battery_level

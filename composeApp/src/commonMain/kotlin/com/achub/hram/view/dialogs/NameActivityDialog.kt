@@ -22,7 +22,7 @@ import com.achub.hram.style.LabelMedium
 import com.achub.hram.style.Red
 import com.achub.hram.style.White
 import com.achub.hram.style.White80
-import com.achub.hram.view.HramTextField
+import com.achub.hram.view.components.HramTextField
 import com.achub.hram.view.components.dialog.DialogButton
 import com.achub.hram.view.components.dialog.DialogElevatedCard
 import com.achub.hram.view.components.dialog.DialogTitle

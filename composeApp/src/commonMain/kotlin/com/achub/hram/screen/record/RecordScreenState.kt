@@ -58,10 +58,6 @@ fun MutableStateFlow<RecordScreenState>.deviceConnectedDialog(bleDevice: BleDevi
             dialog = RecordScreenDialog.DeviceConnectedDialog(bleDevice)
         )
     }
-
-fun MutableStateFlow<RecordScreenState>.toggleGpsTracking() =
-    this.update { it.copy(trackingStatus = it.trackingStatus.copy(trackGps = it.trackingStatus.trackGps.not())) }
-
 fun MutableStateFlow<RecordScreenState>.toggleHrTracking() = this.update {
     it.copy(trackingStatus = it.trackingStatus.copy(trackHR = it.trackingStatus.trackHR.not(), hrDevice = null))
 }

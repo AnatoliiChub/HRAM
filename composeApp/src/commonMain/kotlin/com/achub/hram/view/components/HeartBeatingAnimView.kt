@@ -1,4 +1,4 @@
-package com.achub.hram.view
+package com.achub.hram.view.components
 
 import androidx.compose.animation.core.KeyframesSpec
 import androidx.compose.animation.core.LinearEasing
@@ -12,8 +12,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import com.achub.hram.style.Dimen76
-import com.achub.hram.view.components.IndicationImage
 import hram.composeapp.generated.resources.Res
 import hram.composeapp.generated.resources.ic_heart
 
@@ -60,4 +60,14 @@ private fun heartBeatingSpec(): KeyframesSpec<Float> {
         0.9f at fifth using LinearEasing
         0.8f at duration using LinearEasing
     }
+}
+
+@Preview
+@Composable
+fun HeartBeatingAnimViewPreview() {
+    HeartBeatingAnimView(
+        isBeating = true,
+        modifier = Modifier,
+        color = Color.Red
+    )
 }

@@ -74,9 +74,7 @@ class HramBleConnectionRepo(
     @OptIn(ExperimentalUuidApi::class, FlowPreview::class)
     override fun scanHrDevices() = Scanner {
         filters {
-            match {
-                services = listOf(HR_SERVICE_UUID)
-            }
+            match { services = listOf(HR_SERVICE_UUID) }
         }
     }.advertisements
 
@@ -85,11 +83,11 @@ class HramBleConnectionRepo(
         val isKeepConnectionFlow = isKeepConnection.receiveAsFlow()
             .onEach { logger(TAG) { "Reconnection requested" } }
             .onStart { emit(true) }
-            .onEach { if (it.not()) throw BleConnectionsException.DisconnectRequestedException }
+            .onEach { if (it.not()) throw BleConnectionsException.DisconnectRequestedException() }
 
         val bluetoothOnEventFlow = isBluetoothOn.filter { it }.onEach { logger(TAG) { "Bluetooth is ON" } }
 
-        return bluetoothOnEventFlow.combine(isKeepConnectionFlow) { isOn, keepConnection -> keepConnection }
+        return bluetoothOnEventFlow.combine(isKeepConnectionFlow) { _, keepConnection -> keepConnection }
             .flatMapLatest {
                 flow {
                     runCatching { connected?.disconnect() }.onFailure { loggerE(TAG) { "Error during disconnecting: $it" } }
@@ -98,11 +96,9 @@ class HramBleConnectionRepo(
                     runConnectionJob(peripheral)
                 }
             }.retry(3) {
-                it.printStackTrace()
-                loggerE(TAG) { "$it" }
                 val tryToReconnect =
                     it is BleConnectionsException.DeviceNotConnectedException || it is NotConnectedException
-                logger(TAG) { "try to reconnect: $tryToReconnect" }
+                logger(TAG) { "try to reconnect: $tryToReconnect, because of $it" }
                 tryToReconnect
             }
     }

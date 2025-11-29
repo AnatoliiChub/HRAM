@@ -3,5 +3,5 @@ package com.achub.hram.ble.model
 sealed class BleConnectionsException : Exception() {
     data class DeviceNotConnectedException(override val message: String?) : BleConnectionsException()
 
-    data object DisconnectRequestedException : BleConnectionsException()
+    data class DisconnectRequestedException(override val message: String? = "") : BleConnectionsException()
 }

@@ -23,9 +23,9 @@ import com.achub.hram.permissionController
 import com.achub.hram.requestBluetooth
 import com.achub.hram.style.BlackPreview
 import com.achub.hram.style.Dimen16
-import com.achub.hram.view.dialogs.HrConnectDialog
 import com.achub.hram.view.dialogs.InfoDialog
 import com.achub.hram.view.dialogs.NameActivityDialog
+import com.achub.hram.view.dialogs.choosedevice.HrConnectDialog
 import com.achub.hram.view.section.RecordSection
 import com.achub.hram.view.section.RecordingState
 import com.achub.hram.view.section.TrackingIndicationsSection
