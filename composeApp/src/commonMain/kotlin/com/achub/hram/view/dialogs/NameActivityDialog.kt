@@ -49,10 +49,14 @@ fun NameActivityDialog(
 ) {
     BasicAlertDialog(
         onDismissRequest = onDismiss,
-        properties = if (dismissable) DialogProperties() else DialogProperties(
-            dismissOnBackPress = false,
-            dismissOnClickOutside = false
-        )
+        properties = if (dismissable) {
+            DialogProperties()
+        } else {
+            DialogProperties(
+                dismissOnBackPress = false,
+                dismissOnClickOutside = false
+            )
+        }
     ) {
         DialogElevatedCard {
             Column(modifier = Modifier.padding(Dimen24), horizontalAlignment = CenterHorizontally) {
@@ -83,9 +87,10 @@ fun NameActivityDialog(
                 )
                 Spacer(Modifier.height(Dimen24))
                 DialogButton(
-                    text = stringResource( buttonText),
+                    text = stringResource(buttonText),
                     enabled = error == null && name.isNotBlank(),
-                    onClick = { onButonClick(name) })
+                    onClick = { onButonClick(name) }
+                )
             }
         }
     }

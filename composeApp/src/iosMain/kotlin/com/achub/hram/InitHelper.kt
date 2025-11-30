@@ -8,4 +8,3 @@ fun init() {
     initKoin()
     Napier.base(DebugAntilog())
 }
-

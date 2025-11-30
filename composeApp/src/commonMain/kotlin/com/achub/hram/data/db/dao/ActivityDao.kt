@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ActivityDao {
-
     @Insert(onConflict = REPLACE)
     suspend fun insert(item: ActivityEntity)
 

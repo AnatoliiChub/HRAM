@@ -36,6 +36,7 @@ import hram.composeapp.generated.resources.dialog_choose_hr_device_retry
 import hram.composeapp.generated.resources.dialog_choose_hr_device_scanning
 import hram.composeapp.generated.resources.dialog_choose_hr_device_scanning_message
 import hram.composeapp.generated.resources.dialog_choose_hr_device_select_device_message
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -62,8 +63,11 @@ fun HrConnectDialog(
     val message = provideDialogMessage(isLoading, devices)
 
     BasicAlertDialog(onDismissRequest = onDismissRequest) {
-        val btnText = if (retryState) Res.string.dialog_choose_hr_device_retry
-        else Res.string.dialog_choose_hr_device_connect
+        val btnText = if (retryState) {
+            Res.string.dialog_choose_hr_device_retry
+        } else {
+            Res.string.dialog_choose_hr_device_connect
+        }
         val onBtnClick: () -> Unit = {
             when {
                 selected != null -> selected?.let { onConfirmClick(it) }
@@ -75,21 +79,38 @@ fun HrConnectDialog(
                 DialogTitle(title = title)
                 Spacer(Modifier.height(Dimen24))
 
-                if (isLoading) HRProgress(isLoading, cycleDuration = loadingDuration)
-                else DialogMessage(message = stringResource(message))
+                if (isLoading) {
+                    HRProgress(isLoading, cycleDuration = loadingDuration)
+                } else {
+                    DialogMessage(message = stringResource(message))
+                }
 
                 if (!isDeviceConfirmed) {
-                    Column(horizontalAlignment = CenterHorizontally) {
-                        if (devices.isNotEmpty()) Spacer(Modifier.height(Dimen24))
-                        DeviceList(devices, selected) { selected = if (selected == it) null else it }
-                        Spacer(Modifier.height(Dimen32))
-                        if (!isLoading || selected != null) DialogButton(
-                            text = stringResource(btnText),
-                            onClick = onBtnClick
-                        )
-                    }
+                    Content(devices, selected, isLoading, btnText, onSelected = { selected = it }, onBtnClick)
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun Content(
+    devices: List<BleDevice>,
+    selected: BleDevice?,
+    isLoading: Boolean,
+    btnText: StringResource,
+    onSelected: (BleDevice?) -> Unit,
+    onBtnClick: () -> Unit
+) {
+    Column(horizontalAlignment = CenterHorizontally) {
+        if (devices.isNotEmpty()) Spacer(Modifier.height(Dimen24))
+        DeviceList(devices, selected) { onSelected(if (selected == it) null else it) }
+        Spacer(Modifier.height(Dimen32))
+        if (!isLoading || selected != null) {
+            DialogButton(
+                text = stringResource(btnText),
+                onClick = onBtnClick
+            )
         }
     }
 }

@@ -4,14 +4,14 @@ package com.achub.hram.screen.record
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.achub.hram.ble.model.BleDevice
+import com.achub.hram.ble.model.BleNotification
 import com.achub.hram.ble.repo.BleConnectionRepo
 import com.achub.hram.ble.repo.SCAN_DURATION
-import com.achub.hram.cancelAndClear
-import com.achub.hram.ble.model.BleDevice
-import com.achub.hram.ble.model.BleIndication
-import com.achub.hram.launchIn
-import com.achub.hram.requestBleBefore
-import com.achub.hram.stateInExt
+import com.achub.hram.ext.cancelAndClear
+import com.achub.hram.ext.launchIn
+import com.achub.hram.ext.requestBleBefore
+import com.achub.hram.ext.stateInExt
 import com.achub.hram.tracking.HramActivityTrackingManager
 import com.achub.hram.utils.ActivityNameValidation
 import dev.icerock.moko.permissions.PermissionsController
@@ -50,7 +50,7 @@ class RecordViewModel(
             .flowOn(Dispatchers.Default)
             .launchIn(viewModelScope)
             .let { jobs.add(it) }
-        trackingManager.bleIndication.receiveAsFlow().onStart { emit(BleIndication.Empty) }
+        trackingManager.bleNotification.receiveAsFlow().onStart { emit(BleNotification.Empty) }
             .onEach(_uiState::indications)
             .flowOn(Dispatchers.Default)
             .launchIn(viewModelScope)
@@ -75,9 +75,13 @@ class RecordViewModel(
     }
 
     fun dismissDialog() = _uiState.update { it.copy(dialog = null) }
+
     fun cancelScanning() = trackingManager.cancelScanning()
+
     fun clearRequestBluetooth() = _uiState.update { it.copy(requestBluetooth = false) }
+
     fun openSettings() = permissionController.openAppSettings()
+
     fun toggleHRTracking() {
         if (_uiState.value.trackingStatus.trackHR.not()) {
             requestScanning()
@@ -99,7 +103,9 @@ class RecordViewModel(
 
     private fun scan() {
         trackingManager.scan(
-            onInit = { _uiState.update { it.chooseHrDeviceDialog(SCAN_DURATION.toDuration(DurationUnit.MILLISECONDS)) } },
+            onInit = {
+                _uiState.update { it.chooseHrDeviceDialog(SCAN_DURATION.toDuration(DurationUnit.MILLISECONDS)) }
+            },
             onUpdate = { devices -> _uiState.updateHrDeviceDialogIfExists { it.copy(scannedDevices = devices) } },
             onComplete = { _uiState.updateHrDeviceDialogIfExists { it.copy(isLoading = it.isDeviceConfirmed) } }
         )

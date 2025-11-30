@@ -17,6 +17,8 @@ import com.achub.hram.style.HeadingMediumBold
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.vectorResource
 
+private const val IMAGE_PADDING_DIVISOR = 10
+
 @Composable
 fun ImageLabelRow(
     modifier: Modifier = Modifier,
@@ -40,11 +42,9 @@ fun IndicationImage(
     color: Color?
 ) {
     Image(
-        modifier = modifier.size(imageSize).padding(imageSize / 10),
+        modifier = modifier.size(imageSize).padding(imageSize / IMAGE_PADDING_DIVISOR),
         imageVector = vectorResource(drawable),
         colorFilter = color?.let { ColorFilter.tint(it) },
         contentDescription = null
     )
 }
-
-

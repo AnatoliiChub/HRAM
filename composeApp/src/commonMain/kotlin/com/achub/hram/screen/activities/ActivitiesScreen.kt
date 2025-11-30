@@ -4,6 +4,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -38,6 +39,7 @@ fun ActivitiesScreen() {
     val viewModel = koinViewModel<ActivitiesViewModel>()
     val state = viewModel.uiState.collectAsStateWithLifecycle().value
     val haptic = LocalHapticFeedback.current
+    val selectedIds = state.selectedActivitiesId
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier
@@ -57,55 +59,82 @@ fun ActivitiesScreen() {
                             viewModel.selectActivity(id)
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         },
-                        onClick = { viewModel.onHighlighted(null) }),
-                    selected = state.selectedActivitiesId.contains(id),
-                    selectionEnabled = state.selectedActivitiesId.isNotEmpty(),
+                        onClick = { viewModel.onHighlighted(null) }
+                    ),
+                    selected = selectedIds.contains(id),
+                    selectionEnabled = selectedIds.isNotEmpty(),
                     activityInfo = activityInfo,
                     highLighted = state.highlightedItem,
-                    onHighlighted = { viewModel.onHighlighted(it) })
+                    onHighlighted = { viewModel.onHighlighted(it) }
+                )
             }
         }
-        if (state.selectedActivitiesId.isNotEmpty()) {
-            FloatingToolbar(
-                modifier = Modifier.align(Alignment.BottomEnd).padding(Dimen16),
-                selected = state.selectedActivitiesId
-            ) { option ->
-                when (option) {
-                    ActivityOptions.DELETE -> viewModel.showActivityDeletionDialog()
-                    ActivityOptions.EDIT -> viewModel.showNameActivityDialog()
-                }
-            }
+        if (selectedIds.isNotEmpty()) {
+            Toolbar(
+                selectedIds = selectedIds,
+                onDelete = { viewModel.showActivityDeletionDialog() },
+                onEdit = { viewModel.showNameActivityDialog() }
+            )
         }
-        val dialog = state.dialog
-        if (dialog != null) {
-            when (dialog) {
-                is ActivitiesScreenDialog.ReNameActivity -> {
-                    NameActivityDialog(
-                        title = Res.string.dialog_rename_activity_title,
-                        message = Res.string.dialog_rename_activity_message,
-                        name = dialog.activityName,
-                        error = dialog.error,
-                        dismissable = true,
-                        onNameChanged = viewModel::onActivityNameChanged,
-                        onDismiss = viewModel::dismissDialog,
-                        onButonClick = { viewModel.onActivityNameConfirmed() }
-                    )
-                }
+    }
+    val dialog = state.dialog
+    Dialog(dialog, viewModel, state)
+}
 
-                is ActivitiesScreenDialog.ActivityDeletionDialog -> {
-                    val messageParam = if (state.selectedActivitiesId.size > 1) Res.string.text_activities
-                    else Res.string.text_activity
-                    InfoDialog(
-                        title = Res.string.dialog_activity_deletion_title,
-                        message = stringResource(Res.string.dialog_activity_deletion_message, stringResource(messageParam)),
-                        buttonText = Res.string.dialog_activity_deletion_button_text,
-                        onDismiss = viewModel::dismissDialog,
-                        onButonClick = {
-                            viewModel.deleteActivities(selectedActivitiesId = state.selectedActivitiesId)
-                            viewModel.dismissDialog()
-                        }
-                    )
+@Composable
+fun BoxScope.Toolbar(selectedIds: Set<String>, onDelete: () -> Unit = {}, onEdit: () -> Unit = {}) {
+    FloatingToolbar(
+        modifier = Modifier.align(Alignment.BottomEnd)
+            .padding(Dimen16),
+        selected = selectedIds
+    ) { opt ->
+        when (opt) {
+            ActivityOptions.DELETE -> onDelete()
+            ActivityOptions.EDIT -> onEdit()
+        }
+    }
+}
+
+@Composable
+private fun Dialog(
+    dialog: ActivitiesScreenDialog?,
+    viewModel: ActivitiesViewModel,
+    state: ActivitiesUiState
+) {
+    if (dialog != null) {
+        when (dialog) {
+            is ActivitiesScreenDialog.ReNameActivity -> {
+                NameActivityDialog(
+                    title = Res.string.dialog_rename_activity_title,
+                    message = Res.string.dialog_rename_activity_message,
+                    name = dialog.activityName,
+                    error = dialog.error,
+                    dismissable = true,
+                    onNameChanged = viewModel::onActivityNameChanged,
+                    onDismiss = viewModel::dismissDialog,
+                    onButonClick = { viewModel.onActivityNameConfirmed() }
+                )
+            }
+
+            is ActivitiesScreenDialog.ActivityDeletionDialog -> {
+                val messageParam = if (state.selectedActivitiesId.size > 1) {
+                    Res.string.text_activities
+                } else {
+                    Res.string.text_activity
                 }
+                InfoDialog(
+                    title = Res.string.dialog_activity_deletion_title,
+                    message = stringResource(
+                        Res.string.dialog_activity_deletion_message,
+                        stringResource(messageParam)
+                    ),
+                    buttonText = Res.string.dialog_activity_deletion_button_text,
+                    onDismiss = viewModel::dismissDialog,
+                    onButonClick = {
+                        viewModel.deleteActivities(selectedActivitiesId = state.selectedActivitiesId)
+                        viewModel.dismissDialog()
+                    }
+                )
             }
         }
     }

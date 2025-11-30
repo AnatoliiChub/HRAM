@@ -3,6 +3,7 @@ package com.achub.hram.view
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,10 +22,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.style.TextOverflow
+import com.achub.hram.data.db.entity.ActivityEntity
 import com.achub.hram.data.db.entity.ActivityGraphInfo
 import com.achub.hram.data.models.HighlightedItem
-import com.achub.hram.formatTime
-import com.achub.hram.fromEpochSeconds
+import com.achub.hram.ext.formatTime
+import com.achub.hram.ext.fromEpochSeconds
 import com.achub.hram.style.DarkGray
 import com.achub.hram.style.Dimen12
 import com.achub.hram.style.Dimen16
@@ -107,22 +109,8 @@ fun ActivityCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    modifier = Modifier.weight(1f).padding(vertical = Dimen8),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    text = activity.name.ifBlank { stringResource(Res.string.activity_screen_unnamed_act) },
-                    style = LabelBigBold,
-                )
-                if (selectionEnabled) {
-                    val iconRes = if (selected) Res.drawable.ic_selected else Res.drawable.ic_not_selected
-                    Icon(
-                        modifier = Modifier.size(Dimen32),
-                        painter = painterResource(iconRes),
-                        contentDescription = null,
-                        tint = White80
-                    )
-                }
+                Title(activity)
+                if (selectionEnabled) SelectionIndication(selected)
             }
             Spacer(Modifier.height(Dimen8))
             Text(text = stringResource(Res.string.activity_screen_created_at, date), style = LabelMedium)
@@ -146,6 +134,28 @@ fun ActivityCard(
             ) { xLabel, yLabel -> ChartBubble(xLabel, yLabel) }
         }
     }
+}
+
+@Composable
+private fun RowScope.Title(activity: ActivityEntity) {
+    Text(
+        modifier = Modifier.weight(1f).padding(vertical = Dimen8),
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        text = activity.name.ifBlank { stringResource(Res.string.activity_screen_unnamed_act) },
+        style = LabelBigBold,
+    )
+}
+
+@Composable
+private fun SelectionIndication(selected: Boolean) {
+    val iconRes = if (selected) Res.drawable.ic_selected else Res.drawable.ic_not_selected
+    Icon(
+        modifier = Modifier.size(Dimen32),
+        painter = painterResource(iconRes),
+        contentDescription = null,
+        tint = White80
+    )
 }
 
 @Composable

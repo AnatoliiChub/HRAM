@@ -17,8 +17,10 @@ val White30 = Color(0X4aDEE2E6)
 val Red = Color.Red
 val Red20 = Color.Red.copy(alpha = 0.2f)
 val LightRed = Color(0xFFFF8F8F)
+val GradientRed = Color(0xFFE60000)
+val GradientLightRed = Color(0xFFFF4D4D)
 
 val hrButtonRedDropShadowColor = Color(0x80FF0000)
 val hrButtonDarkRedDropShadowColor = Color(0xCCFF0000)
 
-const val BlackPreview = 0xFF0E1111
+const val BLACK_PREVIEW = 0xFF0E1111

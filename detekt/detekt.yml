@@ -1,0 +1,42 @@
+config:
+  validation: true
+
+build:
+  maxIssues: 10
+  weights:
+    complexity: 2
+    LongParameterList: 1
+    style: 1
+
+style:
+  MagicNumber:
+    active: true
+    ignorePropertyDeclaration: true
+  UnusedPrivateMember:
+    active: true
+    ignoreAnnotated: [ 'Preview' ]
+  DestructuringDeclarationWithTooManyEntries:
+    active: true
+    maxDestructuringEntries: 4
+
+complexity:
+  LongParameterList:
+    active: true
+    functionThreshold: 12
+    constructorThreshold: 12
+    ignoreDefaultParameters: true
+  TooManyFunctions:
+    active: true
+    thresholdInClasses: 20
+    thresholdInInterfaces: 20
+    thresholdInFiles: 30
+  CyclomaticComplexMethod:
+    active: true
+    threshold: 14
+
+naming:
+  FunctionNaming:
+    active: true
+    functionPattern: '^([a-z$][a-zA-Z$0-9]*)|(`.*`)$'
+    excludeClassPattern: '$^'
+    ignoreAnnotated: [ 'Composable', 'Preview' ]

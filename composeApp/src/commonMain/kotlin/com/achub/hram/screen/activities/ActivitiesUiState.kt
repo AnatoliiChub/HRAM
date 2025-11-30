@@ -13,5 +13,6 @@ data class ActivitiesUiState(
 
 sealed class ActivitiesScreenDialog {
     data class ReNameActivity(val activityName: String, val error: StringResource? = null) : ActivitiesScreenDialog()
+
     data object ActivityDeletionDialog : ActivitiesScreenDialog()
 }

@@ -1,15 +1,15 @@
 package com.achub.hram.tracking
 
+import com.achub.hram.ble.model.BleDevice
+import com.achub.hram.ble.model.BleNotification
 import com.achub.hram.ble.repo.HrDeviceRepo
-import com.achub.hram.cancelAndClear
-import com.achub.hram.createActivity
 import com.achub.hram.data.HrActivityRepo
 import com.achub.hram.data.db.entity.ACTIVE_ACTIVITY
 import com.achub.hram.data.db.entity.HeartRateEntity
-import com.achub.hram.ble.model.BleDevice
-import com.achub.hram.ble.model.BleIndication
-import com.achub.hram.launchIn
-import com.achub.hram.logger
+import com.achub.hram.ext.cancelAndClear
+import com.achub.hram.ext.createActivity
+import com.achub.hram.ext.launchIn
+import com.achub.hram.ext.logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -44,7 +44,7 @@ private const val TAG = "HramActivityTrackingManager"
     ExperimentalAtomicApi::class
 )
 class HramActivityTrackingManager : ActivityTrackingManager, KoinComponent {
-    override val bleIndication = Channel<BleIndication>()
+    override val bleNotification = Channel<BleNotification>()
     private val stopWatch: StopWatch by inject()
     private val hrDeviceRepo: HrDeviceRepo by inject(parameters = { parametersOf(scope) })
     private val hrActivityRepo: HrActivityRepo by inject()
@@ -72,7 +72,6 @@ class HramActivityTrackingManager : ActivityTrackingManager, KoinComponent {
         stopWatch.pause()
     }
 
-
     override fun finishTracking(name: String?) {
         scope.launch(Dispatchers.Default) {
             trackingState.update { TRACKING_INIT_STATE }
@@ -95,12 +94,12 @@ class HramActivityTrackingManager : ActivityTrackingManager, KoinComponent {
         listen().flowOn(Dispatchers.Default).launchIn(scope).let { jobs.add(it) }
     }
 
-    private fun listen() = hrDeviceRepo.listen().onStart { emit(BleIndication.Empty) }
+    private fun listen() = hrDeviceRepo.listen().onStart { emit(BleNotification.Empty) }
         .map { it.copy(elapsedTime = stopWatch.elapsedTimeSeconds()) }
-        .onEach { bleIndication.send(it) }
+        .onEach { bleNotification.send(it) }
         .filter { isRecording && it.isBleConnected }
         .onEach { bleIndication ->
-            bleIndication.hrIndication?.let { hrIndication ->
+            bleIndication.hrNotification?.let { hrIndication ->
                 currentActId?.let {
                     val entity = HeartRateEntity(
                         activityId = it,
@@ -110,15 +109,13 @@ class HramActivityTrackingManager : ActivityTrackingManager, KoinComponent {
                     hrActivityRepo.insert(entity)
                 }
             }
-
         }.catch { logger(TAG) { "listen error : $it" } }
-
 
     override fun cancelScanning() = hrDeviceRepo.cancelScanning()
 
     override fun disconnect() {
         hrDeviceRepo.disconnect()
         jobs.cancelAndClear()
-        bleIndication.trySend(BleIndication.Empty)
+        bleNotification.trySend(BleNotification.Empty)
     }
 }

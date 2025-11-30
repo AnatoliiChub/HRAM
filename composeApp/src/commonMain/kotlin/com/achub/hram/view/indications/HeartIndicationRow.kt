@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-import com.achub.hram.ble.model.BleIndication
+import com.achub.hram.ble.model.BleNotification
 import com.achub.hram.style.Dimen132
 import com.achub.hram.style.Dimen32
 import com.achub.hram.style.Gray
@@ -36,19 +36,22 @@ import org.jetbrains.compose.resources.vectorResource
 @Composable
 fun HeartIndicationRow(
     modifier: Modifier = Modifier,
-    bleIndication: BleIndication
+    bleNotification: BleNotification
 ) {
-    val isEmpty = bleIndication.isEmpty()
-    val hrIndication = bleIndication.hrIndication
+    val isEmpty = bleNotification.isEmpty()
+    val hrIndication = bleNotification.hrNotification
     val hrBpm = hrIndication?.hrBpm ?: 0
     val isSensorContactSupported = hrIndication?.isSensorContactSupported == true
     val isContactOn = hrIndication?.isContactOn == true
-    val batteryLevel = bleIndication.batteryLevel
-    val noBle = bleIndication.isBleConnected.not()
+    val batteryLevel = bleNotification.batteryLevel
+    val noBle = bleNotification.isBleConnected.not()
     val hrValueStub = isEmpty || noBle || (isSensorContactSupported && isContactOn.not()) || hrIndication == null
     val heartColor = if (hrValueStub) Gray else Red
-    val hrLabel = if (hrValueStub) stringResource(Res.string.record_screen_heart_indication_stub)
-    else stringResource(Res.string.record_screen_heart_indication_bpm, hrBpm)
+    val hrLabel = if (hrValueStub) {
+        stringResource(Res.string.record_screen_heart_indication_stub)
+    } else {
+        stringResource(Res.string.record_screen_heart_indication_bpm, hrBpm)
+    }
     val secondaryLabel = when {
         noBle -> stringResource(Res.string.record_screen_heart_indication_no_connection)
         isContactOn.not() -> stringResource(Res.string.record_screen_heart_indication_contact_off)
@@ -66,7 +69,7 @@ fun HeartIndicationRow(
                 style = HeadingMediumBold
             )
             Row(verticalAlignment = CenterVertically) {
-                AnimatedVisibility(bleIndication.isBleConnected && isContactOn) {
+                AnimatedVisibility(bleNotification.isBleConnected && isContactOn) {
                     Image(
                         modifier = Modifier.size(Dimen32),
                         imageVector = vectorResource(Res.drawable.ic_battery_full),

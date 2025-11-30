@@ -1,6 +1,6 @@
 package com.achub.hram.tracking
 
-import com.achub.hram.tickerFlow
+import com.achub.hram.ext.tickerFlow
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -18,7 +18,6 @@ private const val STOP_WATCH_TICK_MS = 100L
 
 @OptIn(ExperimentalTime::class, ExperimentalAtomicApi::class, ExperimentalCoroutinesApi::class)
 class HramStopWatch : StopWatch {
-
     companion object {
         private val STOP_WATCH_TICK_DURATION = STOP_WATCH_TICK_MS.toDuration(DurationUnit.MILLISECONDS)
     }
@@ -39,7 +38,6 @@ class HramStopWatch : StopWatch {
     override fun pause() {
         accumulatedOnLastPaused.update { it + now().toEpochMilliseconds() - startedTimestamp }
         isRunning = false
-
     }
 
     override fun reset() {

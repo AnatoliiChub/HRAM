@@ -23,6 +23,8 @@ import hram.composeapp.generated.resources.ic_stop
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
+const val PAUSED_STATE_BTN_WIDTH_FRACTION = 0.5f
+
 @Composable
 fun RecordSection(
     recordingState: RecordingState,
@@ -31,9 +33,9 @@ fun RecordSection(
     onStop: () -> Unit = {}
 ) {
     Row(modifier = Modifier.padding(Dimen16)) {
-        val icon = if (recordingState == RecordingState.Recording) Res.drawable.ic_pause
-        else Res.drawable.ic_play
-        val first by animateFloatAsState(if (recordingState == RecordingState.Paused) 0.5f else 1f)
+        val icon = if (recordingState == RecordingState.Recording) Res.drawable.ic_pause else Res.drawable.ic_play
+        val pausedWidthFraction = if (recordingState == RecordingState.Paused) PAUSED_STATE_BTN_WIDTH_FRACTION else 1f
+        val first by animateFloatAsState(pausedWidthFraction)
         val second by animateFloatAsState(if (recordingState == RecordingState.Paused) 1f else 0f)
 
         HrButton(
@@ -62,7 +64,9 @@ private fun Icon(icon: DrawableResource, f: Float) {
 }
 
 enum class RecordingState {
-    Recording, Paused, Init;
+    Recording,
+    Paused,
+    Init;
 
     fun isRecording() = this == Recording
 }

@@ -1,0 +1,45 @@
+name: Code Analysis
+run-name: Running code analysis
+on: push
+
+#  pull_request:
+#    branches:
+#      - main
+
+jobs:
+  Detekt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: set up
+        uses: ./.github/actions/setup
+      - name: Run Detekt Analysis
+        run: ./gradlew clean detekt --no-daemon --parallel --configuration-cache --stacktrace
+      - name: Upload Detekt report (HTML)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: detekt-report
+          path: |
+            **/build/reports/detekt.html
+          if-no-files-found: warn
+
+  UnitTests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: set up
+        uses: ./.github/actions/setup
+      - name: Run Unit Tests
+        run: ./gradlew clean testDebugUnitTest --no-daemon --parallel --configuration-cache
+      - name: Upload Test Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: |
+            **/build/reports/tests/
+          if-no-files-found: warn
+

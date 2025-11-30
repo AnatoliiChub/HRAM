@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:filename", "detekt:Filename")
+
 package com.achub.hram.ble
 
 import android.bluetooth.BluetoothAdapter.ACTION_STATE_CHANGED
@@ -10,7 +12,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import androidx.core.content.ContextCompat
-import com.achub.hram.loggerE
+import com.achub.hram.ext.loggerE
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.onFailure
 import kotlinx.coroutines.channels.trySendBlocking
@@ -20,7 +22,6 @@ import kotlinx.coroutines.flow.callbackFlow
 private const val TAG = "BluetoothStateAndroid"
 
 class BluetoothStateAndroid(context: Context) : BluetoothState {
-
     override val isBluetoothOn: Flow<Boolean> = callbackFlow {
         val receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
@@ -34,11 +35,7 @@ class BluetoothStateAndroid(context: Context) : BluetoothState {
         trySendBlocking(adapter?.state == STATE_ON)
             .onFailure { loggerE(TAG) { "BluetoothState initial: failed: $it" } }
 
-
-        context.registerReceiver(
-            receiver,
-            IntentFilter(ACTION_STATE_CHANGED)
-        )
+        context.registerReceiver(receiver, IntentFilter(ACTION_STATE_CHANGED))
 
         awaitClose {
             context.unregisterReceiver(receiver)

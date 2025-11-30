@@ -1,11 +1,11 @@
 package com.achub.hram.ble.repo
 
 import com.achub.hram.ble.model.BleDevice
-import com.achub.hram.ble.model.BleIndication
-import com.achub.hram.cancelAndClear
-import com.achub.hram.launchIn
-import com.achub.hram.logger
-import com.achub.hram.loggerE
+import com.achub.hram.ble.model.BleNotification
+import com.achub.hram.ext.cancelAndClear
+import com.achub.hram.ext.launchIn
+import com.achub.hram.ext.logger
+import com.achub.hram.ext.loggerE
 import com.juul.kable.Advertisement
 import com.juul.kable.Peripheral
 import com.juul.kable.State
@@ -88,7 +88,7 @@ class HramHrDeviceRepo(
         }
     }
 
-    //TODO SHOULD RETURN CONNECTED AND DISCONNECTED STATES
+    // TODO SHOULD RETURN CONNECTED AND DISCONNECTED STATES
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun listen() = bleConnectionRepo.onConnected
         .flatMapLatest { device -> hrIndicationCombiner(device) }
@@ -103,11 +103,11 @@ class HramHrDeviceRepo(
     }
 
     @OptIn(ExperimentalTime::class)
-    private fun hrIndicationCombiner(device: Peripheral): Flow<BleIndication> = combine(
+    private fun hrIndicationCombiner(device: Peripheral): Flow<BleNotification> = combine(
         bleDataRepo.observeHeartRate(device),
         bleDataRepo.observeBatteryLevel(device),
         device.state
-    ) { hrIndication, battery, state -> BleIndication(hrIndication, battery, state is State.Connected) }
+    ) { hrIndication, battery, state -> BleNotification(hrIndication, battery, state is State.Connected) }
 
     override fun cancelScanning() = scanJobs.cancelAndClear()
 

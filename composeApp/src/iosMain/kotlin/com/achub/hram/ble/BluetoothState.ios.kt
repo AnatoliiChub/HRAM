@@ -1,6 +1,8 @@
+@file:Suppress("ktlint:standard:filename", "detekt:Filename")
+
 package com.achub.hram.ble
 
-import com.achub.hram.logger
+import com.achub.hram.ext.logger
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.onFailure
 import kotlinx.coroutines.channels.trySendBlocking
@@ -11,13 +13,12 @@ import platform.CoreBluetooth.CBCentralManagerOptionShowPowerAlertKey
 import platform.CoreBluetooth.CBManagerStatePoweredOn
 import platform.darwin.NSObject
 
-//Suppress "turn on bluetooth" popup
+// Suppress "turn on bluetooth" popup
 private val options = mapOf<Any?, Any>(CBCentralManagerOptionShowPowerAlertKey to false)
 
 private const val TAG = "BluetoothStateIos"
 
 class BluetoothStateIos : BluetoothState {
-
     private var manager: CBCentralManager? = null
     private var delegate: CBCentralManagerDelegateProtocol? = null
 

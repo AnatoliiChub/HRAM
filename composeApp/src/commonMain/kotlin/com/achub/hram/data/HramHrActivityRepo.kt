@@ -7,7 +7,7 @@ import com.achub.hram.data.db.entity.ActivityGraphInfo
 import com.achub.hram.data.db.entity.ActivityWithHeartRates
 import com.achub.hram.data.db.entity.HeartRateEntity
 import com.achub.hram.data.models.GraphLimits
-import com.achub.hram.logger
+import com.achub.hram.ext.logger
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -18,10 +18,13 @@ import kotlinx.coroutines.flow.onEach
 import org.koin.core.annotation.Provided
 
 private const val TAG = "HramHrActivityRepo"
+private const val MAX_HR_FACTOR = 1.2f
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class HramHrActivityRepo(@Provided val actDao: ActivityDao, @Provided val hrDao: HeartRateDao) : HrActivityRepo {
-
+class HramHrActivityRepo(
+    @Provided val actDao: ActivityDao,
+    @Provided val hrDao: HeartRateDao
+) : HrActivityRepo {
     override suspend fun insert(item: HeartRateEntity) = hrDao.insert(item)
 
     override suspend fun insert(item: ActivityEntity) = actDao.insert(item)
@@ -52,11 +55,13 @@ class HramHrActivityRepo(@Provided val actDao: ActivityDao, @Provided val hrDao:
                             0f,
                             aggregated.maxOfOrNull { it.timestamp }?.toFloat() ?: 1f,
                             0f,
-                            (aggregated.maxOfOrNull { it.avgHr } ?: 1f) * 1.2f
+                            (aggregated.maxOfOrNull { it.avgHr } ?: 1f) * MAX_HR_FACTOR
                         ),
                         avgHr = if (aggregated.isNotEmpty()) {
                             aggregated.map { it.avgHr }.average().toInt()
-                        } else 0,
+                        } else {
+                            0
+                        },
                         maxHr = aggregated.maxOfOrNull { it.avgHr }?.toInt() ?: 0,
                         minHr = aggregated.minOfOrNull { it.avgHr }?.toInt() ?: 0,
                     )
@@ -64,7 +69,9 @@ class HramHrActivityRepo(@Provided val actDao: ActivityDao, @Provided val hrDao:
             }
 
             combine(flows) { it.toList() }
-        } else flowOf(emptyList())
+        } else {
+            flowOf(emptyList())
+        }
     }
 
     override fun getActivityWithHeartRates(id: String): Flow<ActivityWithHeartRates> =

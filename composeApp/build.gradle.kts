@@ -1,7 +1,7 @@
 @file:OptIn(ExperimentalKotlinGradlePluginApi::class)
 
+import io.gitlab.arturbosch.detekt.Detekt
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -11,6 +11,21 @@ plugins {
     alias(libs.plugins.kotlinxSerialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.androidx.room)
+    alias(libs.plugins.detekt)
+}
+
+detekt {
+    toolVersion = libs.versions.detekt.get()
+    allRules = false
+    parallel = true
+    source.setFrom(
+        files(
+            "src/commonMain/kotlin",
+            "src/androidMain/kotlin",
+            "src/iosMain/kotlin"
+        )
+    )
+    config.setFrom(files("$rootDir/detekt/detekt.yml"))
 }
 
 kotlin {
@@ -23,9 +38,8 @@ kotlin {
     val sharedName = "ComposeApp"
 
     listOf(
-        iosX64(),
         iosArm64(),
-        iosSimulatorArm64()
+        iosSimulatorArm64(),
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = sharedName
@@ -36,7 +50,6 @@ kotlin {
             // Required when using NativeSQLiteDriver
             linkerOpts.add("-lsqlite3")
         }
-
     }
 
     sourceSets {
@@ -80,25 +93,23 @@ kotlin {
             implementation(libs.kotlin.test)
         }
     }
-    compilerOptions {
-        freeCompilerArgs.add("-Xcontext-parameters")
-    }
-
     // KSP Common sourceSet
     sourceSets.named("commonMain").configure {
         kotlin.srcDir("build/generated/ksp/metadata/commonMain/kotlin")
+    }
+
+    compilerOptions {
+        freeCompilerArgs.add("-Xcontext-parameters")
     }
 }
 
 dependencies {
     add("kspCommonMainMetadata", libs.koin.ksp.compiler)
     add("kspAndroid", libs.koin.ksp.compiler)
-    add("kspIosX64", libs.koin.ksp.compiler)
     add("kspIosArm64", libs.koin.ksp.compiler)
     add("kspIosSimulatorArm64", libs.koin.ksp.compiler)
     add("kspAndroid", libs.androidx.room.compiler)
     add("kspIosSimulatorArm64", libs.androidx.room.compiler)
-    add("kspIosX64", libs.androidx.room.compiler)
     add("kspIosArm64", libs.androidx.room.compiler)
     debugImplementation(libs.ui.tooling.preview)
 }
@@ -107,11 +118,20 @@ room {
     schemaDirectory("$projectDir/schemas")
 }
 
-// KSP Metadata Trigger
-project.tasks.withType(KotlinCompilationTask::class.java).configureEach {
-    if (name != "kspCommonMainKotlinMetadata") {
-        dependsOn("kspCommonMainKotlinMetadata")
+tasks.withType<Detekt>().configureEach {
+    reports {
+        html.required.set(true)
+        html.outputLocation.set(file("${projectDir.path}/build/reports/detekt.html"))
+        xml.required.set(false)
+        txt.required.set(false)
+        sarif.required.set(false)
+        md.required.set(false)
     }
+}
+
+// KSP Metadata Trigger
+tasks.matching { it.name.startsWith("ksp") && it.name != "kspCommonMainKotlinMetadata" }.configureEach {
+    dependsOn("kspCommonMainKotlinMetadata")
 }
 
 tasks {
@@ -133,7 +153,6 @@ tasks {
 }
 
 ksp {
-    arg("KOIN_CONFIG_CHECK", "true")
     arg("KOIN_LOG_TIMES", "true")
 }
 
@@ -167,4 +186,3 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 }
-

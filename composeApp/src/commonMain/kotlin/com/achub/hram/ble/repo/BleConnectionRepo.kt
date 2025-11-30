@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlin.uuid.ExperimentalUuidApi
 
 interface BleConnectionRepo {
-
     var isBluetoothOn: Flow<Boolean>
 
     val state: Channel<State>
