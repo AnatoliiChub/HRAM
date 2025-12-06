@@ -8,6 +8,7 @@ import com.achub.hram.data.db.getRoomDatabase
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import org.koin.core.annotation.Configuration
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Provided
 import org.koin.core.annotation.Single
@@ -17,12 +18,15 @@ import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
 
 @Module
+@Configuration
 actual class DatabaseModule actual constructor() {
     @Single
     actual fun provideDatabaseBuilder(scope: Scope): RoomDatabase.Builder<HramDatabase> = getDatabaseBuilder()
 
     @Single
-    actual fun provideDatabase(@Provided builder: RoomDatabase.Builder<HramDatabase>): HramDatabase =
+    actual fun provideDatabase(
+        @Provided builder: RoomDatabase.Builder<HramDatabase>
+    ): HramDatabase =
         getRoomDatabase(builder)
 }
 

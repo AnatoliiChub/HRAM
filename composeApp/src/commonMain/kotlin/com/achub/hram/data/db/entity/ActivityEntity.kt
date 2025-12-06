@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey
 import androidx.room.Relation
 
 const val ACTIVE_ACTIVITY = ""
+
 @Entity
 data class ActivityEntity(
     @PrimaryKey
@@ -17,7 +18,6 @@ data class ActivityEntity(
 
 data class ActivityWithHeartRates(
     @Embedded val activity: ActivityEntity,
-
     @Relation(
         parentColumn = "id",
         entityColumn = "activityId"

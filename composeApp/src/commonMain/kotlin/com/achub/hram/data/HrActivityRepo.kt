@@ -7,7 +7,6 @@ import com.achub.hram.data.db.entity.HeartRateEntity
 import kotlinx.coroutines.flow.Flow
 
 interface HrActivityRepo {
-
     suspend fun insert(item: HeartRateEntity)
 
     suspend fun insert(item: ActivityEntity)

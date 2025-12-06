@@ -9,6 +9,6 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 
 enum class MainTabType(val icon: DrawableResource, val label: StringResource) {
-    Activities(Res.drawable.ic_activities,Res.string.main_tab_activity),
-    Record(Res.drawable.ic_record, Res.string.main_tab_record);
+    Activities(Res.drawable.ic_activities, Res.string.main_tab_activity),
+    Record(Res.drawable.ic_record, Res.string.main_tab_record)
 }

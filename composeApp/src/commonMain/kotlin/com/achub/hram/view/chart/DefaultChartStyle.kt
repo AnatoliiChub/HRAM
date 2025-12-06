@@ -1,8 +1,8 @@
 package com.achub.hram.view.chart
 
 import androidx.compose.runtime.Composable
-import com.achub.hram.dpToPx
-import com.achub.hram.formatTime
+import com.achub.hram.ext.dpToPx
+import com.achub.hram.ext.formatTime
 import com.achub.hram.style.Dimen1
 import com.achub.hram.style.Dimen16
 import com.achub.hram.style.Dimen2

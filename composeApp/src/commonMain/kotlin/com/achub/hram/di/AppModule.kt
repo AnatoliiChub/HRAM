@@ -2,13 +2,15 @@ package com.achub.hram.di
 
 import com.achub.hram.di.ble.BleDataModule
 import com.achub.hram.di.data.DataModule
-import org.koin.core.annotation.Module
+import org.koin.core.annotation.KoinApplication
 
-@Module(
-    includes = [ViewModelModule::class,
+@KoinApplication(
+    modules = [
+        ViewModelModule::class,
         BleDataModule::class,
         TrackingModule::class,
         DataModule::class,
-        UtilsModule::class]
+        UtilsModule::class
+    ]
 )
-class AppModule
+object AppModule

@@ -22,6 +22,17 @@ private const val MAX_HEART_SCALE = 1.25f
 private const val DEFAULT_HEART_SCALE = 1f
 private const val HEART_BEATING_CYCLE_MS = 1000
 
+// fractional positions inside the cycle
+private const val HEART_FRAME_2_FRACTION = 0.24f
+private const val HEART_FRAME_3_FRACTION = 0.42f
+private const val HEART_FRAME_4_FRACTION = 0.58f
+private const val HEART_FRAME_5_FRACTION = 0.68f
+
+// scale values used in keyframes
+private const val HEART_SCALE_LOW = 0.8f
+private const val HEART_SCALE_HIGH = 1.2f
+private const val HEART_SCALE_MID = 0.9f
+
 @Composable
 fun HeartBeatingAnimView(
     isBeating: Boolean,
@@ -47,18 +58,18 @@ fun HeartBeatingAnimView(
 
 private fun heartBeatingSpec(): KeyframesSpec<Float> {
     val duration = HEART_BEATING_CYCLE_MS
-    val second = (duration * 0.24f).toInt()
-    val third = (duration * 0.42f).toInt()
-    val fourth = (duration * 0.58f).toInt()
-    val fifth = (duration * 0.68f).toInt()
+    val second = (duration * HEART_FRAME_2_FRACTION).toInt()
+    val third = (duration * HEART_FRAME_3_FRACTION).toInt()
+    val fourth = (duration * HEART_FRAME_4_FRACTION).toInt()
+    val fifth = (duration * HEART_FRAME_5_FRACTION).toInt()
     return keyframes {
         durationMillis = duration
-        0.8f at 0 using LinearEasing
-        1.2f at second using LinearEasing
-        0.8f at third using LinearEasing
-        1.2f at fourth using LinearEasing
-        0.9f at fifth using LinearEasing
-        0.8f at duration using LinearEasing
+        HEART_SCALE_LOW at 0 using LinearEasing
+        HEART_SCALE_HIGH at second using LinearEasing
+        HEART_SCALE_LOW at third using LinearEasing
+        HEART_SCALE_HIGH at fourth using LinearEasing
+        HEART_SCALE_MID at fifth using LinearEasing
+        HEART_SCALE_LOW at duration using LinearEasing
     }
 }
 

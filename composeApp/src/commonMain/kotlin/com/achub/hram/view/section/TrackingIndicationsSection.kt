@@ -5,7 +5,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
-import com.achub.hram.ble.model.BleIndication
+import com.achub.hram.ble.model.BleNotification
 import com.achub.hram.style.Heading3
 import com.achub.hram.view.indications.HeartIndicationRow
 import kotlinx.datetime.LocalTime
@@ -21,12 +21,12 @@ val dateFormat = LocalTime.Format {
 }
 
 @Composable
-fun TrackingIndicationsSection(bleIndication: BleIndication) {
+fun TrackingIndicationsSection(bleNotification: BleNotification) {
     Column(horizontalAlignment = CenterHorizontally) {
-        HeartIndicationRow(bleIndication = bleIndication)
+        HeartIndicationRow(bleNotification = bleNotification)
         Text(
             modifier = Modifier.align(CenterHorizontally),
-            text = LocalTime.fromSecondOfDay(bleIndication.elapsedTime.toInt()).format(dateFormat),
+            text = LocalTime.fromSecondOfDay(bleNotification.elapsedTime.toInt()).format(dateFormat),
             style = Heading3
         )
     }

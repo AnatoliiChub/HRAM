@@ -40,6 +40,7 @@ private class CustomNodeFactory private constructor(
         color: Color,
         rippleAlpha: RippleAlpha
     ) : this(bounded, radius, null, color, rippleAlpha)
+
     override fun create(interactionSource: InteractionSource): DelegatableNode {
         val colorProducer = colorProducer ?: ColorProducer { color }
         return DelegatingRippleNode(
@@ -50,6 +51,7 @@ private class CustomNodeFactory private constructor(
             rippleAlpha
         )
     }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is CustomNodeFactory) return false
@@ -58,6 +60,7 @@ private class CustomNodeFactory private constructor(
         if (colorProducer != other.colorProducer) return false
         return color == other.color
     }
+
     override fun hashCode(): Int {
         var result = bounded.hashCode()
         result = 31 * result + radius.hashCode()
@@ -95,6 +98,7 @@ private class DelegatingRippleNode(
         )
     }
 }
+
 private val CustomAlpha: RippleAlpha = RippleAlpha(
     pressedAlpha = RIPPLE_ALPHA,
     focusedAlpha = RIPPLE_ALPHA,

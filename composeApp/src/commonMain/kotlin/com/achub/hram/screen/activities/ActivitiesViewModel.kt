@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.achub.hram.data.HrActivityRepo
 import com.achub.hram.data.models.HighlightedItem
-import com.achub.hram.stateInExt
+import com.achub.hram.ext.stateInExt
 import com.achub.hram.utils.ActivityNameValidation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +19,6 @@ class ActivitiesViewModel(
     val hrActivityRepo: HrActivityRepo,
     val activityNameValidation: ActivityNameValidation,
 ) : ViewModel() {
-
     private val highlightedItem = MutableStateFlow<HighlightedItem?>(null)
     private val selectedActivitiesId = MutableStateFlow<Set<String>>(emptySet())
     private val dialog: MutableStateFlow<ActivitiesScreenDialog?> = MutableStateFlow(null)
@@ -57,6 +56,7 @@ class ActivitiesViewModel(
     fun showNameActivityDialog() = dialog.update { ActivitiesScreenDialog.ReNameActivity(activityName = "") }
 
     fun showActivityDeletionDialog() = dialog.update { ActivitiesScreenDialog.ActivityDeletionDialog }
+
     fun onActivityNameChanged(name: String) = dialog.update { dialog ->
         val currentDialog = dialog as? ActivitiesScreenDialog.ReNameActivity
         val error = activityNameValidation(name)
@@ -75,5 +75,4 @@ class ActivitiesViewModel(
             dismissDialog()
         }
     }
-
 }

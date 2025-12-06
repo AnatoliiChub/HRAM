@@ -16,6 +16,7 @@ import kotlinx.coroutines.IO
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class HramDatabase : RoomDatabase() {
     abstract fun getActivityDao(): ActivityDao
+
     abstract fun getHeartRateDao(): HeartRateDao
 }
 

@@ -45,10 +45,21 @@ import kotlinx.coroutines.flow.map
 import kotlin.time.ExperimentalTime
 
 const val PRESS_ANIMATION_DURATION = 70L
-
 const val PRESS_BUTTON_DEBOUNCE_DURATION = 250L
 val rippleColor = Black
 
+// extracted magic numbers
+private const val PRESSED_CONTENT_ALPHA = 0.4f
+private const val DEFAULT_CONTENT_ALPHA = 1f
+private const val PRESSED_SHADOW_ALPHA = 0.2f
+private const val DEFAULT_SHADOW_ALPHA = 1f
+private const val DISABLED_CONTENT_ALPHA = 0.15f
+private const val DISABLED_SHADOW_ALPHA = 0.2f
+
+private const val INNER_SHADOW_RADIUS = 80f
+
+private val TOP_SHADOW_OFFSET = DpOffset(x = 0.dp, y = (-1).dp)
+private val SECOND_SHADOW_OFFSET = DpOffset(x = 2.dp, y = Dimen3)
 
 @Composable
 fun <T> buttonPressAnimation() = tween<T>(
@@ -89,13 +100,11 @@ fun HrButton(
     val transition = updateTransition(targetState = pressed || clicked, label = "button_press_transition")
     val buttonContentAlpha by transition.animateFloat(
         label = "buttonContentAlpha",
-        transitionSpec = { buttonPressAnimation() }) { pressed ->
-        if (pressed) 0.4f else 1f
-    }
-    val shadowAlpha by transition.animateFloat(label = "shadowAlpha", transitionSpec = { buttonPressAnimation() }
-    ) { pressed ->
-        if (pressed) 0.2f else 1f
-    }
+        transitionSpec = { buttonPressAnimation() }
+    ) { pressedState -> if (pressedState) PRESSED_CONTENT_ALPHA else DEFAULT_CONTENT_ALPHA }
+    val shadowAlpha by transition.animateFloat(label = "shadowAlpha", transitionSpec = {
+        buttonPressAnimation()
+    }) { pressedState -> if (pressedState) PRESSED_SHADOW_ALPHA else DEFAULT_SHADOW_ALPHA }
     val backgroundColor = if (enabled) DarkGray else White10
     val shape = RoundedCornerShape(Dimen16)
 
@@ -106,8 +115,8 @@ fun HrButton(
                 radius = Dimen8,
                 spread = Dimen1,
                 color = hrButtonRedDropShadowColor,
-                offset = DpOffset(x = 0.dp, -(1).dp),
-                alpha = if (!enabled) 0.2f else shadowAlpha
+                offset = TOP_SHADOW_OFFSET,
+                alpha = if (!enabled) DISABLED_SHADOW_ALPHA else shadowAlpha
             )
         ).dropShadow(
             shape = shape,
@@ -115,16 +124,16 @@ fun HrButton(
                 radius = Dimen8,
                 spread = Dimen1,
                 color = hrButtonDarkRedDropShadowColor,
-                offset = DpOffset(x = 2.dp, Dimen3),
-                alpha = if (!enabled) 0.2f else shadowAlpha
+                offset = SECOND_SHADOW_OFFSET,
+                alpha = if (!enabled) DISABLED_SHADOW_ALPHA else shadowAlpha
             )
         )
             // note that the background needs to be defined before defining the inner shadow
             .background(
                 color = Black,
                 shape = shape
-            ), contentAlignment = Center
-
+            ),
+        contentAlignment = Center
     ) {
         Box(
             modifier = modifier.clip(shape)
@@ -145,10 +154,11 @@ fun HrButton(
                 .innerShadow(
                     shape = shape,
                     block = {
-                        radius = 80f
+                        radius = INNER_SHADOW_RADIUS
                         color = Black
                     },
-                ), contentAlignment = Center
-        ) { content(if (!enabled) 0.15f else buttonContentAlpha) }
+                ),
+            contentAlignment = Center
+        ) { content(if (!enabled) DISABLED_CONTENT_ALPHA else buttonContentAlpha) }
     }
 }

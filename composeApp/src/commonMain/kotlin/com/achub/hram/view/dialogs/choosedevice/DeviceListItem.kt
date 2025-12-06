@@ -27,7 +27,8 @@ fun DeviceListItem(
         modifier = modifier
             .clip(RoundedCornerShape(Dimen4))
             .fillMaxWidth()
-            .clickable { onSelected(device) }) {
+            .clickable { onSelected(device) }
+    ) {
         Text(text = device.name, color = color, style = LabelMediumBold)
         Text(text = device.identifier, color = color, style = LabelSmall)
     }

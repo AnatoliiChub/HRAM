@@ -1,7 +1,7 @@
 package com.achub.hram.screen.record
 
 import com.achub.hram.ble.model.BleDevice
-import com.achub.hram.ble.model.BleIndication
+import com.achub.hram.ble.model.BleNotification
 import com.achub.hram.data.models.TrackingStatus
 import com.achub.hram.view.section.RecordingState
 import com.achub.hram.view.section.RecordingState.Paused
@@ -12,7 +12,7 @@ import org.jetbrains.compose.resources.StringResource
 import kotlin.time.Duration
 
 data class RecordScreenState(
-    val bleIndication: BleIndication = BleIndication.Empty,
+    val bleNotification: BleNotification = BleNotification.Empty,
     val trackingStatus: TrackingStatus = TrackingStatus(),
     val recordingState: RecordingState = RecordingState.Init,
     val requestBluetooth: Boolean = false,
@@ -41,7 +41,6 @@ sealed class RecordScreenDialog {
     data object OpenSettingsDialog : RecordScreenDialog()
 }
 
-
 fun MutableStateFlow<RecordScreenState>.updateHrDeviceDialogIfExists(
     updatedDialog: (RecordScreenDialog.ChooseHRDevice) -> RecordScreenDialog.ChooseHRDevice
 ) = (value.dialog as? RecordScreenDialog.ChooseHRDevice)?.let {
@@ -58,6 +57,7 @@ fun MutableStateFlow<RecordScreenState>.deviceConnectedDialog(bleDevice: BleDevi
             dialog = RecordScreenDialog.DeviceConnectedDialog(bleDevice)
         )
     }
+
 fun MutableStateFlow<RecordScreenState>.toggleHrTracking() = this.update {
     it.copy(trackingStatus = it.trackingStatus.copy(trackHR = it.trackingStatus.trackHR.not(), hrDevice = null))
 }
@@ -69,8 +69,8 @@ fun MutableStateFlow<RecordScreenState>.stop() = this.update { it.copy(recording
 
 fun MutableStateFlow<RecordScreenState>.requestBluetooth() = this.update { it.copy(requestBluetooth = true) }
 
-fun MutableStateFlow<RecordScreenState>.indications(bleIndication: BleIndication) =
-    this.update { it.copy(bleIndication = bleIndication) }
+fun MutableStateFlow<RecordScreenState>.indications(bleNotification: BleNotification) =
+    this.update { it.copy(bleNotification = bleNotification) }
 
 fun MutableStateFlow<RecordScreenState>.updateHrDeviceDialogConnecting() =
     this.updateHrDeviceDialogIfExists { it.copy(isDeviceConfirmed = true, isLoading = true) }

@@ -1,14 +1,14 @@
 package com.achub.hram.ble.repo
 
-import com.achub.hram.HR_SERVICE_UUID
-import com.achub.hram.MANUFACTURER_NAME_CHAR_UUID
-import com.achub.hram.MANUFACTURER_SERVICE_UUID
 import com.achub.hram.ble.BluetoothState
 import com.achub.hram.ble.model.BleConnectionsException
 import com.achub.hram.ble.model.BleDevice
 import com.achub.hram.ble.model.toBleDevice
-import com.achub.hram.logger
-import com.achub.hram.loggerE
+import com.achub.hram.ext.HR_SERVICE_UUID
+import com.achub.hram.ext.MANUFACTURER_NAME_CHAR_UUID
+import com.achub.hram.ext.MANUFACTURER_SERVICE_UUID
+import com.achub.hram.ext.logger
+import com.achub.hram.ext.loggerE
 import com.juul.kable.ExperimentalApi
 import com.juul.kable.Identifier
 import com.juul.kable.NotConnectedException
@@ -43,12 +43,12 @@ import org.koin.core.annotation.Provided
 import kotlin.uuid.ExperimentalUuidApi
 
 private const val TAG = "HramBleConnectionRepo"
+private const val RECONNECTION_RETRY_ATTEMPTS = 3L
 
 class HramBleConnectionRepo(
     @Provided val bluetoothState: BluetoothState,
     @InjectedParam val scope: CoroutineScope
 ) : BleConnectionRepo {
-
     companion object {
         private val CONNECT_STATES = listOf(
             State.Connected::class,
@@ -90,12 +90,14 @@ class HramBleConnectionRepo(
         return bluetoothOnEventFlow.combine(isKeepConnectionFlow) { _, keepConnection -> keepConnection }
             .flatMapLatest {
                 flow {
-                    runCatching { connected?.disconnect() }.onFailure { loggerE(TAG) { "Error during disconnecting: $it" } }
+                    runCatching { connected?.disconnect() }.onFailure {
+                        loggerE(TAG) { "Error during disconnecting: $it" }
+                    }
                     val peripheral = connectByIdentifier(identifier)
                     emit(peripheral.toBleDevice())
                     runConnectionJob(peripheral)
                 }
-            }.retry(3) {
+            }.retry(RECONNECTION_RETRY_ATTEMPTS) {
                 val tryToReconnect =
                     it is BleConnectionsException.DeviceNotConnectedException || it is NotConnectedException
                 logger(TAG) { "try to reconnect: $tryToReconnect, because of $it" }

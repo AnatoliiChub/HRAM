@@ -113,7 +113,7 @@ fun AreaChart(
         fun mapPixelToData(offset: Offset): Pair<Float, Float>? {
             val fx = (offset.x - plotLeft) / plotWidth
             val x = minX + fx * (maxX - minX)
-            //find nearest x in points
+            // find nearest x in points
             val nearestPoint = points.minByOrNull { abs(it.first - x) }
             return nearestPoint
         }
@@ -146,23 +146,19 @@ fun AreaChart(
         }
 
         Box(modifier) {
-            //draw bubble at selected point
+            // draw bubble at selected point
             selectedPoint?.let { sp ->
                 val bubbleModifier = Modifier.offset {
                     val halfButtonWidth = bubbleSize.value.width / 2
                     var x = mapToPixel(sp).x.toInt() - halfButtonWidth
                     val y = plotTop.toInt() - bubbleSize.value.height
-                    if (x < plotLeft - bubbleXOverlap) {
-                        x = plotLeft.toInt() - bubbleXOverlap.toInt()
-                    } else if (x > plotRight - bubbleSize.value.width + bubbleXOverlap) {
-                        x = plotRight.toInt() - bubbleSize.value.width + bubbleXOverlap.toInt()
-                    }
+                    x = calculateX(x, plotLeft, plotRight, bubbleSize)
                     IntOffset(x, y - bubbleYOffset.toInt())
                 }.onSizeChanged { bubbleSize.value = it }
 
                 Box(bubbleModifier) { bubble(xLabelFormatter(sp.first), yLabelFormatter(sp.second)) }
             }
-            //draw
+            // draw
             Canvas(
                 modifier = Modifier.matchParentSize()
                     .onSizeChanged { canvasSize -> size.value = IntSize(canvasSize.width, canvasSize.height) }
@@ -248,7 +244,7 @@ fun AreaChart(
                 for (i in 0..yLastLabelNumber) {
                     val yValue = minY + i * (maxY - minY) / yLastLabelNumber
                     var yPos = plotBottom - i * plotHeight / yLastLabelNumber
-                    if (i == 0) yPos -= maxYLabelHeight else if (i != yLastLabelNumber) yPos -= maxYLabelHeight / 2
+                    yPos = calculateY(i, yPos, maxYLabelHeight, yLastLabelNumber)
                     val labelWidth = yLabelsWidth[i]
                     drawText(
                         textMeasurer = textMeasurer,
@@ -276,4 +272,33 @@ fun AreaChart(
             }
         }
     }
+}
+
+private fun calculateY(
+    i: Int,
+    yPos: Float,
+    maxYLabelHeight: Float,
+    yLastLabelNumber: Int
+): Float {
+    return if (i == 0) {
+        yPos - maxYLabelHeight
+    } else if (i != yLastLabelNumber) {
+        yPos - maxYLabelHeight / 2
+    } else {
+        yPos
+    }
+}
+
+private fun ChartStyle.calculateX(
+    x: Int,
+    plotLeft: Float,
+    plotRight: Float,
+    bubbleSize: MutableState<IntSize>
+) = when {
+    x < plotLeft - bubbleXOverlap -> plotLeft.toInt() - bubbleXOverlap.toInt()
+
+    x > plotRight - bubbleSize.value.width + bubbleXOverlap ->
+        plotRight.toInt() - bubbleSize.value.width + bubbleXOverlap.toInt()
+
+    else -> x
 }

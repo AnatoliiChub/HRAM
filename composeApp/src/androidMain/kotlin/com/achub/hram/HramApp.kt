@@ -7,7 +7,6 @@ import io.github.aakira.napier.Napier
 import org.koin.android.ext.koin.androidContext
 
 class HramApp : Application() {
-
     override fun onCreate() {
         super.onCreate()
         Napier.base(DebugAntilog())

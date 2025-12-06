@@ -4,7 +4,6 @@ import kotlin.time.Clock.System.now
 import kotlin.time.ExperimentalTime
 
 class EventsCutter(val debounceInterval: Long) {
-
     companion object
 
     @OptIn(ExperimentalTime::class)
@@ -18,7 +17,6 @@ class EventsCutter(val debounceInterval: Long) {
             event.invoke()
             lastEventTimeMs = now
         }
-
     }
 }
 

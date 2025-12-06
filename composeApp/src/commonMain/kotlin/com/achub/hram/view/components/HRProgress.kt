@@ -26,6 +26,7 @@ import kotlin.time.Duration
 
 private const val MIN_PROGRESS = 0.1f
 private const val MAX_PROGRESS = 1.1f
+private const val VISIBILITY_MARGIN = 0.05f
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -43,7 +44,7 @@ fun HRProgress(isLoading: Boolean, cycleDuration: Duration, height: Dp = Dimen48
         }
     }
 
-    val isVisible = progress.value > MIN_PROGRESS && progress.value < MAX_PROGRESS - 0.05f
+    val isVisible = progress.value > MIN_PROGRESS && progress.value < MAX_PROGRESS - VISIBILITY_MARGIN
 
     val alpha = animateFloatAsState(
         targetValue = if (isVisible) 1f else 0f,

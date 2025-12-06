@@ -42,18 +42,27 @@ import com.achub.hram.style.Dimen2
 import com.achub.hram.style.Dimen24
 import com.achub.hram.style.Dimen48
 import com.achub.hram.style.Dimen8
+import com.achub.hram.style.GradientLightRed
+import com.achub.hram.style.GradientRed
 import com.achub.hram.style.White
 
 val Gradient = listOf(
-    Color(0xFFE60000),
-    Color(0xFFFF4D4D),
-    Color(0xFFE60000),
-    Color(0xFFFF4D4D),
-    Color(0xFFE60000),
+    GradientRed,
+    GradientLightRed,
+    GradientRed,
+    GradientLightRed,
+    GradientRed,
 )
-private val MIN_SPREAD = 1f
-private val MAX_SPREAD = 4f
-private val BLINKING_ANIMATION_DURATION = 3000
+
+private const val MIN_SPREAD = 1f
+private const val MAX_SPREAD = 4f
+private const val BLINKING_ANIMATION_DURATION = 3000
+
+// extracted magic numbers
+private const val INNER_SHADOW_RADIUS = 80f
+private const val BORDER_ALPHA = 0.3f
+private const val SPREAD_ALPHA_DIVISOR = 4f
+private const val SECOND_KEYFRAME_RATIO = 0.5f
 
 @Composable
 fun DialogElevatedCard(
@@ -75,7 +84,7 @@ fun DialogElevatedCard(
     val dropShadowShape = RoundedCornerShape(Dimen12)
     val innerShadowShape = RoundedCornerShape(Dimen8)
 
-    Box(Modifier.padding(vertical =  Dimen48), contentAlignment = Center) {
+    Box(Modifier.padding(vertical = Dimen48), contentAlignment = Center) {
         ElevatedCard(
             elevation = CardDefaults.cardElevation(Dimen24),
             modifier = modifier.fillMaxWidth()
@@ -85,7 +94,7 @@ fun DialogElevatedCard(
                         radius = Dimen8,
                         spread = animatedSpread.dp,
                         brush = Brush.sweepGradient(Gradient),
-                        alpha = if (animate) animatedSpread / 4f else 0f
+                        alpha = if (animate) animatedSpread / SPREAD_ALPHA_DIVISOR else 0f
                     )
                 ).clip(dropShadowShape),
             colors = CardColors(
@@ -100,11 +109,11 @@ fun DialogElevatedCard(
                     .padding(Dimen2)
                     .clip(innerShadowShape)
                     .background(color = DarkGray, shape = innerShadowShape)
-                    .border(Dimen2, Dark.copy(alpha = 0.3f), innerShadowShape)
+                    .border(Dimen2, Dark.copy(alpha = BORDER_ALPHA), innerShadowShape)
                     .innerShadow(
                         shape = innerShadowShape,
                         block = {
-                            radius = 80f
+                            radius = INNER_SHADOW_RADIUS
                             color = Black
                         },
                     ).clip(innerShadowShape),
@@ -127,14 +136,12 @@ fun DialogCardPreview() {
     }
 }
 
-
 private fun blinkingSpec(): KeyframesSpec<Float> {
-    val second = (BLINKING_ANIMATION_DURATION * 0.5f).toInt()
-    val third = (BLINKING_ANIMATION_DURATION * 1f).toInt()
+    val second = (BLINKING_ANIMATION_DURATION * SECOND_KEYFRAME_RATIO).toInt()
     return keyframes {
         durationMillis = BLINKING_ANIMATION_DURATION
         MIN_SPREAD at 0 using LinearEasing
         MAX_SPREAD at second using LinearEasing
-        MIN_SPREAD at third using LinearEasing
+        MIN_SPREAD at BLINKING_ANIMATION_DURATION using LinearEasing
     }
 }

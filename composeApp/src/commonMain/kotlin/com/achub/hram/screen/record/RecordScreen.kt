@@ -16,12 +16,12 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.achub.hram.ble.model.BleDevice
-import com.achub.hram.ble.model.BleIndication
-import com.achub.hram.ble.model.HrIndication
+import com.achub.hram.ble.model.BleNotification
+import com.achub.hram.ble.model.HrNotification
 import com.achub.hram.data.models.TrackingStatus
-import com.achub.hram.permissionController
-import com.achub.hram.requestBluetooth
-import com.achub.hram.style.BlackPreview
+import com.achub.hram.ext.permissionController
+import com.achub.hram.ext.requestBluetooth
+import com.achub.hram.style.BLACK_PREVIEW
 import com.achub.hram.style.Dimen16
 import com.achub.hram.view.dialogs.InfoDialog
 import com.achub.hram.view.dialogs.NameActivityDialog
@@ -45,6 +45,7 @@ import org.koin.core.parameter.parametersOf
 import kotlin.time.Duration.Companion.seconds
 
 const val DOUBLE_HAPTIC_INTERVAL = 150L
+private const val COLUMN_SPACER_WEIGHT = 0.5f
 
 @Composable
 fun RecordScreen() {
@@ -88,16 +89,16 @@ private fun RecordScreenContent(
     onActivityNameConfirmed: (String) -> Unit,
 ) {
     val isCheckBoxEnabled = state.recordingState == RecordingState.Init
-    val indications = state.bleIndication
+    val indications = state.bleNotification
     val trackingStatus = state.trackingStatus
     Box(Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier.fillMaxSize().padding(Dimen16),
             horizontalAlignment = CenterHorizontally
         ) {
-            Spacer(Modifier.weight(0.5f))
+            Spacer(Modifier.weight(COLUMN_SPACER_WEIGHT))
             TrackingIndicationsSection(indications)
-            Spacer(Modifier.weight(0.5f))
+            Spacer(Modifier.weight(COLUMN_SPACER_WEIGHT))
             TrackingStatusCheckBoxSection(trackingStatus, isCheckBoxEnabled, onHrCheckBox)
             Spacer(Modifier.height(Dimen16))
             RecordSection(
@@ -108,19 +109,44 @@ private fun RecordScreenContent(
             )
         }
     }
+    showDialog(
+        state,
+        onDeviceSelected,
+        onRequestScanning,
+        onDismissDialog,
+        onCancelScanning,
+        openSettings,
+        onActivityNameChanged,
+        onActivityNameConfirmed
+    )
+}
+
+@Composable
+private fun showDialog(
+    state: RecordScreenState,
+    onDeviceSelected: (BleDevice) -> Unit,
+    onRequestScanning: () -> Unit,
+    onDismissDialog: () -> Unit,
+    onCancelScanning: () -> Unit,
+    openSettings: () -> Unit,
+    onActivityNameChanged: (String) -> Unit,
+    onActivityNameConfirmed: (String) -> Unit
+) {
     when (val dialog = state.dialog) {
-        is RecordScreenDialog.ChooseHRDevice -> HrConnectDialog(
-            isLoading = dialog.isLoading,
-            devices = dialog.scannedDevices,
-            isDeviceConfirmed = dialog.isDeviceConfirmed,
-            loadingDuration = dialog.loadingDuration,
-            onConfirmClick = onDeviceSelected,
-            onRefresh = onRequestScanning,
-            onDismissRequest = {
-                onDismissDialog()
-                onCancelScanning()
-            },
-        )
+        is RecordScreenDialog.ChooseHRDevice -> {
+            HrConnectDialog(
+                isLoading = dialog.isLoading,
+                devices = dialog.scannedDevices,
+                isDeviceConfirmed = dialog.isDeviceConfirmed,
+                loadingDuration = dialog.loadingDuration,
+                onConfirmClick = onDeviceSelected,
+                onRefresh = onRequestScanning,
+                onDismissRequest = {
+                    onDismissDialog()
+                    onCancelScanning()
+                },
+            )
+        }
 
         is RecordScreenDialog.DeviceConnectedDialog -> {
             InfoDialog(
@@ -140,16 +166,18 @@ private fun RecordScreenContent(
             }
         }
 
-        is RecordScreenDialog.OpenSettingsDialog -> InfoDialog(
-            title = Res.string.dialog_open_setting_title,
-            message = stringResource(Res.string.dialog_open_setting_message),
-            buttonText = Res.string.dialog_open_setting_button_text,
-            onDismiss = onDismissDialog,
-            onButonClick = {
-                openSettings()
-                onDismissDialog()
-            }
-        )
+        is RecordScreenDialog.OpenSettingsDialog -> {
+            InfoDialog(
+                title = Res.string.dialog_open_setting_title,
+                message = stringResource(Res.string.dialog_open_setting_message),
+                buttonText = Res.string.dialog_open_setting_button_text,
+                onDismiss = onDismissDialog,
+                onButonClick = {
+                    openSettings()
+                    onDismissDialog()
+                }
+            )
+        }
 
         is RecordScreenDialog.NameActivity -> {
             NameActivityDialog(
@@ -168,12 +196,12 @@ private fun RecordScreenContent(
 }
 
 @Composable
-@Preview(backgroundColor = BlackPreview, showBackground = true)
+@Preview(backgroundColor = BLACK_PREVIEW, showBackground = true)
 private fun RecordScreenPreview() {
     RecordScreenContent(
         state = RecordScreenState(
-            bleIndication = BleIndication(
-                hrIndication = HrIndication(hrBpm = 83, isContactOn = true, isSensorContactSupported = true),
+            bleNotification = BleNotification(
+                hrNotification = HrNotification(hrBpm = 83, isContactOn = true, isSensorContactSupported = true),
                 batteryLevel = 75,
                 isBleConnected = true,
                 elapsedTime = 235L,
@@ -199,12 +227,12 @@ private fun RecordScreenPreview() {
 }
 
 @Composable
-@Preview(backgroundColor = 0xFF000000, showBackground = true)
+@Preview(backgroundColor = BLACK_PREVIEW, showBackground = true)
 private fun RecordScreenEmptyPreview() {
     RecordScreenContent(
         state = RecordScreenState(
-            bleIndication = BleIndication(
-                hrIndication = null,
+            bleNotification = BleNotification(
+                hrNotification = null,
                 batteryLevel = 75,
                 isBleConnected = false,
                 elapsedTime = 235L,
@@ -234,8 +262,8 @@ private fun RecordScreenEmptyPreview() {
 private fun RecordScreenChooseDeviceDialogPreview() {
     RecordScreenContent(
         state = RecordScreenState(
-            bleIndication = BleIndication(
-                hrIndication = HrIndication(hrBpm = 83, isContactOn = true, isSensorContactSupported = true),
+            bleNotification = BleNotification(
+                hrNotification = HrNotification(hrBpm = 83, isContactOn = true, isSensorContactSupported = true),
                 batteryLevel = 75,
                 isBleConnected = true,
                 elapsedTime = 235L,
@@ -254,11 +282,9 @@ private fun RecordScreenChooseDeviceDialogPreview() {
                     BleDevice("Hrm3", "CC:DD:EE:FF:00:11"),
                     BleDevice("Hrm4", "22:33:44:55:66:77"),
                     BleDevice("Hrm5", "88:99:AA:BB:CC:DD"),
-
                 ),
                 loadingDuration = 5.seconds
             )
-
         ),
         onHrCheckBox = {},
         onPlay = {},

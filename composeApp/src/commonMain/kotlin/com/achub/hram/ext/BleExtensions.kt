@@ -1,4 +1,4 @@
-package com.achub.hram
+package com.achub.hram.ext
 
 import androidx.compose.runtime.Composable
 import com.juul.kable.ExperimentalApi
@@ -24,14 +24,21 @@ val BATTERY_SERVICE_UUID = Uuid.service("battery_service")
 
 @OptIn(ExperimentalApi::class, ExperimentalUuidApi::class)
 val BATTERY_LEVEL_CHAR_UUID = Uuid.characteristic("battery_level")
+
+private const val BYTE_MASK = 0xFF
+private const val BITS_IN_BYTE = 8
+private const val SECOND_BYTE_OFFSET = 1
+
 fun ByteArray.uint8(offset: Int) = unsignedByteToInt(this[offset])
-fun ByteArray.uint16(offset: Int) = unsignedBytesToInt(this[offset], this[offset + 1])
+
+fun ByteArray.uint16(offset: Int) = unsignedBytesToInt(this[offset], this[offset + SECOND_BYTE_OFFSET])
+
 private fun unsignedByteToInt(b: Byte): Int {
-    return b.toInt() and 0xFF
+    return b.toInt() and BYTE_MASK
 }
 
 private fun unsignedBytesToInt(b0: Byte, b1: Byte): Int {
-    return (unsignedByteToInt(b0) + (unsignedByteToInt(b1) shl 8))
+    return (unsignedByteToInt(b0) + (unsignedByteToInt(b1) shl BITS_IN_BYTE))
 }
 
 @Suppress("ComposableNaming")
