@@ -2,7 +2,10 @@
 
 ### Kotlin Multiplatform project targeting Android \& iOS
 
-[PLACEHOLDER VIDEO/IMAGE]
+| **Android** | **iOS** |
+|-----|---------|
+| <img src="https://github.com/user-attachments/assets/2496db1f-9d6d-421f-b678-334ca482647f" width="280"> | <img src="https://github.com/user-attachments/assets/ed85f462-0922-47c9-82ab-8071af28d618" width="280"> |
+
 
 HRAM is a Kotlin Multiplatform app for heart rate \& activity tracking with BLE heart rate monitors.  
 It uses Compose Multiplatform for shared UI, Kotlin Multiplatform for shared logic, Koin for DI, and an SQL
@@ -20,7 +23,27 @@ It is **not a medical application** and must **not be used for medical assessmen
 
 ---
 
-## 1. Project description
+## Table of Contents
+
+- [Project description](#project-description)
+- [Implemented features](#implemented-features)
+  - [BLE](#ble)
+  - [Tracking](#tracking)
+  - [Data layer & database](#data-layer--database)
+  - [UI & screens](#ui--screens)
+  - [Dependency injection](#dependency-injection)
+- [Tech stack](#tech-stack)
+- [Getting started](#getting-started)
+  - [Prerequisites](#prerequisites)
+- [Run targets](#run-targets)
+  - [Android](#android)
+  - [iOS](#ios)
+- [Current limitations](#current-limitations)
+- [Video Demo](#video-demo)
+
+---
+
+## Project description
 
 HRAM focuses on:
 
@@ -36,20 +59,20 @@ For compatibility, devices must implement the standard Heart Rate Service (UUID:
 
 ---
 
-## 2. Implemented features
+## Implemented features
 
-### 2\.1 BLE
+### BLE
 
 - BLE Layer is implemented in `hram/ble`:
     - The app communicates with BLE device which implements the standard Heart Rate Service.
     - `BleDevice` model describing discovered devices, `identifier` field used for mac address (
       Android) or UUID (iOS).
-    - `HrIndication` model for heart rate data(Heart Rate Measurement characteristic).
-    - `BleIndication` encapsulates `HrIndication`, battery level, bleConnection status and
+    - `HrNotification` model for heart rate data(Heart Rate Measurement characteristic).
+    - `BleIndication` encapsulates `HrNotification`, battery level, BLE Connection status and
       timestamp.
     - Repositories:
         - `BleConnectionRepo` : Bluetooth state, connection state, connect/disconnect, scanning.
-        - `BleDataRepo` : ble characteristic data streams (heart rate measurement, battery level).
+        - `BleDataRepo` : BLE characteristic data streams (heart rate measurement, battery level).
         - `HrDeviceRepo` : high level repo combining connection and data repos for heart rate devices.
 
 **What implemented:**
@@ -58,7 +81,7 @@ For compatibility, devices must implement the standard Heart Rate Service (UUID:
 - Connecting to devices and receiving heart rate indications.
 - Parsing low-level BLE data.
 
-Below is a simplified flowchart of the BLE connection \& data flow:
+**BLE Connection and Data flow:**
 
 ```mermaid
 flowchart LR
@@ -69,9 +92,23 @@ flowchart LR
     E --> F[UI<br>or<br>DATABASE]
 ```
 
+**BLE reconnection flow:**
+
+```mermaid
+flowchart TD
+    A[Observe device connection state] --> |new state| B{State == Connected or Connecting?}
+    B -->|YES| A
+    B -->|No| D[Peripheral disconnect]
+    D --> E[Peripheral connect]
+    E --> F{Connected?}
+    F -->  |YES| A
+    F -->  |NO, attempts <= 3| E
+    F -->  |NO, attempts >3| G[CONNECTION FAILED]
+```
+
 ---
 
-### 2\.2 Tracking
+### Tracking
 
 Tracking is implemented in `hram/tracking`:
 
@@ -88,7 +125,7 @@ Tracking is implemented in `hram/tracking`:
 
 ---
 
-### 2\.3 Data layer \& database
+### Data layer \& database
 
 Located under `hram/data`:
 
@@ -108,7 +145,7 @@ Located under `hram/data`:
 
 ---
 
-### 2\.4 UI \& screens
+### UI \& screens
 
 Common UI code lives under `hram/screen` and `hram/view`:
 
@@ -131,11 +168,22 @@ Common UI code lives under `hram/screen` and `hram/view`:
 - Custom components using new Material 3 Expressive
 - Localization support for English and Ukrainian.
 
-[PLACEHOLDER VIDEO/IMAGE]
+**Activities Screen:**
+
+| iOS | Android |
+|-----|---------|
+| <img src="https://github.com/user-attachments/assets/692d93cc-8714-4570-acad-ea2e8f8a4ea0" width="280"> | <img src="https://github.com/user-attachments/assets/38342965-2064-4668-866e-b0246ee62e5a" width="280"> |
+
+
+**Record Screen:**
+
+| iOS | Android |
+|-----|---------|
+| <img src="https://github.com/user-attachments/assets/c7a61873-c63c-4ead-9355-360d5b069e79" width="280"> | <img src="https://github.com/user-attachments/assets/fcd85206-a383-4fea-803d-87aa671f6de3" width="280"> |
 
 ---
 
-### 2\.5 Dependency injection
+### Dependency injection
 
 Dependency injection is implemented using Koin under `hram/di`:
 
@@ -150,7 +198,7 @@ Dependency injection is implemented using Koin under `hram/di`:
 
 ---
 
-## 3. Tech stack
+## Tech stack
 
 - **Languages**
     - Kotlin (Multiplatform)
@@ -173,9 +221,9 @@ Dependency injection is implemented using Koin under `hram/di`:
 
 ---
 
-## 4. Getting started
+## Getting started
 
-### 4\.1 Prerequisites
+### Prerequisites
 
 - macOS
 - JDK 17\+
@@ -183,9 +231,9 @@ Dependency injection is implemented using Koin under `hram/di`:
 - Xcode 26\+
 - `git`
 
-## 5. Run targets
+## Run targets
 
-### 5.1 Android
+### Android
 
 Open HRAM in Android Studio. Select the Android configuration for composeApp. Choose a
 device/emulator. Run.
@@ -194,15 +242,32 @@ Useful tasks:
 - `./gradlew :composeApp:assembleDebug`
 - `./gradlew :composeApp:installDebug`
 
-### 5.2 iOS
+### iOS
 
 1. Open iosApp/iosApp.xcodeproj in Xcode.
-2. Select a simulator or device.
+2. Select a simulator.
 3. Run.
 
-## 6. Current limitations
+To create a build for a real device run in terminal:
+
+`xcodebuild  -project iosApp/iosApp.xcodeproj -configuration Debug -scheme iosApp -sdk iphoneos  DEVELOPMENT_TEAM=“YOUR_DEVELOPMENT_TEAMID”  CODE_SIGN_STYLE=Automatic CODE_SIGN_IDENTITY="Apple Development" -verbose`
+
+Just replace `YOUR_DEVELOPMENT_TEAMID` with your team ID.
+
+
+## Current limitations
 
 - No background activity tracking is wired yet - tracking works while the app is active.
 - No external cloud sync/export.
 - Limited error handling and UX for BLE edge cases.
+
+## Video Demo
+
+### Android:
+
+https://github.com/user-attachments/assets/62cf2b3e-e3a5-4052-bfd2-d4797b415d2d
+
+### iOS:
+
+https://github.com/user-attachments/assets/a1b7f320-824e-4ba9-ae1e-bdf70a293b23
 
