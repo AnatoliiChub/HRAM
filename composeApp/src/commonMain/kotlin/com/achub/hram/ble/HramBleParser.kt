@@ -13,7 +13,7 @@ private const val BIT_SENSOR_CONTACT_SUPPORTED = 0x04
 private const val OFFSET_FLAGS = 0
 private const val OFFSET_HEART_RATE_VALUE = 1
 
-class HramBleParser() : BleParser {
+class HramBleParser : BleParser {
     override fun parseHrNotification(data: ByteArray): HrNotification {
         val flags = data.uint8(OFFSET_FLAGS)
         val is8bitFormat = flags and BIT_FORMAT_UINT8 == 0
