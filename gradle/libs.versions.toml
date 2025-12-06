@@ -3,9 +3,9 @@ agp = "8.13.1"
 android-compileSdk = "36"
 android-minSdk = "31"
 android-targetSdk = "36"
-androidx-activity = "1.12.0"
+androidx-activity = "1.12.1"
 androidx-lifecycle = "2.9.6"
-composeMultiplatform = "1.10.0-beta02"
+composeMultiplatform = "1.10.0-rc01"
 material3 = "1.10.0-alpha05"
 kotlin = "2.2.21-RC2"
 koin = "4.1.1"
@@ -18,9 +18,7 @@ datastore = "1.2.0"
 kotlinx-datetime = "0.7.1"
 room = "2.8.4"
 sqlite = "2.6.2"
-ui-tooling = "1.9.5"
-ktlintPlugin = "14.0.1"
-ktlintCli = "1.8.0"
+ui-tooling = "1.10.0"
 detekt = "1.23.8"
 
 [libraries]
@@ -63,5 +61,4 @@ kotlinComposeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.re
 kotlinxSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 androidx-room = { id = "androidx.room", version.ref = "room" }
-ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlintPlugin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }

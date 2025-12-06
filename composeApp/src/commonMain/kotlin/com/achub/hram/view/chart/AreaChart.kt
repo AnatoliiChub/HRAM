@@ -294,12 +294,11 @@ private fun ChartStyle.calculateX(
     plotLeft: Float,
     plotRight: Float,
     bubbleSize: MutableState<IntSize>
-): Int {
-    var x1 = x
-    if (x1 < plotLeft - bubbleXOverlap) {
-        x1 = plotLeft.toInt() - bubbleXOverlap.toInt()
-    } else if (x1 > plotRight - bubbleSize.value.width + bubbleXOverlap) {
-        x1 = plotRight.toInt() - bubbleSize.value.width + bubbleXOverlap.toInt()
-    }
-    return x1
+) = when {
+    x < plotLeft - bubbleXOverlap -> plotLeft.toInt() - bubbleXOverlap.toInt()
+
+    x > plotRight - bubbleSize.value.width + bubbleXOverlap ->
+        plotRight.toInt() - bubbleSize.value.width + bubbleXOverlap.toInt()
+
+    else -> x
 }
