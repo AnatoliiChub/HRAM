@@ -23,7 +23,27 @@ It is **not a medical application** and must **not be used for medical assessmen
 
 ---
 
-## 1. Project description
+## Table of Contents
+
+- [Project description](#project-description)
+- [Implemented features](#implemented-features)
+  - [BLE](#ble)
+  - [Tracking](#tracking)
+  - [Data layer & database](#data-layer--database)
+  - [UI & screens](#ui--screens)
+  - [Dependency injection](#dependency-injection)
+- [Tech stack](#tech-stack)
+- [Getting started](#getting-started)
+  - [Prerequisites](#prerequisites)
+- [Run targets](#run-targets)
+  - [Android](#android)
+  - [iOS](#ios)
+- [Current limitations](#current-limitations)
+- [Video Demo](#video-demo)
+
+---
+
+## Project description
 
 HRAM focuses on:
 
@@ -39,9 +59,9 @@ For compatibility, devices must implement the standard Heart Rate Service (UUID:
 
 ---
 
-## 2. Implemented features
+## Implemented features
 
-### 2\.1 BLE
+### BLE
 
 - BLE Layer is implemented in `hram/ble`:
     - The app communicates with BLE device which implements the standard Heart Rate Service.
@@ -88,7 +108,7 @@ flowchart TD
 
 ---
 
-### 2\.2 Tracking
+### Tracking
 
 Tracking is implemented in `hram/tracking`:
 
@@ -105,7 +125,7 @@ Tracking is implemented in `hram/tracking`:
 
 ---
 
-### 2\.3 Data layer \& database
+### Data layer \& database
 
 Located under `hram/data`:
 
@@ -125,7 +145,7 @@ Located under `hram/data`:
 
 ---
 
-### 2\.4 UI \& screens
+### UI \& screens
 
 Common UI code lives under `hram/screen` and `hram/view`:
 
@@ -163,7 +183,7 @@ Common UI code lives under `hram/screen` and `hram/view`:
 
 ---
 
-### 2\.5 Dependency injection
+### Dependency injection
 
 Dependency injection is implemented using Koin under `hram/di`:
 
@@ -178,7 +198,7 @@ Dependency injection is implemented using Koin under `hram/di`:
 
 ---
 
-## 3. Tech stack
+## Tech stack
 
 - **Languages**
     - Kotlin (Multiplatform)
@@ -201,9 +221,9 @@ Dependency injection is implemented using Koin under `hram/di`:
 
 ---
 
-## 4. Getting started
+## Getting started
 
-### 4\.1 Prerequisites
+### Prerequisites
 
 - macOS
 - JDK 17\+
@@ -211,9 +231,9 @@ Dependency injection is implemented using Koin under `hram/di`:
 - Xcode 26\+
 - `git`
 
-## 5. Run targets
+## Run targets
 
-### 5.1 Android
+### Android
 
 Open HRAM in Android Studio. Select the Android configuration for composeApp. Choose a
 device/emulator. Run.
@@ -222,7 +242,7 @@ Useful tasks:
 - `./gradlew :composeApp:assembleDebug`
 - `./gradlew :composeApp:installDebug`
 
-### 5.2 iOS
+### iOS
 
 1. Open iosApp/iosApp.xcodeproj in Xcode.
 2. Select a simulator.
@@ -234,13 +254,13 @@ to create a build for a real device run in terminal:
 Just replace `YOUR_DEVELOPMENT_TEAMID` with your team ID.
 
 
-## 6. Current limitations
+## Current limitations
 
 - No background activity tracking is wired yet - tracking works while the app is active.
 - No external cloud sync/export.
 - Limited error handling and UX for BLE edge cases.
 
-## 7. Video Demo
+## Video Demo
 
 ### Android:
 
