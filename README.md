@@ -83,7 +83,7 @@ flowchart TD
     E --> F{Connected?}
     F -->  |YES| A
     F -->  |NO, attempts <= 3| E
-    F -->  |NO, attepts >3| G[CONNECTION FAILED]
+    F -->  |NO, attempts >3| G[CONNECTION FAILED]
 ```
 
 ---
@@ -239,4 +239,14 @@ Just replace `YOUR_DEVELOPMENT_TEAMID` with your team ID.
 - No background activity tracking is wired yet - tracking works while the app is active.
 - No external cloud sync/export.
 - Limited error handling and UX for BLE edge cases.
+
+## 7. Video Demo
+
+### Android:
+
+https://github.com/user-attachments/assets/62cf2b3e-e3a5-4052-bfd2-d4797b415d2d
+
+### iOS
+
+https://github.com/user-attachments/assets/a1b7f320-824e-4ba9-ae1e-bdf70a293b23
 
