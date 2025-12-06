@@ -107,7 +107,7 @@ class HramHrDeviceRepo(
         bleDataRepo.observeHeartRate(device),
         bleDataRepo.observeBatteryLevel(device),
         device.state
-    ) { hrIndication, battery, state -> BleNotification(hrIndication, battery, state is State.Connected) }
+    ) { hrNotification, battery, state -> BleNotification(hrNotification, battery, state is State.Connected) }
 
     override fun cancelScanning() = scanJobs.cancelAndClear()
 
