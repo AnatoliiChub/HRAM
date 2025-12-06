@@ -8,8 +8,8 @@ import org.koin.core.annotation.Provided
 import org.koin.core.annotation.Single
 import org.koin.core.scope.Scope
 
-@Configuration
 @Module
+@Configuration
 expect class DatabaseModule() {
     @Single
     fun provideDatabaseBuilder(scope: Scope): RoomDatabase.Builder<HramDatabase>

@@ -8,8 +8,8 @@ import org.koin.core.annotation.Configuration
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Single
 
-@Configuration
 @Module
+@Configuration
 class TrackingModule {
     @Single(binds = [ActivityTrackingManager::class])
     fun trackingManager() = HramActivityTrackingManager()

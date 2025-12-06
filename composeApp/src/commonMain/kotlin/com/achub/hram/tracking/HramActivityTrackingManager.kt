@@ -99,11 +99,11 @@ class HramActivityTrackingManager : ActivityTrackingManager, KoinComponent {
         .onEach { bleNotification.send(it) }
         .filter { isRecording && it.isBleConnected }
         .onEach { bleIndication ->
-            bleIndication.hrNotification?.let { hrIndication ->
+            bleIndication.hrNotification?.let { hrNotification ->
                 currentActId?.let {
                     val entity = HeartRateEntity(
                         activityId = it,
-                        heartRate = hrIndication.hrBpm,
+                        heartRate = hrNotification.hrBpm,
                         timeStamp = bleIndication.elapsedTime
                     )
                     hrActivityRepo.insert(entity)

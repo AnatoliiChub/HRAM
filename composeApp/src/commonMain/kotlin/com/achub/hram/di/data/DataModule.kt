@@ -10,8 +10,8 @@ import org.koin.core.annotation.Module
 import org.koin.core.annotation.Provided
 import org.koin.core.annotation.Single
 
-@Configuration
 @Module(includes = [DatabaseModule::class])
+@Configuration
 class DataModule {
     @Single
     fun provideHeartRateDao(

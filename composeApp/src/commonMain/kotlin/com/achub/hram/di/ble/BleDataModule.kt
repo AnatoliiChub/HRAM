@@ -16,8 +16,8 @@ import org.koin.core.annotation.Module
 import org.koin.core.annotation.Provided
 import org.koin.core.annotation.Single
 
-@Configuration
 @Module(includes = [BleModule::class])
+@Configuration
 class BleDataModule {
     @Single
     fun bleConnectionRepo(

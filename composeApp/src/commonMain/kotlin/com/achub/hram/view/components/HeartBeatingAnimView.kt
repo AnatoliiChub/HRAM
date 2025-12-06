@@ -1,4 +1,3 @@
-// kotlin
 package com.achub.hram.view.components
 
 import androidx.compose.animation.core.KeyframesSpec
