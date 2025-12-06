@@ -1,4 +1,3 @@
-// kotlin
 package com.achub.hram.ext
 
 import androidx.compose.runtime.Composable
