@@ -67,12 +67,12 @@ For compatibility, devices must implement the standard Heart Rate Service (UUID:
     - The app communicates with BLE device which implements the standard Heart Rate Service.
     - `BleDevice` model describing discovered devices, `identifier` field used for mac address (
       Android) or UUID (iOS).
-    - `HrIndication` model for heart rate data(Heart Rate Measurement characteristic).
-    - `BleIndication` encapsulates `HrIndication`, battery level, bleConnection status and
+    - `HrNotification` model for heart rate data(Heart Rate Measurement characteristic).
+    - `BleIndication` encapsulates `HrNotification`, battery level, BLE Connection status and
       timestamp.
     - Repositories:
         - `BleConnectionRepo` : Bluetooth state, connection state, connect/disconnect, scanning.
-        - `BleDataRepo` : ble characteristic data streams (heart rate measurement, battery level).
+        - `BleDataRepo` : BLE characteristic data streams (heart rate measurement, battery level).
         - `HrDeviceRepo` : high level repo combining connection and data repos for heart rate devices.
 
 **What implemented:**
@@ -92,7 +92,7 @@ flowchart LR
     E --> F[UI<br>or<br>DATABASE]
 ```
 
-**BLE recconection flow:**
+**BLE reconnection flow:**
 
 ```mermaid
 flowchart TD
@@ -248,7 +248,8 @@ Useful tasks:
 2. Select a simulator.
 3. Run.
 
-to create a build for a real device run in terminal:
+To create a build for a real device run in terminal:
+
 `xcodebuild  -project iosApp/iosApp.xcodeproj -configuration Debug -scheme iosApp -sdk iphoneos  DEVELOPMENT_TEAM=“YOUR_DEVELOPMENT_TEAMID”  CODE_SIGN_STYLE=Automatic CODE_SIGN_IDENTITY="Apple Development" -verbose`
 
 Just replace `YOUR_DEVELOPMENT_TEAMID` with your team ID.
@@ -266,7 +267,7 @@ Just replace `YOUR_DEVELOPMENT_TEAMID` with your team ID.
 
 https://github.com/user-attachments/assets/62cf2b3e-e3a5-4052-bfd2-d4797b415d2d
 
-### iOS
+### iOS:
 
 https://github.com/user-attachments/assets/a1b7f320-824e-4ba9-ae1e-bdf70a293b23
 
