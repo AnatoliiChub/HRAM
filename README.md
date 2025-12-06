@@ -2,7 +2,10 @@
 
 ### Kotlin Multiplatform project targeting Android \& iOS
 
-[PLACEHOLDER VIDEO/IMAGE]
+| **Android** | **iOS** |
+|-----|---------|
+| <img src="https://github.com/user-attachments/assets/2496db1f-9d6d-421f-b678-334ca482647f" width="280"> | <img src="https://github.com/user-attachments/assets/ed85f462-0922-47c9-82ab-8071af28d618" width="280"> |
+
 
 HRAM is a Kotlin Multiplatform app for heart rate \& activity tracking with BLE heart rate monitors.  
 It uses Compose Multiplatform for shared UI, Kotlin Multiplatform for shared logic, Koin for DI, and an SQL
@@ -58,7 +61,7 @@ For compatibility, devices must implement the standard Heart Rate Service (UUID:
 - Connecting to devices and receiving heart rate indications.
 - Parsing low-level BLE data.
 
-Below is a simplified flowchart of the BLE connection \& data flow:
+**BLE Connection and Data flow:**
 
 ```mermaid
 flowchart LR
@@ -67,6 +70,20 @@ flowchart LR
     C --> D[SUBSCRIBE:<br>HRM 0x2A37,<br>Battery 0x2A19]
     D --> E[PARSE<br>NOTIFICATIONS]
     E --> F[UI<br>or<br>DATABASE]
+```
+
+**BLE recconection flow:**
+
+```mermaid
+flowchart TD
+    A[Observe device connection state] --> |new state| B{State == Connected or Connecting?}
+    B -->|YES| A
+    B -->|No| D[Peripheral disconnect]
+    D --> E[Peripheral connect]
+    E --> F{Connected?}
+    F -->  |YES| A
+    F -->  |NO, attempts <= 3| E
+    F -->  |NO, attepts >3| G[CONNECTION FAILED]
 ```
 
 ---
@@ -131,7 +148,18 @@ Common UI code lives under `hram/screen` and `hram/view`:
 - Custom components using new Material 3 Expressive
 - Localization support for English and Ukrainian.
 
-[PLACEHOLDER VIDEO/IMAGE]
+**Activities Screen:**
+
+| iOS | Android |
+|-----|---------|
+| <img src="https://github.com/user-attachments/assets/692d93cc-8714-4570-acad-ea2e8f8a4ea0" width="280"> | <img src="https://github.com/user-attachments/assets/38342965-2064-4668-866e-b0246ee62e5a" width="280"> |
+
+
+**Record Screen:**
+
+| iOS | Android |
+|-----|---------|
+| <img src="https://github.com/user-attachments/assets/c7a61873-c63c-4ead-9355-360d5b069e79" width="280"> | <img src="https://github.com/user-attachments/assets/fcd85206-a383-4fea-803d-87aa671f6de3" width="280"> |
 
 ---
 
@@ -197,8 +225,14 @@ Useful tasks:
 ### 5.2 iOS
 
 1. Open iosApp/iosApp.xcodeproj in Xcode.
-2. Select a simulator or device.
+2. Select a simulator.
 3. Run.
+
+to create a build for a real device run in terminal:
+`xcodebuild  -project iosApp/iosApp.xcodeproj -configuration Debug -scheme iosApp -sdk iphoneos  DEVELOPMENT_TEAM=“YOUR_DEVELOPMENT_TEAMID”  CODE_SIGN_STYLE=Automatic CODE_SIGN_IDENTITY="Apple Development" -verbose`
+
+Just replace `YOUR_DEVELOPMENT_TEAMID` with your team ID.
+
 
 ## 6. Current limitations
 
