@@ -91,29 +91,22 @@ class RecordViewModel(
         }
     }
 
-    fun requestScanning() {
-        viewModelScope.launch(Dispatchers.Default) {
-            val action = if (isBluetoothOn.value.not()) _uiState::requestBluetooth else ::scan
-            val onFailure = if (isBluetoothOn.value.not()) null else _uiState::settingsDialog
-            permissionController.requestBleBefore(action = action, onFailure = { onFailure?.invoke() })
-        }
+    fun requestScanning() = viewModelScope.launch(Dispatchers.Default) {
+        val action = if (isBluetoothOn.value.not()) _uiState::requestBluetooth else ::scan
+        permissionController.requestBleBefore(action = action, onFailure = _uiState::settingsDialog)
     }
 
-    private fun scan() {
-        trackingManager.scan(
-            onInit = { _uiState.update { it.chooseHrDeviceDialog(scanDuration) } },
-            onUpdate = { devices -> _uiState.updateHrDeviceDialogIfExists { it.copy(scannedDevices = devices) } },
-            onComplete = { _uiState.updateHrDeviceDialogIfExists { it.copy(isLoading = it.isDeviceConfirmed) } }
-        )
-    }
+    private fun scan() = trackingManager.scan(
+        onInit = { _uiState.update { it.chooseHrDeviceDialog(scanDuration) } },
+        onUpdate = { devices -> _uiState.updateHrDeviceDialogIfExists { it.copy(scannedDevices = devices) } },
+        onComplete = { _uiState.updateHrDeviceDialogIfExists { it.copy(isLoading = it.isDeviceConfirmed) } }
+    )
 
-    fun onHrDeviceSelected(device: BleDevice) {
-        trackingManager.connect(
-            device,
-            onInitConnection = _uiState::updateHrDeviceDialogConnecting,
-            onConnected = _uiState::deviceConnectedDialog,
-        )
-    }
+    fun onHrDeviceSelected(device: BleDevice) = trackingManager.connect(
+        device,
+        onInitConnection = _uiState::updateHrDeviceDialogConnecting,
+        onConnected = _uiState::deviceConnectedDialog,
+    )
 
     override fun onCleared() {
         super.onCleared()
