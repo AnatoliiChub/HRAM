@@ -87,7 +87,7 @@ fun NameActivityDialog(
                         focusedContainerColor = containerColor,
                         unfocusedContainerColor = containerColor,
                         errorContainerColor = containerColor,
-                        disabledLabelColor = containerColor,
+                        disabledContainerColor = containerColor,
                     )
                 )
                 Spacer(Modifier.height(Dimen24))

@@ -119,7 +119,7 @@ The project is organized into packages, with the core logic residing in `compose
         - `BleConnectionManager`: Manages Bluetooth state, device scanning, and the connection lifecycle (
           connect/disconnect/reconnect).
         - `BleDataRepo`: Provides streams for BLE characteristic data (heart rate measurement, battery level).
-        - `HramHrDeviceManager`: A high-level manager that coordinates the `BleConnectionManager` and `BleDataRepo` to
+        - `HrDeviceRepo`: A high-level repo that coordinates the `BleConnectionManager` and `BleDataRepo` to
           provide a unified interface for interacting with HR devices.
 
 **What implemented:**
