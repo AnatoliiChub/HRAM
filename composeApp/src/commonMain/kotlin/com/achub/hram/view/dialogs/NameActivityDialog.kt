@@ -16,12 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.DialogProperties
-import com.achub.hram.style.DarkGray
 import com.achub.hram.style.Dimen24
 import com.achub.hram.style.LabelMedium
 import com.achub.hram.style.Red
 import com.achub.hram.style.White
-import com.achub.hram.style.White80
 import com.achub.hram.view.components.HramTextField
 import com.achub.hram.view.components.dialog.DialogButton
 import com.achub.hram.view.components.dialog.DialogElevatedCard
@@ -64,13 +62,14 @@ fun NameActivityDialog(
                 Spacer(Modifier.height(Dimen24))
                 Text(text = stringResource(message), color = White, style = LabelMedium, textAlign = TextAlign.Center)
                 Spacer(Modifier.height(Dimen24))
+                val containerColor = White.copy(alpha = 0.04f)
                 HramTextField(
                     modifier = Modifier,
                     value = name,
                     onValueChange = { onNameChanged(it) },
                     singleLine = true,
                     isError = error != null,
-                    textStyle = LabelMedium.copy(color = DarkGray),
+                    textStyle = LabelMedium.copy(color = White),
                     supportingText = {
                         error?.let {
                             Text(
@@ -81,8 +80,14 @@ fun NameActivityDialog(
                         }
                     },
                     colors = TextFieldDefaults.colors(
-                        focusedIndicatorColor = White80,
-                        cursorColor = Red
+                        cursorColor = Red,
+                        disabledTextColor = White.copy(alpha = 0.6f),
+                        focusedIndicatorColor = White.copy(alpha = 0.8f),
+                        unfocusedIndicatorColor = White.copy(alpha = 0.3f),
+                        focusedContainerColor = containerColor,
+                        unfocusedContainerColor = containerColor,
+                        errorContainerColor = containerColor,
+                        disabledLabelColor = containerColor,
                     )
                 )
                 Spacer(Modifier.height(Dimen24))
