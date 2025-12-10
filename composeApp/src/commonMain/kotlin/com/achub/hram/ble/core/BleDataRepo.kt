@@ -1,4 +1,4 @@
-package com.achub.hram.ble.repo
+package com.achub.hram.ble.core
 
 import com.achub.hram.ble.model.HrNotification
 import com.juul.kable.Peripheral

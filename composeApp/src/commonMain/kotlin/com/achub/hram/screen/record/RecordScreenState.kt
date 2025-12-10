@@ -48,15 +48,14 @@ fun MutableStateFlow<RecordScreenState>.updateHrDeviceDialogIfExists(
 }
 
 fun MutableStateFlow<RecordScreenState>.settingsDialog() =
-    this.update { it.copy(dialog = RecordScreenDialog.OpenSettingsDialog) }
+    update { it.copy(dialog = RecordScreenDialog.OpenSettingsDialog) }
 
-fun MutableStateFlow<RecordScreenState>.deviceConnectedDialog(bleDevice: BleDevice) =
-    this.update {
-        it.copy(
-            trackingStatus = it.trackingStatus.copy(trackHR = true, hrDevice = bleDevice),
-            dialog = RecordScreenDialog.DeviceConnectedDialog(bleDevice)
-        )
-    }
+fun MutableStateFlow<RecordScreenState>.deviceConnectedDialog(bleDevice: BleDevice) = update {
+    it.copy(
+        trackingStatus = it.trackingStatus.copy(trackHR = true, hrDevice = bleDevice),
+        dialog = RecordScreenDialog.DeviceConnectedDialog(bleDevice)
+    )
+}
 
 fun MutableStateFlow<RecordScreenState>.toggleHrTracking() = this.update {
     it.copy(trackingStatus = it.trackingStatus.copy(trackHR = it.trackingStatus.trackHR.not(), hrDevice = null))

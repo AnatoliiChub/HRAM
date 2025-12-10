@@ -6,22 +6,16 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.achub.hram.ble.model.BleDevice
-import com.achub.hram.ble.model.BleNotification
-import com.achub.hram.ble.model.HrNotification
-import com.achub.hram.data.models.TrackingStatus
 import com.achub.hram.ext.permissionController
 import com.achub.hram.ext.requestBluetooth
-import com.achub.hram.style.BLACK_PREVIEW
 import com.achub.hram.style.Dimen16
 import com.achub.hram.view.dialogs.InfoDialog
 import com.achub.hram.view.dialogs.NameActivityDialog
@@ -42,7 +36,6 @@ import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
-import kotlin.time.Duration.Companion.seconds
 
 const val DOUBLE_HAPTIC_INTERVAL = 150L
 private const val COLUMN_SPACER_WEIGHT = 0.5f
@@ -57,15 +50,33 @@ fun RecordScreen() {
             requestBluetooth()
             clearRequestBluetooth()
         }
-        RecordScreenContent(
+        val isCheckBoxEnabled = state.recordingState == RecordingState.Init
+        val indications = state.bleNotification
+        val trackingStatus = state.trackingStatus
+        Box(Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier.fillMaxSize().padding(Dimen16),
+                horizontalAlignment = CenterHorizontally
+            ) {
+                Spacer(Modifier.weight(COLUMN_SPACER_WEIGHT))
+                TrackingIndicationsSection(indications)
+                Spacer(Modifier.weight(COLUMN_SPACER_WEIGHT))
+                TrackingStatusCheckBoxSection(trackingStatus, isCheckBoxEnabled, ::toggleHRTracking)
+                Spacer(Modifier.height(Dimen16))
+                RecordSection(
+                    recordingState = state.recordingState,
+                    isRecordingAvailable = trackingStatus.atLeastOneTrackingEnabled,
+                    onPlay = ::toggleRecording,
+                    onStop = ::showNameActivityDialog,
+                )
+            }
+        }
+        Dialog(
             state,
-            onHrCheckBox = ::toggleHRTracking,
-            onPlay = ::toggleRecording,
-            onStop = ::showNameActivityDialog,
-            onDismissDialog = ::dismissDialog,
-            onCancelScanning = ::cancelScanning,
             onDeviceSelected = ::onHrDeviceSelected,
             onRequestScanning = ::requestScanning,
+            onDismissDialog = ::dismissDialog,
+            onCancelScanning = ::cancelScanning,
             openSettings = ::openSettings,
             onActivityNameChanged = ::onActivityNameChanged,
             onActivityNameConfirmed = ::stopRecording,
@@ -73,56 +84,8 @@ fun RecordScreen() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun RecordScreenContent(
-    state: RecordScreenState,
-    onHrCheckBox: () -> Unit,
-    onPlay: () -> Unit,
-    onStop: () -> Unit,
-    onCancelScanning: () -> Unit,
-    onDismissDialog: () -> Unit,
-    onDeviceSelected: (BleDevice) -> Unit,
-    onRequestScanning: () -> Unit,
-    openSettings: () -> Unit,
-    onActivityNameChanged: (String) -> Unit,
-    onActivityNameConfirmed: (String) -> Unit,
-) {
-    val isCheckBoxEnabled = state.recordingState == RecordingState.Init
-    val indications = state.bleNotification
-    val trackingStatus = state.trackingStatus
-    Box(Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier.fillMaxSize().padding(Dimen16),
-            horizontalAlignment = CenterHorizontally
-        ) {
-            Spacer(Modifier.weight(COLUMN_SPACER_WEIGHT))
-            TrackingIndicationsSection(indications)
-            Spacer(Modifier.weight(COLUMN_SPACER_WEIGHT))
-            TrackingStatusCheckBoxSection(trackingStatus, isCheckBoxEnabled, onHrCheckBox)
-            Spacer(Modifier.height(Dimen16))
-            RecordSection(
-                recordingState = state.recordingState,
-                isRecordingAvailable = trackingStatus.atLeastOneTrackingEnabled,
-                onPlay = onPlay,
-                onStop = onStop
-            )
-        }
-    }
-    showDialog(
-        state,
-        onDeviceSelected,
-        onRequestScanning,
-        onDismissDialog,
-        onCancelScanning,
-        openSettings,
-        onActivityNameChanged,
-        onActivityNameConfirmed
-    )
-}
-
-@Composable
-private fun showDialog(
+private fun Dialog(
     state: RecordScreenState,
     onDeviceSelected: (BleDevice) -> Unit,
     onRequestScanning: () -> Unit,
@@ -193,108 +156,4 @@ private fun showDialog(
 
         else -> {}
     }
-}
-
-@Composable
-@Preview(backgroundColor = BLACK_PREVIEW, showBackground = true)
-private fun RecordScreenPreview() {
-    RecordScreenContent(
-        state = RecordScreenState(
-            bleNotification = BleNotification(
-                hrNotification = HrNotification(hrBpm = 83, isContactOn = true, isSensorContactSupported = true),
-                batteryLevel = 75,
-                isBleConnected = true,
-                elapsedTime = 235L,
-            ),
-            trackingStatus = TrackingStatus(
-                trackHR = true,
-                trackGps = true,
-                hrDevice = BleDevice("Hrm 1", "00:11:22:33:44:55")
-            ),
-            recordingState = RecordingState.Recording
-        ),
-        onHrCheckBox = {},
-        onPlay = {},
-        onStop = {},
-        onDismissDialog = {},
-        onDeviceSelected = {},
-        onRequestScanning = {},
-        onCancelScanning = {},
-        openSettings = {},
-        onActivityNameChanged = {},
-        onActivityNameConfirmed = {}
-    )
-}
-
-@Composable
-@Preview(backgroundColor = BLACK_PREVIEW, showBackground = true)
-private fun RecordScreenEmptyPreview() {
-    RecordScreenContent(
-        state = RecordScreenState(
-            bleNotification = BleNotification(
-                hrNotification = null,
-                batteryLevel = 75,
-                isBleConnected = false,
-                elapsedTime = 235L,
-            ),
-            trackingStatus = TrackingStatus(
-                trackHR = true,
-                trackGps = true,
-                hrDevice = BleDevice("Hrm 1", "00:11:22:33:44:55")
-            ),
-            recordingState = RecordingState.Recording
-        ),
-        onHrCheckBox = {},
-        onPlay = {},
-        onStop = {},
-        onDismissDialog = {},
-        onDeviceSelected = {},
-        onRequestScanning = {},
-        onCancelScanning = {},
-        openSettings = {},
-        onActivityNameChanged = {},
-        onActivityNameConfirmed = {}
-    )
-}
-
-@Composable
-@Preview
-private fun RecordScreenChooseDeviceDialogPreview() {
-    RecordScreenContent(
-        state = RecordScreenState(
-            bleNotification = BleNotification(
-                hrNotification = HrNotification(hrBpm = 83, isContactOn = true, isSensorContactSupported = true),
-                batteryLevel = 75,
-                isBleConnected = true,
-                elapsedTime = 235L,
-            ),
-            trackingStatus = TrackingStatus(
-                trackHR = false,
-                trackGps = false,
-                hrDevice = null
-            ),
-            recordingState = RecordingState.Init,
-            dialog = RecordScreenDialog.ChooseHRDevice(
-                isLoading = false,
-                scannedDevices = listOf(
-                    BleDevice("Hrm1", "00:11:22:33:44:55"),
-                    BleDevice("Hrm2", "66:77:88:99:AA:BB"),
-                    BleDevice("Hrm3", "CC:DD:EE:FF:00:11"),
-                    BleDevice("Hrm4", "22:33:44:55:66:77"),
-                    BleDevice("Hrm5", "88:99:AA:BB:CC:DD"),
-                ),
-                loadingDuration = 5.seconds
-            )
-        ),
-        onHrCheckBox = {},
-        onPlay = {},
-        onStop = {},
-        onDismissDialog = {},
-        onDeviceSelected = {},
-        onRequestScanning = {},
-        onCancelScanning = {},
-        openSettings = {},
-        onActivityNameChanged = {},
-        onActivityNameConfirmed = {}
-    )
 }

@@ -2,7 +2,7 @@ package com.achub.hram.tracking
 
 import com.achub.hram.ext.tickerFlow
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -24,7 +24,7 @@ class HramStopWatch : StopWatch {
 
     private var isRunning: Boolean? = null
 
-    private val elapsedTime: Channel<Long> = Channel()
+    private val elapsedTime = MutableStateFlow(0L)
 
     private var startedTimestamp: Long = 0
 
@@ -48,7 +48,7 @@ class HramStopWatch : StopWatch {
     override fun listen() = tickerFlow(STOP_WATCH_TICK_DURATION)
         .map { elapsedTimeSeconds() }
         .distinctUntilChanged()
-        .onEach { elapsedTime.trySend(it) }
+        .onEach { elapsedTime.value = it }
 
     override fun elapsedTimeSeconds(): Long = when (isRunning) {
         true -> accumulatedOnLastPaused.load() + (now().toEpochMilliseconds() - startedTimestamp)

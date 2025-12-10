@@ -1,4 +1,4 @@
-package com.achub.hram.ble.repo
+package com.achub.hram.ble
 
 import com.achub.hram.ble.model.BleDevice
 import com.achub.hram.ble.model.BleNotification

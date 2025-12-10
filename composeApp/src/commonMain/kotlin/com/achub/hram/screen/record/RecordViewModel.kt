@@ -4,10 +4,9 @@ package com.achub.hram.screen.record
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.achub.hram.ble.SCAN_DURATION
+import com.achub.hram.ble.core.BleConnectionManager
 import com.achub.hram.ble.model.BleDevice
-import com.achub.hram.ble.model.BleNotification
-import com.achub.hram.ble.repo.BleConnectionRepo
-import com.achub.hram.ble.repo.SCAN_DURATION
 import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.launchIn
 import com.achub.hram.ext.requestBleBefore
@@ -20,8 +19,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.InjectedParam
@@ -38,19 +35,20 @@ class RecordViewModel(
     val activityNameValidation: ActivityNameValidation,
     @InjectedParam val permissionController: PermissionsController
 ) : ViewModel(), KoinComponent {
-    private val bleConnectionRepo: BleConnectionRepo by inject(parameters = { parametersOf(viewModelScope) })
+    private val bleConnectionManager: BleConnectionManager by inject(parameters = { parametersOf(viewModelScope) })
     private val _uiState = MutableStateFlow(RecordScreenState())
     val uiState = _uiState.stateInExt(initialValue = RecordScreenState())
     private val isBluetoothOn = MutableStateFlow(false)
     private var jobs = mutableListOf<Job>()
+    private val scanDuration = SCAN_DURATION.toDuration(DurationUnit.MILLISECONDS)
 
     init {
-        bleConnectionRepo.isBluetoothOn
+        bleConnectionManager.isBluetoothOn
             .onEach { isBluetoothOn.value = it }
             .flowOn(Dispatchers.Default)
             .launchIn(viewModelScope)
             .let { jobs.add(it) }
-        trackingManager.bleNotification.receiveAsFlow().onStart { emit(BleNotification.Empty) }
+        trackingManager.bleNotification
             .onEach(_uiState::indications)
             .flowOn(Dispatchers.Default)
             .launchIn(viewModelScope)
@@ -103,9 +101,7 @@ class RecordViewModel(
 
     private fun scan() {
         trackingManager.scan(
-            onInit = {
-                _uiState.update { it.chooseHrDeviceDialog(SCAN_DURATION.toDuration(DurationUnit.MILLISECONDS)) }
-            },
+            onInit = { _uiState.update { it.chooseHrDeviceDialog(scanDuration) } },
             onUpdate = { devices -> _uiState.updateHrDeviceDialogIfExists { it.copy(scannedDevices = devices) } },
             onComplete = { _uiState.updateHrDeviceDialogIfExists { it.copy(isLoading = it.isDeviceConfirmed) } }
         )
