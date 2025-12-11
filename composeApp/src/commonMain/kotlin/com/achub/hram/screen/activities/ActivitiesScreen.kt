@@ -48,15 +48,14 @@ fun ActivitiesScreen() {
                 .padding(Dimen8),
             verticalArrangement = Arrangement.spacedBy(Dimen8)
         ) {
-            items(items = state.list, key = { it.activity.id }) { activityInfo ->
+            items(items = state.activities, key = { it.activity.id }) { activityInfo ->
                 val id = activityInfo.activity.id
                 ActivityCard(
                     modifier = Modifier.combinedClickable(
                         indication = null,
                         interactionSource = MutableInteractionSource(),
                         onLongClick = {
-                            viewModel.onHighlighted(null)
-                            viewModel.selectActivity(id)
+                            viewModel.onActivityLongClick(id)
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         },
                         onClick = { viewModel.onHighlighted(null) }

@@ -5,7 +5,7 @@ import com.achub.hram.data.models.HighlightedItem
 import org.jetbrains.compose.resources.StringResource
 
 data class ActivitiesUiState(
-    val list: List<ActivityGraphInfo>,
+    val activities: List<ActivityGraphInfo> = emptyList(),
     val highlightedItem: HighlightedItem? = null,
     val selectedActivitiesId: Set<String> = emptySet(),
     val dialog: ActivitiesScreenDialog? = null
