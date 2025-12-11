@@ -53,7 +53,7 @@ jobs:
             PR Created/Updated! Code analysis is running... ⏳
 
   SummaryComment:
-    needs: [UnitTests, Detekt]
+    needs: [ UnitTests, Detekt ]
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -61,8 +61,8 @@ jobs:
       - uses: mshick/add-pr-comment@v2
         with:
           message: |
-            **Hello**
-            🌏
-            !
+            Code analysis completed! ✅
             Test reports artifact for this run:
-            https://github.com/${{ github.repository }}/suites/${{ github.run_id }}/artifacts
+            https://github.com/${{ github.repository }}/suites/${{ github.run_id }}/artifacts/${{needs.UnitTests.outputs.output1}}
+            Detekt report artifact for this run:
+            https://github.com/${{ github.repository }}/suites/${{ github.run_id }}/artifacts/${{needs.Detekt.outputs.output1}}
