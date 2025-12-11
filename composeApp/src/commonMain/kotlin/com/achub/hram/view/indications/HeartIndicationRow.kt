@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.achub.hram.ble.model.BleNotification
 import com.achub.hram.ble.model.HrNotification
@@ -33,7 +34,6 @@ import hram.composeapp.generated.resources.record_screen_heart_indication_no_con
 import hram.composeapp.generated.resources.record_screen_heart_indication_stub
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
-import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun HeartIndicationRow(

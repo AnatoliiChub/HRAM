@@ -3,11 +3,11 @@ package com.achub.hram.tracking
 import kotlinx.coroutines.flow.Flow
 
 interface StopWatch {
-    fun start(): Unit
+    fun start()
 
-    fun pause(): Unit
+    fun pause()
 
-    fun reset(): Unit
+    fun reset()
 
     fun listen(): Flow<Long>
 

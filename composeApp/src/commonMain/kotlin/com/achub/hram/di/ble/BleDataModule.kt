@@ -1,14 +1,14 @@
 package com.achub.hram.di.ble
 
-import com.achub.hram.ble.core.BleParser
 import com.achub.hram.ble.BluetoothState
-import com.achub.hram.ble.core.HramBleParser
+import com.achub.hram.ble.HrDeviceRepo
+import com.achub.hram.ble.HramHrDeviceRepo
 import com.achub.hram.ble.core.BleConnectionManager
 import com.achub.hram.ble.core.BleDataRepo
-import com.achub.hram.ble.HrDeviceRepo
+import com.achub.hram.ble.core.BleParser
 import com.achub.hram.ble.core.HramBleConnectionManager
 import com.achub.hram.ble.core.HramBleDataRepo
-import com.achub.hram.ble.HramHrDeviceRepo
+import com.achub.hram.ble.core.HramBleParser
 import kotlinx.coroutines.CoroutineScope
 import org.koin.core.annotation.Configuration
 import org.koin.core.annotation.InjectedParam
