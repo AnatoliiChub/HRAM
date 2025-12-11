@@ -159,6 +159,7 @@ fun HeartRateLabel(stringRes: StringResource, value: Int) = Row {
 
 @Preview
 @Composable
+@Suppress("MagicNumber")
 private fun ActivityCardPreview() {
     val sampleActivity = ActivityEntity(
         id = "1",
