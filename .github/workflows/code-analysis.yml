@@ -42,16 +42,6 @@ jobs:
             **/build/reports/tests/
           if-no-files-found: warn
 
-  InitialComment:
-    runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-    steps:
-      - uses: mshick/add-pr-comment@v2
-        with:
-          message: |
-            PR Created/Updated! Code analysis is running... ⏳
-
   SummaryComment:
     needs: [ UnitTests, Detekt ]
     runs-on: ubuntu-latest
