@@ -32,7 +32,7 @@ class HramBleParserTest {
         HrTestCase(
             name = "16-bit, contact supported and detected",
             data = byteArrayOf(0x07.toByte(), 0x4c.toByte(), 0x00.toByte()),
-            expectedHr = 76,
+            expectedHr = 77,
             expectedSupported = true,
             expectedContact = true
         )

@@ -12,6 +12,7 @@ style:
   MagicNumber:
     active: true
     ignorePropertyDeclaration: true
+    ignoreAnnotated: [ 'Preview' ]
   UnusedPrivateMember:
     active: true
     ignoreAnnotated: [ 'Preview' ]

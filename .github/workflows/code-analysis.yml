@@ -54,7 +54,9 @@ jobs:
     permissions:
       pull-requests: write
     steps:
-      - uses: mshick/add-pr-comment@v2
+      - name: Success Comment on PR
+        if: ${{ (contains(needs.Build.result, 'failure')) }} == true ] || [ ${{ (contains(needs.UnitTests.result, 'failure')) }} == true
+        uses: mshick/add-pr-comment@v2
         with:
           message: |
             Code analysis completed! ✅
@@ -62,3 +64,11 @@ jobs:
             https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{needs.UnitTests.outputs.output1}}
             Detekt report artifact for this run:
             https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.Detekt.outputs.output1 }}
+      - name: Failure Comment on PR
+        if: ${{ (contains(needs.Build.result, 'failure')) }} == false ] || [ ${{ (contains(needs.UnitTests.result, 'failure')) }} == false
+        uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            Code analysis completed with issues! ❌
+            
+          
