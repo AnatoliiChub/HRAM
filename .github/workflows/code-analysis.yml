@@ -58,7 +58,7 @@ jobs:
         uses: mshick/add-pr-comment@v2
         with:
           message: |
-            Code analysis done.
+            Code analysis finished.
             Test reports:
             https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{needs.UnitTests.outputs.output1}}
             Detekt report:
