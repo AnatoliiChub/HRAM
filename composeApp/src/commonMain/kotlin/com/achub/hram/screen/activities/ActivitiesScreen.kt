@@ -78,7 +78,14 @@ fun ActivitiesScreen() {
         }
     }
     val dialog = state.dialog
-    Dialog(dialog, viewModel, state)
+    Dialog(
+        dialog = dialog,
+        state = state,
+        onDismiss = viewModel::dismissDialog,
+        onActivityNameChanged = viewModel::onActivityNameChanged,
+        onActivityNameConfirmed = viewModel::onActivityNameConfirmed,
+        onDeleteActivities = { viewModel.deleteActivities(state.selectedActivitiesId) }
+    )
 }
 
 @Composable
@@ -98,8 +105,11 @@ fun BoxScope.Toolbar(selectedIds: Set<String>, onDelete: () -> Unit = {}, onEdit
 @Composable
 private fun Dialog(
     dialog: ActivitiesScreenDialog?,
-    viewModel: ActivitiesViewModel,
-    state: ActivitiesUiState
+    state: ActivitiesUiState,
+    onDismiss: () -> Unit,
+    onActivityNameChanged: (String) -> Unit,
+    onActivityNameConfirmed: () -> Unit,
+    onDeleteActivities: () -> Unit
 ) {
     if (dialog != null) {
         when (dialog) {
@@ -110,9 +120,9 @@ private fun Dialog(
                     name = dialog.activityName,
                     error = dialog.error,
                     dismissable = true,
-                    onNameChanged = viewModel::onActivityNameChanged,
-                    onDismiss = viewModel::dismissDialog,
-                    onButonClick = { viewModel.onActivityNameConfirmed() }
+                    onNameChanged = onActivityNameChanged,
+                    onDismiss = onDismiss,
+                    onButonClick = { onActivityNameConfirmed() }
                 )
             }
 
@@ -129,10 +139,10 @@ private fun Dialog(
                         stringResource(messageParam)
                     ),
                     buttonText = Res.string.dialog_activity_deletion_button_text,
-                    onDismiss = viewModel::dismissDialog,
+                    onDismiss = onDismiss,
                     onButonClick = {
-                        viewModel.deleteActivities(selectedActivitiesId = state.selectedActivitiesId)
-                        viewModel.dismissDialog()
+                        onDeleteActivities()
+                        onDismiss()
                     }
                 )
             }
