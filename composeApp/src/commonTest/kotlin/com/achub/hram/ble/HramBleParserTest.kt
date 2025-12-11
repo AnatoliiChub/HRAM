@@ -1,5 +1,6 @@
 package com.achub.hram.ble
 
+import com.achub.hram.ble.core.HramBleParser
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse

@@ -2,10 +2,9 @@
 
 ### Kotlin Multiplatform project targeting Android \& iOS
 
-| **Android** | **iOS** |
-|-----|---------|
+| **Android**                                                                                             | **iOS**                                                                                                 |
+|---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
 | <img src="https://github.com/user-attachments/assets/2496db1f-9d6d-421f-b678-334ca482647f" width="280"> | <img src="https://github.com/user-attachments/assets/ed85f462-0922-47c9-82ab-8071af28d618" width="280"> |
-
 
 HRAM is a Kotlin Multiplatform app for heart rate \& activity tracking with BLE heart rate monitors.  
 It uses Compose Multiplatform for shared UI, Kotlin Multiplatform for shared logic, Koin for DI, and an SQL
@@ -25,21 +24,57 @@ It is **not a medical application** and must **not be used for medical assessmen
 
 ## Table of Contents
 
-- [Project description](#project-description)
-- [Implemented features](#implemented-features)
-  - [BLE](#ble)
-  - [Tracking](#tracking)
-  - [Data layer & database](#data-layer--database)
-  - [UI & screens](#ui--screens)
-  - [Dependency injection](#dependency-injection)
-- [Tech stack](#tech-stack)
 - [Getting started](#getting-started)
-  - [Prerequisites](#prerequisites)
+    - [Prerequisites](#prerequisites)
 - [Run targets](#run-targets)
-  - [Android](#android)
-  - [iOS](#ios)
+    - [Android](#android)
+    - [iOS](#ios)
+- [Project description](#project-description)
+- [Project structure](#project-structure)
+- [Implemented features](#implemented-features)
+    - [BLE](#ble)
+    - [Tracking](#tracking)
+    - [Data layer & database](#data-layer--database)
+    - [UI & screens](#ui--screens)
+    - [Dependency injection](#dependency-injection)
+- [Tech stack](#tech-stack)
 - [Current limitations](#current-limitations)
 - [Video Demo](#video-demo)
+
+---
+
+## Getting started
+
+### Prerequisites
+
+- macOS
+- JDK 17\+
+- Android Studio Otter 2 Feature Drop \| 2025\.2\.2 RC 2 or newer
+- Xcode 26\+
+- `git`
+
+## Run targets
+
+### Android
+
+Open HRAM in Android Studio. Select the Android configuration for composeApp. Choose a
+device/emulator. Run.
+Useful tasks:
+
+- `./gradlew :composeApp:assembleDebug`
+- `./gradlew :composeApp:installDebug`
+
+### iOS
+
+1. Open iosApp/iosApp.xcodeproj in Xcode.
+2. Select a simulator.
+3. Run.
+
+To create a build for a real device run in terminal:
+
+`xcodebuild  -project iosApp/iosApp.xcodeproj -configuration Debug -scheme iosApp -sdk iphoneos  DEVELOPMENT_TEAM=“YOUR_DEVELOPMENT_TEAMID”  CODE_SIGN_STYLE=Automatic CODE_SIGN_IDENTITY="Apple Development" -verbose`
+
+Just replace `YOUR_DEVELOPMENT_TEAMID` with your team ID.
 
 ---
 
@@ -49,13 +84,25 @@ HRAM focuses on:
 
 - Discovering, connecting, and reading data from BLE heart rate devices.
 - Tracking heart rate sessions basic info.
-- Visualizing heart rate data using Compose-based charts and indication views.
+- Visualizing heart rate data using charts and indication views.
 - Storing activity data in a local database.
 - Sharing core logic (tracking, BLE, database, view models) between Android and iOS.
 
-The app already contains a concrete implementation of BLE \& tracking layers and activity storage. 
-
 For compatibility, devices must implement the standard Heart Rate Service (UUID: 0x180D).
+
+---
+
+## Project structure
+
+The project is organized into packages, with the core logic residing in `composeApp/src/commonMain`.
+
+- `composeApp/src/commonMain/kotlin/com/achub/hram/`
+    - `ble/` - BLE scanning, connection, and data handling.
+    - `data/` - Database entities, DAOs, and activity repository.
+    - `di/` - Koin dependency injection modules.
+    - `screen/` - screens for each feature (Main, Activities, Record).
+    - `tracking/` - Business logic for managing activity tracking sessions.
+    - `view/` - Reusable UI components like charts and dialogs.
 
 ---
 
@@ -64,21 +111,21 @@ For compatibility, devices must implement the standard Heart Rate Service (UUID:
 ### BLE
 
 - BLE Layer is implemented in `hram/ble`:
-    - The app communicates with BLE device which implements the standard Heart Rate Service.
-    - `BleDevice` model describing discovered devices, `identifier` field used for mac address (
-      Android) or UUID (iOS).
-    - `HrNotification` model for heart rate data(Heart Rate Measurement characteristic).
-    - `BleIndication` encapsulates `HrNotification`, battery level, BLE Connection status and
-      timestamp.
-    - Repositories:
-        - `BleConnectionRepo` : Bluetooth state, connection state, connect/disconnect, scanning.
-        - `BleDataRepo` : BLE characteristic data streams (heart rate measurement, battery level).
-        - `HrDeviceRepo` : high level repo combining connection and data repos for heart rate devices.
+    - The app communicates with BLE devices that implement the standard Heart Rate Service.
+    - `BleDevice` model describing discovered devices; `identifier` field used for mac address (Android) or UUID (iOS).
+    - `HrNotification` model for heart rate data (from the Heart Rate Measurement characteristic).
+    - `BleNotification` encapsulates `HrNotification`, battery level, and BLE connection status.
+    - Core components:
+        - `BleConnectionManager`: Manages Bluetooth state, device scanning, and the connection lifecycle (
+          connect/disconnect/reconnect).
+        - `BleDataRepo`: Provides streams for BLE characteristic data (heart rate measurement, battery level).
+        - `HrDeviceRepo`: A high-level repo that coordinates the `BleConnectionManager` and `BleDataRepo` to
+          provide a unified interface for interacting with HR devices.
 
 **What implemented:**
 
-- Scanning and managing BLE heart rate devices.
-- Connecting to devices and receiving heart rate indications.
+- Scanning for and managing BLE heart rate devices.
+- Connecting to devices and receiving heart rate notifications.
 - Parsing low-level BLE data.
 
 **BLE Connection and Data flow:**
@@ -161,24 +208,20 @@ Common UI code lives under `hram/screen` and `hram/view`:
 **What works:**
 
 - Compose-based UI shared across platforms.
-- Device list \& selection UI.
-- Activity recording and visualization UI.
-- Activity list/details UI.
 - Custom charts for heart rate data.
 - Custom components using new Material 3 Expressive
 - Localization support for English and Ukrainian.
 
 **Activities Screen:**
 
-| iOS | Android |
-|-----|---------|
+| iOS                                                                                                     | Android                                                                                                 |
+|---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
 | <img src="https://github.com/user-attachments/assets/692d93cc-8714-4570-acad-ea2e8f8a4ea0" width="280"> | <img src="https://github.com/user-attachments/assets/38342965-2064-4668-866e-b0246ee62e5a" width="280"> |
-
 
 **Record Screen:**
 
-| iOS | Android |
-|-----|---------|
+| iOS                                                                                                     | Android                                                                                                 |
+|---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
 | <img src="https://github.com/user-attachments/assets/c7a61873-c63c-4ead-9355-360d5b069e79" width="280"> | <img src="https://github.com/user-attachments/assets/fcd85206-a383-4fea-803d-87aa671f6de3" width="280"> |
 
 ---
@@ -200,60 +243,18 @@ Dependency injection is implemented using Koin under `hram/di`:
 
 ## Tech stack
 
-- **Languages**
-    - Kotlin (Multiplatform)
-    - Swift (iOS shell in `iosApp`)
-- **UI**
-    - Compose Multiplatform (Compose for shared UI)
-- **Architecture**
-    - MVVM for UI Layer
-    - Repository pattern for BLE and activities
-    - DI via Koin
-- **Permissions**
-    - [moko-permissions](https://github.com/icerockdev/moko-permissions) for runtime permissions
-      handling
-- **Persistence**
-    - Room (KMM version) for local database
-- **BLE**
-    - [kable](https://github.com/JuulLabs/kable) multiplatform ble library.
-- **Logging**
-    - [Napier](https://github.com/AAkira/Napier) for multiplatform logging.
+| Category                 | Technology                                                         |
+|:-------------------------|:-------------------------------------------------------------------|
+| **Language**             | Kotlin (Multiplatform), Swift (iOS Shell)                          |
+| **UI**                   | Compose Multiplatform                                              |
+| **Architecture**         | MVVM, Repository Pattern                                           |
+| **Dependency Injection** | Koin Annotations                                                   |
+| **Permissions**          | [moko-permissions](https://github.com/icerockdev/moko-permissions) |
+| **Persistence**          | Room (KMP)                                                         |
+| **BLE**                  | [Kable](https://github.com/JuulLabs/kable)                         |
+| **Logging**              | [Napier](https://github.com/AAkira/Napier)                         |
 
 ---
-
-## Getting started
-
-### Prerequisites
-
-- macOS
-- JDK 17\+
-- Android Studio Otter 2 Feature Drop \| 2025\.2\.2 RC 2 or newer
-- Xcode 26\+
-- `git`
-
-## Run targets
-
-### Android
-
-Open HRAM in Android Studio. Select the Android configuration for composeApp. Choose a
-device/emulator. Run.
-Useful tasks:
-
-- `./gradlew :composeApp:assembleDebug`
-- `./gradlew :composeApp:installDebug`
-
-### iOS
-
-1. Open iosApp/iosApp.xcodeproj in Xcode.
-2. Select a simulator.
-3. Run.
-
-To create a build for a real device run in terminal:
-
-`xcodebuild  -project iosApp/iosApp.xcodeproj -configuration Debug -scheme iosApp -sdk iphoneos  DEVELOPMENT_TEAM=“YOUR_DEVELOPMENT_TEAMID”  CODE_SIGN_STYLE=Automatic CODE_SIGN_IDENTITY="Apple Development" -verbose`
-
-Just replace `YOUR_DEVELOPMENT_TEAMID` with your team ID.
-
 
 ## Current limitations
 

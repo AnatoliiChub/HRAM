@@ -1,8 +1,8 @@
 package com.achub.hram.tracking
 
+import com.achub.hram.ble.HrDeviceRepo
 import com.achub.hram.ble.model.BleDevice
 import com.achub.hram.ble.model.BleNotification
-import com.achub.hram.ble.repo.HrDeviceRepo
 import com.achub.hram.data.HrActivityRepo
 import com.achub.hram.data.db.entity.ACTIVE_ACTIVITY
 import com.achub.hram.data.db.entity.HeartRateEntity
@@ -16,7 +16,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
@@ -44,7 +44,7 @@ private const val TAG = "HramActivityTrackingManager"
     ExperimentalAtomicApi::class
 )
 class HramActivityTrackingManager : ActivityTrackingManager, KoinComponent {
-    override val bleNotification = Channel<BleNotification>()
+    override val bleNotification = MutableStateFlow(BleNotification.Empty)
     private val stopWatch: StopWatch by inject()
     private val hrDeviceRepo: HrDeviceRepo by inject(parameters = { parametersOf(scope) })
     private val hrActivityRepo: HrActivityRepo by inject()
@@ -96,7 +96,7 @@ class HramActivityTrackingManager : ActivityTrackingManager, KoinComponent {
 
     private fun listen() = hrDeviceRepo.listen().onStart { emit(BleNotification.Empty) }
         .map { it.copy(elapsedTime = stopWatch.elapsedTimeSeconds()) }
-        .onEach { bleNotification.send(it) }
+        .onEach { bleNotification.value = it }
         .filter { isRecording && it.isBleConnected }
         .onEach { bleIndication ->
             bleIndication.hrNotification?.let { hrNotification ->
@@ -116,6 +116,6 @@ class HramActivityTrackingManager : ActivityTrackingManager, KoinComponent {
     override fun disconnect() {
         hrDeviceRepo.disconnect()
         jobs.cancelAndClear()
-        bleNotification.trySend(BleNotification.Empty)
+        bleNotification.value = BleNotification.Empty
     }
 }

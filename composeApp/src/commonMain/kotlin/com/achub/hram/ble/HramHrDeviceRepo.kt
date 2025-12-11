@@ -1,5 +1,7 @@
-package com.achub.hram.ble.repo
+package com.achub.hram.ble
 
+import com.achub.hram.ble.core.BleConnectionManager
+import com.achub.hram.ble.core.BleDataRepo
 import com.achub.hram.ble.model.BleDevice
 import com.achub.hram.ble.model.BleNotification
 import com.achub.hram.ext.cancelAndClear
@@ -37,7 +39,7 @@ private const val TAG = "HramHrDeviceRepo"
 class HramHrDeviceRepo(
     @InjectedParam val scope: CoroutineScope,
     val bleDataRepo: BleDataRepo,
-    val bleConnectionRepo: BleConnectionRepo
+    val bleConnectionManager: BleConnectionManager
 ) : HrDeviceRepo {
     private val advertisements: MutableList<Advertisement> = mutableListOf()
     private var scanJobs = mutableListOf<Job>()
@@ -49,7 +51,7 @@ class HramHrDeviceRepo(
         scope.launch(Dispatchers.Default) {
             val scannedDevices = mutableSetOf<BleDevice>()
             onInit()
-            bleConnectionRepo.scanHrDevices()
+            bleConnectionManager.scanHrDevices()
                 .onEach { advertisements.add(it) }
                 .map { BleDevice(name = it.peripheralName ?: "", identifier = it.identifier.toString()) }
                 .flowOn(Dispatchers.IO)
@@ -77,7 +79,7 @@ class HramHrDeviceRepo(
         cancelConnection()
         advertisements.firstOrNull { it.identifier.toString() == device.identifier }?.let { advertisement ->
             onInitConnection()
-            bleConnectionRepo.connectToDevice(advertisement.identifier)
+            bleConnectionManager.connectToDevice(advertisement.identifier)
                 .withIndex()
                 .onEach { (index, device) -> if (index == 0) onConnected(device) }
                 .catch { loggerE(TAG) { "Error while connecting to device: $it" } }
@@ -88,15 +90,14 @@ class HramHrDeviceRepo(
         }
     }
 
-    // TODO SHOULD RETURN CONNECTED AND DISCONNECTED STATES
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun listen() = bleConnectionRepo.onConnected
+    override fun listen() = bleConnectionManager.onConnected
         .flatMapLatest { device -> hrIndicationCombiner(device) }
         .catch { loggerE(TAG) { "Error: $it" } }
 
     override fun disconnect() {
         scope.launch {
-            bleConnectionRepo.disconnect()
+            bleConnectionManager.disconnect()
             cancelScanning()
             cancelConnection()
         }

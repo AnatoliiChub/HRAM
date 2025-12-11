@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import com.achub.hram.data.db.entity.ActivityEntity
+import dev.icerock.moko.permissions.DeniedException
 import dev.icerock.moko.permissions.Permission
 import dev.icerock.moko.permissions.PermissionsController
 import dev.icerock.moko.permissions.bluetooth.BLUETOOTH_CONNECT
@@ -74,6 +75,7 @@ suspend fun PermissionsController.requestBleBefore(action: () -> Unit, onFailure
         action()
     } catch (exception: Exception) {
         loggerE("PermissionsController") { "requestBlePermissionBeforeAction Error : $exception" }
+        if (exception is DeniedException && exception.message == "Bluetooth is powered off") return
         onFailure()
     }
 }

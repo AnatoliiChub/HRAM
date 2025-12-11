@@ -1,6 +1,6 @@
 package com.achub.hram.ble.model
 
-import com.achub.hram.ble.repo.HramBleConnectionRepo.Companion.MANUFACTURER_CHAR
+import com.achub.hram.ble.core.HramBleConnectionManager.Companion.MANUFACTURER_CHAR
 import com.juul.kable.ExperimentalApi
 import com.juul.kable.Peripheral
 import kotlin.uuid.ExperimentalUuidApi
