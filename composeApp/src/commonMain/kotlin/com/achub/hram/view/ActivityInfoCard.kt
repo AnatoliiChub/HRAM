@@ -28,6 +28,7 @@ import com.achub.hram.data.db.entity.ActivityGraphInfo
 import com.achub.hram.data.db.entity.AvgHrBucketByActivity
 import com.achub.hram.data.models.GraphLimits
 import com.achub.hram.data.models.HighlightedItem
+import com.achub.hram.ext.dateFormat
 import com.achub.hram.ext.formatTime
 import com.achub.hram.ext.fromEpochSeconds
 import com.achub.hram.style.DarkGray
@@ -56,27 +57,15 @@ import hram.composeapp.generated.resources.activity_screen_min_hr
 import hram.composeapp.generated.resources.activity_screen_unnamed_act
 import hram.composeapp.generated.resources.ic_not_selected
 import hram.composeapp.generated.resources.ic_selected
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.format.char
+import hram.composeapp.generated.resources.month_names
+import kotlinx.datetime.format.MonthNames
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringArrayResource
 import org.jetbrains.compose.resources.stringResource
 
 const val Y_LABEL_COUNT = 5
 const val X_LABEL_COUNT = 4
-val DATE_TIME_FORMAT = LocalDateTime.Format {
-    day()
-    char('.')
-    monthNumber()
-    char('.')
-    year()
-    char(' ')
-    hour()
-    char(':')
-    minute()
-    char(':')
-    second()
-}
 
 @Composable
 fun ActivityCard(
@@ -94,8 +83,8 @@ fun ActivityCard(
         limits = activityInfo.limits,
         highLighted = if (activity.id == highLighted?.activityId) highLighted.point else null
     )
-
-    val date = remember { DATE_TIME_FORMAT.format(activity.startDate.fromEpochSeconds()) }
+    val monthNames = stringArrayResource(Res.array.month_names)
+    val date = remember { dateFormat(MonthNames(monthNames)).format(activity.startDate.fromEpochSeconds()) }
 
     Card(
         modifier = modifier
