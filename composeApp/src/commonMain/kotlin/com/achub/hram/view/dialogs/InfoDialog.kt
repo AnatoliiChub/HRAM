@@ -2,6 +2,7 @@ package com.achub.hram.view.dialogs
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.BasicAlertDialog
@@ -11,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import com.achub.hram.style.Dimen24
 import com.achub.hram.style.LabelMedium
 import com.achub.hram.style.White
@@ -33,7 +35,7 @@ fun InfoDialog(
 ) {
     BasicAlertDialog(onDismissRequest = onDismiss) {
         DialogElevatedCard {
-            Column(modifier = Modifier.padding(Dimen24), horizontalAlignment = CenterHorizontally) {
+            Column(modifier = Modifier.padding(Dimen24).fillMaxWidth(), horizontalAlignment = CenterHorizontally) {
                 DialogTitle(title = title)
                 Spacer(Modifier.height(Dimen24))
                 Text(text = message, color = White, style = LabelMedium, textAlign = TextAlign.Center)
@@ -42,4 +44,14 @@ fun InfoDialog(
             }
         }
     }
+}
+
+@Preview
+@Composable
+private fun InfoDialogPreview() {
+    InfoDialog(
+        title = Res.string.dialog_info_ok,
+        message = "Sample information message",
+        onDismiss = {},
+    )
 }

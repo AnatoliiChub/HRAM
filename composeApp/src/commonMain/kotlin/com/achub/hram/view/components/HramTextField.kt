@@ -14,6 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import kotlinx.coroutines.delay
+import androidx.compose.material3.Text
+import androidx.compose.ui.tooling.preview.Preview
 
 const val TEXT_DEBOUNCE_TIME = 50L
 
@@ -48,5 +50,16 @@ fun HramTextField(
         shape = shape,
         supportingText = supportingText,
         colors = colors
+    )
+}
+
+@Preview
+@Composable
+private fun HramTextFieldPreview() {
+    HramTextField(
+        value = "Sample text",
+        onValueChange = {},
+        singleLine = true,
+        supportingText = { Text("Helper text") }
     )
 }

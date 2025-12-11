@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight.Companion.W500
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import com.achub.hram.style.LabelSmall
 import com.achub.hram.style.White80
 
@@ -16,4 +17,10 @@ fun DialogMessage(modifier: Modifier = Modifier, message: String) {
         style = LabelSmall.copy(color = White80, fontWeight = W500),
         textAlign = TextAlign.Center
     )
+}
+
+@Preview
+@Composable
+private fun DialogMessagePreview() {
+    DialogMessage(message = "Sample dialog message")
 }

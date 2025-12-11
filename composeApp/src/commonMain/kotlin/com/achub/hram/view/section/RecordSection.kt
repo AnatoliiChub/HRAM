@@ -11,6 +11,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import com.achub.hram.style.Dimen16
 import com.achub.hram.style.Dimen2
 import com.achub.hram.style.Dimen48
@@ -69,4 +70,26 @@ enum class RecordingState {
     Init;
 
     fun isRecording() = this == Recording
+}
+
+@Preview
+@Composable
+private fun RecordSectionRecordingPreview() {
+    RecordSection(
+        recordingState = RecordingState.Recording,
+        isRecordingAvailable = true,
+        onPlay = {},
+        onStop = {},
+    )
+}
+
+@Preview
+@Composable
+private fun RecordSectionPausedPreview() {
+    RecordSection(
+        recordingState = RecordingState.Paused,
+        isRecordingAvailable = true,
+        onPlay = {},
+        onStop = {},
+    )
 }

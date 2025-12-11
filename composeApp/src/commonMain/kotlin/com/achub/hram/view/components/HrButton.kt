@@ -11,7 +11,9 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.draw.innerShadow
 import androidx.compose.ui.graphics.shadow.Shadow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.achub.hram.EventsCutter
@@ -35,6 +38,7 @@ import com.achub.hram.style.Dimen16
 import com.achub.hram.style.Dimen2
 import com.achub.hram.style.Dimen3
 import com.achub.hram.style.Dimen8
+import com.achub.hram.style.White
 import com.achub.hram.style.White10
 import com.achub.hram.style.hrButtonDarkRedDropShadowColor
 import com.achub.hram.style.hrButtonRedDropShadowColor
@@ -160,5 +164,19 @@ fun HrButton(
                 ),
             contentAlignment = Center
         ) { content(if (!enabled) DISABLED_CONTENT_ALPHA else buttonContentAlpha) }
+    }
+}
+
+@Preview
+@Composable
+private fun HrButtonPreview() {
+    Box(Modifier.padding(16.dp)) {
+        HrButton(onClick = {}) { contentAlpha ->
+            Text(
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
+                text = "HR Button",
+                color = White.copy(alpha = contentAlpha)
+            )
+        }
     }
 }

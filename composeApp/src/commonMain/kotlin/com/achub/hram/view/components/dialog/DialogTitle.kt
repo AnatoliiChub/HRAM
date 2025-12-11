@@ -9,6 +9,9 @@ import com.achub.hram.style.LabelMedium
 import com.achub.hram.style.White
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import hram.composeapp.generated.resources.Res
+import hram.composeapp.generated.resources.dialog_info_ok
 
 @Composable
 fun DialogTitle(modifier: Modifier = Modifier, title: StringResource) {
@@ -18,4 +21,10 @@ fun DialogTitle(modifier: Modifier = Modifier, title: StringResource) {
         style = LabelMedium.copy(color = White, fontWeight = W600),
         textAlign = TextAlign.Center
     )
+}
+
+@Preview
+@Composable
+private fun DialogTitlePreview() {
+    DialogTitle(title = Res.string.dialog_info_ok)
 }

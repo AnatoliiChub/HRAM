@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.tooling.preview.Preview
 import com.achub.hram.ble.model.BleDevice
 import com.achub.hram.style.Dimen4
 import com.achub.hram.style.LabelMediumBold
@@ -32,4 +33,14 @@ fun DeviceListItem(
         Text(text = device.name, color = color, style = LabelMediumBold)
         Text(text = device.identifier, color = color, style = LabelSmall)
     }
+}
+
+@Preview
+@Composable
+private fun DeviceListItemPreview() {
+    DeviceListItem(
+        modifier = Modifier,
+        isSelected = true,
+        device = BleDevice(name = "Polar H10", identifier = "00:11:22:33:44:55"),
+    ) {}
 }

@@ -16,6 +16,10 @@ import com.achub.hram.style.Dimen64
 import com.achub.hram.style.HeadingMediumBold
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.vectorResource
+import androidx.compose.ui.tooling.preview.Preview
+import com.achub.hram.style.Red
+import hram.composeapp.generated.resources.Res
+import hram.composeapp.generated.resources.ic_distance
 
 private const val IMAGE_PADDING_DIVISOR = 10
 
@@ -46,5 +50,15 @@ fun IndicationImage(
         imageVector = vectorResource(drawable),
         colorFilter = color?.let { ColorFilter.tint(it) },
         contentDescription = null
+    )
+}
+
+@Preview
+@Composable
+private fun ImageLabelRowPreview() {
+    ImageLabelRow(
+        label = "5.34 km",
+        drawable = Res.drawable.ic_distance,
+        color = Red,
     )
 }

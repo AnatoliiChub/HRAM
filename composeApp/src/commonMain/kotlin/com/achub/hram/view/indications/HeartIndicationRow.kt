@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.achub.hram.ble.model.BleNotification
+import com.achub.hram.ble.model.HrNotification
 import com.achub.hram.style.Dimen132
 import com.achub.hram.style.Dimen32
 import com.achub.hram.style.Gray
@@ -32,6 +33,7 @@ import hram.composeapp.generated.resources.record_screen_heart_indication_no_con
 import hram.composeapp.generated.resources.record_screen_heart_indication_stub
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
+import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun HeartIndicationRow(
@@ -84,4 +86,17 @@ fun HeartIndicationRow(
             }
         }
     }
+}
+
+@Preview
+@Composable
+private fun HeartIndicationRowPreview() {
+    val hrNotification = HrNotification(hrBpm = 130, isSensorContactSupported = true, isContactOn = true)
+    val bleNotification = BleNotification(
+        hrNotification = hrNotification,
+        batteryLevel = 85,
+        isBleConnected = true,
+        elapsedTime = 120L,
+    )
+    HeartIndicationRow(bleNotification = bleNotification)
 }

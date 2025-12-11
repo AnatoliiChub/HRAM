@@ -6,6 +6,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight.Companion.W600
+import androidx.compose.ui.tooling.preview.Preview
 import com.achub.hram.style.Dimen12
 import com.achub.hram.style.Dimen24
 import com.achub.hram.style.LabelMedium
@@ -25,4 +26,10 @@ fun DialogButton(text: String, enabled: Boolean = true, onClick: () -> Unit) {
             style = LabelMedium.copy(color = White, fontWeight = W600),
         )
     }
+}
+
+@Preview
+@Composable
+private fun DialogButtonPreview() {
+    DialogButton(text = "OK", onClick = {})
 }
