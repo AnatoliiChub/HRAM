@@ -63,7 +63,6 @@
     <string name="text_activity">activity</string>
     <string name="text_activities">activities</string>
 
-    //declare array of month names
     <string-array name="month_names">
         <item>Jan</item>
         <item>Feb</item>

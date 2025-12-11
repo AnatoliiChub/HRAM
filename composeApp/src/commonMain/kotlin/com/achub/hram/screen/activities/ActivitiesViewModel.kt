@@ -42,10 +42,7 @@ class ActivitiesViewModel(
     fun selectActivity(activityId: String) = _uiState.update { state ->
         val selectedIds = state.selectedActivitiesId
         state.copy(
-            selectedActivitiesId = if (selectedIds.contains(
-                    activityId
-                )
-            ) {
+            selectedActivitiesId = if (selectedIds.contains(activityId)) {
                 selectedIds - activityId
             } else {
                 selectedIds + activityId
