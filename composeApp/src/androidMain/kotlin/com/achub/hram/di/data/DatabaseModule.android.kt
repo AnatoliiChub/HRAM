@@ -5,6 +5,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.achub.hram.data.db.HramDatabase
 import com.achub.hram.data.db.getRoomDatabase
+import com.achub.hram.di.CoroutineModule
 import com.achub.hram.di.WorkerIOThread
 import kotlinx.coroutines.CoroutineDispatcher
 import org.koin.core.annotation.Configuration
@@ -13,7 +14,7 @@ import org.koin.core.annotation.Provided
 import org.koin.core.annotation.Single
 import org.koin.core.scope.Scope
 
-@Module
+@Module(includes = [CoroutineModule::class])
 @Configuration
 actual class DatabaseModule actual constructor() {
     @Single
@@ -33,7 +34,7 @@ actual class DatabaseModule actual constructor() {
     }
 }
 
-fun getDatabaseBuilder(context: Context, ): RoomDatabase.Builder<HramDatabase> {
+fun getDatabaseBuilder(context: Context): RoomDatabase.Builder<HramDatabase> {
     val dbFile = context.getDatabasePath("hram_room.db")
     return Room.databaseBuilder<HramDatabase>(context = context, name = dbFile.absolutePath)
 }

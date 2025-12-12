@@ -45,7 +45,7 @@ private const val TAG = "HramActivityTrackingManager"
     ExperimentalAtomicApi::class
 )
 class HramActivityTrackingManager(
-    @WorkerThread
+    @param:WorkerThread
     private val dispatcher: CoroutineDispatcher
 ) : ActivityTrackingManager, KoinComponent {
     override val bleNotification = MutableStateFlow(BleNotification.Empty)

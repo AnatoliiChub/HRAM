@@ -5,6 +5,7 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.driver.NativeSQLiteDriver
 import com.achub.hram.data.db.HramDatabase
 import com.achub.hram.data.db.getRoomDatabase
+import com.achub.hram.di.CoroutineModule
 import com.achub.hram.di.WorkerIOThread
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CoroutineDispatcher
@@ -17,7 +18,7 @@ import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
 
-@Module
+@Module(includes = [CoroutineModule::class])
 @Configuration
 actual class DatabaseModule actual constructor() {
     @Single
