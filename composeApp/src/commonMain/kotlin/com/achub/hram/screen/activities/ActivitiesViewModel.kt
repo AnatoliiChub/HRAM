@@ -6,7 +6,7 @@ import com.achub.hram.data.HrActivityRepo
 import com.achub.hram.data.models.HighlightedItem
 import com.achub.hram.ext.stateInExt
 import com.achub.hram.utils.ActivityNameValidation
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -16,13 +16,14 @@ import kotlinx.coroutines.launch
 class ActivitiesViewModel(
     val hrActivityRepo: HrActivityRepo,
     val activityNameValidation: ActivityNameValidation,
+    val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ActivitiesUiState())
 
     val uiState: StateFlow<ActivitiesUiState> = _uiState.stateInExt(initialValue = ActivitiesUiState(emptyList()))
 
     init {
-        viewModelScope.launch(Dispatchers.Default) {
+        viewModelScope.launch(dispatcher) {
             hrActivityRepo.getActivitiesGraph()
                 .map { list -> list.filter { it.activity.name.isNotEmpty() } }
                 .collect { activities ->
@@ -51,7 +52,7 @@ class ActivitiesViewModel(
     }
 
     fun deleteActivities(selectedActivitiesId: Set<String>) {
-        viewModelScope.launch(Dispatchers.Default) {
+        viewModelScope.launch(dispatcher) {
             hrActivityRepo.deleteActivitiesById(selectedActivitiesId)
             _uiState.update { state ->
                 state.copy(selectedActivitiesId = state.selectedActivitiesId - selectedActivitiesId)
@@ -80,7 +81,7 @@ class ActivitiesViewModel(
         val selectedIds = state.selectedActivitiesId
         if (selectedIds.size != 1) return
         val activityId = selectedIds.first()
-        viewModelScope.launch(Dispatchers.Default) {
+        viewModelScope.launch(dispatcher) {
             hrActivityRepo.updateNameById(activityId, currentDialog.activityName)
             dismissDialog()
         }

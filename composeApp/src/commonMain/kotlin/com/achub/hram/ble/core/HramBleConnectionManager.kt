@@ -109,6 +109,7 @@ class HramBleConnectionManager(
         return peripheral
     }
 
+    //TODO EXTRACT CONNECTION TRACKER TO SEPARATE CLASS
     @OptIn(ExperimentalUuidApi::class)
     private fun runConnectionHandler(peripheral: Peripheral) {
         clearConnectionHandlerJob()

@@ -9,8 +9,8 @@ import com.achub.hram.data.db.dao.ActivityDao
 import com.achub.hram.data.db.dao.HeartRateDao
 import com.achub.hram.data.db.entity.ActivityEntity
 import com.achub.hram.data.db.entity.HeartRateEntity
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
+import com.achub.hram.di.WorkerIOThread
+import kotlinx.coroutines.CoroutineDispatcher
 
 @Database(entities = [ActivityEntity::class, HeartRateEntity::class], version = 1)
 @ConstructedBy(AppDatabaseConstructor::class)
@@ -27,10 +27,11 @@ expect object AppDatabaseConstructor : RoomDatabaseConstructor<HramDatabase> {
 }
 
 fun getRoomDatabase(
-    builder: RoomDatabase.Builder<HramDatabase>
+    builder: RoomDatabase.Builder<HramDatabase>,
+    @WorkerIOThread dispatcher: CoroutineDispatcher,
 ): HramDatabase {
     return builder
         .setDriver(BundledSQLiteDriver())
-        .setQueryCoroutineContext(Dispatchers.IO)
+        .setQueryCoroutineContext(dispatcher)
         .build()
 }

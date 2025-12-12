@@ -14,7 +14,7 @@ import com.achub.hram.ext.stateInExt
 import com.achub.hram.tracking.HramActivityTrackingManager
 import com.achub.hram.utils.ActivityNameValidation
 import dev.icerock.moko.permissions.PermissionsController
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOn
@@ -33,7 +33,8 @@ import kotlin.uuid.ExperimentalUuidApi
 class RecordViewModel(
     val trackingManager: HramActivityTrackingManager,
     val activityNameValidation: ActivityNameValidation,
-    @InjectedParam val permissionController: PermissionsController
+    val dispatcher: CoroutineDispatcher,
+    @InjectedParam val permissionController: PermissionsController,
 ) : ViewModel(), KoinComponent {
     private val bleConnectionManager: BleConnectionManager by inject(parameters = { parametersOf(viewModelScope) })
     private val _uiState = MutableStateFlow(RecordScreenState())
@@ -45,12 +46,12 @@ class RecordViewModel(
     init {
         bleConnectionManager.isBluetoothOn
             .onEach { isBluetoothOn.value = it }
-            .flowOn(Dispatchers.Default)
+            .flowOn(dispatcher)
             .launchIn(viewModelScope)
             .let { jobs.add(it) }
         trackingManager.bleNotification
             .onEach(_uiState::indications)
-            .flowOn(Dispatchers.Default)
+            .flowOn(dispatcher)
             .launchIn(viewModelScope)
             .let { jobs.add(it) }
     }
@@ -84,14 +85,14 @@ class RecordViewModel(
         if (_uiState.value.trackingStatus.trackHR.not()) {
             requestScanning()
         } else {
-            viewModelScope.launch(Dispatchers.Default) {
+            viewModelScope.launch(dispatcher) {
                 trackingManager.disconnect()
                 _uiState.toggleHrTracking()
             }
         }
     }
 
-    fun requestScanning() = viewModelScope.launch(Dispatchers.Default) {
+    fun requestScanning() = viewModelScope.launch(dispatcher) {
         val action = if (isBluetoothOn.value.not()) _uiState::requestBluetooth else ::scan
         permissionController.requestBleBefore(action = action, onFailure = _uiState::settingsDialog)
     }

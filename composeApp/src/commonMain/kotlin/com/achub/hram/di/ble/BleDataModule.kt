@@ -9,6 +9,9 @@ import com.achub.hram.ble.core.BleParser
 import com.achub.hram.ble.core.HramBleConnectionManager
 import com.achub.hram.ble.core.HramBleDataRepo
 import com.achub.hram.ble.core.HramBleParser
+import com.achub.hram.di.CoroutineModule
+import com.achub.hram.di.WorkerThread
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import org.koin.core.annotation.Configuration
 import org.koin.core.annotation.InjectedParam
@@ -16,7 +19,7 @@ import org.koin.core.annotation.Module
 import org.koin.core.annotation.Provided
 import org.koin.core.annotation.Single
 
-@Module(includes = [BleModule::class])
+@Module(includes = [BleModule::class, CoroutineModule::class])
 @Configuration
 class BleDataModule {
     @Single
@@ -32,8 +35,9 @@ class BleDataModule {
     fun hrDeviceRepo(
         @InjectedParam scope: CoroutineScope,
         bleDataRepo: BleDataRepo,
-        bleConnectionManager: BleConnectionManager
-    ): HrDeviceRepo = HramHrDeviceRepo(scope, bleDataRepo, bleConnectionManager)
+        bleConnectionManager: BleConnectionManager,
+        @WorkerThread dispatcher: CoroutineDispatcher,
+    ): HrDeviceRepo = HramHrDeviceRepo(scope, bleDataRepo, bleConnectionManager, dispatcher)
 
     @Single
     fun provideBleParser(): BleParser = HramBleParser()
