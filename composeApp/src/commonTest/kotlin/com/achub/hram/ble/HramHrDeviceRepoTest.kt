@@ -1,9 +1,10 @@
 package com.achub.hram.ble
 
-import com.achub.hram.ble.core.BleConnectionManager
 import com.achub.hram.ble.core.BleDataRepo
+import com.achub.hram.ble.core.connection.BleConnectionManager
 import com.achub.hram.ble.model.BleDevice
 import com.juul.kable.Advertisement
+import com.juul.kable.Identifier
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -29,13 +31,19 @@ class HramHrDeviceRepoTest {
         private const val ADV_INTERVAL = 950L
     }
 
+    private lateinit var bleConnectionManager: BleConnectionManager
+    private lateinit var bleDataRepo: BleDataRepo
+
+    @BeforeTest
+    fun setup() {
+        bleConnectionManager = mock()
+        bleDataRepo = mock()
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
     @Test
     fun `scan hr devices flow`() = runTest {
-        val bleConnectionManager = mock<BleConnectionManager>()
         every { bleConnectionManager.scanHrDevices() } returns flow { infiniteAdvertisement() }
-
-        val bleDataRepo = mock<BleDataRepo>()
 
         val repo = HramHrDeviceRepo(this, bleDataRepo, bleConnectionManager, StandardTestDispatcher(testScheduler))
 
@@ -66,21 +74,21 @@ class HramHrDeviceRepoTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `connect with no matching advertisement does nothing`() = runTest {
-        val bleConnectionManager = mock<BleConnectionManager>()
-        val bleDataRepo = mock<BleDataRepo>()
+    fun `connect with no matching identifier does nothing`() = runTest {
+        val adv = mock<Advertisement>(MockMode.autofill)
+        every { adv.identifier } returns "identifier1" as Identifier
+        every { bleConnectionManager.scanHrDevices() } returns flow { emit(adv) }
 
-        val dispatcher = StandardTestDispatcher(testScheduler)
-        val repo = HramHrDeviceRepo(this, bleDataRepo, bleConnectionManager, dispatcher)
+        val repo = HramHrDeviceRepo(this, bleDataRepo, bleConnectionManager, StandardTestDispatcher(testScheduler))
 
         val initCalled = mock<Runnable>(MockMode.autofill)
         val connectedCalled = mock<Runnable>(MockMode.autofill)
 
-        val target = BleDevice(name = "NoAdv", identifier = "indentifier")
+        val target = BleDevice(name = "NoAdv", identifier = "identifier")
         repo.connect(
             device = target,
             onInitConnection = initCalled::run,
-            onConnected = { connectedCalled.run() }
+            onConnected = { _ -> connectedCalled.run() }
         )
 
         testScheduler.advanceUntilIdle()

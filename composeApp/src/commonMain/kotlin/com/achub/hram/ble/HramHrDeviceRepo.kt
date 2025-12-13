@@ -1,7 +1,7 @@
 package com.achub.hram.ble
 
-import com.achub.hram.ble.core.BleConnectionManager
 import com.achub.hram.ble.core.BleDataRepo
+import com.achub.hram.ble.core.connection.BleConnectionManager
 import com.achub.hram.ble.model.BleDevice
 import com.achub.hram.ble.model.BleNotification
 import com.achub.hram.ext.cancelAndClear
@@ -73,13 +73,12 @@ class HramHrDeviceRepo(
         onInitConnection: () -> Unit,
         onConnected: (BleDevice) -> Unit
     ) {
-        cancelScanning()
-        cancelConnection()
+        cancelAllJobs()
         bleConnectionManager.scanHrDevices().filter { it.identifier.toString() == device.identifier }
             .take(1)
             .flatMapLatest { advertisement ->
                 onInitConnection()
-                bleConnectionManager.connectToDevice(advertisement.identifier)
+                bleConnectionManager.connectToDevice(advertisement)
                     .withIndex()
                     .onEach { (index, device) -> if (index == 0) onConnected(device) }
                     .catch { loggerE(TAG) { "Error while connecting to device: $it" } }
@@ -97,8 +96,7 @@ class HramHrDeviceRepo(
     override fun disconnect() {
         scope.launch {
             bleConnectionManager.disconnect()
-            cancelScanning()
-            cancelConnection()
+            cancelAllJobs()
         }
     }
 
@@ -112,4 +110,9 @@ class HramHrDeviceRepo(
     override fun cancelScanning() = scanJobs.cancelAndClear()
 
     private fun cancelConnection() = connectionJobs.cancelAndClear()
+
+    private fun cancelAllJobs() {
+        cancelScanning()
+        cancelConnection()
+    }
 }

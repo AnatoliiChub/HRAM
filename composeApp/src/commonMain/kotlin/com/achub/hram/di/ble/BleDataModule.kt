@@ -3,12 +3,14 @@ package com.achub.hram.di.ble
 import com.achub.hram.ble.BluetoothState
 import com.achub.hram.ble.HrDeviceRepo
 import com.achub.hram.ble.HramHrDeviceRepo
-import com.achub.hram.ble.core.BleConnectionManager
+import com.achub.hram.ble.core.connection.BleConnectionManager
 import com.achub.hram.ble.core.BleDataRepo
 import com.achub.hram.ble.core.BleParser
-import com.achub.hram.ble.core.HramBleConnectionManager
+import com.achub.hram.ble.core.connection.ConnectionTracker
+import com.achub.hram.ble.core.connection.HramBleConnectionManager
 import com.achub.hram.ble.core.HramBleDataRepo
 import com.achub.hram.ble.core.HramBleParser
+import com.achub.hram.ble.core.connection.HramConnectionTracker
 import com.achub.hram.di.CoroutineModule
 import com.achub.hram.di.WorkerThread
 import kotlinx.coroutines.CoroutineDispatcher
@@ -24,9 +26,9 @@ import org.koin.core.annotation.Single
 class BleDataModule {
     @Single
     fun bleConnectionManager(
-        @Provided bluetoothState: BluetoothState,
+        connectionTracker: ConnectionTracker,
         @InjectedParam scope: CoroutineScope
-    ): BleConnectionManager = HramBleConnectionManager(bluetoothState, scope)
+    ): BleConnectionManager = HramBleConnectionManager(connectionTracker, scope)
 
     @Single(binds = [BleDataRepo::class])
     fun bleDataRepo(parser: BleParser): BleDataRepo = HramBleDataRepo(parser)
@@ -41,4 +43,8 @@ class BleDataModule {
 
     @Single
     fun provideBleParser(): BleParser = HramBleParser()
+
+    @Single
+    fun provideConnectionTracker(@Provided bluetoothState: BluetoothState): ConnectionTracker =
+        HramConnectionTracker(bluetoothState)
 }

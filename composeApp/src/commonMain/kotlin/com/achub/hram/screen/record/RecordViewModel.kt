@@ -5,7 +5,7 @@ package com.achub.hram.screen.record
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.achub.hram.ble.SCAN_DURATION
-import com.achub.hram.ble.core.BleConnectionManager
+import com.achub.hram.ble.core.connection.BleConnectionManager
 import com.achub.hram.ble.model.BleDevice
 import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.launchIn
@@ -103,11 +103,14 @@ class RecordViewModel(
         onComplete = { _uiState.updateHrDeviceDialogIfExists { it.copy(isLoading = it.isDeviceConfirmed) } }
     )
 
-    fun onHrDeviceSelected(device: BleDevice) = trackingManager.connect(
-        device,
-        onInitConnection = _uiState::updateHrDeviceDialogConnecting,
-        onConnected = _uiState::deviceConnectedDialog,
-    )
+    fun onHrDeviceSelected(device: BleDevice) {
+        trackingManager.cancelScanning()
+        trackingManager.connect(
+            device,
+            onInitConnection = _uiState::updateHrDeviceDialogConnecting,
+            onConnected = _uiState::deviceConnectedDialog,
+        )
+    }
 
     override fun onCleared() {
         super.onCleared()
