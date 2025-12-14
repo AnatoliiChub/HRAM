@@ -30,7 +30,9 @@ class HramConnectionTracker(
     companion object Companion {
         private val CONNECT_STATES = listOf(
             State.Connected::class,
-            State.Connecting::class,
+            State.Connecting.Bluetooth::class,
+            State.Connecting.Services::class,
+            State.Connecting.Observes::class,
         )
     }
 
@@ -56,12 +58,12 @@ class HramConnectionTracker(
         return bluetoothOnEventFlow.combine(isKeepConnectionFlow) { _, keepConnection -> keepConnection }
     }
 
+    override fun stopTracking() {
+        isKeepConnection.trySend(false)
+    }
+
     private fun handleTrackingFlowError(throwable: Throwable) {
         loggerE(TAG) { "Reconnection flow exception: $throwable" }
         if (throwable !is UnmetRequirementException) isKeepConnection.trySend(true)
-    }
-
-    override fun stopTracking() {
-        isKeepConnection.trySend(false)
     }
 }

@@ -54,7 +54,6 @@ class HramBleDataRepoTest {
 
         val collected = mutableListOf<HrNotification>()
         val job = repo.observeHeartRate(peripheralMock).onEach { collected.add(it) }.launchIn(this)
-
         advanceUntilIdle()
 
         verify { parserMock.parseHrNotification(INPUT_BYTES) }
@@ -82,7 +81,6 @@ class HramBleDataRepoTest {
 
         val collected = mutableListOf<Int>()
         val job = repo.observeBatteryLevel(peripheralMock).onEach { collected.add(it) }.launchIn(this)
-
         advanceTimeBy(MINIMAL_EPSILON)
 
         verifySuspend { peripheralMock.read(BATTERY_CHAR) }

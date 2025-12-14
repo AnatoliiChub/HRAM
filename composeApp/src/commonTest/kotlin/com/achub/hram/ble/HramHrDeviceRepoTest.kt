@@ -5,8 +5,8 @@ import com.achub.hram.ble.core.connection.BleConnectionManager
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.BleNotification
 import com.achub.hram.ble.models.HrNotification
+import com.achub.hram.identifier
 import com.juul.kable.Advertisement
-import com.juul.kable.Identifier
 import com.juul.kable.Peripheral
 import com.juul.kable.State
 import dev.mokkery.MockMode
@@ -82,7 +82,7 @@ class HramHrDeviceRepoTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `connect with matching identifier`() = runTest {
+    fun `connect to device`() = runTest {
         val identifier = identifier("identifier")
         val advertisement = mock<Advertisement>(MockMode.autofill)
         every { bleConnectionManagerMock.scanHrDevices() } returns flow { emit(advertisement) }
@@ -172,5 +172,4 @@ class HramHrDeviceRepoTest {
         StandardTestDispatcher(testScheduler)
     )
 
-    private fun identifier(id: String): Identifier = id as Identifier
 }
