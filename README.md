@@ -152,6 +152,7 @@ The project is organized into packages, with the core logic residing in `compose
 
 - Scanning for and managing BLE heart rate devices.
 - Connecting to devices and receiving heart rate notifications.
+- Reconnecting on disconnection with retry logic.
 - Parsing low-level BLE data.
 
 **BLE Connection and Data flow:**
