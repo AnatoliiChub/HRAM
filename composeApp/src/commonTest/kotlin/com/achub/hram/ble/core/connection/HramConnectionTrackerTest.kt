@@ -81,7 +81,7 @@ class HramConnectionTrackerTest {
     }
 
     @Test
-    fun `stopTracking `() = runTest {
+    fun `stopTracking - keepConnection off`() = runTest {
         tracker.stopTracking()
 
         verify { isKeepConnectionMock.trySend(false) }

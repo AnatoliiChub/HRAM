@@ -27,7 +27,7 @@ class HramConnectionTracker(
     @Provided val bluetoothState: BluetoothState,
     private val isKeepConnection: Channel<Boolean> = Channel()
 ) : ConnectionTracker {
-    companion object Companion {
+    companion object {
         private val CONNECT_STATES = listOf(
             State.Connected::class,
             State.Connecting.Bluetooth::class,

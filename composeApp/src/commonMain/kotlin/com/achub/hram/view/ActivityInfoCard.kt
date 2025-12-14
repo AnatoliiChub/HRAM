@@ -84,7 +84,7 @@ fun ActivityCard(
         highLighted = if (activity.id == highLighted?.activityId) highLighted.point else null
     )
     val monthNames = stringArrayResource(Res.array.month_names)
-    val date = remember { dateFormat(MonthNames(monthNames)).format(activity.startDate.fromEpochSeconds()) }
+    val date = remember(monthNames) { dateFormat(MonthNames(monthNames)).format(activity.startDate.fromEpochSeconds()) }
 
     Card(
         modifier = modifier

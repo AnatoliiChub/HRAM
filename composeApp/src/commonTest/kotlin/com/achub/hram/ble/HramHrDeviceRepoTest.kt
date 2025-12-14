@@ -34,7 +34,6 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 class HramHrDeviceRepoTest {
@@ -156,12 +155,14 @@ class HramHrDeviceRepoTest {
 
     @OptIn(ExperimentalTime::class)
     private suspend fun FlowCollector<Advertisement>.infiniteAdvertisement() {
+        var counter = 0L
         while (true) {
             val adv = mock<Advertisement>(MockMode.autofill)
-            every { adv.peripheralName } returns "HRM Device${Clock.System.now().nanosecondsOfSecond}"
-            every { adv.identifier } returns identifier("identifier-${Clock.System.now().nanosecondsOfSecond}")
+            every { adv.peripheralName } returns "HRM Device$counter"
+            every { adv.identifier } returns identifier("identifier-$counter")
             delay(ADV_INTERVAL)
             emit(adv)
+            counter++
         }
     }
 

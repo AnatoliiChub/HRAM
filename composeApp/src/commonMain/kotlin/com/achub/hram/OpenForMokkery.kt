@@ -1,3 +1,3 @@
 package com.achub.hram
 
-annotation class OpenForMokkery()
+annotation class OpenForMokkery

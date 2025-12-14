@@ -20,7 +20,6 @@ actual class DatabaseModule actual constructor() {
     @Single
     actual fun provideDatabaseBuilder(
         scope: Scope,
-        @WorkerIOThread dispatcher: CoroutineDispatcher
     ): RoomDatabase.Builder<HramDatabase> {
         return getDatabaseBuilder(scope.get())
     }
