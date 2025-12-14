@@ -1,7 +1,7 @@
 package com.achub.hram.ble.core.connection
 
 import com.achub.hram.ble.BluetoothState
-import com.achub.hram.ble.model.BleConnectionsException
+import com.achub.hram.ble.models.BleConnectionsException
 import com.achub.hram.ext.logger
 import com.achub.hram.ext.loggerE
 import com.juul.kable.ExperimentalApi

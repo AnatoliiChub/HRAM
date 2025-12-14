@@ -13,6 +13,7 @@ plugins {
     alias(libs.plugins.androidx.room)
     alias(libs.plugins.detekt)
     alias(libs.plugins.mokkery)
+    alias(libs.plugins.kover)
 }
 
 detekt {
@@ -27,6 +28,21 @@ detekt {
         )
     )
     config.setFrom(files("$rootDir/detekt/detekt.yml"))
+}
+
+kover {
+    reports {
+        filters {
+            includes {
+                classes("com.achub.hram.ble.*")
+                classes("com.achub.hram.tracking.*")
+                classes("com.achub.hram.utils.*")
+            }
+            excludes {
+                classes("*.models.*")
+            }
+        }
+    }
 }
 
 kotlin {

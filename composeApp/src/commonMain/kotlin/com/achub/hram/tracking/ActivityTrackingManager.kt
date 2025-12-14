@@ -1,7 +1,7 @@
 package com.achub.hram.tracking
 
-import com.achub.hram.ble.model.BleDevice
-import com.achub.hram.ble.model.BleNotification
+import com.achub.hram.ble.models.BleDevice
+import com.achub.hram.ble.models.BleNotification
 import kotlinx.coroutines.flow.StateFlow
 
 const val TRACKING_INIT_STATE = 0

@@ -1,4 +1,4 @@
-package com.achub.hram.ble.model
+package com.achub.hram.ble.models
 
 import com.achub.hram.ext.MANUFACTURER_NAME_CHAR_UUID
 import com.achub.hram.ext.MANUFACTURER_SERVICE_UUID

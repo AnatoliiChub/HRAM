@@ -3,7 +3,7 @@ package com.achub.hram.view.section
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.achub.hram.ble.model.BleDevice
+import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.data.models.TrackingStatus
 import com.achub.hram.view.components.HRCheckBoxLabel
 import com.achub.hram.view.indications.WarningLabelRow

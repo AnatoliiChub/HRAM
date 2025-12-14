@@ -1,6 +1,6 @@
 package com.achub.hram.ble.core.connection
 
-import com.achub.hram.ble.model.BleDevice
+import com.achub.hram.ble.models.BleDevice
 import com.juul.kable.Advertisement
 import com.juul.kable.Peripheral
 import kotlinx.coroutines.flow.Flow

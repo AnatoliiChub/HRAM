@@ -15,8 +15,8 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
-import com.achub.hram.ble.model.BleNotification
-import com.achub.hram.ble.model.HrNotification
+import com.achub.hram.ble.models.BleNotification
+import com.achub.hram.ble.models.HrNotification
 import com.achub.hram.style.Dimen132
 import com.achub.hram.style.Dimen32
 import com.achub.hram.style.Gray

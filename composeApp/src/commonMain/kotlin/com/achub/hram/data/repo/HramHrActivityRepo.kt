@@ -1,4 +1,4 @@
-package com.achub.hram.data
+package com.achub.hram.data.repo
 
 import com.achub.hram.data.db.dao.ActivityDao
 import com.achub.hram.data.db.dao.HeartRateDao

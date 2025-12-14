@@ -2,8 +2,8 @@ package com.achub.hram.ble
 
 import com.achub.hram.ble.core.BleDataRepo
 import com.achub.hram.ble.core.connection.BleConnectionManager
-import com.achub.hram.ble.model.BleDevice
-import com.achub.hram.ble.model.BleNotification
+import com.achub.hram.ble.models.BleDevice
+import com.achub.hram.ble.models.BleNotification
 import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.launchIn
 import com.achub.hram.ext.logger

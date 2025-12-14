@@ -1,7 +1,7 @@
 package com.achub.hram.screen.record
 
-import com.achub.hram.ble.model.BleDevice
-import com.achub.hram.ble.model.BleNotification
+import com.achub.hram.ble.models.BleDevice
+import com.achub.hram.ble.models.BleNotification
 import com.achub.hram.data.models.TrackingStatus
 import com.achub.hram.view.section.RecordingState
 import com.achub.hram.view.section.RecordingState.Paused

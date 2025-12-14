@@ -1,6 +1,6 @@
 package com.achub.hram.di
 
-import com.achub.hram.data.HrActivityRepo
+import com.achub.hram.data.repo.HrActivityRepo
 import com.achub.hram.screen.activities.ActivitiesViewModel
 import com.achub.hram.screen.record.RecordViewModel
 import com.achub.hram.tracking.HramActivityTrackingManager

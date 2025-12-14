@@ -2,7 +2,7 @@ package com.achub.hram.screen.activities
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.achub.hram.data.HrActivityRepo
+import com.achub.hram.data.repo.HrActivityRepo
 import com.achub.hram.data.models.HighlightedItem
 import com.achub.hram.ext.stateInExt
 import com.achub.hram.utils.ActivityNameValidation

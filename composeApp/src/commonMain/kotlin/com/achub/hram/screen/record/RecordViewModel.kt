@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.achub.hram.ble.SCAN_DURATION
 import com.achub.hram.ble.core.connection.BleConnectionManager
-import com.achub.hram.ble.model.BleDevice
+import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.launchIn
 import com.achub.hram.ext.requestBleBefore

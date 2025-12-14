@@ -1,7 +1,7 @@
 package com.achub.hram.ble
 
-import com.achub.hram.ble.model.BleDevice
-import com.achub.hram.ble.model.BleNotification
+import com.achub.hram.ble.models.BleDevice
+import com.achub.hram.ble.models.BleNotification
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow

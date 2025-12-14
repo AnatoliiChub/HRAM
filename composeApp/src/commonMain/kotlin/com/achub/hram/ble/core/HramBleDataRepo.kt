@@ -1,6 +1,6 @@
 package com.achub.hram.ble.core
 
-import com.achub.hram.ble.model.HrNotification
+import com.achub.hram.ble.models.HrNotification
 import com.achub.hram.ext.BATTERY_LEVEL_CHAR_UUID
 import com.achub.hram.ext.BATTERY_SERVICE_UUID
 import com.achub.hram.ext.HR_MEASUREMENT_CHAR_UUID

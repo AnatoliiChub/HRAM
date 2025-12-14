@@ -2,9 +2,9 @@ package com.achub.hram.ble
 
 import com.achub.hram.ble.core.BleDataRepo
 import com.achub.hram.ble.core.connection.BleConnectionManager
-import com.achub.hram.ble.model.BleDevice
-import com.achub.hram.ble.model.BleNotification
-import com.achub.hram.ble.model.HrNotification
+import com.achub.hram.ble.models.BleDevice
+import com.achub.hram.ble.models.BleNotification
+import com.achub.hram.ble.models.HrNotification
 import com.juul.kable.Advertisement
 import com.juul.kable.Identifier
 import com.juul.kable.Peripheral

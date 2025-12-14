@@ -1,8 +1,8 @@
 package com.achub.hram.ble.core.connection
 
-import com.achub.hram.ble.model.BleConnectionsException
-import com.achub.hram.ble.model.BleDevice
-import com.achub.hram.ble.model.toBleDevice
+import com.achub.hram.ble.models.BleConnectionsException
+import com.achub.hram.ble.models.BleDevice
+import com.achub.hram.ble.models.toBleDevice
 import com.achub.hram.ext.HR_SERVICE_UUID
 import com.achub.hram.ext.logger
 import com.achub.hram.ext.loggerE

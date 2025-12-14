@@ -11,4 +11,5 @@ plugins {
     alias(libs.plugins.androidx.room) apply false
     alias(libs.plugins.detekt) apply false
     alias(libs.plugins.mokkery) apply false
+    alias(libs.plugins.kover) apply false
 }

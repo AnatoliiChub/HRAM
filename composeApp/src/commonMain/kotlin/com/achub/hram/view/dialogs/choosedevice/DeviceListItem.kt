@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
-import com.achub.hram.ble.model.BleDevice
+import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.style.Dimen4
 import com.achub.hram.style.LabelMediumBold
 import com.achub.hram.style.LabelSmall

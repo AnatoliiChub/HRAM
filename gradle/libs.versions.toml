@@ -22,6 +22,7 @@ sqlite = "2.6.2"
 ui-tooling = "1.10.0"
 detekt = "1.23.8"
 mokkery = "3.0.0"
+kover = "0.9.4"
 
 [libraries]
 components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "composeMultiplatform" }
@@ -66,3 +67,4 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 androidx-room = { id = "androidx.room", version.ref = "room" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 mokkery = { id = "dev.mokkery", version.ref = "mokkery" }
+kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }

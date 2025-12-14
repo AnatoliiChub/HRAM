@@ -37,8 +37,8 @@ jobs:
       - name: set up
         uses: ./.github/actions/setup
       - name: Run Unit Tests
-        run: ./gradlew clean testDebugUnitTest --no-daemon --parallel --configuration-cache
-      - name: Upload Test Reports
+        run: ./gradlew clean koverHtmlReport --no-daemon --parallel --configuration-cache
+      - name: Upload Test Coverage Reports
         if: always()
         uses: actions/upload-artifact@v4
         id: artifact-upload-step
@@ -46,6 +46,7 @@ jobs:
           name: test-reports
           path: |
             **/build/reports/tests/
+            **/build/reports/kover/html/
           if-no-files-found: warn
 
   SummaryComment:
@@ -59,7 +60,7 @@ jobs:
         with:
           message: |
             Code analysis finished.
-            Test reports:
+            Test reports including code coverage:
             https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{needs.UnitTests.outputs.output1}}
             Detekt report:
             https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.Detekt.outputs.output1 }}

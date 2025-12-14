@@ -1,9 +1,9 @@
 package com.achub.hram.tracking
 
 import com.achub.hram.ble.HrDeviceRepo
-import com.achub.hram.ble.model.BleDevice
-import com.achub.hram.ble.model.BleNotification
-import com.achub.hram.data.HrActivityRepo
+import com.achub.hram.ble.models.BleDevice
+import com.achub.hram.ble.models.BleNotification
+import com.achub.hram.data.repo.HrActivityRepo
 import com.achub.hram.data.db.entity.ACTIVE_ACTIVITY
 import com.achub.hram.data.db.entity.HeartRateEntity
 import com.achub.hram.di.WorkerThread
