@@ -269,18 +269,18 @@ Dependency injection is implemented using Koin under `hram/di`:
 
 ## Tech stack
 
-| Category                 | Technology                                                                             |
-|:-------------------------|:---------------------------------------------------------------------------------------|
-| **Language**             | Kotlin (Multiplatform), Swift (iOS Shell)                                              |
-| **UI**                   | Compose Multiplatform                                                                  |
-| **Architecture**         | MVVM, Repository Pattern                                                               |
-| **Dependency Injection** | Koin Annotations                                                                       |
-| **Permissions**          | [moko-permissions](https://github.com/icerockdev/moko-permissions)                     |
-| **Persistence**          | Room (KMP)                                                                             |
-| **BLE**                  | [Kable](https://github.com/JuulLabs/kable)                                             |
-| **Logging**              | [Napier](https://github.com/AAkira/Napier)                                             |
-| **Testing**              | kotlin.test, kotlinx-coroutines-test, [Mokkery](https://mokkery.dev/)                  |
-| **Code Coverage**        | [Kover](https://github.com/Kotlin/kotlinx-kover) |
+| Category                 | Technology                                                            |
+|:-------------------------|:----------------------------------------------------------------------|
+| **Language**             | Kotlin (Multiplatform), Swift (iOS Shell)                             |
+| **UI**                   | Compose Multiplatform                                                 |
+| **Architecture**         | MVVM, Repository Pattern                                              |
+| **Dependency Injection** | Koin Annotations                                                      |
+| **Permissions**          | [moko-permissions](https://github.com/icerockdev/moko-permissions)    |
+| **Persistence**          | Room (KMP)                                                            |
+| **BLE**                  | [Kable](https://github.com/JuulLabs/kable)                            |
+| **Logging**              | [Napier](https://github.com/AAkira/Napier)                            |
+| **Testing**              | kotlin.test, kotlinx-coroutines-test, [Mokkery](https://mokkery.dev/) |
+| **Code Coverage**        | [Kover](https://github.com/Kotlin/kotlinx-kover)                      | 
 
 ---
 
