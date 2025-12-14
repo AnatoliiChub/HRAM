@@ -2,8 +2,8 @@ package com.achub.hram.screen.activities
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.achub.hram.data.repo.HrActivityRepo
 import com.achub.hram.data.models.HighlightedItem
+import com.achub.hram.data.repo.HrActivityRepo
 import com.achub.hram.ext.stateInExt
 import com.achub.hram.utils.ActivityNameValidation
 import kotlinx.coroutines.CoroutineDispatcher
@@ -60,8 +60,12 @@ class ActivitiesViewModel(
         }
     }
 
-    fun showNameActivityDialog() =
-        _uiState.update { it.copy(dialog = ActivitiesScreenDialog.ReNameActivity(activityName = "")) }
+    fun showNameActivityDialog() {
+        val state = _uiState.value
+        val editedGraph = state.activities.firstOrNull { it.activity.id == state.selectedActivitiesId.firstOrNull() }
+        val name = editedGraph?.activity?.name ?: ""
+        _uiState.update { it.copy(dialog = ActivitiesScreenDialog.ReNameActivity(activityName = name)) }
+    }
 
     fun showActivityDeletionDialog() = _uiState.update {
         it.copy(dialog = ActivitiesScreenDialog.ActivityDeletionDialog)
