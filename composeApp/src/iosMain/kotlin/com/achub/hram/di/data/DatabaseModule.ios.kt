@@ -31,15 +31,13 @@ actual class DatabaseModule actual constructor() {
     actual fun provideDatabase(
         @Provided builder: RoomDatabase.Builder<HramDatabase>,
         @WorkerIOThread dispatcher: CoroutineDispatcher
-    ): HramDatabase =
-        getRoomDatabase(builder, dispatcher)
+    ): HramDatabase = getRoomDatabase(builder, dispatcher)
 }
 
 fun getDatabaseBuilder(dispatcher: CoroutineDispatcher): RoomDatabase.Builder<HramDatabase> {
     val dbFilePath = documentDirectory() + "/hram_room.db"
-    return Room.databaseBuilder<HramDatabase>(
-        name = dbFilePath,
-    ).setDriver(NativeSQLiteDriver()).setQueryCoroutineContext(dispatcher)
+    return Room.databaseBuilder<HramDatabase>(name = dbFilePath)
+        .setDriver(NativeSQLiteDriver()).setQueryCoroutineContext(dispatcher)
 }
 
 @OptIn(ExperimentalForeignApi::class)

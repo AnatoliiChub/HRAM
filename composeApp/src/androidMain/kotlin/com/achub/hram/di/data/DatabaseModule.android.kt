@@ -20,8 +20,9 @@ actual class DatabaseModule actual constructor() {
     @Single
     actual fun provideDatabaseBuilder(
         scope: Scope,
+        @WorkerIOThread dispatcher: CoroutineDispatcher
     ): RoomDatabase.Builder<HramDatabase> {
-        return getDatabaseBuilder(scope.get())
+        return getDatabaseBuilder(scope.get(), dispatcher)
     }
 
     @Single
@@ -33,7 +34,8 @@ actual class DatabaseModule actual constructor() {
     }
 }
 
-fun getDatabaseBuilder(context: Context): RoomDatabase.Builder<HramDatabase> {
+fun getDatabaseBuilder(context: Context, dispatcher: CoroutineDispatcher): RoomDatabase.Builder<HramDatabase> {
     val dbFile = context.getDatabasePath("hram_room.db")
     return Room.databaseBuilder<HramDatabase>(context = context, name = dbFile.absolutePath)
+        .setQueryCoroutineContext(dispatcher)
 }

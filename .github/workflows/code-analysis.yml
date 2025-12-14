@@ -61,6 +61,6 @@ jobs:
           message: |
             Code analysis finished.
             Test reports including code coverage:
-            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{needs.UnitTests.outputs.output1}}
+            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.UnitTests.outputs.output1 }}
             Detekt report:
             https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.Detekt.outputs.output1 }}

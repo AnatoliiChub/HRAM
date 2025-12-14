@@ -17,6 +17,7 @@ expect class DatabaseModule() {
     @Single
     fun provideDatabaseBuilder(
         scope: Scope,
+        @WorkerIOThread dispatcher: CoroutineDispatcher
     ): RoomDatabase.Builder<HramDatabase>
 
     @Single
