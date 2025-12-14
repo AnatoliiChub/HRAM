@@ -23,7 +23,10 @@ import kotlin.uuid.ExperimentalUuidApi
 
 private const val TAG = "ConnectionTracker"
 
-class HramConnectionTracker(@Provided val bluetoothState: BluetoothState) : ConnectionTracker {
+class HramConnectionTracker(
+    @Provided val bluetoothState: BluetoothState,
+    private val isKeepConnection: Channel<Boolean> = Channel(Channel.CONFLATED)
+) : ConnectionTracker {
     companion object Companion {
         private val CONNECT_STATES = listOf(
             State.Connected::class,
@@ -32,7 +35,6 @@ class HramConnectionTracker(@Provided val bluetoothState: BluetoothState) : Conn
     }
 
     override val isBluetoothOn: Flow<Boolean> = bluetoothState.isBluetoothOn
-    private val isKeepConnection = Channel<Boolean>()
 
     @OptIn(ExperimentalApi::class, ExperimentalUuidApi::class)
     override fun startTracking(peripheral: Peripheral, onCompletion: () -> Unit) = peripheral.state

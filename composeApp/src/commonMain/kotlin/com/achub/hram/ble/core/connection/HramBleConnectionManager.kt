@@ -49,6 +49,7 @@ class HramBleConnectionManager(
     override fun connectToDevice(advertisement: Advertisement): Flow<BleDevice> =
         connectionTracker.observeDisconnection()
             .onStart { emit(true) } // for initial connect
+            .onEach { stopConnectionTracking() }
             .onEach { _connected.value?.disconnect() }
             .catch { loggerE(TAG) { "Error during disconnection: $it" } }
             .map { connect(advertisement) }
