@@ -29,6 +29,8 @@ It is **not a medical application** and must **not be used for medical assessmen
 - [Run targets](#run-targets)
     - [Android](#android)
     - [iOS](#ios)
+- [Testing](#testing)
+    - [Running Tests](#running-tests)
 - [Project description](#project-description)
 - [Project structure](#project-structure)
 - [Implemented features](#implemented-features)
@@ -77,6 +79,30 @@ To create a build for a real device run in terminal:
 Just replace `YOUR_DEVELOPMENT_TEAMID` with your team ID.
 
 ---
+
+## Testing
+
+Unit tests for the shared logic are located in `composeApp/src/commonTest`. The project utilizes the following testing libraries:
+
+- **`kotlin.test`**: For standard assertions.
+- **`kotlinx-coroutines-test`**: For testing coroutine-based asynchronous code.
+- [**`Mokkery`**](https://mokkery.dev/): For creating mocks and stubs of dependencies.
+
+### Running Tests
+
+To execute all tests in the `composeApp` module, run:
+
+`./gradlew testDebugUnitTest`
+
+To run a specific test class:
+
+`./gradlew :composeApp:testDebugUnitTest --tests "com.achub.hram.ble.core.connection.HramConnectionTrackerTest"`
+
+**Test coverage** is generated using [Kover](https://github.com/Kotlin/kotlinx-kover)
+To generate an HTML coverage report, run the following command:
+
+`./gradlew koverHtmlReport`
+
 
 ## Project description
 
@@ -243,16 +269,18 @@ Dependency injection is implemented using Koin under `hram/di`:
 
 ## Tech stack
 
-| Category                 | Technology                                                         |
-|:-------------------------|:-------------------------------------------------------------------|
-| **Language**             | Kotlin (Multiplatform), Swift (iOS Shell)                          |
-| **UI**                   | Compose Multiplatform                                              |
-| **Architecture**         | MVVM, Repository Pattern                                           |
-| **Dependency Injection** | Koin Annotations                                                   |
-| **Permissions**          | [moko-permissions](https://github.com/icerockdev/moko-permissions) |
-| **Persistence**          | Room (KMP)                                                         |
-| **BLE**                  | [Kable](https://github.com/JuulLabs/kable)                         |
-| **Logging**              | [Napier](https://github.com/AAkira/Napier)                         |
+| Category                 | Technology                                                                             |
+|:-------------------------|:---------------------------------------------------------------------------------------|
+| **Language**             | Kotlin (Multiplatform), Swift (iOS Shell)                                              |
+| **UI**                   | Compose Multiplatform                                                                  |
+| **Architecture**         | MVVM, Repository Pattern                                                               |
+| **Dependency Injection** | Koin Annotations                                                                       |
+| **Permissions**          | [moko-permissions](https://github.com/icerockdev/moko-permissions)                     |
+| **Persistence**          | Room (KMP)                                                                             |
+| **BLE**                  | [Kable](https://github.com/JuulLabs/kable)                                             |
+| **Logging**              | [Napier](https://github.com/AAkira/Napier)                                             |
+| **Testing**              | kotlin.test, kotlinx-coroutines-test, [Mokkery](https://mokkery.dev/)                  |
+| **Code Coverage**        | [Kover](https://github.com/Kotlin/kotlinx-kover) |
 
 ---
 
