@@ -103,14 +103,11 @@ class RecordViewModel(
         onComplete = { _uiState.updateHrDeviceDialogIfExists { it.copy(isLoading = it.isDeviceConfirmed) } }
     )
 
-    fun onHrDeviceSelected(device: BleDevice) {
-        trackingManager.cancelScanning()
-        trackingManager.connect(
-            device,
-            onInitConnection = _uiState::updateHrDeviceDialogConnecting,
-            onConnected = _uiState::deviceConnectedDialog,
-        )
-    }
+    fun onHrDeviceSelected(device: BleDevice) = trackingManager.connect(
+        device,
+        onInitConnection = _uiState::updateHrDeviceDialogConnecting,
+        onConnected = _uiState::deviceConnectedDialog,
+    )
 
     override fun onCleared() {
         super.onCleared()
