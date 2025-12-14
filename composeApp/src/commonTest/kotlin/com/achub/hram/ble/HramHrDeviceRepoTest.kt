@@ -82,35 +82,14 @@ class HramHrDeviceRepoTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `connect with no matching identifier does nothing`() = runTest {
-        val adv = mock<Advertisement>(MockMode.autofill)
-        every { adv.identifier } returns "identifier1" as Identifier
-        every { bleConnectionManagerMock.scanHrDevices() } returns flow { emit(adv) }
-
-        val repo = createRepo()
-
-        val initCalled = mock<Runnable>(MockMode.autofill)
-        val connectedCalled = mock<Runnable>(MockMode.autofill)
-
-        val target = BleDevice(name = "NoAdv", identifier = "NO MATCHING IDENTIFIER")
-        repo.connect(device = target, onInitConnection = initCalled::run, onConnected = { _ -> connectedCalled.run() })
-
-        testScheduler.advanceUntilIdle()
-
-        verify(VerifyMode.not) { initCalled.run() }
-        verify(VerifyMode.not) { connectedCalled.run() }
-        verifyNoMoreCalls(initCalled, connectedCalled)
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
     fun `connect with matching identifier`() = runTest {
+        val identifier = identifier("identifier")
         val advertisement = mock<Advertisement>(MockMode.autofill)
-        every { advertisement.identifier } returns "identifier" as Identifier
         every { bleConnectionManagerMock.scanHrDevices() } returns flow { emit(advertisement) }
 
-        val target = BleDevice(name = "Adv", identifier = "identifier")
-        every { bleConnectionManagerMock.connectToDevice(advertisement) } returns flow { emit(target) }
+        val target = mock<BleDevice>(MockMode.autofill)
+        every { target.provideIdentifier() } returns identifier
+        every { bleConnectionManagerMock.connectToDevice(identifier) } returns flow { emit(target) }
 
         val repo = createRepo()
 
@@ -180,7 +159,7 @@ class HramHrDeviceRepoTest {
         while (true) {
             val adv = mock<Advertisement>(MockMode.autofill)
             every { adv.peripheralName } returns "HRM Device${Clock.System.now().nanosecondsOfSecond}"
-            every { adv.identifier } returns "identifier-${Clock.System.now().nanosecondsOfSecond}" as Identifier
+            every { adv.identifier } returns identifier("identifier-${Clock.System.now().nanosecondsOfSecond}")
             delay(ADV_INTERVAL)
             emit(adv)
         }
@@ -192,4 +171,6 @@ class HramHrDeviceRepoTest {
         bleConnectionManagerMock,
         StandardTestDispatcher(testScheduler)
     )
+
+    private fun identifier(id: String): Identifier = id as Identifier
 }

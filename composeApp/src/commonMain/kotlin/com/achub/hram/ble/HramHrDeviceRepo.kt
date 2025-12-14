@@ -20,13 +20,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.InjectedParam
@@ -57,9 +55,10 @@ class HramHrDeviceRepo(
                 .onEach { device ->
                     scannedDevices.add(device)
                     onUpdate(scannedDevices.toList())
-                }.onCompletion { onComplete() }
+                }
                 .catch { loggerE(TAG) { "Error: $it" } }
                 .flowOn(dispatcher)
+                .onCompletion { onComplete() }
                 .launchIn(scope = scope)
                 .let { scanJobs.add(it) }
             delay(SCAN_DURATION)
@@ -74,16 +73,13 @@ class HramHrDeviceRepo(
         onConnected: (BleDevice) -> Unit
     ) {
         cancelAllJobs()
-        bleConnectionManager.scanHrDevices().filter { it.identifier.toString() == device.identifier }
-            .take(1)
-            .flatMapLatest { advertisement ->
-                onInitConnection()
-                bleConnectionManager.connectToDevice(advertisement)
-                    .withIndex()
-                    .onEach { (index, device) -> if (index == 0) onConnected(device) }
-                    .catch { loggerE(TAG) { "Error while connecting to device: $it" } }
-                    .onCompletion { logger(TAG) { "ConnectToDevice job completed" } }
-            }.flowOn(dispatcher)
+        onInitConnection()
+        bleConnectionManager.connectToDevice(device.provideIdentifier())
+            .withIndex()
+            .onEach { (index, device) -> if (index == 0) onConnected(device) }
+            .catch { loggerE(TAG) { "Error while connecting to device: $it" } }
+            .onCompletion { logger(TAG) { "ConnectToDevice job completed" } }
+            .flowOn(dispatcher)
             .launchIn(scope)
             .let { connectionJobs.add(it) }
     }

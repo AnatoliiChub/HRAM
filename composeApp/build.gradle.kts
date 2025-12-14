@@ -14,6 +14,16 @@ plugins {
     alias(libs.plugins.detekt)
     alias(libs.plugins.mokkery)
     alias(libs.plugins.kover)
+    alias(libs.plugins.kotlin.allopen)
+}
+
+mokkery {
+    ignoreInlineMembers.set(true) // ignores only inline members
+    ignoreFinalMembers.set(true) // ignores final members (inline included)
+}
+
+allOpen {
+    annotation("com.achub.hram.OpenForMokkery")
 }
 
 detekt {

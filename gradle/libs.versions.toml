@@ -68,3 +68,4 @@ androidx-room = { id = "androidx.room", version.ref = "room" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 mokkery = { id = "dev.mokkery", version.ref = "mokkery" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
+kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version = "2.2.21" }

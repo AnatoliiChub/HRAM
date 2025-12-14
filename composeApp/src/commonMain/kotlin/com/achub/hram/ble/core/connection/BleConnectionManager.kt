@@ -2,6 +2,7 @@ package com.achub.hram.ble.core.connection
 
 import com.achub.hram.ble.models.BleDevice
 import com.juul.kable.Advertisement
+import com.juul.kable.Identifier
 import com.juul.kable.Peripheral
 import kotlinx.coroutines.flow.Flow
 import kotlin.uuid.ExperimentalUuidApi
@@ -18,7 +19,7 @@ interface BleConnectionManager {
     fun scanHrDevices(): Flow<Advertisement>
 
     @OptIn(ExperimentalUuidApi::class)
-    fun connectToDevice(advertisement: Advertisement): Flow<BleDevice>
+    fun connectToDevice(identifier: Identifier): Flow<BleDevice>
 
     suspend fun disconnect()
 }
