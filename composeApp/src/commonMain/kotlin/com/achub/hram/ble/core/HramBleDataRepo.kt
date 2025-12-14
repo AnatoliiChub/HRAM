@@ -18,10 +18,10 @@ import kotlin.uuid.ExperimentalUuidApi
 private const val TAG = "HramBleDataRepo"
 
 @OptIn(ExperimentalUuidApi::class)
-private val HR_CHAR = characteristicOf(HR_SERVICE_UUID, HR_MEASUREMENT_CHAR_UUID)
+val HR_CHAR = characteristicOf(HR_SERVICE_UUID, HR_MEASUREMENT_CHAR_UUID)
 
 @OptIn(ExperimentalUuidApi::class)
-private val BATTERY_CHAR = characteristicOf(BATTERY_SERVICE_UUID, BATTERY_LEVEL_CHAR_UUID)
+val BATTERY_CHAR = characteristicOf(BATTERY_SERVICE_UUID, BATTERY_LEVEL_CHAR_UUID)
 
 @OptIn(ExperimentalUuidApi::class)
 class HramBleDataRepo(val parser: BleParser) : BleDataRepo {
