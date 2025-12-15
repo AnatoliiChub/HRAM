@@ -22,29 +22,6 @@ It is **not a medical application** and must **not be used for medical assessmen
 
 ---
 
-## Table of Contents
-
-- [Getting started](#getting-started)
-    - [Prerequisites](#prerequisites)
-- [Run targets](#run-targets)
-    - [Android](#android)
-    - [iOS](#ios)
-- [Testing](#testing)
-    - [Running Tests](#running-tests)
-- [Project description](#project-description)
-- [Project structure](#project-structure)
-- [Implemented features](#implemented-features)
-    - [BLE](#ble)
-    - [Tracking](#tracking)
-    - [Data layer & database](#data-layer--database)
-    - [UI & screens](#ui--screens)
-    - [Dependency injection](#dependency-injection)
-- [Tech stack](#tech-stack)
-- [Current limitations](#current-limitations)
-- [Video Demo](#video-demo)
-
----
-
 ## Getting started
 
 ### Prerequisites
@@ -56,6 +33,8 @@ It is **not a medical application** and must **not be used for medical assessmen
 - `git`
 
 ## Run targets
+
+The project is currently under active development, and only a debug version of the application is available.
 
 ### Android
 
@@ -291,13 +270,8 @@ Dependency injection is implemented using Koin under `hram/di`:
 - No external cloud sync/export.
 - Limited error handling and UX for BLE edge cases.
 
-## Video Demo
+## Video Demo: iOS - Android
 
-### Android:
+https://github.com/user-attachments/assets/2bbafd47-4129-4465-a88f-1adfcbd8eea6
 
-https://github.com/user-attachments/assets/62cf2b3e-e3a5-4052-bfd2-d4797b415d2d
-
-### iOS:
-
-https://github.com/user-attachments/assets/a1b7f320-824e-4ba9-ae1e-bdf70a293b23
 
