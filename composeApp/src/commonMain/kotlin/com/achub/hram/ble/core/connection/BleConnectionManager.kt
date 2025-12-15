@@ -12,8 +12,6 @@ import kotlin.uuid.ExperimentalUuidApi
  * and handling connection states.
  */
 interface BleConnectionManager {
-    val isBluetoothOn: Flow<Boolean>
-
     val onConnected: Flow<Peripheral>
 
     fun scanHrDevices(): Flow<Advertisement>

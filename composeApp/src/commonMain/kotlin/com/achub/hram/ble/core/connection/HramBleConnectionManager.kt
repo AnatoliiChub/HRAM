@@ -13,10 +13,12 @@ import com.juul.kable.NotConnectedException
 import com.juul.kable.Peripheral
 import com.juul.kable.PlatformAdvertisement
 import com.juul.kable.Scanner
+import com.juul.kable.UnmetRequirementException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
@@ -34,12 +36,12 @@ import kotlin.uuid.ExperimentalUuidApi
 
 private const val TAG = "HramBleConnectionManager"
 private const val RECONNECTION_RETRY_ATTEMPTS = 3L
+private const val RECONNECTION_DELAY_MS = 2_000L
 
 class HramBleConnectionManager(
     val connectionTracker: ConnectionTracker,
     @InjectedParam val scope: CoroutineScope
 ) : BleConnectionManager {
-    override val isBluetoothOn: Flow<Boolean> = connectionTracker.isBluetoothOn
     private val _connected = MutableStateFlow<Peripheral?>(null)
 
     @OptIn(ExperimentalApi::class)
@@ -62,7 +64,6 @@ class HramBleConnectionManager(
 
     @OptIn(ExperimentalApi::class, ExperimentalUuidApi::class)
     private suspend fun connect(advertisement: Advertisement): BleDevice {
-        stopConnectionTracking()
         val peripheral = Peripheral(advertisement)
         logger(TAG) { "initiate connection to device $peripheral" }
         peripheral.connect()
@@ -73,17 +74,17 @@ class HramBleConnectionManager(
     }
 
     override suspend fun disconnect() {
-        connectionTracker.stopTracking()
+        stopConnectionTracking()
         _connected.value?.disconnect()
         _connected.value = null
-        stopConnectionTracking()
     }
 
+    @OptIn(ExperimentalUuidApi::class, FlowPreview::class)
     private suspend fun scan(identifier: Identifier): PlatformAdvertisement =
         scanHrDevices().filter { it.identifier == identifier }.first()
 
     private fun startConnectionTracking(peripheral: Peripheral) {
-        connectionTrackerJob = connectionTracker.startTracking(peripheral, onCompletion = ::stopConnectionTracking)
+        connectionTrackerJob = connectionTracker.trackConnectionState(peripheral)
             .launchIn(scope)
     }
 
@@ -92,10 +93,13 @@ class HramBleConnectionManager(
         connectionTrackerJob = null
     }
 
-    private fun isReconnectionRequired(throwable: Throwable): Boolean {
+    private suspend fun isReconnectionRequired(throwable: Throwable): Boolean {
         val isReconnectionRequired =
-            throwable is BleConnectionsException.DeviceNotConnectedException || throwable is NotConnectedException
+            throwable is BleConnectionsException.DeviceNotConnectedException ||
+                throwable is NotConnectedException ||
+                throwable is UnmetRequirementException
         logger(TAG) { "try to reconnect: $isReconnectionRequired, because of $throwable" }
+        if (isReconnectionRequired) delay(RECONNECTION_DELAY_MS)
         return isReconnectionRequired
     }
 }

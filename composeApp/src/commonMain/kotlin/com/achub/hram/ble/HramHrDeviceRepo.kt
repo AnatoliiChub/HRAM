@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.InjectedParam
+import org.koin.core.component.KoinComponent
 import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 
@@ -37,14 +38,19 @@ private const val TAG = "HramHrDeviceRepo"
 class HramHrDeviceRepo(
     @InjectedParam val scope: CoroutineScope,
     val bleDataRepo: BleDataRepo,
-    val bleConnectionManager: BleConnectionManager,
     val dispatcher: CoroutineDispatcher,
-) : HrDeviceRepo {
+    val bleConnectionManager: BleConnectionManager
+) : HrDeviceRepo, KoinComponent {
     private var scanJobs = mutableListOf<Job>()
     private val connectionJobs = mutableListOf<Job>()
 
     @OptIn(FlowPreview::class, ExperimentalUuidApi::class)
-    override fun scan(onInit: () -> Unit, onUpdate: (List<BleDevice>) -> Unit, onComplete: () -> Unit) {
+    override fun scan(
+        onInit: () -> Unit,
+        onUpdate: (List<BleDevice>) -> Unit,
+        onComplete: () -> Unit,
+        onError: (Throwable) -> Unit
+    ) {
         cancelScanning()
         scope.launch(dispatcher) {
             val scannedDevices = mutableSetOf<BleDevice>()
@@ -56,7 +62,7 @@ class HramHrDeviceRepo(
                     scannedDevices.add(device)
                     onUpdate(scannedDevices.toList())
                 }
-                .catch { loggerE(TAG) { "Error: $it" } }
+                .catch { onError(it) }
                 .flowOn(dispatcher)
                 .onCompletion { onComplete() }
                 .launchIn(scope = scope)

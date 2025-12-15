@@ -12,9 +12,7 @@ interface ConnectionTracker {
     val isBluetoothOn: Flow<Boolean>
 
     @OptIn(ExperimentalApi::class, ExperimentalUuidApi::class)
-    fun startTracking(peripheral: Peripheral, onCompletion: () -> Unit): Flow<Boolean>
+    fun trackConnectionState(peripheral: Peripheral): Flow<Boolean>
 
     fun observeDisconnection(): Flow<Boolean>
-
-    fun stopTracking()
 }

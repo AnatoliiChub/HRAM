@@ -17,8 +17,6 @@ interface ActivityTrackingManager {
 
     fun finishTracking(name: String?)
 
-    fun scan(onInit: () -> Unit, onUpdate: (List<BleDevice>) -> Unit, onComplete: () -> Unit)
-
     fun cancelScanning()
 
     fun disconnect()
@@ -27,5 +25,12 @@ interface ActivityTrackingManager {
         device: BleDevice,
         onInitConnection: () -> Unit,
         onConnected: (BleDevice) -> Unit,
+    )
+
+    fun scan(
+        onInit: () -> Unit,
+        onUpdate: (List<BleDevice>) -> Unit,
+        onComplete: () -> Unit,
+        onError: (Throwable) -> Unit
     )
 }

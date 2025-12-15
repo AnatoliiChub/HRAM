@@ -3,9 +3,9 @@ package com.achub.hram.tracking
 import com.achub.hram.ble.HrDeviceRepo
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.BleNotification
-import com.achub.hram.data.repo.HrActivityRepo
 import com.achub.hram.data.db.entity.ACTIVE_ACTIVITY
 import com.achub.hram.data.db.entity.HeartRateEntity
+import com.achub.hram.data.repo.HrActivityRepo
 import com.achub.hram.di.WorkerThread
 import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.createActivity
@@ -88,8 +88,12 @@ class HramActivityTrackingManager(
         }.let { jobs.add(it) }
     }
 
-    override fun scan(onInit: () -> Unit, onUpdate: (List<BleDevice>) -> Unit, onComplete: () -> Unit) =
-        hrDeviceRepo.scan(onInit, onUpdate, onComplete)
+    override fun scan(
+        onInit: () -> Unit,
+        onUpdate: (List<BleDevice>) -> Unit,
+        onComplete: () -> Unit,
+        onError: (Throwable) -> Unit
+    ) = hrDeviceRepo.scan(onInit, onUpdate, onComplete, onError)
 
     override fun connect(
         device: BleDevice,

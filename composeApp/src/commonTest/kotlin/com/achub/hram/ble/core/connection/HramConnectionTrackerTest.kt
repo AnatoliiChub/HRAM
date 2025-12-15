@@ -23,6 +23,7 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -44,7 +45,7 @@ class HramConnectionTrackerTest {
 
     @Test
     fun `startTracking - disconnect`() = runTest {
-        val trackingJob = tracker.startTracking(peripheralMock) {}.launchIn(this)
+        val trackingJob = tracker.trackConnectionState(peripheralMock).launchIn(this)
         stateFlow.emit(State.Disconnected())
         advanceUntilIdle()
 
@@ -57,7 +58,7 @@ class HramConnectionTrackerTest {
     fun `startTracking - disconnect, bluetoothOff`() = runTest {
         bluetoothOn.update { false }
 
-        val trackingJob = tracker.startTracking(peripheralMock) {}.launchIn(this)
+        val trackingJob = tracker.trackConnectionState(peripheralMock).launchIn(this)
         stateFlow.emit(State.Disconnected())
         advanceUntilIdle()
 
@@ -68,7 +69,7 @@ class HramConnectionTrackerTest {
 
     @Test
     fun `startTracking - connected or connecting states`() = runTest {
-        val trackingJob = tracker.startTracking(peripheralMock) {}.launchIn(this)
+        val trackingJob = tracker.trackConnectionState(peripheralMock).launchIn(this)
         stateFlow.emit(State.Connected(this))
         stateFlow.emit(State.Connecting.Services)
         stateFlow.emit(State.Connecting.Bluetooth)
@@ -81,40 +82,19 @@ class HramConnectionTrackerTest {
     }
 
     @Test
-    fun `stopTracking - keepConnection off`() = runTest {
-        tracker.stopTracking()
-
-        verify { isKeepConnectionMock.trySend(false) }
-    }
-
-    @Test
-    fun `observeDisconnection - bluetoothOn and keepConnection on`() = runTest {
+    fun `observeDisconnection true, false`() = runTest {
         val events = mutableListOf<Boolean>()
         val isKeepConnection = Channel<Boolean>()
         tracker = tracker(bluetoothOn, isKeepConnection)
 
         val job = tracker.observeDisconnection().onEach { events.add(it) }.launchIn(this)
         isKeepConnection.send(true)
+        isKeepConnection.send(false)
         advanceUntilIdle()
 
         assertTrue(events.first())
-        assertEquals(1, events.size)
-
-        job.cancel()
-    }
-
-    @Test
-    fun `observeDisconnection - bluetoothOff and keepConnection on - no reconnection`() = runTest {
-        val events = mutableListOf<Boolean>()
-        val isKeepConnection = Channel<Boolean>()
-        tracker = tracker(bluetoothOn, isKeepConnection)
-        bluetoothOn.update { false }
-
-        val job = tracker.observeDisconnection().onEach { events.add(it) }.launchIn(this)
-        isKeepConnection.send(true)
-        advanceUntilIdle()
-
-        assertTrue(events.isEmpty())
+        assertFalse(events[1])
+        assertEquals(2, events.size)
 
         job.cancel()
     }

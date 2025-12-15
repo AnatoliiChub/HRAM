@@ -13,10 +13,12 @@ import android.content.Intent
 import android.content.IntentFilter
 import androidx.core.content.ContextCompat
 import com.achub.hram.ext.loggerE
+import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.onFailure
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.callbackFlow
 
 private const val TAG = "BluetoothStateAndroid"
@@ -40,5 +42,5 @@ class BluetoothStateAndroid(context: Context) : BluetoothState {
         awaitClose {
             context.unregisterReceiver(receiver)
         }
-    }
+    }.buffer(CONFLATED)
 }
