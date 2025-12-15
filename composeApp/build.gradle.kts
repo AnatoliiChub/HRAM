@@ -50,6 +50,8 @@ kover {
             }
             excludes {
                 classes("*.models.*")
+                classes("*Android*")
+                classes("*Ios*")
             }
         }
     }
