@@ -272,6 +272,7 @@ Dependency injection is implemented using Koin under `hram/di`:
 
 ## Video Demo: iOS - Android
 
-https://github.com/user-attachments/assets/2bbafd47-4129-4465-a88f-1adfcbd8eea6
+https://github.com/user-attachments/assets/e88b0a23-735c-469a-849d-84a6222fd4a3
+
 
 
