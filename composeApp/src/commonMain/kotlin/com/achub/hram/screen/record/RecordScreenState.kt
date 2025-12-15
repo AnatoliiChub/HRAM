@@ -1,7 +1,7 @@
 package com.achub.hram.screen.record
 
-import com.achub.hram.ble.model.BleDevice
-import com.achub.hram.ble.model.BleNotification
+import com.achub.hram.ble.models.BleDevice
+import com.achub.hram.ble.models.BleNotification
 import com.achub.hram.data.models.TrackingStatus
 import com.achub.hram.view.section.RecordingState
 import com.achub.hram.view.section.RecordingState.Paused
@@ -66,7 +66,8 @@ fun MutableStateFlow<RecordScreenState>.toggleRecordingState() =
 
 fun MutableStateFlow<RecordScreenState>.stop() = this.update { it.copy(recordingState = RecordingState.Init) }
 
-fun MutableStateFlow<RecordScreenState>.requestBluetooth() = this.update { it.copy(requestBluetooth = true) }
+fun MutableStateFlow<RecordScreenState>.requestBluetooth() =
+    this.update { it.copy(requestBluetooth = true, dialog = null) }
 
 fun MutableStateFlow<RecordScreenState>.indications(bleNotification: BleNotification) =
     this.update { it.copy(bleNotification = bleNotification) }

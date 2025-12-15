@@ -1,6 +1,6 @@
 package com.achub.hram.ble.core
 
-import com.achub.hram.ble.model.HrNotification
+import com.achub.hram.ble.models.HrNotification
 
 interface BleParser {
     fun parseHrNotification(data: ByteArray): HrNotification

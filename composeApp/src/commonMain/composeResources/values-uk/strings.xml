@@ -5,7 +5,7 @@
 
     <!-- Activity Screen -->
     <string name="activity_screen_unnamed_act">Без назви</string>
-    <string name="activity_screen_created_at">Створено %1$s</string>
+    <string name="activity_screen_created_at">Створено: %1$s</string>
     <string name="activity_screen_elapsed_time">Минуло часу: %1$s</string>
     <string name="activity_screen_avg_hr">Ср. пульс:</string>
     <string name="activity_screen_max_hr">Макс. пульс:</string>
@@ -63,4 +63,19 @@
 
     <string name="text_activity">активність</string>
     <string name="text_activities">активності</string>
+
+    <string-array name="month_names">
+        <item>Січ</item>
+        <item>Лют</item>
+        <item>Бер</item>
+        <item>Квіт</item>
+        <item>Трав</item>
+        <item>Чер</item>
+        <item>Лип</item>
+        <item>Сер</item>
+        <item>Вер</item>
+        <item>Жов</item>
+        <item>Лис</item>
+        <item>Гру</item>
+    </string-array>
 </resources>

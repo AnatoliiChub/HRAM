@@ -3,9 +3,11 @@
 package com.achub.hram.ble
 
 import com.achub.hram.ext.logger
+import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.onFailure
 import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.callbackFlow
 import platform.CoreBluetooth.CBCentralManager
 import platform.CoreBluetooth.CBCentralManagerDelegateProtocol
@@ -35,5 +37,5 @@ class BluetoothStateIos : BluetoothState {
             manager = null
             delegate = null
         }
-    }
+    }.buffer(CONFLATED)
 }

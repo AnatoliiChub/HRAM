@@ -22,9 +22,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import com.achub.hram.data.db.entity.ActivityEntity
 import com.achub.hram.data.db.entity.ActivityGraphInfo
+import com.achub.hram.data.db.entity.AvgHrBucketByActivity
+import com.achub.hram.data.models.GraphLimits
 import com.achub.hram.data.models.HighlightedItem
+import com.achub.hram.ext.dateFormat
 import com.achub.hram.ext.formatTime
 import com.achub.hram.ext.fromEpochSeconds
 import com.achub.hram.style.DarkGray
@@ -53,27 +57,15 @@ import hram.composeapp.generated.resources.activity_screen_min_hr
 import hram.composeapp.generated.resources.activity_screen_unnamed_act
 import hram.composeapp.generated.resources.ic_not_selected
 import hram.composeapp.generated.resources.ic_selected
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.format.char
+import hram.composeapp.generated.resources.month_names
+import kotlinx.datetime.format.MonthNames
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringArrayResource
 import org.jetbrains.compose.resources.stringResource
 
 const val Y_LABEL_COUNT = 5
 const val X_LABEL_COUNT = 4
-val DATE_TIME_FORMAT = LocalDateTime.Format {
-    day()
-    char('.')
-    monthNumber()
-    char('.')
-    year()
-    char(' ')
-    hour()
-    char(':')
-    minute()
-    char(':')
-    second()
-}
 
 @Composable
 fun ActivityCard(
@@ -91,8 +83,8 @@ fun ActivityCard(
         limits = activityInfo.limits,
         highLighted = if (activity.id == highLighted?.activityId) highLighted.point else null
     )
-
-    val date = remember { DATE_TIME_FORMAT.format(activity.startDate.fromEpochSeconds()) }
+    val monthNames = stringArrayResource(Res.array.month_names)
+    val date = remember(monthNames) { dateFormat(MonthNames(monthNames)).format(activity.startDate.fromEpochSeconds()) }
 
     Card(
         modifier = modifier
@@ -163,4 +155,49 @@ fun HeartRateLabel(stringRes: StringResource, value: Int) = Row {
     Text(text = stringResource(stringRes), style = LabelMedium)
     Spacer(Modifier.weight(1f))
     Text(text = stringResource(Res.string.activity_screen_heart_indication_bpm, value), style = LabelMediumBold)
+}
+
+@Preview
+@Composable
+@Suppress("MagicNumber")
+private fun ActivityCardPreview() {
+    val sampleActivity = ActivityEntity(
+        id = "1",
+        name = "Evening Run",
+        startDate = 1_700_000_000L,
+        duration = 45 * 60L,
+    )
+
+    val buckets = listOf(
+        AvgHrBucketByActivity(1, timestamp = 60L, avgHr = 90f),
+        AvgHrBucketByActivity(2, timestamp = 120L, avgHr = 110f),
+        AvgHrBucketByActivity(3, timestamp = 180L, avgHr = 130f),
+        AvgHrBucketByActivity(4, timestamp = 240L, avgHr = 125f),
+        AvgHrBucketByActivity(5, timestamp = 300L, avgHr = 115f),
+    )
+
+    val info = ActivityGraphInfo(
+        activity = sampleActivity,
+        buckets = buckets,
+        avgHr = 115,
+        maxHr = 135,
+        minHr = 80,
+        totalRecords = buckets.size,
+        limits = GraphLimits(
+            minX = buckets.minOf { it.timestamp }.toFloat(),
+            maxX = buckets.maxOf { it.timestamp }.toFloat(),
+            minY = 60f,
+            maxY = 190f
+        )
+    )
+    val point = buckets[2].timestamp.toFloat() to buckets[2].avgHr
+
+    ActivityCard(
+        modifier = Modifier,
+        selected = true,
+        selectionEnabled = true,
+        activityInfo = info,
+        highLighted = HighlightedItem(sampleActivity.id, point),
+        onHighlighted = {}
+    )
 }

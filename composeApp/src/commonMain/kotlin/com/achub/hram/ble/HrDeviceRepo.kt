@@ -1,16 +1,13 @@
 package com.achub.hram.ble
 
-import com.achub.hram.ble.model.BleDevice
-import com.achub.hram.ble.model.BleNotification
+import com.achub.hram.ble.models.BleDevice
+import com.achub.hram.ble.models.BleNotification
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlin.uuid.ExperimentalUuidApi
 
 interface HrDeviceRepo {
-    @OptIn(FlowPreview::class, ExperimentalUuidApi::class)
-    fun scan(onInit: () -> Unit, onUpdate: (List<BleDevice>) -> Unit, onComplete: () -> Unit)
-
     @OptIn(ExperimentalCoroutinesApi::class)
     fun listen(): Flow<BleNotification>
 
@@ -24,4 +21,12 @@ interface HrDeviceRepo {
     fun cancelScanning()
 
     fun disconnect()
+
+    @OptIn(FlowPreview::class, ExperimentalUuidApi::class)
+    fun scan(
+        onInit: () -> Unit,
+        onUpdate: (List<BleDevice>) -> Unit,
+        onComplete: () -> Unit,
+        onError: (Throwable) -> Unit
+    )
 }

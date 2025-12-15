@@ -5,27 +5,37 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.achub.hram.data.db.HramDatabase
 import com.achub.hram.data.db.getRoomDatabase
+import com.achub.hram.di.CoroutineModule
+import com.achub.hram.di.WorkerIOThread
+import kotlinx.coroutines.CoroutineDispatcher
 import org.koin.core.annotation.Configuration
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Provided
 import org.koin.core.annotation.Single
 import org.koin.core.scope.Scope
 
-@Module
+@Module(includes = [CoroutineModule::class])
 @Configuration
 actual class DatabaseModule actual constructor() {
     @Single
-    actual fun provideDatabaseBuilder(scope: Scope): RoomDatabase.Builder<HramDatabase> {
-        return getDatabaseBuilder(scope.get())
+    actual fun provideDatabaseBuilder(
+        scope: Scope,
+        @WorkerIOThread dispatcher: CoroutineDispatcher
+    ): RoomDatabase.Builder<HramDatabase> {
+        return getDatabaseBuilder(scope.get(), dispatcher)
     }
 
     @Single
-    actual fun provideDatabase(@Provided builder: RoomDatabase.Builder<HramDatabase>): HramDatabase {
-        return getRoomDatabase(builder)
+    actual fun provideDatabase(
+        @Provided builder: RoomDatabase.Builder<HramDatabase>,
+        @WorkerIOThread dispatcher: CoroutineDispatcher
+    ): HramDatabase {
+        return getRoomDatabase(builder, dispatcher)
     }
 }
 
-fun getDatabaseBuilder(context: Context): RoomDatabase.Builder<HramDatabase> {
+fun getDatabaseBuilder(context: Context, dispatcher: CoroutineDispatcher): RoomDatabase.Builder<HramDatabase> {
     val dbFile = context.getDatabasePath("hram_room.db")
     return Room.databaseBuilder<HramDatabase>(context = context, name = dbFile.absolutePath)
+        .setQueryCoroutineContext(dispatcher)
 }

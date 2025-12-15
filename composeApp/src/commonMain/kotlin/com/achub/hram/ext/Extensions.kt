@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import com.achub.hram.data.db.entity.ActivityEntity
+import com.juul.kable.UnmetRequirementException
 import dev.icerock.moko.permissions.DeniedException
 import dev.icerock.moko.permissions.Permission
 import dev.icerock.moko.permissions.PermissionsController
@@ -68,15 +69,22 @@ fun tickerFlow(period: Duration, initialDelay: Duration = Duration.ZERO) = flow 
 }
 
 @Suppress("detekt:TooGenericExceptionCaught")
-suspend fun PermissionsController.requestBleBefore(action: () -> Unit, onFailure: () -> Unit) {
+suspend fun PermissionsController.requestBleBefore(
+    action: () -> Unit,
+    onFailure: () -> Unit,
+    requestTurnOnBle: () -> Unit
+) {
     try {
         providePermission(Permission.BLUETOOTH_SCAN)
         providePermission(Permission.BLUETOOTH_CONNECT)
         action()
     } catch (exception: Exception) {
         loggerE("PermissionsController") { "requestBlePermissionBeforeAction Error : $exception" }
-        if (exception is DeniedException && exception.message == "Bluetooth is powered off") return
-        onFailure()
+        when (exception) {
+            is DeniedException if exception.message == "Bluetooth is powered off" -> requestTurnOnBle()
+            is UnmetRequirementException -> requestTurnOnBle()
+            else -> onFailure()
+        }
     }
 }
 

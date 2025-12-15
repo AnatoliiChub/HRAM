@@ -1,7 +1,7 @@
 package com.achub.hram.tracking
 
-import com.achub.hram.ble.model.BleDevice
-import com.achub.hram.ble.model.BleNotification
+import com.achub.hram.ble.models.BleDevice
+import com.achub.hram.ble.models.BleNotification
 import kotlinx.coroutines.flow.StateFlow
 
 const val TRACKING_INIT_STATE = 0
@@ -17,8 +17,6 @@ interface ActivityTrackingManager {
 
     fun finishTracking(name: String?)
 
-    fun scan(onInit: () -> Unit, onUpdate: (List<BleDevice>) -> Unit, onComplete: () -> Unit)
-
     fun cancelScanning()
 
     fun disconnect()
@@ -27,5 +25,12 @@ interface ActivityTrackingManager {
         device: BleDevice,
         onInitConnection: () -> Unit,
         onConnected: (BleDevice) -> Unit,
+    )
+
+    fun scan(
+        onInit: () -> Unit,
+        onUpdate: (List<BleDevice>) -> Unit,
+        onComplete: () -> Unit,
+        onError: (Throwable) -> Unit
     )
 }

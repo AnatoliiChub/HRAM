@@ -6,6 +6,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import hram.composeapp.generated.resources.Res
 import hram.composeapp.generated.resources.ic_edit
 import hram.composeapp.generated.resources.ic_trash
@@ -35,4 +36,16 @@ fun FloatingToolbar(modifier: Modifier = Modifier, selected: Set<String>, onClic
 enum class ActivityOptions {
     DELETE,
     EDIT
+}
+
+@Preview
+@Composable
+private fun FloatingToolbarPreview() {
+    FloatingToolbar(selected = setOf("1", "2")) { }
+}
+
+@Preview
+@Composable
+private fun FloatingToolbarSingleItemSelectedPreview() {
+    FloatingToolbar(selected = setOf("1")) { }
 }

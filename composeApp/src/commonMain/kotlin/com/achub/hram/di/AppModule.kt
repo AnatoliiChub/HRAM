@@ -10,7 +10,7 @@ import org.koin.core.annotation.KoinApplication
         BleDataModule::class,
         TrackingModule::class,
         DataModule::class,
-        UtilsModule::class
+        UtilsModule::class,
     ]
 )
 object AppModule

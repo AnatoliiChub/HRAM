@@ -1,17 +1,18 @@
 package com.achub.hram.tracking
 
 import com.achub.hram.ble.HrDeviceRepo
-import com.achub.hram.ble.model.BleDevice
-import com.achub.hram.ble.model.BleNotification
-import com.achub.hram.data.HrActivityRepo
+import com.achub.hram.ble.models.BleDevice
+import com.achub.hram.ble.models.BleNotification
 import com.achub.hram.data.db.entity.ACTIVE_ACTIVITY
 import com.achub.hram.data.db.entity.HeartRateEntity
+import com.achub.hram.data.repo.HrActivityRepo
+import com.achub.hram.di.WorkerThread
 import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.createActivity
 import com.achub.hram.ext.launchIn
 import com.achub.hram.ext.logger
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
@@ -43,19 +44,23 @@ private const val TAG = "HramActivityTrackingManager"
     ExperimentalTime::class,
     ExperimentalAtomicApi::class
 )
-class HramActivityTrackingManager : ActivityTrackingManager, KoinComponent {
+class HramActivityTrackingManager(
+    @param:WorkerThread
+    private val dispatcher: CoroutineDispatcher
+) : ActivityTrackingManager, KoinComponent {
     override val bleNotification = MutableStateFlow(BleNotification.Empty)
     private val stopWatch: StopWatch by inject()
     private val hrDeviceRepo: HrDeviceRepo by inject(parameters = { parametersOf(scope) })
     private val hrActivityRepo: HrActivityRepo by inject()
-    private var scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+
+    private var scope = CoroutineScope(dispatcher + SupervisorJob())
     private val trackingState = AtomicInt(TRACKING_INIT_STATE)
     private var jobs = mutableListOf<Job>()
     private val isRecording get() = trackingState.load() == ACTIVE_TRACKING_STATE
     private var currentActId: String? = null
 
     override fun startTracking() {
-        scope.launch(Dispatchers.Default) {
+        scope.launch(dispatcher) {
             if (currentActId == null) {
                 val currentTime = now().epochSeconds
                 val activity = createActivity(ACTIVE_ACTIVITY, currentTime)
@@ -73,7 +78,7 @@ class HramActivityTrackingManager : ActivityTrackingManager, KoinComponent {
     }
 
     override fun finishTracking(name: String?) {
-        scope.launch(Dispatchers.Default) {
+        scope.launch(dispatcher) {
             trackingState.update { TRACKING_INIT_STATE }
             val duration = stopWatch.elapsedTimeSeconds()
             stopWatch.reset()
@@ -83,15 +88,19 @@ class HramActivityTrackingManager : ActivityTrackingManager, KoinComponent {
         }.let { jobs.add(it) }
     }
 
-    override fun scan(onInit: () -> Unit, onUpdate: (List<BleDevice>) -> Unit, onComplete: () -> Unit) =
-        hrDeviceRepo.scan(onInit, onUpdate, onComplete)
+    override fun scan(
+        onInit: () -> Unit,
+        onUpdate: (List<BleDevice>) -> Unit,
+        onComplete: () -> Unit,
+        onError: (Throwable) -> Unit
+    ) = hrDeviceRepo.scan(onInit, onUpdate, onComplete, onError)
 
     override fun connect(
         device: BleDevice,
         onInitConnection: () -> Unit,
         onConnected: (BleDevice) -> Unit
     ) = hrDeviceRepo.connect(device, onInitConnection, onConnected).also {
-        listen().flowOn(Dispatchers.Default).launchIn(scope).let { jobs.add(it) }
+        listen().flowOn(dispatcher).launchIn(scope).let { jobs.add(it) }
     }
 
     private fun listen() = hrDeviceRepo.listen().onStart { emit(BleNotification.Empty) }

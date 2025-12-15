@@ -1,6 +1,5 @@
-package com.achub.hram.ble
+package com.achub.hram.ble.core
 
-import com.achub.hram.ble.core.HramBleParser
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -41,7 +40,7 @@ class HramBleParserTest {
     private val parser = HramBleParser()
 
     @Test
-    fun parseHrNotification() {
+    fun `parse heart rate notification`() {
         for (case in cases) {
             val result = parser.parseHrNotification(case.data)
             assertEquals(case.expectedHr, result.hrBpm, "case: ${case.name}")
@@ -55,7 +54,7 @@ class HramBleParserTest {
     }
 
     @Test
-    fun parseBatteryLevel() {
+    fun `parse battery level`() {
         val battery = byteArrayOf(42.toByte())
         // preserved original expected value
         assertEquals(42, parser.parseBatteryLevel(battery))

@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import com.achub.hram.style.LabelMedium
 import com.achub.hram.style.LabelSmall
 import com.achub.hram.style.Red
@@ -61,4 +62,15 @@ fun HRCheckBoxLabel(
             )
         }
     }
+}
+
+@Preview
+@Composable
+private fun HRCheckBoxLabelPreview() {
+    HRCheckBoxLabel(
+        isChecked = true,
+        isEnabled = true,
+        connectedDevice = "Polar H10",
+        onCheckedChange = {},
+    )
 }

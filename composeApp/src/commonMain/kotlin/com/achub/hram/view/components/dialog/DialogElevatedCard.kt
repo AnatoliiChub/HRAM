@@ -123,6 +123,16 @@ fun DialogElevatedCard(
     }
 }
 
+private fun blinkingSpec(): KeyframesSpec<Float> {
+    val second = (BLINKING_ANIMATION_DURATION * SECOND_KEYFRAME_RATIO).toInt()
+    return keyframes {
+        durationMillis = BLINKING_ANIMATION_DURATION
+        MIN_SPREAD at 0 using LinearEasing
+        MAX_SPREAD at second using LinearEasing
+        MIN_SPREAD at BLINKING_ANIMATION_DURATION using LinearEasing
+    }
+}
+
 @Composable
 @Preview
 fun DialogCardPreview() {
@@ -133,15 +143,5 @@ fun DialogCardPreview() {
                 text = "Short med assd d asasdd a d  da sa sd asd  dasas dda  dads a ads addad ada dasssage"
             )
         }
-    }
-}
-
-private fun blinkingSpec(): KeyframesSpec<Float> {
-    val second = (BLINKING_ANIMATION_DURATION * SECOND_KEYFRAME_RATIO).toInt()
-    return keyframes {
-        durationMillis = BLINKING_ANIMATION_DURATION
-        MIN_SPREAD at 0 using LinearEasing
-        MAX_SPREAD at second using LinearEasing
-        MIN_SPREAD at BLINKING_ANIMATION_DURATION using LinearEasing
     }
 }

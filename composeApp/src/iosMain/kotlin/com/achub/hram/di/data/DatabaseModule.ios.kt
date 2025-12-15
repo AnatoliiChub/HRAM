@@ -5,9 +5,10 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.driver.NativeSQLiteDriver
 import com.achub.hram.data.db.HramDatabase
 import com.achub.hram.data.db.getRoomDatabase
+import com.achub.hram.di.CoroutineModule
+import com.achub.hram.di.WorkerIOThread
 import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
+import kotlinx.coroutines.CoroutineDispatcher
 import org.koin.core.annotation.Configuration
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Provided
@@ -17,24 +18,26 @@ import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
 
-@Module
+@Module(includes = [CoroutineModule::class])
 @Configuration
 actual class DatabaseModule actual constructor() {
     @Single
-    actual fun provideDatabaseBuilder(scope: Scope): RoomDatabase.Builder<HramDatabase> = getDatabaseBuilder()
+    actual fun provideDatabaseBuilder(
+        scope: Scope,
+        @WorkerIOThread dispatcher: CoroutineDispatcher
+    ): RoomDatabase.Builder<HramDatabase> = getDatabaseBuilder(dispatcher)
 
     @Single
     actual fun provideDatabase(
-        @Provided builder: RoomDatabase.Builder<HramDatabase>
-    ): HramDatabase =
-        getRoomDatabase(builder)
+        @Provided builder: RoomDatabase.Builder<HramDatabase>,
+        @WorkerIOThread dispatcher: CoroutineDispatcher
+    ): HramDatabase = getRoomDatabase(builder, dispatcher)
 }
 
-fun getDatabaseBuilder(): RoomDatabase.Builder<HramDatabase> {
+fun getDatabaseBuilder(dispatcher: CoroutineDispatcher): RoomDatabase.Builder<HramDatabase> {
     val dbFilePath = documentDirectory() + "/hram_room.db"
-    return Room.databaseBuilder<HramDatabase>(
-        name = dbFilePath,
-    ).setDriver(NativeSQLiteDriver()).setQueryCoroutineContext(Dispatchers.IO)
+    return Room.databaseBuilder<HramDatabase>(name = dbFilePath)
+        .setDriver(NativeSQLiteDriver()).setQueryCoroutineContext(dispatcher)
 }
 
 @OptIn(ExperimentalForeignApi::class)

@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.tooling.preview.Preview
 import com.achub.hram.style.Black
 import com.achub.hram.style.Dimen120
 import com.achub.hram.style.Dimen16
@@ -38,4 +39,10 @@ fun ChartBubble(xLabel: String, yLabel: String) {
             Text(text = xLabel, style = LabelSmall.copy(color = Black))
         }
     }
+}
+
+@Preview
+@Composable
+private fun ChartBubblePreview() {
+    ChartBubble(xLabel = "12:34", yLabel = "132")
 }

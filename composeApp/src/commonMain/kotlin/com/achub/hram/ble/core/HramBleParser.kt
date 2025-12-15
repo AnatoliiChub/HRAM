@@ -1,6 +1,6 @@
 package com.achub.hram.ble.core
 
-import com.achub.hram.ble.model.HrNotification
+import com.achub.hram.ble.models.HrNotification
 import com.achub.hram.ext.uint16
 import com.achub.hram.ext.uint8
 

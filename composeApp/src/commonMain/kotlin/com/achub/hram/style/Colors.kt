@@ -15,6 +15,7 @@ val White10 = Color(0X1aDEE2E6)
 val White30 = Color(0X4aDEE2E6)
 
 val Red = Color.Red
+val DarkRedShadow = Color(0xFF6B0000)
 val Red20 = Color.Red.copy(alpha = 0.2f)
 val LightRed = Color(0xFFFF8F8F)
 val GradientRed = Color(0xFFE60000)

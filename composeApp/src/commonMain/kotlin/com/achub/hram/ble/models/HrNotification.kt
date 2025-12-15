@@ -1,4 +1,4 @@
-package com.achub.hram.ble.model
+package com.achub.hram.ble.models
 
 data class HrNotification(
     val hrBpm: Int,

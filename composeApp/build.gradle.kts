@@ -12,6 +12,18 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.androidx.room)
     alias(libs.plugins.detekt)
+    alias(libs.plugins.mokkery)
+    alias(libs.plugins.kover)
+    alias(libs.plugins.kotlin.allopen)
+}
+
+mokkery {
+    ignoreInlineMembers.set(true) // ignores only inline members
+    ignoreFinalMembers.set(true) // ignores final members (inline included)
+}
+
+allOpen {
+    annotation("com.achub.hram.OpenForMokkery")
 }
 
 detekt {
@@ -26,6 +38,23 @@ detekt {
         )
     )
     config.setFrom(files("$rootDir/detekt/detekt.yml"))
+}
+
+kover {
+    reports {
+        filters {
+            includes {
+                classes("com.achub.hram.ble.*")
+                classes("com.achub.hram.tracking.*")
+                classes("com.achub.hram.utils.*")
+            }
+            excludes {
+                classes("*.models.*")
+                classes("*Android*")
+                classes("*Ios*")
+            }
+        }
+    }
 }
 
 kotlin {
@@ -91,6 +120,7 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
         }
     }
     // KSP Common sourceSet

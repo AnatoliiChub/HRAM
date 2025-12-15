@@ -1,6 +1,10 @@
 package com.achub.hram.ext
 
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format.DateTimeFormat
+import kotlinx.datetime.format.MonthNames
+import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -23,3 +27,16 @@ fun formatTime(seconds: Long): String {
 
 @OptIn(ExperimentalTime::class)
 fun Long.fromEpochSeconds() = Instant.fromEpochSeconds(this).toLocalDateTime(TimeZone.currentSystemDefault())
+
+fun dateFormat(monthNames: MonthNames): DateTimeFormat<LocalDateTime> {
+    return LocalDateTime.Format {
+        monthName(monthNames)
+        char(' ')
+        day()
+        char(',')
+        char(' ')
+        hour()
+        char(':')
+        minute()
+    }
+}

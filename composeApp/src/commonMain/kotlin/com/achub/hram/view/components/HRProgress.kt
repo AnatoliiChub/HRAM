@@ -15,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color.Companion.Transparent
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.achub.hram.style.Dimen2
 import com.achub.hram.style.Dimen24
@@ -23,6 +24,7 @@ import com.achub.hram.style.Dimen8
 import com.achub.hram.style.DimenZero
 import com.achub.hram.style.Red
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 private const val MIN_PROGRESS = 0.1f
 private const val MAX_PROGRESS = 1.1f
@@ -62,4 +64,10 @@ fun HRProgress(isLoading: Boolean, cycleDuration: Duration, height: Dp = Dimen48
         waveSpeed = Dimen2,
         progress = { progress.value },
     )
+}
+
+@Preview
+@Composable
+private fun HRProgressPreview() {
+    HRProgress(isLoading = true, cycleDuration = 5.seconds)
 }
