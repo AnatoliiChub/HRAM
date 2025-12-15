@@ -281,7 +281,7 @@ Dependency injection is implemented using Koin under `hram/di`:
 | **BLE**                  | [Kable](https://github.com/JuulLabs/kable)                            |
 | **Logging**              | [Napier](https://github.com/AAkira/Napier)                            |
 | **Testing**              | kotlin.test, kotlinx-coroutines-test, [Mokkery](https://mokkery.dev/) |
-| **Code Coverage**        | [Kover](https://github.com/Kotlin/kotlinx-kover)                      | 
+| **Code Coverage**        | [Kover](https://github.com/Kotlin/kotlinx-kover)                      |
 
 ---
 

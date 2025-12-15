@@ -95,12 +95,7 @@ class RecordViewModel(
         onInit = { _uiState.update { it.chooseHrDeviceDialog(scanDuration) } },
         onUpdate = { devices -> _uiState.updateHrDeviceDialogIfExists { it.copy(scannedDevices = devices) } },
         onComplete = { _uiState.updateHrDeviceDialogIfExists { it.copy(isLoading = it.isDeviceConfirmed) } },
-        onError = {
-            if (it is UnmetRequirementException) {
-                dismissDialog()
-                _uiState.requestBluetooth()
-            }
-        }
+        onError = { if (it is UnmetRequirementException) _uiState.requestBluetooth() }
     )
 
     fun onHrDeviceSelected(device: BleDevice) = trackingManager.connect(

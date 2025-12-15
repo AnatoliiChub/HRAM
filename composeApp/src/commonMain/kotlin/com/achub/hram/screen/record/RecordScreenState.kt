@@ -66,7 +66,8 @@ fun MutableStateFlow<RecordScreenState>.toggleRecordingState() =
 
 fun MutableStateFlow<RecordScreenState>.stop() = this.update { it.copy(recordingState = RecordingState.Init) }
 
-fun MutableStateFlow<RecordScreenState>.requestBluetooth() = this.update { it.copy(requestBluetooth = true) }
+fun MutableStateFlow<RecordScreenState>.requestBluetooth() =
+    this.update { it.copy(requestBluetooth = true, dialog = null) }
 
 fun MutableStateFlow<RecordScreenState>.indications(bleNotification: BleNotification) =
     this.update { it.copy(bleNotification = bleNotification) }
