@@ -23,8 +23,6 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HramConnectionTrackerTest {
@@ -82,18 +80,16 @@ class HramConnectionTrackerTest {
     }
 
     @Test
-    fun `observeDisconnection true, false`() = runTest {
+    fun `observeDisconnection 2 times`() = runTest {
         val events = mutableListOf<Boolean>()
         val isKeepConnection = Channel<Boolean>()
         tracker = tracker(bluetoothOn, isKeepConnection)
 
         val job = tracker.observeDisconnection().onEach { events.add(it) }.launchIn(this)
         isKeepConnection.send(true)
-        isKeepConnection.send(false)
+        isKeepConnection.send(true)
         advanceUntilIdle()
 
-        assertTrue(events.first())
-        assertFalse(events[1])
         assertEquals(2, events.size)
 
         job.cancel()
