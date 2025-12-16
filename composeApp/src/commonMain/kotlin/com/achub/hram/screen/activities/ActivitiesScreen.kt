@@ -55,13 +55,16 @@ fun ActivitiesScreen() {
                         indication = null,
                         interactionSource = MutableInteractionSource(),
                         onLongClick = {
-                            viewModel.onActivityLongClick(id)
+                            viewModel.toggleSelection(id)
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         },
-                        onClick = { viewModel.onHighlighted(null) }
+                        onClick = {
+                            viewModel.onHighlighted(null)
+                            if (state.isSelectionMode) viewModel.toggleSelection(id)
+                        }
                     ),
                     selected = selectedIds.contains(id),
-                    selectionEnabled = selectedIds.isNotEmpty(),
+                    selectionEnabled = state.isSelectionMode,
                     activityInfo = activityInfo,
                     highLighted = state.highlightedItem,
                     onHighlighted = { viewModel.onHighlighted(it) }

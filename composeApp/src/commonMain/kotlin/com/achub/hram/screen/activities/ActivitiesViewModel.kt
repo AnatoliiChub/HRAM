@@ -35,12 +35,12 @@ class ActivitiesViewModel(
     fun onHighlighted(highlightedItem: HighlightedItem?) =
         _uiState.update { it.copy(highlightedItem = highlightedItem) }
 
-    fun onActivityLongClick(id: String) {
+    fun toggleSelection(id: String) {
         onHighlighted(null)
-        selectActivity(id)
+        toggleActivitySelection(id)
     }
 
-    fun selectActivity(activityId: String) = _uiState.update { state ->
+    fun toggleActivitySelection(activityId: String) = _uiState.update { state ->
         val selectedIds = state.selectedActivitiesId
         state.copy(
             selectedActivitiesId = if (selectedIds.contains(activityId)) {
@@ -88,6 +88,7 @@ class ActivitiesViewModel(
         viewModelScope.launch(dispatcher) {
             hrActivityRepo.updateNameById(activityId, currentDialog.activityName)
             dismissDialog()
+            _uiState.update { it.copy(selectedActivitiesId = emptySet()) }
         }
     }
 }

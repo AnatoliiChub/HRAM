@@ -9,7 +9,10 @@ data class ActivitiesUiState(
     val highlightedItem: HighlightedItem? = null,
     val selectedActivitiesId: Set<String> = emptySet(),
     val dialog: ActivitiesScreenDialog? = null
-)
+) {
+    val isSelectionMode: Boolean
+        get() = selectedActivitiesId.isNotEmpty()
+}
 
 sealed class ActivitiesScreenDialog {
     data class ReNameActivity(val activityName: String, val error: StringResource? = null) : ActivitiesScreenDialog()
