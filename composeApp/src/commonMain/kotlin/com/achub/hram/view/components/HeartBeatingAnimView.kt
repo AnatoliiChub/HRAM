@@ -16,6 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.achub.hram.style.Dimen76
 import hram.composeapp.generated.resources.Res
 import hram.composeapp.generated.resources.ic_heart
+import org.jetbrains.compose.resources.DrawableResource
 
 private const val MIN_HEART_SCALE = 0.75f
 private const val MAX_HEART_SCALE = 1.25f
@@ -37,6 +38,7 @@ private const val HEART_SCALE_MID = 0.9f
 fun HeartBeatingAnimView(
     isBeating: Boolean,
     modifier: Modifier,
+    icon: DrawableResource,
     color: Color
 ) {
     val infiniteTransition = rememberInfiniteTransition()
@@ -51,7 +53,7 @@ fun HeartBeatingAnimView(
     IndicationImage(
         modifier = modifier.scale(if (isBeating) animatedScale else DEFAULT_HEART_SCALE),
         imageSize = Dimen76,
-        drawable = Res.drawable.ic_heart,
+        drawable = icon,
         color = color
     )
 }
@@ -79,6 +81,7 @@ fun HeartBeatingAnimViewPreview() {
     HeartBeatingAnimView(
         isBeating = true,
         modifier = Modifier,
+        icon = Res.drawable.ic_heart,
         color = Color.Red
     )
 }

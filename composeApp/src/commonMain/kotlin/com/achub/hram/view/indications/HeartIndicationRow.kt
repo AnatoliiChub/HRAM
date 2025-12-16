@@ -27,6 +27,9 @@ import com.achub.hram.style.White
 import com.achub.hram.view.components.HeartBeatingAnimView
 import hram.composeapp.generated.resources.Res
 import hram.composeapp.generated.resources.ic_battery_full
+import hram.composeapp.generated.resources.ic_heart
+import hram.composeapp.generated.resources.ic_heart_contact_off
+import hram.composeapp.generated.resources.ic_heart_disconnected
 import hram.composeapp.generated.resources.record_screen_heart_indication_battery_level
 import hram.composeapp.generated.resources.record_screen_heart_indication_bpm
 import hram.composeapp.generated.resources.record_screen_heart_indication_contact_off
@@ -61,8 +64,13 @@ fun HeartIndicationRow(
     }
     val secondaryLabelColor = if (isEmpty) Red else White
 
+    val heartIcon = when {
+        noBle -> Res.drawable.ic_heart_disconnected
+        isContactOn.not() -> Res.drawable.ic_heart_contact_off
+        else -> Res.drawable.ic_heart
+    }
     Row(verticalAlignment = CenterVertically) {
-        HeartBeatingAnimView(hrValueStub.not(), modifier, heartColor)
+        HeartBeatingAnimView(hrValueStub.not(), modifier, heartIcon, heartColor)
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 modifier = Modifier.align(Alignment.CenterHorizontally).widthIn(min = Dimen132),

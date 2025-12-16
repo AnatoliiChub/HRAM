@@ -63,6 +63,8 @@ private const val INNER_SHADOW_RADIUS = 80f
 private const val BORDER_ALPHA = 0.3f
 private const val SPREAD_ALPHA_DIVISOR = 4f
 private const val SECOND_KEYFRAME_RATIO = 0.5f
+private const val MIDDLE_OF_ANIMATION = BLINKING_ANIMATION_DURATION * SECOND_KEYFRAME_RATIO
+private const val STATIC_ALPHA = 0.5f
 
 @Composable
 fun DialogElevatedCard(
@@ -91,10 +93,10 @@ fun DialogElevatedCard(
                 .dropShadow(
                     shape = dropShadowShape,
                     shadow = Shadow(
-                        radius = Dimen8,
-                        spread = animatedSpread.dp,
+                        radius = if (animate) Dimen8 else Dimen12,
+                        spread = if (animate) animatedSpread.dp else MAX_SPREAD.dp,
                         brush = Brush.sweepGradient(Gradient),
-                        alpha = if (animate) animatedSpread / SPREAD_ALPHA_DIVISOR else 0f
+                        alpha = if (animate) animatedSpread / SPREAD_ALPHA_DIVISOR else STATIC_ALPHA
                     )
                 ).clip(dropShadowShape),
             colors = CardColors(
@@ -124,7 +126,7 @@ fun DialogElevatedCard(
 }
 
 private fun blinkingSpec(): KeyframesSpec<Float> {
-    val second = (BLINKING_ANIMATION_DURATION * SECOND_KEYFRAME_RATIO).toInt()
+    val second = (MIDDLE_OF_ANIMATION).toInt()
     return keyframes {
         durationMillis = BLINKING_ANIMATION_DURATION
         MIN_SPREAD at 0 using LinearEasing
