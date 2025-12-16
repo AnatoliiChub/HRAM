@@ -45,28 +45,30 @@ fun HeartIndicationRow(
 ) {
     val isEmpty = bleNotification.isEmpty()
     val hrIndication = bleNotification.hrNotification
-    val hrBpm = hrIndication?.hrBpm ?: 0
+    val hrBpm = hrIndication?.hrBpm ?: "--"
     val isSensorContactSupported = hrIndication?.isSensorContactSupported == true
     val isContactOn = hrIndication?.isContactOn == true
     val batteryLevel = bleNotification.batteryLevel
     val noBle = bleNotification.isBleConnected.not()
-    val hrValueStub = isEmpty || noBle || (isSensorContactSupported && isContactOn.not()) || hrIndication == null
+    val isContactOff = isSensorContactSupported && isContactOn.not()
+    val hrValueStub = isEmpty || noBle || isContactOff || hrIndication == null
     val heartColor = if (hrValueStub) Gray else Red
     val hrLabel = if (hrValueStub) {
         stringResource(Res.string.record_screen_heart_indication_stub)
     } else {
         stringResource(Res.string.record_screen_heart_indication_bpm, hrBpm)
     }
+
     val secondaryLabel = when {
         noBle -> stringResource(Res.string.record_screen_heart_indication_no_connection)
-        isContactOn.not() -> stringResource(Res.string.record_screen_heart_indication_contact_off)
+        isContactOff -> stringResource(Res.string.record_screen_heart_indication_contact_off)
         else -> stringResource(Res.string.record_screen_heart_indication_battery_level, batteryLevel)
     }
     val secondaryLabelColor = if (isEmpty) Red else White
 
     val heartIcon = when {
         noBle -> Res.drawable.ic_heart_disconnected
-        isContactOn.not() -> Res.drawable.ic_heart_contact_off
+        isContactOff -> Res.drawable.ic_heart_contact_off
         else -> Res.drawable.ic_heart
     }
     Row(verticalAlignment = CenterVertically) {
