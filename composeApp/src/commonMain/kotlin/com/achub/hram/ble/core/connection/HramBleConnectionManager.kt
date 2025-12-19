@@ -1,6 +1,6 @@
 package com.achub.hram.ble.core.connection
 
-import com.achub.hram.ble.SCAN_DURATION
+import com.achub.hram.BLE_SCAN_DURATION
 import com.achub.hram.ble.models.BleConnectionsException
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.PeripheralConvertor
@@ -55,7 +55,7 @@ class HramBleConnectionManager(
             .onStart { emit(true) } // for initial connect
             .onEach { stopConnectionTracking() }
             .onEach { connector.disconnect() }
-            .map { scanner.scan(identifier, SCAN_DURATION.toDuration(DurationUnit.MILLISECONDS)) }
+            .map { scanner.scan(identifier, BLE_SCAN_DURATION.toDuration(DurationUnit.MILLISECONDS)) }
             .map(connector::connect)
             .onEach(::startConnectionTracking)
             .map(peripheralConverter::convert)

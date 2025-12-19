@@ -4,14 +4,14 @@ package com.achub.hram.screen.record
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.achub.hram.ble.SCAN_DURATION
+import com.achub.hram.BLE_SCAN_DURATION
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.launchIn
 import com.achub.hram.ext.requestBleBefore
 import com.achub.hram.ext.stateInExt
 import com.achub.hram.tracking.HramActivityTrackingManager
-import com.achub.hram.utils.ActivityNameValidation
+import com.achub.hram.utils.ActivityNameErrorMapper
 import com.juul.kable.UnmetRequirementException
 import dev.icerock.moko.permissions.PermissionsController
 import kotlinx.coroutines.CoroutineDispatcher
@@ -30,14 +30,14 @@ import kotlin.uuid.ExperimentalUuidApi
 
 class RecordViewModel(
     val trackingManager: HramActivityTrackingManager,
-    val activityNameValidation: ActivityNameValidation,
+    val activityNameErrorMapper: ActivityNameErrorMapper,
     val dispatcher: CoroutineDispatcher,
     @InjectedParam val permissionController: PermissionsController,
 ) : ViewModel(), KoinComponent {
     private val _uiState = MutableStateFlow(RecordScreenState())
     val uiState = _uiState.stateInExt(initialValue = RecordScreenState())
     private var jobs = mutableListOf<Job>()
-    private val scanDuration = SCAN_DURATION.toDuration(DurationUnit.MILLISECONDS)
+    private val scanDuration = BLE_SCAN_DURATION.toDuration(DurationUnit.MILLISECONDS)
 
     init {
         trackingManager.bleNotification
@@ -60,7 +60,7 @@ class RecordViewModel(
 
     fun onActivityNameChanged(name: String) = _uiState.update { state ->
         val currentDialog = state.dialog as? RecordScreenDialog.NameActivity
-        val error = activityNameValidation(name)
+        val error = activityNameErrorMapper(name)
         currentDialog?.let { state.copy(dialog = currentDialog.copy(activityName = name, error = error)) } ?: state
     }
 

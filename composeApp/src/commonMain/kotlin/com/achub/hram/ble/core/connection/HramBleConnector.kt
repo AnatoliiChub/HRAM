@@ -15,8 +15,8 @@ class HramBleConnector(
     private var _peripheral: Peripheral? = null
 
     override suspend fun connect(advertisement: Advertisement): Peripheral {
+        logger(TAG) { "initiate connection to device $advertisement" }
         val peripheral = peripheralBuilder(advertisement)
-        logger(TAG) { "initiate connection to device $peripheral" }
         peripheral.connect()
         _peripheral = peripheral
         connected.update { peripheral }

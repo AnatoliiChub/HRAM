@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.achub.hram.data.models.HighlightedItem
 import com.achub.hram.data.repo.HrActivityRepo
 import com.achub.hram.ext.stateInExt
-import com.achub.hram.utils.ActivityNameValidation
+import com.achub.hram.utils.ActivityNameErrorMapper
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 class ActivitiesViewModel(
     val hrActivityRepo: HrActivityRepo,
-    val activityNameValidation: ActivityNameValidation,
+    val activityNameErrorMapper: ActivityNameErrorMapper,
     val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ActivitiesUiState())
@@ -73,7 +73,7 @@ class ActivitiesViewModel(
 
     fun onActivityNameChanged(name: String) = _uiState.update { state ->
         val currentDialog = state.dialog as? ActivitiesScreenDialog.ReNameActivity
-        val error = activityNameValidation(name)
+        val error = activityNameErrorMapper(name)
         state.copy(dialog = currentDialog?.copy(activityName = name, error = error))
     }
 

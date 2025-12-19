@@ -1,7 +1,8 @@
 package com.achub.hram.ble
 
-import com.achub.hram.ble.core.BleDataRepo
+import com.achub.hram.BLE_SCAN_DURATION
 import com.achub.hram.ble.core.connection.BleConnectionManager
+import com.achub.hram.ble.core.data.BleDataRepo
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.BleNotification
 import com.achub.hram.ble.models.HrNotification
@@ -166,12 +167,12 @@ class HramHrDeviceRepoTest {
         verify(VerifyMode.not) { onScanUpdateMock.run() }
         verify(VerifyMode.not) { onScanCompleteMock.run() }
 
-        advanceTimeBy(SCAN_DURATION)
+        advanceTimeBy(BLE_SCAN_DURATION)
 
         verify(VerifyMode.exactly(5)) { onScanUpdateMock.run() }
         verify { onScanCompleteMock.run() }
 
-        advanceTimeBy(SCAN_DURATION)
+        advanceTimeBy(BLE_SCAN_DURATION)
         verifyNoMoreCalls(onScanInitMock, onScanUpdateMock, onScanCompleteMock, onScanErrorMock)
     }
 

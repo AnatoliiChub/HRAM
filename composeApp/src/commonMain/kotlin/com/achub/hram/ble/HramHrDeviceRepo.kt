@@ -1,6 +1,7 @@
 package com.achub.hram.ble
 
-import com.achub.hram.ble.core.BleDataRepo
+import com.achub.hram.BLE_SCAN_DURATION
+import com.achub.hram.ble.core.data.BleDataRepo
 import com.achub.hram.ble.core.connection.BleConnectionManager
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.BleNotification
@@ -33,7 +34,6 @@ import org.koin.core.component.KoinComponent
 import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 
-const val SCAN_DURATION = 5_000L
 private const val TAG = "HramHrDeviceRepo"
 
 class HramHrDeviceRepo(
@@ -68,7 +68,7 @@ class HramHrDeviceRepo(
                 .onCompletion { onComplete() }
                 .launchIn(scope = scope)
                 .let { scanJobs.add(it) }
-            delay(SCAN_DURATION)
+            delay(BLE_SCAN_DURATION)
             cancelScanning()
         }.let { scanJobs.add(it) }
     }

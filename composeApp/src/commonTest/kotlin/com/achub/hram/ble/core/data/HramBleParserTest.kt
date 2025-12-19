@@ -1,4 +1,4 @@
-package com.achub.hram.ble.core
+package com.achub.hram.ble.core.data
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

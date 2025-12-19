@@ -3,10 +3,10 @@ package com.achub.hram.di.ble
 import com.achub.hram.ble.BluetoothState
 import com.achub.hram.ble.HrDeviceRepo
 import com.achub.hram.ble.HramHrDeviceRepo
-import com.achub.hram.ble.core.BleDataRepo
-import com.achub.hram.ble.core.BleParser
-import com.achub.hram.ble.core.HramBleDataRepo
-import com.achub.hram.ble.core.HramBleParser
+import com.achub.hram.ble.core.data.BleDataRepo
+import com.achub.hram.ble.core.data.BleParser
+import com.achub.hram.ble.core.data.HramBleDataRepo
+import com.achub.hram.ble.core.data.HramBleParser
 import com.achub.hram.ble.core.connection.BleConnector
 import com.achub.hram.ble.core.connection.BleScanner
 import com.achub.hram.ble.core.connection.ConnectionTracker

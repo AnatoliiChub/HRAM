@@ -78,7 +78,3 @@ fun MutableStateFlow<RecordScreenState>.updateHrDeviceDialogConnecting() =
     this.updateHrDeviceDialogIfExists { it.copy(isDeviceConfirmed = true, isLoading = true) }
 
 val MutableStateFlow<RecordScreenState>.isRecording: Boolean get() = value.recordingState.isRecording()
-
-fun MutableStateFlow<RecordScreenState>.connectionErrorDialog() = update {
-    it.copy(dialog = RecordScreenDialog.ConnectionErrorDialog)
-}
