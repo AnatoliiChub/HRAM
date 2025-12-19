@@ -98,8 +98,9 @@ class HramActivityTrackingManager(
     override fun connect(
         device: BleDevice,
         onInitConnection: () -> Unit,
-        onConnected: (BleDevice) -> Unit
-    ) = hrDeviceRepo.connect(device, onInitConnection, onConnected).also {
+        onConnected: (BleDevice) -> Unit,
+        onError: (Throwable) -> Unit,
+    ) = hrDeviceRepo.connect(device, onInitConnection, onConnected, onError).also {
         listen().flowOn(dispatcher).launchIn(scope).let { jobs.add(it) }
     }
 

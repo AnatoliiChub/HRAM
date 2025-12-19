@@ -39,6 +39,8 @@ sealed class RecordScreenDialog {
     data class DeviceConnectedDialog(val bleDevice: BleDevice) : RecordScreenDialog()
 
     data object OpenSettingsDialog : RecordScreenDialog()
+
+    data object ConnectionErrorDialog : RecordScreenDialog()
 }
 
 fun MutableStateFlow<RecordScreenState>.updateHrDeviceDialogIfExists(
@@ -76,3 +78,7 @@ fun MutableStateFlow<RecordScreenState>.updateHrDeviceDialogConnecting() =
     this.updateHrDeviceDialogIfExists { it.copy(isDeviceConfirmed = true, isLoading = true) }
 
 val MutableStateFlow<RecordScreenState>.isRecording: Boolean get() = value.recordingState.isRecording()
+
+fun MutableStateFlow<RecordScreenState>.connectionErrorDialog() = update {
+    it.copy(dialog = RecordScreenDialog.ConnectionErrorDialog)
+}

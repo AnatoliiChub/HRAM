@@ -8,11 +8,14 @@ import com.juul.kable.State
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
+import dev.mokkery.everySuspend
 import dev.mokkery.mock
 import dev.mokkery.verify
 import dev.mokkery.verifyNoMoreCalls
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ChannelResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -32,12 +35,14 @@ class HramConnectionTrackerTest {
     lateinit var isKeepConnectionMock: Channel<Boolean>
     lateinit var tracker: HramConnectionTracker
 
+    @OptIn(InternalCoroutinesApi::class)
     @BeforeTest
     fun setup() {
         bluetoothOn = MutableStateFlow(true)
         stateFlow = MutableStateFlow(State.Connecting.Bluetooth)
         peripheralMock = createPeripheral(stateFlow)
         isKeepConnectionMock = mock(MockMode.autofill)
+        everySuspend { isKeepConnectionMock.trySend(true) } returns ChannelResult.success(Unit)
         tracker = tracker(bluetoothOn, isKeepConnectionMock)
     }
 

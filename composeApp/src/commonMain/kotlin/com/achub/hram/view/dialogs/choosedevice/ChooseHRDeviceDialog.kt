@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.achub.hram.ble.models.BleDevice
+import com.achub.hram.ble.models.HramBleDevice
 import com.achub.hram.style.Dimen24
 import com.achub.hram.style.Dimen32
 import com.achub.hram.view.components.HRProgress
@@ -143,9 +144,9 @@ fun ChooseHRDeviceDialogPreview() {
             onRefresh = {},
             isLoading = true,
             devices = listOf(
-                BleDevice("Hrm1", "00:11:22:33:44:55"),
-                BleDevice("Hrm2", "66:77:88:99:AA:BB"),
-                BleDevice("Hrm3", "CC:DD:EE:FF:00:11"),
+                HramBleDevice("Hrm1", "00:11:22:33:44:55"),
+                HramBleDevice("Hrm2", "66:77:88:99:AA:BB"),
+                HramBleDevice("Hrm3", "CC:DD:EE:FF:00:11"),
             ),
             loadingDuration = 5.seconds
         )

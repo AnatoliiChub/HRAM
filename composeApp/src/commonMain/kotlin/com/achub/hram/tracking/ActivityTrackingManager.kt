@@ -25,6 +25,7 @@ interface ActivityTrackingManager {
         device: BleDevice,
         onInitConnection: () -> Unit,
         onConnected: (BleDevice) -> Unit,
+        onError: (Throwable) -> Unit,
     )
 
     fun scan(

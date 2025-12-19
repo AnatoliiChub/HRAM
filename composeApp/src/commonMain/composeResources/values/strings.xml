@@ -47,6 +47,9 @@
     <string name="dialog_open_setting_message">It looks like you denied the BLE permission. Please allow it for the app in system settings.</string>
     <string name="dialog_open_setting_button_text">Open Settings</string>
 
+    <string name="dialog_device_connection_failed_title">Connection Failed</string>
+    <string name="dialog_device_connection_failed_message">Connection failed. Please try again.</string>
+
     <string name="dialog_device_connected_title">Device Connected</string>
     <string name="dialog_device_connected_message">%1$s from %2$s successfully connected</string>
 

@@ -27,6 +27,9 @@ import com.achub.hram.view.section.TrackingStatusCheckBoxSection
 import hram.composeapp.generated.resources.Res
 import hram.composeapp.generated.resources.dialog_device_connected_message
 import hram.composeapp.generated.resources.dialog_device_connected_title
+import hram.composeapp.generated.resources.dialog_device_connection_failed_message
+import hram.composeapp.generated.resources.dialog_device_connection_failed_title
+import hram.composeapp.generated.resources.dialog_info_ok
 import hram.composeapp.generated.resources.dialog_name_activity_message
 import hram.composeapp.generated.resources.dialog_name_activity_title
 import hram.composeapp.generated.resources.dialog_open_setting_button_text
@@ -151,6 +154,16 @@ private fun Dialog(
                 onNameChanged = onActivityNameChanged,
                 onDismiss = onDismissDialog,
                 onButonClick = onActivityNameConfirmed
+            )
+        }
+
+        is RecordScreenDialog.ConnectionErrorDialog -> {
+            InfoDialog(
+                title = Res.string.dialog_device_connection_failed_title,
+                message = stringResource(Res.string.dialog_device_connection_failed_message),
+                buttonText = Res.string.dialog_info_ok,
+                onDismiss = onDismissDialog,
+                onButonClick = onDismissDialog,
             )
         }
 

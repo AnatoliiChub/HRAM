@@ -3,7 +3,7 @@ package com.achub.hram.view.section
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.achub.hram.ble.models.BleDevice
+import com.achub.hram.ble.models.HramBleDevice
 import com.achub.hram.data.models.TrackingStatus
 import com.achub.hram.view.components.HRCheckBoxLabel
 import com.achub.hram.view.indications.WarningLabelRow
@@ -33,7 +33,7 @@ fun TrackingStatusCheckBoxSection(
 private fun TrackingStatusCheckBoxSectionPreview() {
     val trackingStatus = TrackingStatus(
         trackHR = true,
-        hrDevice = BleDevice(name = "Polar H10", identifier = "00:11:22:33:44:55"),
+        hrDevice = HramBleDevice(name = "Polar H10", identifier = "00:11:22:33:44:55"),
     )
     TrackingStatusCheckBoxSection(
         trackingStatus = trackingStatus,

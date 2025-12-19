@@ -102,6 +102,9 @@ class RecordViewModel(
         device,
         onInitConnection = _uiState::updateHrDeviceDialogConnecting,
         onConnected = _uiState::deviceConnectedDialog,
+        onError = {
+            _uiState.update { it.copy(dialog = RecordScreenDialog.ConnectionErrorDialog) }
+        }
     )
 
     override fun onCleared() {
