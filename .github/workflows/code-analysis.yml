@@ -49,8 +49,62 @@ jobs:
             **/build/reports/kover/html/
           if-no-files-found: warn
 
-  SummaryComment:
+  AndroidBuild:
     needs: [ UnitTests, Detekt ]
+    runs-on: ubuntu-latest
+    outputs:
+      output1: ${{ steps.artifact-upload-step.outputs.artifact-id }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: set up
+        uses: ./.github/actions/setup
+      - name: Build Android Debug APK
+        run: ./gradlew clean assembleDebug --no-daemon --stacktrace
+      - name: Upload Android Debug APK
+        if: always()
+        uses: actions/upload-artifact@v4
+        id: artifact-upload-step
+        with:
+          name: android-debug-apk
+          path: composeApp/build/outputs/apk/debug/*.apk
+          if-no-files-found: warn
+
+  iOSBuild:
+    needs: [ UnitTests, Detekt ]
+    runs-on: macos-latest
+    outputs:
+      output1: ${{ steps.artifact-upload-step.outputs.artifact-id }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: set up
+        uses: ./.github/actions/setup
+      - name: Build iOS Debug App
+        run: |
+          xcodebuild \
+            -project iosApp/iosApp.xcodeproj \
+            -scheme iosApp \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 16e' \
+            -derivedDataPath ./build/ios-simulator \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            -verbose
+            clean build
+      - name: Upload iOS Debug App
+        if: always()
+        uses: actions/upload-artifact@v4
+        id: artifact-upload-step
+        with:
+          name: ios-debug-app
+          path: build/ios-simulator/Build/Products/Debug-iphonesimulator/iosApp.app
+          if-no-files-found: warn
+
+  SummaryComment:
+    needs: [ AndroidBuild, iOSBuild ]
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -64,3 +118,7 @@ jobs:
             https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.UnitTests.outputs.output1 }}
             Detekt report:
             https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.Detekt.outputs.output1 }}
+            Android Debug APK:
+            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.AndroidBuild.outputs.output1 }}
+            iOS Debug App:
+            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.iOSBuild.outputs.output1 }}
