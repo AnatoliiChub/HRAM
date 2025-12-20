@@ -38,7 +38,7 @@ class HramConnectionTracker(
     @OptIn(ExperimentalApi::class, ExperimentalUuidApi::class, FlowPreview::class)
     override fun trackConnectionState(peripheral: Peripheral) = peripheral.state
         .onEach { logger(TAG) { "${peripheral.name} device current connection state $it" } }
-        .map { currentState -> CONNECTING_STATES.any { it == currentState || it == State.Connected::class }.not() }
+        .map { currentState -> CONNECTING_STATES.any { it == currentState }.not() || currentState is State.Connected }
         .debounce(STATE_CHANGING_DEBOUNCE)
         .combine(isBluetoothOn) { isDisconnected, isBluetoothOn -> isDisconnected && isBluetoothOn }
         .filter { it }

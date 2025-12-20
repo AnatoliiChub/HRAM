@@ -124,7 +124,7 @@ private fun Dialog(
                     dismissable = true,
                     onNameChanged = onActivityNameChanged,
                     onDismiss = onDismiss,
-                    onButonClick = { onActivityNameConfirmed() }
+                    onButtonClick = { onActivityNameConfirmed() }
                 )
             }
 
@@ -142,7 +142,7 @@ private fun Dialog(
                     ),
                     buttonText = Res.string.dialog_activity_deletion_button_text,
                     onDismiss = onDismiss,
-                    onButonClick = {
+                    onButtonClick = {
                         onDeleteActivities()
                         onDismiss()
                     }

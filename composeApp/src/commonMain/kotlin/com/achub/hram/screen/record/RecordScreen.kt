@@ -138,7 +138,7 @@ private fun Dialog(
                 message = stringResource(Res.string.dialog_open_setting_message),
                 buttonText = Res.string.dialog_open_setting_button_text,
                 onDismiss = onDismissDialog,
-                onButonClick = {
+                onButtonClick = {
                     openSettings()
                     onDismissDialog()
                 }
@@ -153,7 +153,7 @@ private fun Dialog(
                 error = dialog.error,
                 onNameChanged = onActivityNameChanged,
                 onDismiss = onDismissDialog,
-                onButonClick = onActivityNameConfirmed
+                onButtonClick = onActivityNameConfirmed
             )
         }
 
@@ -163,7 +163,7 @@ private fun Dialog(
                 message = stringResource(Res.string.dialog_device_connection_failed_message),
                 buttonText = Res.string.dialog_info_ok,
                 onDismiss = onDismissDialog,
-                onButonClick = onDismissDialog,
+                onButtonClick = onDismissDialog,
             )
         }
 

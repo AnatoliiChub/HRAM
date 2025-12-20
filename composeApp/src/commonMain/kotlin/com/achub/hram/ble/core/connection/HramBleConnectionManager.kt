@@ -27,7 +27,11 @@ import kotlin.time.toDuration
 import kotlin.uuid.ExperimentalUuidApi
 
 private const val TAG = "HramBleConnectionManager"
+
+/** Number of attempts to retry reconnection in case of disconnection or error */
 const val RECONNECTION_RETRY_ATTEMPTS = 3L
+
+/**  Delay between reconnection attempts */
 const val RECONNECTION_DELAY_MS = 2_000L
 private val ERROR_REQUIRED_RECONNECTION = listOf(
     BleConnectionsException.DeviceNotConnectedException::class,

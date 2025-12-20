@@ -31,7 +31,7 @@ fun InfoDialog(
     message: String,
     buttonText: StringResource = Res.string.dialog_info_ok,
     onDismiss: () -> Unit,
-    onButonClick: () -> Unit = { onDismiss() }
+    onButtonClick: () -> Unit = { onDismiss() }
 ) {
     BasicAlertDialog(onDismissRequest = onDismiss) {
         DialogElevatedCard {
@@ -40,7 +40,7 @@ fun InfoDialog(
                 Spacer(Modifier.height(Dimen24))
                 Text(text = message, color = White, style = LabelMedium, textAlign = TextAlign.Center)
                 Spacer(Modifier.height(Dimen24))
-                DialogButton(text = stringResource(buttonText), onClick = onButonClick)
+                DialogButton(text = stringResource(buttonText), onClick = onButtonClick)
             }
         }
     }
