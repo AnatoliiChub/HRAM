@@ -1,9 +1,11 @@
 package com.achub.hram.ble
 
-import com.achub.hram.ble.core.BleDataRepo
+import com.achub.hram.BLE_SCAN_DURATION
 import com.achub.hram.ble.core.connection.BleConnectionManager
+import com.achub.hram.ble.core.data.BleDataRepo
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.BleNotification
+import com.achub.hram.ble.models.HramBleDevice
 import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.launchIn
 import com.achub.hram.ext.logger
@@ -32,7 +34,6 @@ import org.koin.core.component.KoinComponent
 import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 
-const val SCAN_DURATION = 5_000L
 private const val TAG = "HramHrDeviceRepo"
 
 class HramHrDeviceRepo(
@@ -56,7 +57,7 @@ class HramHrDeviceRepo(
             val scannedDevices = mutableSetOf<BleDevice>()
             onInit()
             bleConnectionManager.scanHrDevices()
-                .map { BleDevice(name = it.peripheralName ?: "", identifier = it.identifier.toString()) }
+                .map { HramBleDevice(name = it.peripheralName ?: "", identifier = it.identifier.toString()) }
                 .distinctUntilChanged()
                 .onEach { device ->
                     scannedDevices.add(device)
@@ -67,7 +68,7 @@ class HramHrDeviceRepo(
                 .onCompletion { onComplete() }
                 .launchIn(scope = scope)
                 .let { scanJobs.add(it) }
-            delay(SCAN_DURATION)
+            delay(BLE_SCAN_DURATION)
             cancelScanning()
         }.let { scanJobs.add(it) }
     }
@@ -76,14 +77,18 @@ class HramHrDeviceRepo(
     override fun connect(
         device: BleDevice,
         onInitConnection: () -> Unit,
-        onConnected: (BleDevice) -> Unit
+        onConnected: (BleDevice) -> Unit,
+        onError: (Throwable) -> Unit
     ) {
         cancelAllJobs()
         onInitConnection()
         bleConnectionManager.connectToDevice(device.provideIdentifier())
             .withIndex()
             .onEach { (index, device) -> if (index == 0) onConnected(device) }
-            .catch { loggerE(TAG) { "Error while connecting to device: $it" } }
+            .catch {
+                loggerE(TAG) { "Error while connecting to device: $it" }
+                onError(it)
+            }
             .onCompletion { logger(TAG) { "ConnectToDevice job completed" } }
             .flowOn(dispatcher)
             .launchIn(scope)

@@ -16,6 +16,7 @@ interface HrDeviceRepo {
         device: BleDevice,
         onInitConnection: () -> Unit,
         onConnected: (BleDevice) -> Unit,
+        onError: (Throwable) -> Unit
     )
 
     fun cancelScanning()

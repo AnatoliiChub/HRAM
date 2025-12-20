@@ -4,7 +4,7 @@ import com.achub.hram.data.repo.HrActivityRepo
 import com.achub.hram.screen.activities.ActivitiesViewModel
 import com.achub.hram.screen.record.RecordViewModel
 import com.achub.hram.tracking.HramActivityTrackingManager
-import com.achub.hram.utils.ActivityNameValidation
+import com.achub.hram.utils.ActivityNameErrorMapper
 import dev.icerock.moko.permissions.PermissionsController
 import kotlinx.coroutines.CoroutineDispatcher
 import org.koin.android.annotation.KoinViewModel
@@ -20,12 +20,12 @@ class ViewModelModule {
     @KoinViewModel
     fun recordViewModel(
         trackingManager: HramActivityTrackingManager,
-        activityNameValidation: ActivityNameValidation,
+        activityNameErrorMapper: ActivityNameErrorMapper,
         @InjectedParam permissionsController: PermissionsController,
         @WorkerThread dispatcher: CoroutineDispatcher,
     ) = RecordViewModel(
         trackingManager = trackingManager,
-        activityNameValidation = activityNameValidation,
+        activityNameErrorMapper = activityNameErrorMapper,
         permissionController = permissionsController,
         dispatcher = dispatcher,
     )
@@ -34,7 +34,7 @@ class ViewModelModule {
     @KoinViewModel
     fun activitiesViewModel(
         hrActivityRepo: HrActivityRepo,
-        activityNameValidation: ActivityNameValidation,
+        activityNameErrorMapper: ActivityNameErrorMapper,
         @WorkerThread dispatcher: CoroutineDispatcher,
-    ) = ActivitiesViewModel(hrActivityRepo, activityNameValidation, dispatcher)
+    ) = ActivitiesViewModel(hrActivityRepo, activityNameErrorMapper, dispatcher)
 }

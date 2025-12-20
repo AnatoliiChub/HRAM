@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import com.achub.hram.ble.models.BleDevice
+import com.achub.hram.ble.models.HramBleDevice
 import com.achub.hram.style.Dimen4
 import com.achub.hram.style.LabelMediumBold
 import com.achub.hram.style.LabelSmall
@@ -41,6 +42,6 @@ private fun DeviceListItemPreview() {
     DeviceListItem(
         modifier = Modifier,
         isSelected = true,
-        device = BleDevice(name = "Polar H10", identifier = "00:11:22:33:44:55"),
+        device = HramBleDevice(name = "Polar H10", identifier = "00:11:22:33:44:55"),
     ) {}
 }

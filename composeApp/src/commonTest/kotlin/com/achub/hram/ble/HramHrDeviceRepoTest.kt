@@ -1,7 +1,8 @@
 package com.achub.hram.ble
 
-import com.achub.hram.ble.core.BleDataRepo
+import com.achub.hram.BLE_SCAN_DURATION
 import com.achub.hram.ble.core.connection.BleConnectionManager
+import com.achub.hram.ble.core.data.BleDataRepo
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.BleNotification
 import com.achub.hram.ble.models.HrNotification
@@ -23,9 +24,10 @@ import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
@@ -40,6 +42,7 @@ class HramHrDeviceRepoTest {
     companion object {
         private const val TEST_TIME_EPSILON_MS = 10L
         private const val ADV_INTERVAL = 950L
+        private val IDENTIFIER = identifier("identifier")
     }
 
     private lateinit var bleConnectionManagerMock: BleConnectionManager
@@ -48,6 +51,11 @@ class HramHrDeviceRepoTest {
     private lateinit var onScanCompleteMock: Runnable
     private lateinit var onScanUpdateMock: Runnable
     private lateinit var onScanErrorMock: (Throwable) -> Unit
+    private lateinit var onConnectionInitMock: Runnable
+    private lateinit var onConnectionCompleteMock: (BleDevice) -> Unit
+    private lateinit var onConnectionErrorMock: (Throwable) -> Unit
+    private lateinit var advertisementMock: Advertisement
+    private lateinit var bleDeviceMock: BleDevice
 
     @BeforeTest
     fun setup() {
@@ -57,6 +65,87 @@ class HramHrDeviceRepoTest {
         onScanCompleteMock = mock(MockMode.autofill)
         onScanUpdateMock = mock(MockMode.autofill)
         onScanErrorMock = mock(MockMode.autofill)
+        onConnectionInitMock = mock(MockMode.autofill)
+        onConnectionCompleteMock = mock(MockMode.autofill)
+        onConnectionErrorMock = mock(MockMode.autofill)
+        advertisementMock = mock(MockMode.autofill)
+        bleDeviceMock = mock(MockMode.autofill)
+
+        every { bleConnectionManagerMock.scanHrDevices() } returns flow { emit(advertisementMock) }
+        every { bleDeviceMock.provideIdentifier() } returns IDENTIFIER
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `connect to device`() = runTest {
+        every { bleConnectionManagerMock.connectToDevice(IDENTIFIER) } returns flow {
+            emit(bleDeviceMock)
+            emit(bleDeviceMock)
+            emit(bleDeviceMock)
+        }
+        val repo = createRepo()
+
+        repo.connect(
+            device = bleDeviceMock,
+            onInitConnection = onConnectionInitMock::run,
+            onConnected = onConnectionCompleteMock::invoke,
+            onError = onConnectionErrorMock::invoke
+        )
+        testScheduler.advanceUntilIdle()
+
+        verify { onConnectionInitMock.run() }
+        verify(VerifyMode.exactly(1)) { onConnectionCompleteMock.invoke(bleDeviceMock) }
+        verifyNoMoreCalls(onConnectionInitMock, onConnectionCompleteMock, onConnectionErrorMock)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `connect to device - error`() = runTest {
+        val exception = RuntimeException("Connection failed")
+        every { bleConnectionManagerMock.connectToDevice(IDENTIFIER) } returns flow { throw exception }
+
+        val repo = createRepo()
+
+        repo.connect(
+            device = bleDeviceMock,
+            onInitConnection = onConnectionInitMock::run,
+            onConnected = onConnectionCompleteMock::invoke,
+            onError = onConnectionErrorMock::invoke
+        )
+
+        testScheduler.advanceTimeBy(1L)
+
+        verify { onConnectionInitMock.run() }
+        verify(VerifyMode.exactly(1)) { onConnectionErrorMock.invoke(exception) }
+        verifyNoMoreCalls(onConnectionInitMock, onConnectionCompleteMock, onConnectionErrorMock)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `listen emits notification, error suppressed`() = runTest {
+        val exception = NumberFormatException("Simulated battery read error")
+        val peripheral = mock<Peripheral>(MockMode.autofill)
+        val hrNotification = HrNotification(hrBpm = 72, isSensorContactSupported = true, isContactOn = true)
+        every { bleConnectionManagerMock.onConnected } returns flowOf(peripheral)
+        every { bleDataRepoMock.observeHeartRate(peripheral) } returns flowOf(hrNotification)
+        every { bleDataRepoMock.observeBatteryLevel(peripheral) } returns flow {
+            emit(85)
+            delay(100)
+            throw exception
+        }
+        every { peripheral.state } returns MutableStateFlow<State>(State.Connected(this))
+        val repo = createRepo()
+        val collected = mutableListOf<BleNotification>()
+
+        repo.listen().onEach(collected::add).launchIn(this)
+
+        advanceTimeBy(111L)
+
+        assertEquals(
+            BleNotification(hrNotification = hrNotification, batteryLevel = 85, isBleConnected = true),
+            collected.first()
+        )
+        assertEquals(1, collected.size)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
@@ -78,58 +167,13 @@ class HramHrDeviceRepoTest {
         verify(VerifyMode.not) { onScanUpdateMock.run() }
         verify(VerifyMode.not) { onScanCompleteMock.run() }
 
-        advanceTimeBy(SCAN_DURATION)
+        advanceTimeBy(BLE_SCAN_DURATION)
 
         verify(VerifyMode.exactly(5)) { onScanUpdateMock.run() }
         verify { onScanCompleteMock.run() }
 
-        advanceTimeBy(SCAN_DURATION)
+        advanceTimeBy(BLE_SCAN_DURATION)
         verifyNoMoreCalls(onScanInitMock, onScanUpdateMock, onScanCompleteMock, onScanErrorMock)
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun `connect to device`() = runTest {
-        val identifier = identifier("identifier")
-        val advertisement = mock<Advertisement>(MockMode.autofill)
-        every { bleConnectionManagerMock.scanHrDevices() } returns flow { emit(advertisement) }
-        val target = mock<BleDevice>(MockMode.autofill)
-        every { target.provideIdentifier() } returns identifier
-        every { bleConnectionManagerMock.connectToDevice(identifier) } returns flow { emit(target) }
-
-        val repo = createRepo()
-
-        val initCalled = mock<Runnable>(MockMode.autofill)
-        val connectedCalled: (BleDevice) -> Unit = mock(MockMode.autofill)
-
-        repo.connect(device = target, onInitConnection = initCalled::run, onConnected = connectedCalled::invoke)
-
-        testScheduler.advanceUntilIdle()
-
-        verify { initCalled.run() }
-        verify(VerifyMode.exactly(1)) { connectedCalled.invoke(target) }
-        verifyNoMoreCalls(initCalled, connectedCalled)
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun `listen emits notification`() = runTest {
-        val peripheral = mock<Peripheral>(MockMode.autofill)
-        val hrNotification = HrNotification(hrBpm = 72, isSensorContactSupported = true, isContactOn = true)
-
-        every { bleConnectionManagerMock.onConnected } returns flowOf(peripheral)
-        every { bleDataRepoMock.observeHeartRate(peripheral) } returns flowOf(hrNotification)
-        every { bleDataRepoMock.observeBatteryLevel(peripheral) } returns flowOf(85)
-        every { peripheral.state } returns MutableStateFlow<State>(State.Connected(this))
-
-        val repo = createRepo()
-
-        val notification = repo.listen().first()
-
-        assertEquals(
-            BleNotification(hrNotification = hrNotification, batteryLevel = 85, isBleConnected = true),
-            notification
-        )
     }
 
     @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
@@ -150,7 +194,6 @@ class HramHrDeviceRepoTest {
             onComplete = onScanCompleteMock::run,
             onError = onScanErrorMock::invoke
         )
-
         advanceUntilIdle()
 
         verify { onScanInitMock.run() }

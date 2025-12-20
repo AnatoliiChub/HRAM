@@ -26,11 +26,10 @@ class HramConnectionTracker(
     private val isKeepConnection: Channel<Boolean> = Channel(CONFLATED)
 ) : ConnectionTracker {
     companion object {
-        private val CONNECT_STATES = listOf(
-            State.Connected::class,
-            State.Connecting.Bluetooth::class,
-            State.Connecting.Services::class,
-            State.Connecting.Observes::class,
+        private val CONNECTING_STATES = listOf(
+            State.Connecting.Bluetooth,
+            State.Connecting.Services,
+            State.Connecting.Observes,
         )
     }
 
@@ -39,7 +38,7 @@ class HramConnectionTracker(
     @OptIn(ExperimentalApi::class, ExperimentalUuidApi::class, FlowPreview::class)
     override fun trackConnectionState(peripheral: Peripheral) = peripheral.state
         .onEach { logger(TAG) { "${peripheral.name} device current connection state $it" } }
-        .map { currentState -> CONNECT_STATES.any { it == currentState::class }.not() }
+        .map { currentState -> CONNECTING_STATES.any { it == currentState }.not() && currentState !is State.Connected }
         .debounce(STATE_CHANGING_DEBOUNCE)
         .combine(isBluetoothOn) { isDisconnected, isBluetoothOn -> isDisconnected && isBluetoothOn }
         .filter { it }

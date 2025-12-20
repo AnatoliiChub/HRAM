@@ -1,5 +1,5 @@
-name: Code Analysis
-run-name: Running code analysis
+name: Code Review
+run-name: Running pre-merge code review tasks
 on:
   pull_request:
     branches:
@@ -29,6 +29,9 @@ jobs:
 
   UnitTests:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     outputs:
       output1: ${{ steps.artifact-upload-step.outputs.artifact-id }}
     steps:
@@ -37,7 +40,7 @@ jobs:
       - name: set up
         uses: ./.github/actions/setup
       - name: Run Unit Tests and Generate Coverage Report
-        run: ./gradlew clean koverHtmlReport --no-daemon --parallel --configuration-cache
+        run: ./gradlew clean koverXmlReport koverHtmlReport  --no-daemon --parallel --configuration-cache
       - name: Upload Test Results and Coverage Reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -46,11 +49,76 @@ jobs:
           name: test-reports
           path: |
             **/build/reports/tests/
-            **/build/reports/kover/html/
+            **/build/reports/kover/
+          if-no-files-found: warn
+      - name: Add coverage report to PR
+        id: kover
+        uses: mi-kas/kover-report@v1
+        with:
+          path: |
+            ${{ github.workspace }}/composeApp/build/reports/kover/report.xml
+          title: Code Coverage for BLE package and Utils
+          update-comment: true
+          min-coverage-overall: 80
+          min-coverage-changed-files: 80
+          coverage-counter-type: LINE
+
+  AndroidBuild:
+    needs: [ Detekt ]
+    runs-on: ubuntu-latest
+    outputs:
+      output1: ${{ steps.artifact-upload-step.outputs.artifact-id }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: set up
+        uses: ./.github/actions/setup
+      - name: Build Android Debug APK
+        run: ./gradlew clean assembleDebug --no-daemon --stacktrace
+      - name: Upload Android Debug APK
+        if: always()
+        uses: actions/upload-artifact@v4
+        id: artifact-upload-step
+        with:
+          name: android-debug-apk
+          path: composeApp/build/outputs/apk/debug/*.apk
+          if-no-files-found: warn
+
+  iOSBuild:
+    needs: [ Detekt ]
+    runs-on: macos-latest
+    outputs:
+      output1: ${{ steps.artifact-upload-step.outputs.artifact-id }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: set up
+        uses: ./.github/actions/setup
+      - name: Build iOS Debug App
+        run: |
+          xcodebuild \
+            -project iosApp/iosApp.xcodeproj \
+            -scheme iosApp \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 16e' \
+            -derivedDataPath ./build/ios-simulator \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            -verbose \
+            clean build
+      - name: Upload iOS Debug App
+        if: always()
+        uses: actions/upload-artifact@v4
+        id: artifact-upload-step
+        with:
+          name: ios-debug-app
+          path: build/ios-simulator/Build/Products/Debug-iphonesimulator/*.app
           if-no-files-found: warn
 
   SummaryComment:
-    needs: [ UnitTests, Detekt ]
+    needs: [ UnitTests, Detekt, AndroidBuild, iOSBuild ]
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -59,8 +127,8 @@ jobs:
         uses: mshick/add-pr-comment@v2
         with:
           message: |
-            Code analysis finished.
-            Test reports including code coverage:
-            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.UnitTests.outputs.output1 }}
-            Detekt report:
-            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.Detekt.outputs.output1 }}
+            Code analysis, unit tests, and builds have completed. Here are the results:
+            [Detekt report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.Detekt.outputs.output1 }}).
+            [Test reports](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.UnitTests.outputs.output1 }}) including code coverage.
+            Android Debug [APK](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.AndroidBuild.outputs.output1 }}).
+            iOS Debug [App](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.iOSBuild.outputs.output1 }}).

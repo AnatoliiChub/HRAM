@@ -39,6 +39,8 @@ sealed class RecordScreenDialog {
     data class DeviceConnectedDialog(val bleDevice: BleDevice) : RecordScreenDialog()
 
     data object OpenSettingsDialog : RecordScreenDialog()
+
+    data object ConnectionErrorDialog : RecordScreenDialog()
 }
 
 fun MutableStateFlow<RecordScreenState>.updateHrDeviceDialogIfExists(

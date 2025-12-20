@@ -1,6 +1,6 @@
 package com.achub.hram.di
 
-import com.achub.hram.utils.ActivityNameValidation
+import com.achub.hram.utils.ActivityNameErrorMapper
 import org.koin.core.annotation.Configuration
 import org.koin.core.annotation.Factory
 import org.koin.core.annotation.Module
@@ -9,5 +9,5 @@ import org.koin.core.annotation.Module
 @Configuration
 class UtilsModule {
     @Factory
-    fun provideActivityNameValidationUseCase() = ActivityNameValidation()
+    fun provideActivityNameValidationUseCase() = ActivityNameErrorMapper()
 }
