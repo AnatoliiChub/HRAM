@@ -1,11 +1,13 @@
 @file:OptIn(ExperimentalKotlinGradlePluginApi::class)
 
+import com.android.build.api.dsl.androidLibrary
 import io.gitlab.arturbosch.detekt.Detekt
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
+    alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.kotlinComposeCompiler)
     alias(libs.plugins.kotlinxSerialization)
@@ -43,8 +45,8 @@ detekt {
 kover {
     reports {
         filters {
-            includes {
                 // ble is a critical part of the app, so we include it in coverage
+            includes {
                 classes("com.achub.hram.ble.*")
                 classes("com.achub.hram.utils.*")
             }
@@ -58,9 +60,32 @@ kover {
 }
 
 kotlin {
-    androidTarget {
+    androidLibrary {
+        namespace = "com.achub.hram"
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
+
+        packaging {
+            resources {
+                excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            }
+        }
+
         compilerOptions {
             freeCompilerArgs.add("-Xexpect-actual-classes")
+        }
+
+        compilations.all {
+            compileTaskProvider.configure {
+                compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
+            }
+        }
+
+        withHostTest {
+            isIncludeAndroidResources = true
+        }
+        androidResources {
+            enable = true
         }
     }
 
@@ -76,7 +101,6 @@ kotlin {
             compilerOptions {
                 freeCompilerArgs.add("-Xexpect-actual-classes")
             }
-            // Required when using NativeSQLiteDriver
             linkerOpts.add("-lsqlite3")
         }
     }
@@ -123,7 +147,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.test)
         }
     }
-    // KSP Common sourceSet
+
     sourceSets.named("commonMain").configure {
         kotlin.srcDir("build/generated/ksp/metadata/commonMain/kotlin")
     }
@@ -141,7 +165,7 @@ dependencies {
     add("kspAndroid", libs.androidx.room.compiler)
     add("kspIosSimulatorArm64", libs.androidx.room.compiler)
     add("kspIosArm64", libs.androidx.room.compiler)
-    debugImplementation(libs.ui.tooling.preview)
+    add("androidRuntimeClasspath", libs.ui.tooling.preview)
 }
 
 room {
@@ -159,7 +183,6 @@ tasks.withType<Detekt>().configureEach {
     }
 }
 
-// KSP Metadata Trigger
 tasks.matching { it.name.startsWith("ksp") && it.name != "kspCommonMainKotlinMetadata" }.configureEach {
     dependsOn("kspCommonMainKotlinMetadata")
 }
@@ -176,7 +199,6 @@ tasks {
             this.dependsOn("kspCommonMainKotlinMetadata")
         }
         if (this.name.contains("kspKotlinIos")) {
-            // Ensure it depends on the metadata task that contains all common metadata for KSP to work.
             this.dependsOn("kspCommonMainKotlinMetadata")
         }
     }
@@ -187,33 +209,3 @@ ksp {
     arg("KOIN_CONFIG_CHECK", "true")
 }
 
-android {
-    namespace = "com.achub.hram"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    sourceSets["main"].res.srcDirs("src/androidMain/res")
-    sourceSets["main"].resources.srcDirs("src/commonMain/resources")
-
-    defaultConfig {
-        applicationId = "com.achub.hram"
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
-    }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
-        }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-}
