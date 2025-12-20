@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.achub.hram.BLE_SCAN_DURATION
 import com.achub.hram.ble.models.BleDevice
+import com.achub.hram.data.models.TrackingStatus
 import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.launchIn
 import com.achub.hram.ext.requestBleBefore
@@ -103,7 +104,13 @@ class RecordViewModel(
         onInitConnection = _uiState::updateHrDeviceDialogConnecting,
         onConnected = _uiState::deviceConnectedDialog,
         onError = {
-            _uiState.update { it.copy(dialog = RecordScreenDialog.ConnectionErrorDialog) }
+            _uiState.update {
+                it.copy(
+                    dialog = RecordScreenDialog.ConnectionErrorDialog,
+                    trackingStatus = TrackingStatus(trackHR = false, hrDevice = null)
+                )
+            }
+            trackingManager.disconnect()
         }
     )
 

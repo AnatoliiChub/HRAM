@@ -67,6 +67,7 @@ class HramBleConnectionManager(
     )
     override fun connectToDevice(identifier: Identifier): Flow<BleDevice> =
         connectionTracker.observeDisconnection()
+            .onStart { wasConnected.store(false) }
             .onStart { emit(true) } // for initial connect
             .onEach { stopConnectionTracking() }
             .onEach { connector.disconnect() }
