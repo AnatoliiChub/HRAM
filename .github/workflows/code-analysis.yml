@@ -127,12 +127,8 @@ jobs:
         uses: mshick/add-pr-comment@v2
         with:
           message: |
-            Code analysis finished.
-            Test reports including code coverage:
-            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.UnitTests.outputs.output1 }}
-            Detekt report:
-            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.Detekt.outputs.output1 }}
-            Android Debug APK:
-            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.AndroidBuild.outputs.output1 }}
-            iOS Debug App:
-            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.iOSBuild.outputs.output1 }}
+            Code analysis, unit tests, and builds have completed. Here are the results:
+            [Detekt report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.Detekt.outputs.output1 }}).
+            [Test reports](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.UnitTests.outputs.output1 }}) including code coverage.
+            Android Debug [APK](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.AndroidBuild.outputs.output1 }}).
+            iOS Debug [App](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.iOSBuild.outputs.output1 }}).
