@@ -57,7 +57,7 @@ jobs:
         with:
           path: |
             ${{ github.workspace }}/composeApp/build/reports/kover/report.xml
-          title: Code Coverage
+          title: Code Coverage for BLE package and Utils
           update-comment: true
           min-coverage-overall: 80
           min-coverage-changed-files: 80
@@ -114,11 +114,11 @@ jobs:
         id: artifact-upload-step
         with:
           name: ios-debug-app
-          path: build/ios-simulator/Build/Products/Debug-iphonesimulator/iosApp.app
+          path: build/ios-simulator/Build/Products/Debug-iphonesimulator/*.app
           if-no-files-found: warn
 
   SummaryComment:
-    needs: [ UnitTests, AndroidBuild, iOSBuild ]
+    needs: [ UnitTests, Detekt, AndroidBuild, iOSBuild ]
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
