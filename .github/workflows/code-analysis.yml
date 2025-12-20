@@ -1,5 +1,5 @@
-name: Code Analysis
-run-name: Running code analysis
+name: Code Review
+run-name: Running pre-merge code review tasks
 on:
   pull_request:
     branches:
@@ -29,6 +29,9 @@ jobs:
 
   UnitTests:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     outputs:
       output1: ${{ steps.artifact-upload-step.outputs.artifact-id }}
     steps:
@@ -37,7 +40,7 @@ jobs:
       - name: set up
         uses: ./.github/actions/setup
       - name: Run Unit Tests and Generate Coverage Report
-        run: ./gradlew clean koverHtmlReport --no-daemon --parallel --configuration-cache
+        run: ./gradlew clean koverXmlReport koverHtmlReport  --no-daemon --parallel --configuration-cache
       - name: Upload Test Results and Coverage Reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -46,11 +49,22 @@ jobs:
           name: test-reports
           path: |
             **/build/reports/tests/
-            **/build/reports/kover/html/
+            **/build/reports/kover/
           if-no-files-found: warn
+      - name: Add coverage report to PR
+        id: kover
+        uses: mi-kas/kover-report@v1
+        with:
+          path: |
+            ${{ github.workspace }}/composeApp/build/reports/kover/report.xml
+          title: Code Coverage
+          update-comment: true
+          min-coverage-overall: 80
+          min-coverage-changed-files: 80
+          coverage-counter-type: LINE
 
   AndroidBuild:
-    needs: [ UnitTests, Detekt ]
+    needs: [ Detekt ]
     runs-on: ubuntu-latest
     outputs:
       output1: ${{ steps.artifact-upload-step.outputs.artifact-id }}
@@ -71,7 +85,7 @@ jobs:
           if-no-files-found: warn
 
   iOSBuild:
-    needs: [ UnitTests, Detekt ]
+    needs: [ Detekt ]
     runs-on: macos-latest
     outputs:
       output1: ${{ steps.artifact-upload-step.outputs.artifact-id }}
@@ -92,7 +106,7 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
-            -verbose
+            -verbose \
             clean build
       - name: Upload iOS Debug App
         if: always()
@@ -104,7 +118,7 @@ jobs:
           if-no-files-found: warn
 
   SummaryComment:
-    needs: [ AndroidBuild, iOSBuild ]
+    needs: [ UnitTests, AndroidBuild, iOSBuild ]
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
