@@ -33,7 +33,7 @@ class ActivityNameErrorMapperTest {
 
     @Test
     fun `name starting with a digit`() {
-        val result = mapper("3rd Morning rung")
+        val result = mapper("3rd Morning Run")
         assertEquals(Res.string.activity_screen_name_validation_start_digit, result)
     }
 
