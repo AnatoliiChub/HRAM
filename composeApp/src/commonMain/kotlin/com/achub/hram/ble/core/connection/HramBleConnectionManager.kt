@@ -13,6 +13,7 @@ import com.juul.kable.UnmetRequirementException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
@@ -22,6 +23,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.retry
 import org.koin.core.annotation.InjectedParam
+import kotlin.concurrent.atomics.AtomicBoolean
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 import kotlin.uuid.ExperimentalUuidApi
@@ -53,7 +56,15 @@ class HramBleConnectionManager(
 
     private var connectionTrackerJob: Job? = null
 
-    @OptIn(ExperimentalApi::class, ExperimentalCoroutinesApi::class, ExperimentalUuidApi::class)
+    @OptIn(ExperimentalAtomicApi::class)
+    private val wasConnected = AtomicBoolean(false)
+
+    @OptIn(
+        ExperimentalApi::class,
+        ExperimentalCoroutinesApi::class,
+        ExperimentalUuidApi::class,
+        ExperimentalAtomicApi::class
+    )
     override fun connectToDevice(identifier: Identifier): Flow<BleDevice> =
         connectionTracker.observeDisconnection()
             .onStart { emit(true) } // for initial connect
@@ -61,6 +72,7 @@ class HramBleConnectionManager(
             .onEach { connector.disconnect() }
             .map { scanner.scan(identifier, BLE_SCAN_DURATION.toDuration(DurationUnit.MILLISECONDS)) }
             .map(connector::connect)
+            .onEach { wasConnected.store(true) }
             .onEach(::startConnectionTracking)
             .map(peripheralConverter::convert)
             .retry(RECONNECTION_RETRY_ATTEMPTS, ::isReconnectionRequired)
@@ -79,8 +91,10 @@ class HramBleConnectionManager(
         connectionTrackerJob = null
     }
 
+    @OptIn(ExperimentalAtomicApi::class)
     private suspend fun isReconnectionRequired(throwable: Throwable): Boolean {
-        val isReconnectionRequired = ERROR_REQUIRED_RECONNECTION.any { throwable::class == it }
+        val isReconnectionRequired = ERROR_REQUIRED_RECONNECTION.any { throwable::class == it } ||
+            (throwable is TimeoutCancellationException && wasConnected.load())
         logger(TAG) { "try to reconnect: $isReconnectionRequired, because of $throwable" }
         if (isReconnectionRequired) delay(RECONNECTION_DELAY_MS)
         return isReconnectionRequired
