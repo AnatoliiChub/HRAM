@@ -6,8 +6,8 @@ import org.koin.dsl.KoinAppDeclaration
 import org.koin.ksp.generated.startKoin
 
 fun initKoin(config: KoinAppDeclaration? = null) {
+    Napier.base(DebugAntilog())
     AppModule.startKoin {
-        Napier.base(DebugAntilog())
         config?.invoke(this)
     }
 }
