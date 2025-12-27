@@ -8,13 +8,6 @@ plugins {
 }
 
 kotlin {
-//    sourceSets {
-//        val androidMain by getting {
-//            dependencies {
-//                implementation(project(":composeApp"))
-//            }
-//        }
-//    }
     compilerOptions {
         jvmTarget = JvmTarget.JVM_11
     }
