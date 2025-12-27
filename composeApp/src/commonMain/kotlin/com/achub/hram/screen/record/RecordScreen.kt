@@ -167,16 +167,6 @@ private fun Dialog(
             )
         }
 
-        is RecordScreenDialog.ConnectionErrorDialog -> {
-            InfoDialog(
-                title = Res.string.dialog_device_connection_failed_title,
-                message = stringResource(Res.string.dialog_device_connection_failed_message),
-                buttonText = Res.string.dialog_info_ok,
-                onDismiss = onDismissDialog,
-                onButonClick = onDismissDialog,
-            )
-        }
-
         else -> {}
     }
 }
