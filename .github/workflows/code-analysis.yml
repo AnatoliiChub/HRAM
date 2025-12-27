@@ -81,7 +81,7 @@ jobs:
         id: artifact-upload-step
         with:
           name: android-debug-apk
-          path: composeApp/build/outputs/apk/debug/*.apk
+          path: androidApp/build/outputs/apk/debug/*.apk
           if-no-files-found: warn
 
   iOSBuild:

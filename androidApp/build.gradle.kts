@@ -14,7 +14,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.achub.hram.android"
+    namespace = "com.achub.hram"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
