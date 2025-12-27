@@ -51,5 +51,6 @@ class HramBleConnectorTest {
         connector.disconnect()
 
         verifySuspend { peripheralMock.disconnect() }
+        assertEquals(null, connectedFlow.value)
     }
 }

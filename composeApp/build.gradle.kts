@@ -47,6 +47,7 @@ kover {
         filters {
                 // ble is a critical part of the app, so we include it in coverage
             includes {
+                // ble is a critical part of the app, so we include it in coverage
                 classes("com.achub.hram.ble.*")
                 classes("com.achub.hram.utils.*")
             }

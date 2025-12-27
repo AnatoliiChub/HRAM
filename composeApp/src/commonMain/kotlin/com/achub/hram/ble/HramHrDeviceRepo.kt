@@ -1,8 +1,8 @@
 package com.achub.hram.ble
 
 import com.achub.hram.BLE_SCAN_DURATION
-import com.achub.hram.ble.core.data.BleDataRepo
 import com.achub.hram.ble.core.connection.BleConnectionManager
+import com.achub.hram.ble.core.data.BleDataRepo
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.BleNotification
 import com.achub.hram.ble.models.HramBleDevice

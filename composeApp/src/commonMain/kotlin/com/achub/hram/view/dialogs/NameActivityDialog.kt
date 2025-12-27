@@ -41,7 +41,7 @@ fun NameActivityDialog(
     dismissable: Boolean = false,
     onNameChanged: (String) -> Unit,
     onDismiss: () -> Unit,
-    onButonClick: (String) -> Unit = { onDismiss() }
+    onButtonClick: (String) -> Unit = { onDismiss() }
 ) {
     BasicAlertDialog(
         onDismissRequest = onDismiss,
@@ -81,7 +81,7 @@ fun NameActivityDialog(
                 DialogButton(
                     text = stringResource(buttonText),
                     enabled = error == null && name.isNotBlank(),
-                    onClick = { onButonClick(name) }
+                    onClick = { onButtonClick(name) }
                 )
             }
         }

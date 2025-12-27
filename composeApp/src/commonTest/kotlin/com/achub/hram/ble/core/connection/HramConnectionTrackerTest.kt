@@ -30,7 +30,7 @@ import kotlin.test.assertEquals
 @OptIn(ExperimentalCoroutinesApi::class)
 class HramConnectionTrackerTest {
     lateinit var bluetoothOn: MutableStateFlow<Boolean>
-    lateinit var stateFlow: MutableStateFlow<State>
+    lateinit var peripheralStateFlow: MutableStateFlow<State>
     lateinit var peripheralMock: Peripheral
     lateinit var isKeepConnectionMock: Channel<Boolean>
     lateinit var tracker: HramConnectionTracker
@@ -39,8 +39,8 @@ class HramConnectionTrackerTest {
     @BeforeTest
     fun setup() {
         bluetoothOn = MutableStateFlow(true)
-        stateFlow = MutableStateFlow(State.Connecting.Bluetooth)
-        peripheralMock = createPeripheral(stateFlow)
+        peripheralStateFlow = MutableStateFlow(State.Connecting.Bluetooth)
+        peripheralMock = createPeripheral(peripheralStateFlow)
         isKeepConnectionMock = mock(MockMode.autofill)
         everySuspend { isKeepConnectionMock.trySend(true) } returns ChannelResult.success(Unit)
         tracker = tracker(bluetoothOn, isKeepConnectionMock)
@@ -49,7 +49,7 @@ class HramConnectionTrackerTest {
     @Test
     fun `startTracking - disconnect`() = runTest {
         val trackingJob = tracker.trackConnectionState(peripheralMock).launchIn(this)
-        stateFlow.emit(State.Disconnected())
+        peripheralStateFlow.update { State.Disconnected() }
         advanceUntilIdle()
 
         verify { isKeepConnectionMock.trySend(true) }
@@ -62,7 +62,7 @@ class HramConnectionTrackerTest {
         bluetoothOn.update { false }
 
         val trackingJob = tracker.trackConnectionState(peripheralMock).launchIn(this)
-        stateFlow.emit(State.Disconnected())
+        peripheralStateFlow.update { State.Disconnected() }
         advanceUntilIdle()
 
         verifyNoMoreCalls(isKeepConnectionMock)
@@ -73,10 +73,13 @@ class HramConnectionTrackerTest {
     @Test
     fun `startTracking - connected or connecting states`() = runTest {
         val trackingJob = tracker.trackConnectionState(peripheralMock).launchIn(this)
-        stateFlow.emit(State.Connected(this))
-        stateFlow.emit(State.Connecting.Services)
-        stateFlow.emit(State.Connecting.Bluetooth)
-        stateFlow.emit(State.Connecting.Observes)
+        peripheralStateFlow.update { State.Connected(this) }
+        advanceUntilIdle()
+        peripheralStateFlow.update { State.Connecting.Services }
+        advanceUntilIdle()
+        peripheralStateFlow.update { State.Connecting.Bluetooth }
+        advanceUntilIdle()
+        peripheralStateFlow.update { State.Connecting.Observes }
         advanceUntilIdle()
 
         verifyNoMoreCalls(isKeepConnectionMock)
@@ -92,6 +95,7 @@ class HramConnectionTrackerTest {
 
         val job = tracker.observeDisconnection().onEach { events.add(it) }.launchIn(this)
         isKeepConnection.send(true)
+        advanceUntilIdle()
         isKeepConnection.send(true)
         advanceUntilIdle()
 
