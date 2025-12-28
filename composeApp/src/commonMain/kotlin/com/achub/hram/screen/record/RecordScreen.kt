@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -21,9 +20,7 @@ import com.achub.hram.view.dialogs.InfoDialog
 import com.achub.hram.view.dialogs.NameActivityDialog
 import com.achub.hram.view.dialogs.choosedevice.HrConnectDialog
 import com.achub.hram.view.section.RecordSection
-import com.achub.hram.view.section.RecordingState
 import com.achub.hram.view.section.TrackingIndicationsSection
-import com.achub.hram.view.section.TrackingStatusCheckBoxSection
 import hram.composeapp.generated.resources.Res
 import hram.composeapp.generated.resources.dialog_device_connected_message
 import hram.composeapp.generated.resources.dialog_device_connected_title
@@ -53,22 +50,18 @@ fun RecordScreen() {
             requestBluetooth()
             clearRequestBluetooth()
         }
-        val isCheckBoxEnabled = state.recordingState == RecordingState.Init
         val indications = state.bleNotification
-        val trackingStatus = state.trackingStatus
+        val device = state.connectedDevice
         Box(Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier.fillMaxSize().padding(Dimen16),
                 horizontalAlignment = CenterHorizontally
             ) {
                 Spacer(Modifier.weight(COLUMN_SPACER_WEIGHT))
-                TrackingIndicationsSection(indications)
+                TrackingIndicationsSection(indications, device)
                 Spacer(Modifier.weight(COLUMN_SPACER_WEIGHT))
-                TrackingStatusCheckBoxSection(trackingStatus, isCheckBoxEnabled, ::toggleHRTracking)
-                Spacer(Modifier.height(Dimen16))
                 RecordSection(
                     recordingState = state.recordingState,
-                    isRecordingAvailable = trackingStatus.atLeastOneTrackingEnabled,
                     onPlay = ::toggleRecording,
                     onStop = ::showNameActivityDialog,
                 )

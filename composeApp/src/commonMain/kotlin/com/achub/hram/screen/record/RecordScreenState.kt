@@ -2,7 +2,6 @@ package com.achub.hram.screen.record
 
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.BleNotification
-import com.achub.hram.data.models.TrackingStatus
 import com.achub.hram.view.section.RecordingState
 import com.achub.hram.view.section.RecordingState.Paused
 import com.achub.hram.view.section.RecordingState.Recording
@@ -13,7 +12,7 @@ import kotlin.time.Duration
 
 data class RecordScreenState(
     val bleNotification: BleNotification = BleNotification.Empty,
-    val trackingStatus: TrackingStatus = TrackingStatus(),
+    val connectedDevice: BleDevice? = null,
     val recordingState: RecordingState = RecordingState.Init,
     val requestBluetooth: Boolean = false,
     val dialog: RecordScreenDialog? = null,
@@ -53,14 +52,7 @@ fun MutableStateFlow<RecordScreenState>.settingsDialog() =
     update { it.copy(dialog = RecordScreenDialog.OpenSettingsDialog) }
 
 fun MutableStateFlow<RecordScreenState>.deviceConnectedDialog(bleDevice: BleDevice) = update {
-    it.copy(
-        trackingStatus = it.trackingStatus.copy(trackHR = true, hrDevice = bleDevice),
-        dialog = RecordScreenDialog.DeviceConnectedDialog(bleDevice)
-    )
-}
-
-fun MutableStateFlow<RecordScreenState>.toggleHrTracking() = this.update {
-    it.copy(trackingStatus = it.trackingStatus.copy(trackHR = it.trackingStatus.trackHR.not(), hrDevice = null))
+    it.copy(connectedDevice = bleDevice, dialog = RecordScreenDialog.DeviceConnectedDialog(bleDevice))
 }
 
 fun MutableStateFlow<RecordScreenState>.toggleRecordingState() =

@@ -6,13 +6,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.achub.hram.BLE_SCAN_DURATION
 import com.achub.hram.ble.models.BleDevice
-import com.achub.hram.data.models.TrackingStatus
 import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.launchIn
 import com.achub.hram.ext.requestBleBefore
 import com.achub.hram.ext.stateInExt
 import com.achub.hram.tracking.HramActivityTrackingManager
 import com.achub.hram.utils.ActivityNameErrorMapper
+import com.achub.hram.view.section.RecordingState
 import com.juul.kable.UnmetRequirementException
 import dev.icerock.moko.permissions.PermissionsController
 import kotlinx.coroutines.CoroutineDispatcher
@@ -49,12 +49,19 @@ class RecordViewModel(
     }
 
     fun toggleRecording() {
+        if (_uiState.value.recordingState == RecordingState.Init) {
+            requestScanning()
+            return
+        }
         _uiState.toggleRecordingState()
         if (_uiState.isRecording) trackingManager.startTracking() else trackingManager.pauseTracking()
     }
 
     fun stopRecording(name: String?) =
-        _uiState.stop().also { trackingManager.finishTracking(name) }.also { dismissDialog() }
+        _uiState.stop().also { trackingManager.finishTracking(name) }.also {
+            _uiState.update { it.copy(dialog = null, connectedDevice = null) }
+            viewModelScope.launch(dispatcher) { trackingManager.disconnect() }
+        }
 
     fun showNameActivityDialog() =
         _uiState.update { it.copy(dialog = RecordScreenDialog.NameActivity(activityName = "")) }
@@ -72,17 +79,6 @@ class RecordViewModel(
     fun clearRequestBluetooth() = _uiState.update { it.copy(requestBluetooth = false) }
 
     fun openSettings() = permissionController.openAppSettings()
-
-    fun toggleHRTracking() {
-        if (_uiState.value.trackingStatus.trackHR.not()) {
-            requestScanning()
-        } else {
-            viewModelScope.launch(dispatcher) {
-                trackingManager.disconnect()
-                _uiState.toggleHrTracking()
-            }
-        }
-    }
 
     fun requestScanning() = viewModelScope.launch(dispatcher) {
         permissionController.requestBleBefore(
@@ -102,14 +98,15 @@ class RecordViewModel(
     fun onHrDeviceSelected(device: BleDevice) = trackingManager.connect(
         device,
         onInitConnection = _uiState::updateHrDeviceDialogConnecting,
-        onConnected = _uiState::deviceConnectedDialog,
-        onError = {
-            _uiState.update {
-                it.copy(
-                    dialog = RecordScreenDialog.ConnectionErrorDialog,
-                    trackingStatus = TrackingStatus(trackHR = false, hrDevice = null)
-                )
+        onConnected = {
+            _uiState.deviceConnectedDialog(it)
+            if (_uiState.value.recordingState == RecordingState.Init) {
+                _uiState.toggleRecordingState()
+                trackingManager.startTracking()
             }
+        },
+        onError = {
+            _uiState.update { it.copy(dialog = RecordScreenDialog.ConnectionErrorDialog, connectedDevice = null) }
             trackingManager.disconnect()
         }
     )
