@@ -27,7 +27,7 @@ interface HrDeviceRepo {
     fun scan(
         onInit: () -> Unit,
         onUpdate: (List<BleDevice>) -> Unit,
-        onComplete: () -> Unit,
+        onComplete: (List<BleDevice>) -> Unit,
         onError: (Throwable) -> Unit
     )
 }

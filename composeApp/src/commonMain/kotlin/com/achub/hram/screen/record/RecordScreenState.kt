@@ -16,14 +16,7 @@ data class RecordScreenState(
     val recordingState: RecordingState = RecordingState.Init,
     val requestBluetooth: Boolean = false,
     val dialog: RecordScreenDialog? = null,
-) {
-    fun chooseHrDeviceDialog(duration: Duration) = this.copy(
-        dialog = RecordScreenDialog.ChooseHRDevice(
-            isLoading = true,
-            loadingDuration = duration
-        )
-    )
-}
+)
 
 sealed class RecordScreenDialog {
     data class ChooseHRDevice(

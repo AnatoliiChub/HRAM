@@ -18,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.window.DialogProperties
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.HramBleDevice
 import com.achub.hram.style.Dimen24
@@ -63,7 +64,10 @@ fun HrConnectDialog(
     }
     val message = provideDialogMessage(isLoading, devices)
 
-    BasicAlertDialog(onDismissRequest = onDismissRequest) {
+    BasicAlertDialog(
+        onDismissRequest = onDismissRequest,
+        properties = DialogProperties(dismissOnClickOutside = isLoading.not())
+    ) {
         val btnText = if (retryState) {
             Res.string.dialog_choose_hr_device_retry
         } else {

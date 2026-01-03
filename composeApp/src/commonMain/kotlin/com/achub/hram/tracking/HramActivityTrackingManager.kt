@@ -91,7 +91,7 @@ class HramActivityTrackingManager(
     override fun scan(
         onInit: () -> Unit,
         onUpdate: (List<BleDevice>) -> Unit,
-        onComplete: () -> Unit,
+        onComplete: (List<BleDevice>) -> Unit,
         onError: (Throwable) -> Unit
     ) = hrDeviceRepo.scan(onInit, onUpdate, onComplete, onError)
 

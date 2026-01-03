@@ -6,6 +6,7 @@ import com.achub.hram.ble.core.data.BleDataRepo
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.BleNotification
 import com.achub.hram.ble.models.HramBleDevice
+import com.achub.hram.di.WorkerThread
 import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.launchIn
 import com.achub.hram.ext.logger
@@ -39,6 +40,7 @@ private const val TAG = "HramHrDeviceRepo"
 class HramHrDeviceRepo(
     @InjectedParam val scope: CoroutineScope,
     val bleDataRepo: BleDataRepo,
+    @param:WorkerThread
     val dispatcher: CoroutineDispatcher,
     val bleConnectionManager: BleConnectionManager
 ) : HrDeviceRepo, KoinComponent {
@@ -49,7 +51,7 @@ class HramHrDeviceRepo(
     override fun scan(
         onInit: () -> Unit,
         onUpdate: (List<BleDevice>) -> Unit,
-        onComplete: () -> Unit,
+        onComplete: (List<BleDevice>) -> Unit,
         onError: (Throwable) -> Unit
     ) {
         cancelScanning()
@@ -65,7 +67,7 @@ class HramHrDeviceRepo(
                 }
                 .catch { onError(it) }
                 .flowOn(dispatcher)
-                .onCompletion { onComplete() }
+                .onCompletion { onComplete(scannedDevices.toList()) }
                 .launchIn(scope = scope)
                 .let { scanJobs.add(it) }
             delay(BLE_SCAN_DURATION)

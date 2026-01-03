@@ -13,10 +13,11 @@ koin = "4.1.1"
 kable = "0.41.0"
 logger = "2.7.1"
 moko = "0.20.1"
-ksp = "2.3.4"
+ksp = "2.3.2"
 koin-annotations = "2.3.1"
 datastore = "1.2.0"
 kotlinx-datetime = "0.7.1"
+resourcesGenerator = "0.25.2"
 room = "2.8.4"
 sqlite = "2.6.2"
 ui-tooling = "1.10.0"
@@ -24,6 +25,8 @@ detekt = "1.23.8"
 mokkery = "3.1.1"
 kover = "0.9.4"
 coreKtx = "1.17.0"
+kotlinx-serialization = "1.9.0"
+okio = "3.16.4"
 
 [libraries]
 components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "composeMultiplatform" }
@@ -54,6 +57,8 @@ ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "composeMultiplatfo
 ui-tooling-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "composeMultiplatform" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "ui-tooling" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 
 ## Test libraries
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }

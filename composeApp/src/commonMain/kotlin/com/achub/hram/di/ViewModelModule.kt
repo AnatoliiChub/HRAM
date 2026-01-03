@@ -1,9 +1,11 @@
 package com.achub.hram.di
 
 import com.achub.hram.data.repo.HrActivityRepo
+import com.achub.hram.data.repo.TrackingStateRepo
 import com.achub.hram.screen.activities.ActivitiesViewModel
 import com.achub.hram.screen.record.RecordViewModel
 import com.achub.hram.tracking.HramActivityTrackingManager
+import com.achub.hram.tracking.TrackingController
 import com.achub.hram.utils.ActivityNameErrorMapper
 import dev.icerock.moko.permissions.PermissionsController
 import kotlinx.coroutines.CoroutineDispatcher
@@ -21,6 +23,8 @@ class ViewModelModule {
     fun recordViewModel(
         trackingManager: HramActivityTrackingManager,
         activityNameErrorMapper: ActivityNameErrorMapper,
+        trackingController: TrackingController,
+        trackingStateRepo: TrackingStateRepo,
         @InjectedParam permissionsController: PermissionsController,
         @WorkerThread dispatcher: CoroutineDispatcher,
     ) = RecordViewModel(
@@ -28,6 +32,8 @@ class ViewModelModule {
         activityNameErrorMapper = activityNameErrorMapper,
         permissionController = permissionsController,
         dispatcher = dispatcher,
+        trackingStateRepo = trackingStateRepo,
+        trackingController = trackingController,
     )
 
     @Factory
