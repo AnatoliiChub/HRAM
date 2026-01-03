@@ -1,4 +1,4 @@
-package com.achub.hram.data
+package com.achub.hram.data.store
 
 import androidx.datastore.core.okio.OkioSerializer
 import com.achub.hram.data.models.BleState
@@ -7,7 +7,7 @@ import okio.BufferedSink
 import okio.BufferedSource
 import okio.use
 
-class TrackingStateSerializer(val json: Json) : OkioSerializer<BleState> {
+class BleStateSerializer(val json: Json) : OkioSerializer<BleState> {
     override val defaultValue: BleState = BleState.Disconnected
 
     override suspend fun readFrom(source: BufferedSource): BleState = json.decodeFromString<BleState>(

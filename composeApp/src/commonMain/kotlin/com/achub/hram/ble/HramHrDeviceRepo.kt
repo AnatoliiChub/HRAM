@@ -77,5 +77,8 @@ class HramHrDeviceRepo(
         bleDataRepo.observeHeartRate(device),
         bleDataRepo.observeBatteryLevel(device),
         device.state.onEach { logger(TAG) { "Device state changed. $it " } }
-    ) { hr, battery, state -> BleNotification(hr, battery, state is State.Connected) }
+    ) { hr, battery, state ->
+        val isConnected = state is State.Connected
+        if (isConnected) BleNotification(hr, battery, true) else BleNotification.Empty
+    }
 }

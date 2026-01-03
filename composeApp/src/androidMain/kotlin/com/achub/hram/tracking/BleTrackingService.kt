@@ -16,13 +16,14 @@ import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.HramBleDevice
 import com.achub.hram.data.models.BleState
 import com.achub.hram.data.models.ScanError
-import com.achub.hram.data.repo.TrackingStateRepo
+import com.achub.hram.data.repo.state.BleStateRepo
 import com.achub.hram.di.CoroutineModule.Companion.WORKER_DISPATCHER
 import com.achub.hram.ext.launchIn
 import com.achub.hram.ext.logger
 import com.achub.hram.ext.loggerE
 import com.achub.hram.library.R
 import com.juul.kable.UnmetRequirementException
+import dev.icerock.moko.permissions.DeniedException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,6 +32,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -53,10 +55,11 @@ private const val TAG = "BleTrackingService"
 class BleTrackingService : Service(), KoinComponent {
     companion object {
         const val EXTRA_DEVICE = "device"
+        const val EXTRA_NAME = "name"
     }
 
     private val trackingManager: ActivityTrackingManager by inject()
-    private val trackingStateRepo: TrackingStateRepo by inject()
+    private val bleStateRepo: BleStateRepo by inject()
 
     private val dispatcher: CoroutineDispatcher by inject(qualifier = named(WORKER_DISPATCHER))
     private val job = SupervisorJob()
@@ -74,10 +77,6 @@ class BleTrackingService : Service(), KoinComponent {
         val notification: Notification = notification("")
         ServiceCompat.startForeground(this, 1, notification, FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE)
         logger(TAG) { "Service created" }
-        trackingManager.listen()
-            .onEach { trackingStateRepo.updateTrackingState(BleState.NotificationUpdate(it)) }
-            .flowOn(dispatcher)
-            .launchIn(scope)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -95,7 +94,20 @@ class BleTrackingService : Service(), KoinComponent {
                 intent?.getStringExtra(EXTRA_DEVICE)?.let { connect(identifier = it) }
             }
 
-            Action.Disconnect -> scope.launch { trackingStateRepo.updateTrackingState(BleState.Disconnected) }
+            Action.Disconnect -> {
+                hrTrackingJob?.cancel()
+                hrTrackingJob = null
+                scope.launch { bleStateRepo.update(BleState.Disconnected) }
+            }
+
+            Action.StartTracking -> scope.launch { trackingManager.startTracking() }
+
+            Action.PauseTracking -> scope.launch { trackingManager.pauseTracking() }
+
+            Action.StopTracking -> {
+                val name = intent?.getStringExtra(EXTRA_NAME)
+                scope.launch { trackingManager.finishTracking(name) }
+            }
         }
         return START_STICKY
     }
@@ -125,7 +137,11 @@ class BleTrackingService : Service(), KoinComponent {
             .filter { result -> result is ConnectionResult.Connected }
             .map { it as ConnectionResult.Connected }
             .map { it.device }
-            .onEach { trackingStateRepo.updateTrackingState(BleState.Connected(it)) }
+            .onEach { bleStateRepo.update(BleState.Connected(it)) }
+            .flatMapLatest { device ->
+                trackingManager.listen()
+                    .onEach { bleStateRepo.update(BleState.NotificationUpdate(it, device)) }
+            }
             .launchIn(scope)
             .let { hrTrackingJob = it }
     }
@@ -133,35 +149,37 @@ class BleTrackingService : Service(), KoinComponent {
     fun onConnectionFailed(exception: Throwable? = null) = scope.launch {
         loggerE(TAG) { "Connection failed: $exception" }
         trackingManager.disconnect()
-        trackingStateRepo.updateTrackingState(BleState.Disconnected)
+        bleStateRepo.update(BleState.Disconnected)
     }
 
     private suspend fun onConnectionInit(device: HramBleDevice) {
         logger(TAG) { "Initializing connection to device: $device" }
-        trackingStateRepo.updateTrackingState(BleState.Connecting(device))
+        bleStateRepo.update(BleState.Connecting(device))
     }
 
     private suspend fun onScanFailed(exception: Throwable) {
         loggerE(TAG) { "Scan failed: $exception" }
-        val error = if (exception is UnmetRequirementException) ScanError.BLUETOOTH_OFF else null
-        if (error == null) return
-        val scanState = BleState.Scanning.Error
-        trackingStateRepo.updateTrackingState(scanState)
+        val error = when (exception) {
+            is DeniedException if exception.message == "Bluetooth is powered off" -> ScanError.BLUETOOTH_OFF
+            is UnmetRequirementException -> ScanError.BLUETOOTH_OFF
+            else -> ScanError.NO_BLE_PERMISSIONS
+        }
+        bleStateRepo.update(BleState.Scanning.Error(error))
     }
 
     private suspend fun onScanComplete() {
         logger(TAG) { "completeScan" }
         if (currentAction.get() != Action.Scan.ordinal) return
-        trackingStateRepo.updateTrackingState(BleState.Scanning.Completed)
+        bleStateRepo.update(BleState.Scanning.Completed)
     }
 
     private suspend fun onInitScan() {
-        trackingStateRepo.updateTrackingState(BleState.Scanning.Started)
+        bleStateRepo.update(BleState.Scanning.Started)
     }
 
     private suspend fun onUpdateScan(device: BleDevice) {
         if (currentAction.get() != Action.Scan.ordinal) return
-        trackingStateRepo.updateTrackingState(BleState.Scanning.Update(device))
+        bleStateRepo.update(BleState.Scanning.Update(device))
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -188,5 +206,8 @@ class BleTrackingService : Service(), KoinComponent {
         Scan,
         Connect,
         Disconnect,
+        StartTracking,
+        PauseTracking,
+        StopTracking,
     }
 }

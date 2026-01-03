@@ -10,6 +10,7 @@ import com.achub.hram.di.WorkerThread
 import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.createActivity
 import com.achub.hram.ext.loggerE
+import com.achub.hram.ext.tickerFlow
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -18,6 +19,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
@@ -30,7 +33,9 @@ import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.concurrent.atomics.update
 import kotlin.time.Clock.System.now
 import kotlin.time.Duration
+import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
+import kotlin.time.toDuration
 import kotlin.uuid.ExperimentalUuidApi
 
 private const val TAG = "HramActivityTrackingManager"
@@ -89,11 +94,15 @@ class HramActivityTrackingManager(
 
     override fun connect(device: BleDevice) = hrDeviceRepo.connect(device)
 
-    override fun listen(): Flow<BleNotification> = hrDeviceRepo.listen()
-        .onStart { emit(BleNotification.Empty) }
-        .map { it.copy(elapsedTime = stopWatch.elapsedTimeSeconds()) }
-        .onEach { bleIndication -> if (isRecording && bleIndication.isBleConnected) store(bleIndication) }
-        .catch { loggerE(TAG) { "listen error : $it" } }
+    override fun listen(): Flow<BleNotification> =
+        hrDeviceRepo.listen()
+            .combine(
+                tickerFlow(1.toDuration(DurationUnit.SECONDS)).filter { isRecording }.onStart { emit(Unit) }
+            ) { bleNotification, _ -> bleNotification }
+            .onStart { emit(BleNotification.Empty) }
+            .map { it.copy(elapsedTime = stopWatch.elapsedTimeSeconds()) }
+            .onEach { bleIndication -> if (isRecording && bleIndication.isBleConnected) store(bleIndication) }
+            .catch { loggerE(TAG) { "listen error : $it" } }
 
     private suspend fun store(bleIndication: BleNotification) {
         bleIndication.hrNotification?.let { hrNotification ->

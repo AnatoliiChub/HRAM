@@ -12,7 +12,7 @@ sealed class BleState() {
         data class Update(val device: BleDevice) : Scanning()
 
         @Serializable
-        data object Error : Scanning()
+        data class Error(val error: ScanError) : Scanning()
 
         @Serializable
         data object Completed : Scanning()
@@ -28,14 +28,16 @@ sealed class BleState() {
     data class Connected(val bleDevice: BleDevice, val error: ConnectionError? = null) : BleState()
 
     @Serializable
-    data class NotificationUpdate(val bleNotification: BleNotification) : BleState()
+    data class NotificationUpdate(val bleNotification: BleNotification, val device: BleDevice) : BleState()
 
     @Serializable
     data object Disconnected : BleState()
 }
 
+@Serializable
 enum class ScanError {
     BLUETOOTH_OFF,
+    NO_BLE_PERMISSIONS,
 }
 
 enum class ConnectionError {

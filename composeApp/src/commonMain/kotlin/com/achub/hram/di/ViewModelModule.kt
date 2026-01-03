@@ -1,10 +1,10 @@
 package com.achub.hram.di
 
+import com.achub.hram.data.repo.state.BleStateRepo
 import com.achub.hram.data.repo.HrActivityRepo
-import com.achub.hram.data.repo.TrackingStateRepo
+import com.achub.hram.data.repo.state.TrackingStateRepo
 import com.achub.hram.screen.activities.ActivitiesViewModel
 import com.achub.hram.screen.record.RecordViewModel
-import com.achub.hram.tracking.HramActivityTrackingManager
 import com.achub.hram.tracking.TrackingController
 import com.achub.hram.utils.ActivityNameErrorMapper
 import dev.icerock.moko.permissions.PermissionsController
@@ -21,17 +21,17 @@ class ViewModelModule {
     @Factory
     @KoinViewModel
     fun recordViewModel(
-        trackingManager: HramActivityTrackingManager,
         activityNameErrorMapper: ActivityNameErrorMapper,
         trackingController: TrackingController,
+        bleStateRepo: BleStateRepo,
         trackingStateRepo: TrackingStateRepo,
         @InjectedParam permissionsController: PermissionsController,
         @WorkerThread dispatcher: CoroutineDispatcher,
     ) = RecordViewModel(
-        trackingManager = trackingManager,
         activityNameErrorMapper = activityNameErrorMapper,
         permissionController = permissionsController,
         dispatcher = dispatcher,
+        bleStateRepo = bleStateRepo,
         trackingStateRepo = trackingStateRepo,
         trackingController = trackingController,
     )

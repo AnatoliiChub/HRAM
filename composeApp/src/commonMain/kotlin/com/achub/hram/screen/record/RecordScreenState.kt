@@ -44,6 +44,16 @@ fun MutableStateFlow<RecordScreenState>.updateHrDeviceDialogIfExists(
     update { state -> state.copy(dialog = updatedDialog(it)) }
 }
 
+fun MutableStateFlow<RecordScreenState>.hrDeviceDialog(scanDuration: Duration) =
+    update {
+        it.copy(
+            dialog = RecordScreenDialog.ChooseHRDevice(
+                isLoading = true,
+                loadingDuration = scanDuration
+            )
+        )
+    }
+
 fun MutableStateFlow<RecordScreenState>.settingsDialog() =
     update { it.copy(dialog = RecordScreenDialog.OpenSettingsDialog) }
 
@@ -66,3 +76,7 @@ fun MutableStateFlow<RecordScreenState>.updateHrDeviceDialogConnecting() =
     this.updateHrDeviceDialogIfExists { it.copy(isDeviceConfirmed = true, isLoading = true) }
 
 val MutableStateFlow<RecordScreenState>.isRecording: Boolean get() = value.recordingState.isRecording()
+
+fun MutableStateFlow<RecordScreenState>.clearRequestBluetooth() = this.value.requestBluetooth.also {
+    if (it) this.update { state -> state.copy(requestBluetooth = false) }
+}

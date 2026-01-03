@@ -70,7 +70,7 @@ fun RecordScreen() {
                 Spacer(Modifier.weight(COLUMN_SPACER_WEIGHT))
                 TrackingIndicationsSection(indications)
                 Spacer(Modifier.size(Dimen32))
-                DeviceSection(device) { viewModel.requestScanning() }
+                DeviceSection(device) { viewModel.scan() }
                 Spacer(Modifier.weight(COLUMN_SPACER_WEIGHT))
                 RecordSection(
                     recordingState = state.recordingState,
@@ -83,7 +83,7 @@ fun RecordScreen() {
         Dialog(
             state,
             onDeviceSelected = ::onHrDeviceSelected,
-            onRequestScanning = ::requestScanning,
+            onRequestScanning = ::scan,
             onDismissDialog = ::dismissDialog,
             onCancelScanning = ::cancelScanning,
             openSettings = ::openSettings,

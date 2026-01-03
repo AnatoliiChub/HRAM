@@ -25,14 +25,35 @@ actual class TrackingController(
     }
 
     actual fun disconnectDevice() {
+        context.startForegroundService(
+            Intent(context, BleTrackingService::class.java).apply {
+                putExtra(ACTION, BleTrackingService.Action.Disconnect.ordinal)
+            }
+        )
     }
 
     actual fun startTracking() {
+        context.startForegroundService(
+            Intent(context, BleTrackingService::class.java).apply {
+                putExtra(ACTION, BleTrackingService.Action.StartTracking.ordinal)
+            }
+        )
     }
 
     actual fun pauseTracking() {
+        context.startForegroundService(
+            Intent(context, BleTrackingService::class.java).apply {
+                putExtra(ACTION, BleTrackingService.Action.PauseTracking.ordinal)
+            }
+        )
     }
 
     actual fun stopTracking(name: String) {
+        context.startForegroundService(
+            Intent(context, BleTrackingService::class.java).apply {
+                putExtra(ACTION, BleTrackingService.Action.StopTracking.ordinal)
+                putExtra(BleTrackingService.EXTRA_NAME, name)
+            }
+        )
     }
 }
