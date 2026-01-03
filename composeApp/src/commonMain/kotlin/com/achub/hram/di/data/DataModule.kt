@@ -4,7 +4,7 @@ import androidx.datastore.core.DataStore
 import com.achub.hram.data.db.HramDatabase
 import com.achub.hram.data.db.dao.ActivityDao
 import com.achub.hram.data.db.dao.HeartRateDao
-import com.achub.hram.data.models.TrackingState
+import com.achub.hram.data.models.BleState
 import com.achub.hram.data.repo.HrActivityRepo
 import com.achub.hram.data.repo.HramHrActivityRepo
 import com.achub.hram.data.repo.HramTrackingStateRepo
@@ -32,6 +32,6 @@ class DataModule {
         HramHrActivityRepo(actDao, hrDao)
 
     @Single
-    fun provideTrackingStateRepo(datastore: DataStore<TrackingState>): TrackingStateRepo =
+    fun provideTrackingStateRepo(datastore: DataStore<BleState>): TrackingStateRepo =
         HramTrackingStateRepo(datastore)
 }

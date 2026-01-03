@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.achub.hram.BLE_SCAN_DURATION
 import com.achub.hram.ble.models.BleDevice
-import com.achub.hram.data.models.TrackingState
+import com.achub.hram.data.models.BleState
 import com.achub.hram.data.repo.TrackingStateRepo
 import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.launchIn
@@ -15,7 +15,6 @@ import com.achub.hram.ext.stateInExt
 import com.achub.hram.tracking.HramActivityTrackingManager
 import com.achub.hram.tracking.TrackingController
 import com.achub.hram.utils.ActivityNameErrorMapper
-import com.achub.hram.view.section.RecordingState
 import dev.icerock.moko.permissions.PermissionsController
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineDispatcher
@@ -50,38 +49,47 @@ class RecordViewModel(
         trackingStateRepo.listenTrackingState().onStart { trackingStateRepo.release() }.onEach { state ->
             Napier.d { "new state : $state" }
             when (state) {
-                is TrackingState.Scanning -> {
-                    if (state.error == com.achub.hram.data.models.ScanError.BLUETOOTH_OFF) {
-                        _uiState.requestBluetooth()
-                    } else {
-                        _uiState.update {
+                is BleState.Scanning -> {
+                    when (state) {
+                        is BleState.Scanning.Started -> _uiState.update {
                             it.copy(
                                 dialog = RecordScreenDialog.ChooseHRDevice(
-                                    isLoading = state.completed.not() && state.error == null,
-                                    scannedDevices = state.devices,
-                                    loadingDuration = scanDuration,
+                                    isLoading = true,
+                                    loadingDuration = scanDuration
                                 )
                             )
+                        }
+
+                        is BleState.Scanning.Error,
+                        is BleState.Scanning.Completed -> _uiState.updateHrDeviceDialogIfExists {
+                            it.copy(isLoading = false)
+                        }
+
+                        is BleState.Scanning.Update -> _uiState.updateHrDeviceDialogIfExists { dialog ->
+                            if (dialog.scannedDevices.any { it.identifier == state.device.identifier }.not()) {
+                                dialog.copy(scannedDevices = dialog.scannedDevices + state.device)
+                            } else {
+                                dialog
+                            }
                         }
                     }
                 }
 
-                is TrackingState.Connecting -> _uiState.updateHrDeviceDialogConnecting()
+                is BleState.Connecting -> _uiState.updateHrDeviceDialogConnecting()
 
-                is TrackingState.Connected -> {
+                is BleState.Connected -> {
                     if (state.error != null) {
                         _uiState.update {
                             it.copy(dialog = RecordScreenDialog.ConnectionErrorDialog, connectedDevice = null)
                         }
                     } else {
                         _uiState.deviceConnectedDialog(state.bleDevice)
-                        if (_uiState.value.recordingState == RecordingState.Init) _uiState.toggleRecordingState()
                     }
                 }
 
-                is TrackingState.NotificationUpdate -> _uiState.indications(state.bleNotification)
+                is BleState.NotificationUpdate -> _uiState.indications(state.bleNotification)
 
-                is TrackingState.Disconnected -> {
+                is BleState.Disconnected -> {
                     _uiState.update { it.copy(connectedDevice = null) }
                 }
             }
@@ -89,10 +97,6 @@ class RecordViewModel(
     }
 
     fun toggleRecording() {
-        if (_uiState.value.recordingState == RecordingState.Init) {
-            requestScanning()
-            return
-        }
         _uiState.toggleRecordingState()
         if (_uiState.isRecording) trackingManager.startTracking() else trackingManager.pauseTracking()
     }
@@ -113,7 +117,9 @@ class RecordViewModel(
 
     fun dismissDialog() = _uiState.update { it.copy(dialog = null) }
 
-    fun cancelScanning() = trackingManager.cancelScanning()
+    fun cancelScanning() {
+        // TODO cancel scanning
+    }
 
     fun clearRequestBluetooth() = _uiState.update { it.copy(requestBluetooth = false) }
 

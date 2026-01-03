@@ -1,127 +1,81 @@
 package com.achub.hram.ble
 
-import com.achub.hram.BLE_SCAN_DURATION
 import com.achub.hram.ble.core.connection.BleConnectionManager
 import com.achub.hram.ble.core.data.BleDataRepo
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.BleNotification
 import com.achub.hram.ble.models.HramBleDevice
 import com.achub.hram.di.WorkerThread
-import com.achub.hram.ext.cancelAndClear
-import com.achub.hram.ext.launchIn
 import com.achub.hram.ext.logger
 import com.achub.hram.ext.loggerE
 import com.juul.kable.Peripheral
 import com.juul.kable.State
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.timeout
 import kotlinx.coroutines.flow.withIndex
-import kotlinx.coroutines.launch
-import org.koin.core.annotation.InjectedParam
 import org.koin.core.component.KoinComponent
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 
 private const val TAG = "HramHrDeviceRepo"
 
 class HramHrDeviceRepo(
-    @InjectedParam val scope: CoroutineScope,
     val bleDataRepo: BleDataRepo,
     @param:WorkerThread
     val dispatcher: CoroutineDispatcher,
     val bleConnectionManager: BleConnectionManager
 ) : HrDeviceRepo, KoinComponent {
-    private var scanJobs = mutableListOf<Job>()
-    private val connectionJobs = mutableListOf<Job>()
-
     @OptIn(FlowPreview::class, ExperimentalUuidApi::class)
-    override fun scan(
-        onInit: () -> Unit,
-        onUpdate: (List<BleDevice>) -> Unit,
-        onComplete: (List<BleDevice>) -> Unit,
-        onError: (Throwable) -> Unit
-    ) {
-        cancelScanning()
-        scope.launch(dispatcher) {
-            val scannedDevices = mutableSetOf<BleDevice>()
-            onInit()
-            bleConnectionManager.scanHrDevices()
-                .map { HramBleDevice(name = it.peripheralName ?: "", identifier = it.identifier.toString()) }
-                .distinctUntilChanged()
-                .onEach { device ->
-                    scannedDevices.add(device)
-                    onUpdate(scannedDevices.toList())
-                }
-                .catch { onError(it) }
-                .flowOn(dispatcher)
-                .onCompletion { onComplete(scannedDevices.toList()) }
-                .launchIn(scope = scope)
-                .let { scanJobs.add(it) }
-            delay(BLE_SCAN_DURATION)
-            cancelScanning()
-        }.let { scanJobs.add(it) }
-    }
+    override fun scan(duration: Duration): Flow<ScanResult> = bleConnectionManager.scanHrDevices()
+        .map { HramBleDevice(name = it.peripheralName ?: "", identifier = it.identifier.toString()) }
+        .distinctUntilChanged()
+        .map { device -> ScanResult.ScanUpdate(device) as ScanResult }
+        .timeout(duration)
+        .catch {
+            if (it is kotlinx.coroutines.TimeoutCancellationException) {
+                logger(TAG) { "Scan completed after timeout of $duration" }
+                emit(ScanResult.Complete)
+            } else {
+                loggerE(TAG) { "Error while scanning for devices: $it" }
+                emit(ScanResult.Error(it))
+            }
+        }
 
-    @OptIn(ExperimentalUuidApi::class, ExperimentalCoroutinesApi::class)
-    override fun connect(
-        device: BleDevice,
-        onInitConnection: () -> Unit,
-        onConnected: (BleDevice) -> Unit,
-        onError: (Throwable) -> Unit
-    ) {
-        cancelAllJobs()
-        onInitConnection()
+    @OptIn(ExperimentalUuidApi::class)
+    override fun connect(device: BleDevice): Flow<ConnectionResult> =
         bleConnectionManager.connectToDevice(device.provideIdentifier())
             .withIndex()
-            .onEach { (index, device) -> if (index == 0) onConnected(device) }
-            .catch {
-                loggerE(TAG) { "Error while connecting to device: $it" }
-                onError(it)
+            .filter { it.index == 0 }
+            .map { ConnectionResult.Connected(it.value) as ConnectionResult }
+            .catch { error ->
+                loggerE(TAG) { "Error while connecting to device: $error" }
+                emit(ConnectionResult.Error(error))
             }
-            .onCompletion { logger(TAG) { "ConnectToDevice job completed" } }
-            .flowOn(dispatcher)
-            .launchIn(scope)
-            .let { connectionJobs.add(it) }
-    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun listen() = bleConnectionManager.onConnected
+    override fun listen(): Flow<BleNotification> = bleConnectionManager.onConnected
         .flatMapLatest { device -> hrIndicationCombiner(device) }
         .catch { loggerE(TAG) { "Error: $it" } }
 
-    override fun disconnect() {
-        scope.launch {
-            bleConnectionManager.disconnect()
-            cancelAllJobs()
-        }
+    override suspend fun disconnect() {
+        bleConnectionManager.disconnect()
     }
 
     @OptIn(ExperimentalTime::class)
     private fun hrIndicationCombiner(device: Peripheral): Flow<BleNotification> = combine(
         bleDataRepo.observeHeartRate(device),
         bleDataRepo.observeBatteryLevel(device),
-        device.state
-    ) { hrNotification, battery, state -> BleNotification(hrNotification, battery, state is State.Connected) }
-
-    override fun cancelScanning() = scanJobs.cancelAndClear()
-
-    private fun cancelConnection() = connectionJobs.cancelAndClear()
-
-    private fun cancelAllJobs() {
-        cancelScanning()
-        cancelConnection()
-    }
+        device.state.onEach { logger(TAG) { "Device state changed. $it " } }
+    ) { hr, battery, state -> BleNotification(hr, battery, state is State.Connected) }
 }

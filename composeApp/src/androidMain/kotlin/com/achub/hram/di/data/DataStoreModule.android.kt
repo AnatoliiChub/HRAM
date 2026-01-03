@@ -3,7 +3,7 @@ package com.achub.hram.di.data
 import android.content.Context
 import androidx.datastore.core.DataStore
 import com.achub.hram.data.TrackingStateSerializer
-import com.achub.hram.data.models.TrackingState
+import com.achub.hram.data.models.BleState
 import com.achub.hram.data.store.DATA_STORE_FILE_NAME
 import com.achub.hram.data.store.createTrackingStateDataStore
 import com.achub.hram.di.CoroutineModule
@@ -20,7 +20,7 @@ actual class DataStoreModule actual constructor() {
     actual fun provideTrackingStateDataStore(
         scope: Scope,
         serializer: TrackingStateSerializer
-    ): DataStore<TrackingState> = createTrackingStateDataStore(
+    ): DataStore<BleState> = createTrackingStateDataStore(
         produceFilePath = { scope.get<Context>().filesDir.resolve(DATA_STORE_FILE_NAME).absolutePath },
         serializer = serializer
     )

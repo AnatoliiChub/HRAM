@@ -9,10 +9,13 @@ import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
+import com.achub.hram.BLE_SCAN_DURATION
+import com.achub.hram.ble.ConnectionResult
+import com.achub.hram.ble.ScanResult
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.HramBleDevice
+import com.achub.hram.data.models.BleState
 import com.achub.hram.data.models.ScanError
-import com.achub.hram.data.models.TrackingState
 import com.achub.hram.data.repo.TrackingStateRepo
 import com.achub.hram.di.CoroutineModule.Companion.WORKER_DISPATCHER
 import com.achub.hram.ext.launchIn
@@ -23,10 +26,13 @@ import com.juul.kable.UnmetRequirementException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -34,6 +40,8 @@ import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
 import org.koin.core.qualifier.named
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 const val CHANNEL_ID = "BLE_TRACKING_CHANNEL_ID"
 const val CHANNEL_NAME = "Channel name"
@@ -56,6 +64,8 @@ class BleTrackingService : Service(), KoinComponent {
     private var hrTrackingJob: Job? = null
     private val currentAction = AtomicInteger(-1)
 
+    private var scanJob: Job? = null
+
     override fun onCreate() {
         super.onCreate()
         val notificationChannel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT)
@@ -64,6 +74,10 @@ class BleTrackingService : Service(), KoinComponent {
         val notification: Notification = notification("")
         ServiceCompat.startForeground(this, 1, notification, FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE)
         logger(TAG) { "Service created" }
+        trackingManager.listen()
+            .onEach { trackingStateRepo.updateTrackingState(BleState.NotificationUpdate(it)) }
+            .flowOn(dispatcher)
+            .launchIn(scope)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -74,71 +88,80 @@ class BleTrackingService : Service(), KoinComponent {
 
         when (action) {
             Action.Scan -> scan()
-            Action.Connect -> intent?.getStringExtra(EXTRA_DEVICE)?.let { connect(identifier = it) }
-            Action.Disconnect -> scope.launch { trackingStateRepo.updateTrackingState(TrackingState.Disconnected) }
+
+            Action.Connect -> {
+                scanJob?.cancel()
+                scanJob = null
+                intent?.getStringExtra(EXTRA_DEVICE)?.let { connect(identifier = it) }
+            }
+
+            Action.Disconnect -> scope.launch { trackingStateRepo.updateTrackingState(BleState.Disconnected) }
         }
         return START_STICKY
     }
 
     private fun scan() {
-        trackingManager.scan(
-            onInit = { scope.launch { onInitScan() } },
-            onUpdate = { devices -> scope.launch { onUpdateScan(devices) } },
-            onComplete = { scope.launch { onScanComplete(it) } },
-            onError = { scope.launch { onScanFailed(it) } }
-        )
+        trackingManager.scan(BLE_SCAN_DURATION.toDuration(DurationUnit.MILLISECONDS))
+            .filter { currentAction.get() == Action.Scan.ordinal }
+            .onStart { onInitScan() }
+            .flowOn(dispatcher)
+            .onEach {
+                when (it) {
+                    is ScanResult.Complete -> onScanComplete(emptyList())
+                    is ScanResult.Error -> onScanFailed(it.error)
+                    is ScanResult.ScanUpdate -> onUpdateScan(it.device)
+                }
+            }
+            .launchIn(scope)
+            .let { scanJob = it }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun connect(identifier: String) {
         val device = HramBleDevice(name = "", identifier = identifier)
-        trackingManager.connect(
-            device = device,
-            onInitConnection = { scope.launch { onConnectionInit(device) } },
-            onConnected = ::onConnected,
-            onError = ::onConnectionFailed,
-        )
+        trackingManager.connect(device = device)
+            .onStart { onConnectionInit(device) }
+            .onEach { if (it is ConnectionResult.Error) onConnectionFailed(it.error) }
+            .filter { result -> result is ConnectionResult.Connected }
+            .map { it as ConnectionResult.Connected }
+            .map { it.device }
+            .onEach { trackingStateRepo.updateTrackingState(BleState.Connected(it)) }
+            .launchIn(scope)
+            .let { hrTrackingJob = it }
     }
 
-    private fun onConnected(bleDevice: BleDevice) = trackingManager.bleNotification
-        .onStart { logger(TAG) { "Connected to $bleDevice" } }
-        .onStart { trackingStateRepo.updateTrackingState(TrackingState.Connected(bleDevice)) }
-        .onEach { trackingStateRepo.updateTrackingState(TrackingState.NotificationUpdate(it)) }
-        .flowOn(dispatcher)
-        .launchIn(scope)
-        .let { hrTrackingJob = it }
-
-    private fun onConnectionFailed(exception: Throwable? = null) = scope.launch {
+    fun onConnectionFailed(exception: Throwable? = null) = scope.launch {
         loggerE(TAG) { "Connection failed: $exception" }
         trackingManager.disconnect()
-        trackingStateRepo.updateTrackingState(TrackingState.Disconnected)
+        trackingStateRepo.updateTrackingState(BleState.Disconnected)
     }
 
     private suspend fun onConnectionInit(device: HramBleDevice) {
         logger(TAG) { "Initializing connection to device: $device" }
-        trackingStateRepo.updateTrackingState(TrackingState.Connecting(device))
+        trackingStateRepo.updateTrackingState(BleState.Connecting(device))
     }
 
     private suspend fun onScanFailed(exception: Throwable) {
         loggerE(TAG) { "Scan failed: $exception" }
         val error = if (exception is UnmetRequirementException) ScanError.BLUETOOTH_OFF else null
         if (error == null) return
-        val scanState = TrackingState.Scanning(devices = emptyList(), completed = false, error = error)
+        val scanState = BleState.Scanning.Error
         trackingStateRepo.updateTrackingState(scanState)
     }
 
     private suspend fun onScanComplete(devices: List<BleDevice>) {
         logger(TAG) { "completeScan" }
         if (currentAction.get() != Action.Scan.ordinal) return
-        trackingStateRepo.updateTrackingState(TrackingState.Scanning(devices, true, error = null))
+        trackingStateRepo.updateTrackingState(BleState.Scanning.Completed)
     }
 
     private suspend fun onInitScan() {
-        trackingStateRepo.updateTrackingState(TrackingState.Scanning(devices = emptyList()))
+        trackingStateRepo.updateTrackingState(BleState.Scanning.Started)
     }
 
-    private suspend fun onUpdateScan(devices: List<BleDevice>) {
+    private suspend fun onUpdateScan(device: BleDevice) {
         if (currentAction.get() != Action.Scan.ordinal) return
-        trackingStateRepo.updateTrackingState(TrackingState.Scanning(devices))
+        trackingStateRepo.updateTrackingState(BleState.Scanning.Update(device))
     }
 
     override fun onBind(intent: Intent?): IBinder? {

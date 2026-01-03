@@ -49,7 +49,6 @@ class BleDataModule {
         bleConnector: BleConnector,
         peripheralConvertor: PeripheralConvertor,
     ): HrDeviceRepo = HramHrDeviceRepo(
-        scope,
         bleDataRepo,
         dispatcher,
         // Assisted injection in AssistedInject is not supported

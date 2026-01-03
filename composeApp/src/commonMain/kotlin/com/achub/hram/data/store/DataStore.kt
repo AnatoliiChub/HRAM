@@ -4,7 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.core.okio.OkioStorage
 import com.achub.hram.data.TrackingStateSerializer
-import com.achub.hram.data.models.TrackingState
+import com.achub.hram.data.models.BleState
 import okio.FileSystem
 import okio.Path.Companion.toPath
 import okio.SYSTEM
@@ -12,7 +12,7 @@ import okio.SYSTEM
 fun createTrackingStateDataStore(
     produceFilePath: () -> String,
     serializer: TrackingStateSerializer
-): DataStore<TrackingState> = DataStoreFactory.create(
+): DataStore<BleState> = DataStoreFactory.create(
     storage = OkioStorage(
         fileSystem = FileSystem.SYSTEM,
         serializer = serializer,

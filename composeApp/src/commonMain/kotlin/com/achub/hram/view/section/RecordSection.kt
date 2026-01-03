@@ -30,7 +30,8 @@ const val PAUSED_STATE_BTN_WIDTH_FRACTION = 0.5f
 fun RecordSection(
     recordingState: RecordingState,
     onPlay: () -> Unit = {},
-    onStop: () -> Unit = {}
+    onStop: () -> Unit = {},
+    isRecordingEnabled: Boolean,
 ) {
     Row(modifier = Modifier.padding(Dimen16)) {
         val icon = if (recordingState == RecordingState.Recording) Res.drawable.ic_pause else Res.drawable.ic_play
@@ -41,7 +42,7 @@ fun RecordSection(
         HrButton(
             modifier = Modifier.height(Dimen48).fillMaxWidth(first),
             onClick = onPlay,
-            enabled = true,
+            enabled = isRecordingEnabled,
         ) { Icon(icon, it) }
 
         Spacer(Modifier.size(Dimen16))
@@ -78,6 +79,7 @@ private fun RecordSectionRecordingPreview() {
         recordingState = RecordingState.Recording,
         onPlay = {},
         onStop = {},
+        isRecordingEnabled = true
     )
 }
 
@@ -88,5 +90,17 @@ private fun RecordSectionPausedPreview() {
         recordingState = RecordingState.Paused,
         onPlay = {},
         onStop = {},
+        isRecordingEnabled = true
+    )
+}
+
+@Preview
+@Composable
+private fun RecordSectionInitPreview() {
+    RecordSection(
+        recordingState = RecordingState.Init,
+        onPlay = {},
+        onStop = {},
+        isRecordingEnabled = false
     )
 }

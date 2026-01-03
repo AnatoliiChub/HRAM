@@ -2,7 +2,7 @@ package com.achub.hram.di.data
 
 import androidx.datastore.core.DataStore
 import com.achub.hram.data.TrackingStateSerializer
-import com.achub.hram.data.models.TrackingState
+import com.achub.hram.data.models.BleState
 import com.achub.hram.di.CoroutineModule
 import com.achub.hram.di.JsonModule
 import org.koin.core.annotation.Configuration
@@ -14,5 +14,5 @@ import org.koin.core.scope.Scope
 @Configuration
 expect class DataStoreModule() {
     @Single
-    fun provideTrackingStateDataStore(scope: Scope, serializer: TrackingStateSerializer): DataStore<TrackingState>
+    fun provideTrackingStateDataStore(scope: Scope, serializer: TrackingStateSerializer): DataStore<BleState>
 }
