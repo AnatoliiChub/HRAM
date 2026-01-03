@@ -107,7 +107,7 @@ class BleTrackingService : Service(), KoinComponent {
             .flowOn(dispatcher)
             .onEach {
                 when (it) {
-                    is ScanResult.Complete -> onScanComplete(emptyList())
+                    is ScanResult.Complete -> onScanComplete()
                     is ScanResult.Error -> onScanFailed(it.error)
                     is ScanResult.ScanUpdate -> onUpdateScan(it.device)
                 }
@@ -149,7 +149,7 @@ class BleTrackingService : Service(), KoinComponent {
         trackingStateRepo.updateTrackingState(scanState)
     }
 
-    private suspend fun onScanComplete(devices: List<BleDevice>) {
+    private suspend fun onScanComplete() {
         logger(TAG) { "completeScan" }
         if (currentAction.get() != Action.Scan.ordinal) return
         trackingStateRepo.updateTrackingState(BleState.Scanning.Completed)

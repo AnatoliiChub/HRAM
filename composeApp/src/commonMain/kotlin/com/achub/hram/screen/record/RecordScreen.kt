@@ -68,7 +68,7 @@ fun RecordScreen() {
                 horizontalAlignment = CenterHorizontally
             ) {
                 Spacer(Modifier.weight(COLUMN_SPACER_WEIGHT))
-                TrackingIndicationsSection(indications, device)
+                TrackingIndicationsSection(indications)
                 Spacer(Modifier.size(Dimen32))
                 DeviceSection(device) { viewModel.requestScanning() }
                 Spacer(Modifier.weight(COLUMN_SPACER_WEIGHT))

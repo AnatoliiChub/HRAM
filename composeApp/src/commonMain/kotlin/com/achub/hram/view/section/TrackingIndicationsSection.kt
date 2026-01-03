@@ -8,10 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.BleNotification
 import com.achub.hram.ble.models.HrNotification
-import com.achub.hram.ble.models.HramBleDevice
 import com.achub.hram.style.Dimen16
 import com.achub.hram.style.Heading3
 import com.achub.hram.view.indications.HeartIndicationRow
@@ -28,7 +26,7 @@ val dateFormat = LocalTime.Format {
 }
 
 @Composable
-fun TrackingIndicationsSection(bleNotification: BleNotification, device: BleDevice?) {
+fun TrackingIndicationsSection(bleNotification: BleNotification) {
     Column(horizontalAlignment = CenterHorizontally) {
         HeartIndicationRow(bleNotification = bleNotification)
         Text(
@@ -52,10 +50,5 @@ private fun TrackingIndicationsSectionPreview() {
     )
     TrackingIndicationsSection(
         bleNotification = bleNotification,
-        device = HramBleDevice(
-            name = "HRM Belt 42282",
-            identifier = "00:11:22:33:44:55",
-            manufacturer = "Decathlon",
-        )
     )
 }
