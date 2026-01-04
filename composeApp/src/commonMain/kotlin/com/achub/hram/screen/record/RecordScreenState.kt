@@ -74,7 +74,7 @@ fun MutableStateFlow<RecordScreenState>.requestBluetooth() =
 fun MutableStateFlow<RecordScreenState>.indications(bleNotification: BleNotification) =
     this.update { it.copy(bleNotification = bleNotification) }
 
-fun MutableStateFlow<RecordScreenState>.connectingProgressDialog() =
+fun MutableStateFlow<RecordScreenState>.connectingProgressDialog(device: BleDevice) =
     this.update {
         it.copy(
             dialog = RecordScreenDialog.ChooseHRDevice(

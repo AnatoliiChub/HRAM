@@ -1,6 +1,5 @@
 package com.achub.hram.tracking
 
-import com.achub.hram.ble.ConnectionResult
 import com.achub.hram.ble.ScanResult
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.BleNotification
@@ -24,9 +23,13 @@ interface ActivityTrackingManager {
 
     fun disconnect()
 
-    fun connect(device: BleDevice): Flow<ConnectionResult>
+    fun connectAndSubscribe(device: BleDevice): Flow<BleNotification>
 
     fun scan(duration: Duration): Flow<ScanResult>
 
-    fun listen(): Flow<BleNotification>
+    fun releaseState()
+
+    suspend fun trackingState(): TrackingStateStage
+
+    fun cancelScanning()
 }

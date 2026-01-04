@@ -60,7 +60,7 @@ class RecordViewModel(
             when (state) {
                 is BleState.Scanning -> handleScanning(state)
 
-                is BleState.Connecting -> _uiState.connectingProgressDialog()
+                is BleState.Connecting -> _uiState.connectingProgressDialog(state.device)
 
                 is BleState.Connected -> handleConnectedState(state)
 

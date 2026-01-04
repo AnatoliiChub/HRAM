@@ -19,7 +19,8 @@ actual class TrackingController(
         context.startForegroundService(
             Intent(context, BleTrackingService::class.java).apply {
                 putExtra(ACTION, BleTrackingService.Action.Connect.ordinal)
-                putExtra(BleTrackingService.EXTRA_DEVICE, device.identifier)
+                putExtra(BleTrackingService.EXTRA_DEVICE_ID, device.identifier)
+                putExtra(BleTrackingService.EXTRA_DEVICE_NAME, device.name)
             }
         )
     }
@@ -52,7 +53,7 @@ actual class TrackingController(
         context.startForegroundService(
             Intent(context, BleTrackingService::class.java).apply {
                 putExtra(ACTION, BleTrackingService.Action.StopTracking.ordinal)
-                putExtra(BleTrackingService.EXTRA_NAME, name)
+                putExtra(BleTrackingService.EXTRA_ACTIVITY_NAME, name)
             }
         )
     }
