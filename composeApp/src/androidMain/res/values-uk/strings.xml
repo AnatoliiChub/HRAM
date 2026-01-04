@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">HRAM</string>
+    <string name="channel_name">Відстеження пульсу</string>
+
+    <!-- Notification texts -->
+    <string name="notification_title">HRAM</string>
+    <string name="notification_initializing">Ініціалізація…</string>
+    <string name="notification_scanning_started">Пошук пристроїв…</string>
+    <string name="notification_scanning_found_device">Знайдено пристрій: %1$s</string>
+    <string name="notification_scanning_complete">Пошук завершено.</string>
+    <string name="notification_scanning_error">Помилка пошуку: %1$s</string>
+    <string name="notification_connecting">Підключення до пристрою: %1$s…</string>
+    <string name="notification_connected">Підключено до пристрою: %1$s.</string>
+    <string name="notification_connection_lost">З\&#39;язок втрачено.</string>
+    <string name="notification_no_contact">Відсутній контакт із сенсором.</string>
+    <string name="notification_current_hr">%1$sПоточний пульс: %2$s уд/хв</string>
+    <string name="notification_disconnected">Відключено від пристрою.</string>
+</resources>

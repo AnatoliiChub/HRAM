@@ -74,7 +74,8 @@ class BleTrackingService : Service(), KoinComponent {
 
     override fun onCreate() {
         super.onCreate()
-        val notificationChannel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT)
+        val notificationChannel =
+            NotificationChannel(CHANNEL_ID, getString(R.string.channel_name), NotificationManager.IMPORTANCE_DEFAULT)
         val notificationManager = getSystemService(NotificationManager::class.java)
         notificationManager.createNotificationChannel(notificationChannel)
         val notification: Notification = createNotification()
@@ -201,7 +202,7 @@ class BleTrackingService : Service(), KoinComponent {
 
     private fun createNotification(): Notification {
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Heart Rate Tracking")
+            .setContentTitle(getString(R.string.notification_title))
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setSilent(true)
             .setOngoing(true)
@@ -211,52 +212,70 @@ class BleTrackingService : Service(), KoinComponent {
     private suspend fun updateNotification(state: BleState) {
         val notificationData = when (state) {
             is BleState.Scanning -> when (state) {
-                is BleState.Scanning.Started -> NotificationData("Scanning for devices...", R.drawable.ic_scanning_24)
-
-                is BleState.Scanning.Update -> NotificationData(
-                    "Found device: ${state.device.name}",
+                is BleState.Scanning.Started -> NotificationData(
+                    getString(R.string.notification_scanning_started),
                     R.drawable.ic_scanning_24
                 )
 
-                is BleState.Scanning.Completed -> NotificationData("Scan complete.", R.drawable.ic_scanning_24)
+                is BleState.Scanning.Update -> NotificationData(
+                    getString(R.string.notification_scanning_found_device, state.device.name),
+                    R.drawable.ic_scanning_24
+                )
 
-                is BleState.Scanning.Error -> NotificationData("Scan error: ${state.error}", R.drawable.ic_scanning_24)
+                is BleState.Scanning.Completed -> NotificationData(
+                    getString(R.string.notification_scanning_complete),
+                    R.drawable.ic_scanning_24
+                )
+
+                is BleState.Scanning.Error -> NotificationData(
+                    getString(
+                        R.string.notification_scanning_error,
+                        state.error
+                    ),
+                    R.drawable.ic_scanning_24
+                )
             }
 
             is BleState.Connecting -> NotificationData(
-                "Connecting to device: ${state.device.identifier}...",
+                getString(R.string.notification_connecting, state.device.identifier),
                 R.drawable.ic_scanning_24
             )
 
             is BleState.Connected -> NotificationData(
-                "Connected to device: ${state.bleDevice.name}.",
+                getString(R.string.notification_connected, state.bleDevice.name),
                 R.drawable.ic_heart
             )
 
             is BleState.NotificationUpdate -> {
                 with(state.bleNotification) {
                     if (isBleConnected.not()) {
-                        NotificationData("Connection Lost.", R.drawable.ic_heart_disconnected)
+                        NotificationData(
+                            getString(R.string.notification_connection_lost),
+                            R.drawable.ic_heart_disconnected
+                        )
                     } else if (hrNotification?.isContactOn?.not() == true) {
-                        NotificationData("No Contact with sensor.", R.drawable.ic_heart_contact_off)
+                        NotificationData(getString(R.string.notification_no_contact), R.drawable.ic_heart_contact_off)
                     } else {
                         val hrBpm = hrNotification?.hrBpm ?: "--"
                         NotificationData(
-                            "${trackingStateRepo.get().text()}Current Heart Rate: $hrBpm bpm",
+                            getString(R.string.notification_current_hr, trackingStateRepo.get().text(), hrBpm),
                             R.drawable.ic_heart
                         )
                     }
                 }
             }
 
-            is BleState.Disconnected -> NotificationData("Disconnected from device.", R.drawable.ic_heart_disconnected)
+            is BleState.Disconnected -> NotificationData(
+                getString(R.string.notification_disconnected),
+                R.drawable.ic_heart_disconnected
+            )
         }
 
         updateNotification(notificationData)
     }
 
     private fun updateNotification(data: NotificationData) {
-        val title = "HRAM"
+        val title = getString(R.string.notification_title)
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setLargeIcon(Icon.createWithResource(this, data.iconRes))

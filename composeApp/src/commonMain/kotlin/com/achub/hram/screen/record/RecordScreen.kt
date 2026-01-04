@@ -42,6 +42,8 @@ import hram.composeapp.generated.resources.dialog_name_activity_title
 import hram.composeapp.generated.resources.dialog_open_setting_button_text
 import hram.composeapp.generated.resources.dialog_open_setting_message
 import hram.composeapp.generated.resources.dialog_open_setting_title
+import hram.composeapp.generated.resources.record_screen_connect_device
+import hram.composeapp.generated.resources.record_screen_device_from
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -103,14 +105,18 @@ private fun DeviceSection(device: BleDevice?, onConnectClick: () -> Unit) {
         ) {
             Text(
                 modifier = Modifier.padding(horizontal = Dimen32),
-                text = "Connect Device".uppercase(),
+                text = stringResource(Res.string.record_screen_connect_device).uppercase(),
                 style = LabelSmall.copy(color = Red.copy(alpha = it)),
             )
         }
     } else {
         Text(
             modifier = Modifier.padding(Dimen32),
-            text = "${device.name} from ${device.manufacturer}",
+            text = stringResource(
+                Res.string.record_screen_device_from,
+                device.name,
+                device.manufacturer ?: ""
+            ),
             style = LabelMediumBold.copy(color = White.copy(alpha = 0.7f))
         )
     }
