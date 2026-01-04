@@ -50,25 +50,27 @@ fun ActivitiesScreen() {
         ) {
             items(items = state.activities, key = { it.activity.id }) { activityInfo ->
                 val id = activityInfo.activity.id
-                ActivityCard(
-                    modifier = Modifier.combinedClickable(
-                        indication = null,
-                        interactionSource = MutableInteractionSource(),
-                        onLongClick = {
-                            viewModel.toggleSelection(id)
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        },
-                        onClick = {
-                            viewModel.onHighlighted(null)
-                            if (state.isSelectionMode) viewModel.toggleSelection(id)
-                        }
-                    ),
-                    selected = selectedIds.contains(id),
-                    selectionEnabled = state.isSelectionMode,
-                    activityInfo = activityInfo,
-                    highLighted = state.highlightedItem,
-                    onHighlighted = { viewModel.onHighlighted(it) }
-                )
+                if (activityInfo.buckets.isNotEmpty()) {
+                    ActivityCard(
+                        modifier = Modifier.combinedClickable(
+                            indication = null,
+                            interactionSource = MutableInteractionSource(),
+                            onLongClick = {
+                                viewModel.toggleSelection(id)
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            },
+                            onClick = {
+                                viewModel.onHighlighted(null)
+                                if (state.isSelectionMode) viewModel.toggleSelection(id)
+                            }
+                        ),
+                        selected = selectedIds.contains(id),
+                        selectionEnabled = state.isSelectionMode,
+                        activityInfo = activityInfo,
+                        highLighted = state.highlightedItem,
+                        onHighlighted = { viewModel.onHighlighted(it) }
+                    )
+                }
             }
         }
         if (selectedIds.isNotEmpty()) {
