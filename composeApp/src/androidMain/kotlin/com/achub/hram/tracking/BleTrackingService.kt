@@ -30,9 +30,11 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
@@ -44,15 +46,14 @@ import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
 import org.koin.core.qualifier.named
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
+import kotlin.time.Duration.Companion.milliseconds
 
 const val CHANNEL_ID = "BLE_TRACKING_CHANNEL_ID"
-const val CHANNEL_NAME = "Channel name"
-
 const val ACTION = "com.achub.hram.tracking.BleTrackingService.ACTION"
 const val NOTIFICATION_ID = 1
 private const val TAG = "BleTrackingService"
+
+private const val SCAN_DEBOUNCE_MS = 500L
 
 class BleTrackingService : Service(), KoinComponent {
     companion object {
@@ -117,13 +118,16 @@ class BleTrackingService : Service(), KoinComponent {
         return START_STICKY
     }
 
+    @OptIn(FlowPreview::class)
     private fun scan() {
-        trackingManager.scan(BLE_SCAN_DURATION.toDuration(DurationUnit.MILLISECONDS))
+        trackingManager.scan(BLE_SCAN_DURATION.milliseconds)
             .filter { currentAction.get() == Action.Scan.ordinal }
-            .onStart { onInitScan() }
+            .onStart { emit(ScanResult.Initiated) }
             .flowOn(dispatcher)
+            .debounce { SCAN_DEBOUNCE_MS.milliseconds }
             .onEach {
                 when (it) {
+                    is ScanResult.Initiated -> onInitScan()
                     is ScanResult.Complete -> onScanComplete()
                     is ScanResult.Error -> onScanFailed(it.error)
                     is ScanResult.ScanUpdate -> onUpdateScan(it.device)
@@ -173,7 +177,7 @@ class BleTrackingService : Service(), KoinComponent {
             is UnmetRequirementException -> ScanError.BLUETOOTH_OFF
             else -> ScanError.NO_BLE_PERMISSIONS
         }
-        updateState(BleState.Scanning.Error(error))
+        updateState(BleState.Scanning.Error(error, System.currentTimeMillis()))
     }
 
     private suspend fun onScanComplete() {

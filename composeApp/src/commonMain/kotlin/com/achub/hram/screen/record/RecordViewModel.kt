@@ -12,6 +12,7 @@ import com.achub.hram.data.repo.state.BleStateRepo
 import com.achub.hram.data.repo.state.TrackingStateRepo
 import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.launchIn
+import com.achub.hram.ext.requestBleBefore
 import com.achub.hram.ext.stateInExt
 import com.achub.hram.tracking.TrackingController
 import com.achub.hram.tracking.TrackingStateStage
@@ -29,11 +30,11 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import org.koin.core.annotation.InjectedParam
 import org.koin.core.component.KoinComponent
-import kotlin.time.DurationUnit
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
-import kotlin.time.toDuration
 import kotlin.uuid.ExperimentalUuidApi
 
 class RecordViewModel(
@@ -47,7 +48,7 @@ class RecordViewModel(
     private val _uiState = MutableStateFlow(RecordScreenState())
     val uiState = _uiState.stateInExt(initialValue = RecordScreenState())
     private var jobs = mutableListOf<Job>()
-    private val scanDuration = BLE_SCAN_DURATION.toDuration(DurationUnit.MILLISECONDS)
+    private val scanDuration = BLE_SCAN_DURATION.milliseconds
 
     init {
         trackingStateRepo.listen().onEach { state ->
@@ -95,6 +96,10 @@ class RecordViewModel(
     fun openSettings() = permissionController.openAppSettings()
 
     fun scan() = trackingController.scan()
+
+    fun requestScanning() = viewModelScope.launch(dispatcher) {
+        permissionController.requestBleBefore(action = ::scan, onFailure = _uiState::settingsDialog)
+    }
 
     fun onHrDeviceSelected(device: BleDevice) = trackingController.connectDevice(device)
 

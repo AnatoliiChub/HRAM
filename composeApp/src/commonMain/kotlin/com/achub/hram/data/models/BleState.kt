@@ -12,7 +12,7 @@ sealed class BleState() {
         data class Update(val device: BleDevice) : Scanning()
 
         @Serializable
-        data class Error(val error: ScanError) : Scanning()
+        data class Error(val error: ScanError, val timesStamp: Long) : Scanning()
 
         @Serializable
         data object Completed : Scanning()

@@ -30,6 +30,7 @@ import kotlin.uuid.Uuid
 
 private const val DECIMAL_MULTIPLIER = 100
 private const val PAD_END_LENGTH = 2
+private const val BLE_OFF_MESSAGE = "Bluetooth is powered off"
 
 /**
  * round numbers to 2 decimal places and format as string
@@ -75,19 +76,15 @@ fun tickerFlow(period: Duration, initialDelay: Duration = Duration.ZERO) = flow 
 suspend fun PermissionsController.requestBleBefore(
     action: () -> Unit,
     onFailure: () -> Unit,
-    requestTurnOnBle: () -> Unit
 ) {
     try {
         providePermission(Permission.BLUETOOTH_SCAN)
         providePermission(Permission.BLUETOOTH_CONNECT)
         action()
-    } catch (exception: Exception) {
-        loggerE("PermissionsController") { "requestBlePermissionBeforeAction Error : $exception" }
-        when (exception) {
-            is DeniedException if exception.message == "Bluetooth is powered off" -> requestTurnOnBle()
-            is UnmetRequirementException -> requestTurnOnBle()
-            else -> onFailure()
-        }
+    } catch (ex: Exception) {
+        loggerE("PermissionsController") { "requestBlePermissionBeforeAction Error : $ex" }
+        val bleOff = (ex is DeniedException) && (ex.message == BLE_OFF_MESSAGE) || (ex is UnmetRequirementException)
+        if (bleOff) return else onFailure()
     }
 }
 

@@ -11,6 +11,8 @@ sealed interface ScanResult {
     data class Error(val error: Throwable) : ScanResult
 
     data object Complete : ScanResult
+
+    data object Initiated : ScanResult
 }
 
 sealed interface ConnectionResult {

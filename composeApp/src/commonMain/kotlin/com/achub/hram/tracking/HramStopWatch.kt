@@ -10,16 +10,15 @@ import kotlin.concurrent.atomics.AtomicLong
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.concurrent.atomics.update
 import kotlin.time.Clock.System.now
-import kotlin.time.DurationUnit
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
-import kotlin.time.toDuration
 
 private const val STOP_WATCH_TICK_MS = 100L
 
 @OptIn(ExperimentalTime::class, ExperimentalAtomicApi::class, ExperimentalCoroutinesApi::class)
 class HramStopWatch : StopWatch {
     companion object {
-        private val STOP_WATCH_TICK_DURATION = STOP_WATCH_TICK_MS.toDuration(DurationUnit.MILLISECONDS)
+        private val STOP_WATCH_TICK_DURATION = STOP_WATCH_TICK_MS.milliseconds
     }
 
     private var isRunning: Boolean? = null
@@ -54,5 +53,5 @@ class HramStopWatch : StopWatch {
         true -> accumulatedOnLastPaused.load() + (now().toEpochMilliseconds() - startedTimestamp)
         false -> accumulatedOnLastPaused.load()
         null -> 0
-    }.toDuration(DurationUnit.MILLISECONDS).inWholeSeconds
+    }.milliseconds.inWholeSeconds
 }

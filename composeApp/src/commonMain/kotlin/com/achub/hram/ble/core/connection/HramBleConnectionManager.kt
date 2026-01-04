@@ -25,8 +25,7 @@ import kotlinx.coroutines.flow.retry
 import org.koin.core.annotation.InjectedParam
 import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.uuid.ExperimentalUuidApi
 
 private const val TAG = "HramBleConnectionManager"
@@ -71,7 +70,7 @@ class HramBleConnectionManager(
             .onStart { emit(true) } // for initial connect
             .onEach { stopConnectionTracking() }
             .onEach { connector.disconnect() }
-            .map { scanner.scan(identifier, BLE_SCAN_DURATION.toDuration(DurationUnit.MILLISECONDS)) }
+            .map { scanner.scan(identifier, BLE_SCAN_DURATION.milliseconds) }
             .map(connector::connect)
             .onEach { wasConnected.store(true) }
             .onEach(::startConnectionTracking)

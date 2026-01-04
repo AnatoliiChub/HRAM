@@ -32,9 +32,8 @@ import org.koin.core.parameter.parametersOf
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.time.Clock.System.now
 import kotlin.time.Duration
-import kotlin.time.DurationUnit
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
-import kotlin.time.toDuration
 import kotlin.uuid.ExperimentalUuidApi
 
 private const val TAG = "HramActivityTrackingManager"
@@ -97,7 +96,7 @@ class HramActivityTrackingManager(
     override fun listen(): Flow<BleNotification> =
         hrDeviceRepo.listen()
             .combine(
-                tickerFlow(1.toDuration(DurationUnit.SECONDS)).filter { isTracking() }.onStart { emit(Unit) }
+                tickerFlow(1.seconds).filter { isTracking() }.onStart { emit(Unit) }
             ) { bleNotification, _ -> bleNotification }
             .onStart { emit(BleNotification.Empty) }
             .map { it.copy(elapsedTime = stopWatch.elapsedTimeSeconds()) }

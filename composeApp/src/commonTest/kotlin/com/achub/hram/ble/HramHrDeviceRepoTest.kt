@@ -34,9 +34,8 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
-import kotlin.time.DurationUnit
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
-import kotlin.time.toDuration
 
 class HramHrDeviceRepoTest {
     companion object {
@@ -141,7 +140,7 @@ class HramHrDeviceRepoTest {
         val repo = createRepo()
         val results = mutableListOf<ScanResult>()
 
-        repo.scan((BLE_SCAN_DURATION).toDuration(DurationUnit.MILLISECONDS))
+        repo.scan((BLE_SCAN_DURATION).milliseconds)
             .onEach(results::add)
             .launchIn(this)
 
@@ -166,7 +165,7 @@ class HramHrDeviceRepoTest {
         val repo = createRepo()
         val results = mutableListOf<ScanResult>()
 
-        repo.scan(BLE_SCAN_DURATION.toDuration(DurationUnit.MILLISECONDS))
+        repo.scan(BLE_SCAN_DURATION.milliseconds)
             .onEach(results::add)
             .launchIn(this)
 
