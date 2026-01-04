@@ -16,4 +16,5 @@
     <string name="notification_no_contact">Відсутній контакт із сенсором.</string>
     <string name="notification_current_hr">%1$sПоточний пульс: %2$s уд/хв</string>
     <string name="notification_disconnected">Відключено від пристрою.</string>
+    <string name="notification_scanning_cancelled">Сканування девайсiв було зупинено</string>
 </resources>

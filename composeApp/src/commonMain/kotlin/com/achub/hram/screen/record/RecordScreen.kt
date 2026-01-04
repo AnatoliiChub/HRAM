@@ -44,6 +44,7 @@ import hram.composeapp.generated.resources.dialog_open_setting_message
 import hram.composeapp.generated.resources.dialog_open_setting_title
 import hram.composeapp.generated.resources.record_screen_connect_device
 import hram.composeapp.generated.resources.record_screen_device_from
+import hram.composeapp.generated.resources.record_screen_disconnect_device
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -72,7 +73,7 @@ fun RecordScreen() {
                 Spacer(Modifier.weight(COLUMN_SPACER_WEIGHT))
                 TrackingIndicationsSection(indications)
                 Spacer(Modifier.size(Dimen32))
-                DeviceSection(device) { viewModel.requestScanning() }
+                DeviceSection(device, onConnectClick = { requestScanning() }, onDisconnectClick = { disconnect() })
                 Spacer(Modifier.weight(COLUMN_SPACER_WEIGHT))
                 RecordSection(
                     recordingState = state.recordingState,
@@ -96,7 +97,7 @@ fun RecordScreen() {
 }
 
 @Composable
-private fun DeviceSection(device: BleDevice?, onConnectClick: () -> Unit) {
+private fun DeviceSection(device: BleDevice?, onConnectClick: () -> Unit, onDisconnectClick: () -> Unit) {
     if (device == null) {
         HrButton(
             modifier = Modifier.height(Dimen48),
@@ -119,6 +120,18 @@ private fun DeviceSection(device: BleDevice?, onConnectClick: () -> Unit) {
             ),
             style = LabelMediumBold.copy(color = White.copy(alpha = 0.7f))
         )
+        Spacer(Modifier.size(Dimen16))
+        HrButton(
+            modifier = Modifier.height(Dimen48),
+            onClick = onDisconnectClick,
+            enabled = true,
+        ) {
+            Text(
+                modifier = Modifier.padding(horizontal = Dimen32),
+                text = stringResource(Res.string.record_screen_disconnect_device).uppercase(),
+                style = LabelSmall.copy(color = Red.copy(alpha = it)),
+            )
+        }
     }
 }
 

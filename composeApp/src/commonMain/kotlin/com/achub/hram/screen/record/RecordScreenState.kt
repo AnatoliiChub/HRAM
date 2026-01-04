@@ -1,5 +1,6 @@
 package com.achub.hram.screen.record
 
+import com.achub.hram.BLE_SCAN_DURATION
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.BleNotification
 import com.achub.hram.view.section.RecordingState
@@ -9,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import org.jetbrains.compose.resources.StringResource
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 data class RecordScreenState(
     val bleNotification: BleNotification = BleNotification.Empty,
@@ -72,8 +74,16 @@ fun MutableStateFlow<RecordScreenState>.requestBluetooth() =
 fun MutableStateFlow<RecordScreenState>.indications(bleNotification: BleNotification) =
     this.update { it.copy(bleNotification = bleNotification) }
 
-fun MutableStateFlow<RecordScreenState>.updateHrDeviceDialogConnecting() =
-    this.updateHrDeviceDialogIfExists { it.copy(isDeviceConfirmed = true, isLoading = true) }
+fun MutableStateFlow<RecordScreenState>.connectingProgressDialog() =
+    this.update {
+        it.copy(
+            dialog = RecordScreenDialog.ChooseHRDevice(
+                isLoading = true,
+                isDeviceConfirmed = true,
+                loadingDuration = BLE_SCAN_DURATION.milliseconds
+            )
+        )
+    }
 
 val MutableStateFlow<RecordScreenState>.isRecording: Boolean get() = value.recordingState.isRecording()
 

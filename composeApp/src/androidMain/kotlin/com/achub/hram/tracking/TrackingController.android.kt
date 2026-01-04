@@ -48,11 +48,19 @@ actual class TrackingController(
         )
     }
 
-    actual fun stopTracking(name: String) {
+    actual fun finishTracking(name: String) {
         context.startForegroundService(
             Intent(context, BleTrackingService::class.java).apply {
                 putExtra(ACTION, BleTrackingService.Action.StopTracking.ordinal)
                 putExtra(BleTrackingService.EXTRA_NAME, name)
+            }
+        )
+    }
+
+    actual fun cancelScanning() {
+        context.startForegroundService(
+            Intent(context, BleTrackingService::class.java).apply {
+                putExtra(ACTION, BleTrackingService.Action.CancelScanning.ordinal)
             }
         )
     }

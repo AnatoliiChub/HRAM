@@ -26,6 +26,7 @@ import com.achub.hram.ext.loggerE
 import com.achub.hram.library.R
 import com.juul.kable.UnmetRequirementException
 import dev.icerock.moko.permissions.DeniedException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -90,19 +91,23 @@ class BleTrackingService : Service(), KoinComponent {
         if (intent == null) return START_STICKY
         currentAction.set(Action.entries[intent.getIntExtra(ACTION, -1)].ordinal)
         val action = Action.entries[currentAction.get()]
+        logger(TAG) { "Processing action: $action" }
 
         when (action) {
-            Action.Scan -> scan()
+            Action.CancelScanning -> cancelScanning()
+
+            Action.Scan -> {
+                cancelScanning()
+                scan()
+            }
 
             Action.Connect -> {
-                scanJob?.cancel()
-                scanJob = null
+                cancelScanning()
                 intent.getStringExtra(EXTRA_DEVICE)?.let { connect(identifier = it) }
             }
 
             Action.Disconnect -> {
-                hrTrackingJob?.cancel()
-                hrTrackingJob = null
+                trackingManager.disconnect()
                 scope.launch { updateState(BleState.Disconnected) }
             }
 
@@ -116,6 +121,12 @@ class BleTrackingService : Service(), KoinComponent {
             }
         }
         return START_STICKY
+    }
+
+    private fun cancelScanning() {
+        scanJob?.cancel(ScanCancelledException())
+        scanJob = null
+        scope.launch { updateState(BleState.Scanning.Completed) }
     }
 
     @OptIn(FlowPreview::class)
@@ -305,6 +316,7 @@ class BleTrackingService : Service(), KoinComponent {
         StartTracking,
         PauseTracking,
         StopTracking,
+        CancelScanning
     }
 }
 
@@ -318,3 +330,5 @@ data class NotificationData(
     val text: String,
     val iconRes: Int
 )
+
+class ScanCancelledException : CancellationException("Scan cancelled by user")

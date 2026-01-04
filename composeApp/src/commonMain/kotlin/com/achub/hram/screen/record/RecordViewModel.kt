@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.achub.hram.BLE_SCAN_DURATION
 import com.achub.hram.ble.models.BleDevice
+import com.achub.hram.ble.models.BleNotification
 import com.achub.hram.data.models.BleState
 import com.achub.hram.data.models.ScanError
 import com.achub.hram.data.repo.state.BleStateRepo
@@ -58,10 +59,16 @@ class RecordViewModel(
             Napier.d { "new state : $state" }
             when (state) {
                 is BleState.Scanning -> handleScanning(state)
-                is BleState.Connecting -> _uiState.updateHrDeviceDialogConnecting()
+
+                is BleState.Connecting -> _uiState.connectingProgressDialog()
+
                 is BleState.Connected -> handleConnectedState(state)
+
                 is BleState.NotificationUpdate -> handleNotificationUpdate(state)
-                is BleState.Disconnected -> _uiState.update { it.copy(connectedDevice = null) }
+
+                is BleState.Disconnected -> _uiState.update {
+                    it.copy(connectedDevice = null, bleNotification = BleNotification.Empty)
+                }
             }
         }.flowOn(dispatcher).launchIn(viewModelScope).let { jobs.add(it) }
     }
@@ -72,7 +79,7 @@ class RecordViewModel(
     }
 
     fun stopRecording(name: String?) = _uiState.stop().also {
-        trackingController.stopTracking(name ?: "Temporary name")
+        trackingController.finishTracking(name ?: "Temporary name")
         _uiState.update { it.copy(dialog = null, connectedDevice = null) }
     }
 
@@ -87,15 +94,15 @@ class RecordViewModel(
 
     fun dismissDialog() = _uiState.update { it.copy(dialog = null) }
 
-    fun cancelScanning() {
-        // TODO cancel scanning
-    }
+    fun cancelScanning() = trackingController.cancelScanning()
 
     fun clearRequestBluetooth() = _uiState.clearRequestBluetooth()
 
     fun openSettings() = permissionController.openAppSettings()
 
     fun scan() = trackingController.scan()
+
+    fun disconnect() = trackingController.disconnectDevice()
 
     fun requestScanning() = viewModelScope.launch(dispatcher) {
         permissionController.requestBleBefore(action = ::scan, onFailure = _uiState::settingsDialog)

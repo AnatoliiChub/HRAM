@@ -30,6 +30,7 @@
     <string name="record_screen_heart_indication_battery_level"> %1$s %</string>
     <string name="record_scree_choose_at_least_one_option">Choose at least one tracking option</string>
     <string name="record_screen_connect_device">Connect device</string>
+    <string name="record_screen_disconnect_device">Disconnect device</string>
     <string name="record_screen_device_from">%1$s from %2$s</string>
 
     <!-- Dialogs -->

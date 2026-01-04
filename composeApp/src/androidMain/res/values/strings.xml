@@ -16,5 +16,6 @@
     <string name="notification_no_contact">No Contact with sensor.</string>
     <string name="notification_current_hr">%1$sCurrent Heart Rate: %2$s bpm</string>
     <string name="notification_disconnected">Disconnected from device.</string>
+    <string name="notification_scanning_cancelled">Scanning was canceled.</string>
 </resources>
 

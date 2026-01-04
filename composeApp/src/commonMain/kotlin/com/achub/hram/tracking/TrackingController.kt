@@ -13,5 +13,7 @@ expect class TrackingController {
 
     fun pauseTracking()
 
-    fun stopTracking(name: String)
+    fun finishTracking(name: String)
+
+    fun cancelScanning()
 }
