@@ -3,6 +3,7 @@ package com.achub.hram.tracking
 import com.achub.hram.ble.ScanResult
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.BleNotification
+import com.achub.hram.data.models.BleState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
@@ -32,4 +33,6 @@ interface ActivityTrackingManager {
     suspend fun trackingState(): TrackingStateStage
 
     fun cancelScanning()
+
+    fun observeBleState(): Flow<BleState>
 }

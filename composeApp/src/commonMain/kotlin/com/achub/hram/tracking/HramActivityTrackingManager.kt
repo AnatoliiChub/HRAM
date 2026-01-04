@@ -155,6 +155,8 @@ class HramActivityTrackingManager(
         scope.launch { updateBleState(BleState.Scanning.Completed) }
     }
 
+    override fun observeBleState() = bleStateRepo.listen()
+
     override fun disconnect() {
         scope.launch(dispatcher) {
             hrDeviceRepo.disconnect()
@@ -199,12 +201,6 @@ class HramActivityTrackingManager(
     private suspend fun updateBleState(state: BleState) {
         bleStateRepo.update(state)
     }
-}
-
-fun TrackingStateStage.text() = when (this) {
-    TrackingStateStage.TRACKING_INIT_STATE -> ""
-    TrackingStateStage.ACTIVE_TRACKING_STATE -> "Tracking, "
-    TrackingStateStage.PAUSED_TRACKING_STATE -> "Paused, "
 }
 
 class ScanCancelledException : CancellationException("Scan cancelled by user")

@@ -17,4 +17,7 @@
     <string name="notification_current_hr">%1$sПоточний пульс: %2$s уд/хв</string>
     <string name="notification_disconnected">Відключено від пристрою.</string>
     <string name="notification_scanning_cancelled">Сканування девайсiв було зупинено</string>
+    <string name="empty" />
+    <string name="notification_tracking">"Запис, "</string>
+    <string name="notification_tracking_paused">"Запис призупинено, "</string>
 </resources>

@@ -14,6 +14,7 @@ import com.achub.hram.BLE_SCAN_DURATION
 import com.achub.hram.ble.models.HramBleDevice
 import com.achub.hram.data.models.BleState
 import com.achub.hram.di.CoroutineModule.Companion.WORKER_DISPATCHER
+import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.launchIn
 import com.achub.hram.ext.logger
 import com.achub.hram.library.R
@@ -26,6 +27,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
@@ -49,9 +51,8 @@ class BleTrackingService : Service(), KoinComponent {
     private val dispatcher: CoroutineDispatcher by inject(qualifier = named(WORKER_DISPATCHER))
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
-    private var hrTrackingJob: Job? = null
     private val currentAction = AtomicInteger(-1)
-    private var scanJob: Job? = null
+    private val jobs = mutableListOf<Job>()
 
     override fun onCreate() {
         super.onCreate()
@@ -61,7 +62,7 @@ class BleTrackingService : Service(), KoinComponent {
         notificationManager.createNotificationChannel(notificationChannel)
         val notification: Notification = createNotification()
         ServiceCompat.startForeground(this, NOTIFICATION_ID, notification, FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE)
-        scope.launch { tracker }
+        trackBleState()
         logger(TAG) { "Service created" }
     }
 
@@ -92,7 +93,7 @@ class BleTrackingService : Service(), KoinComponent {
             val device = HramBleDevice(name = intent.getStringExtra(EXTRA_DEVICE_NAME) ?: "", identifier = identifier)
             tracker.connectAndSubscribe(device = device)
                 .launchIn(scope)
-                .let { hrTrackingJob = it }
+                .let { jobs.add(it) }
         }
     }
 
@@ -102,7 +103,7 @@ class BleTrackingService : Service(), KoinComponent {
             .filter { currentAction.get() == Action.Scan.ordinal }
             .flowOn(dispatcher)
             .launchIn(scope)
-            .let { scanJob = it }
+            .let { jobs.add(it) }
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -111,10 +112,7 @@ class BleTrackingService : Service(), KoinComponent {
 
     override fun onDestroy() {
         logger(TAG) { "Service destroyed" }
-        hrTrackingJob?.cancel()
-        scanJob?.cancel()
-        hrTrackingJob = null
-        scanJob = null
+        jobs.cancelAndClear()
         scope.cancel()
     }
 
@@ -125,6 +123,14 @@ class BleTrackingService : Service(), KoinComponent {
             .setSilent(true)
             .setOngoing(true)
             .build()
+    }
+
+    private fun trackBleState() {
+        tracker.observeBleState()
+            .onEach { updateNotification(it) }
+            .flowOn(dispatcher)
+            .launchIn(scope)
+            .let { jobs.add(it) }
     }
 
     private suspend fun updateNotification(state: BleState) {
@@ -175,10 +181,9 @@ class BleTrackingService : Service(), KoinComponent {
                         NotificationData(getString(R.string.notification_no_contact), R.drawable.ic_heart_contact_off)
                     } else {
                         val hrBpm = hrNotification?.hrBpm ?: "--"
-                        NotificationData(
-                            getString(R.string.notification_current_hr, tracker.trackingState().text(), hrBpm),
-                            R.drawable.ic_heart
-                        )
+                        val prefix = getString(tracker.trackingState().text())
+                        val text = getString(R.string.notification_current_hr, prefix, hrBpm)
+                        NotificationData(text, R.drawable.ic_heart)
                     }
                 }
             }
@@ -222,3 +227,9 @@ data class NotificationData(
     val text: String,
     val iconRes: Int
 )
+
+fun TrackingStateStage.text() = when (this) {
+    TrackingStateStage.TRACKING_INIT_STATE -> R.string.empty
+    TrackingStateStage.ACTIVE_TRACKING_STATE -> R.string.notification_tracking
+    TrackingStateStage.PAUSED_TRACKING_STATE -> R.string.notification_tracking_paused
+}
