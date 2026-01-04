@@ -168,16 +168,7 @@ dependencies {
     add("kspAndroid", libs.androidx.room.compiler)
     add("kspIosSimulatorArm64", libs.androidx.room.compiler)
     add("kspIosArm64", libs.androidx.room.compiler)
-//    add("androidRuntimeClasspath", libs.ui.tooling.preview)
 }
-
-//multiplatformResources {
-//    resourcesPackage.set("org.example.library") // required
-//    resourcesClassName.set("SharedRes") // optional, default MR
-//    resourcesVisibility.set(MRVisibility.Internal) // optional, default Public
-//    iosBaseLocalizationRegion.set("en") // optional, default "en"
-//    iosMinimalDeploymentTarget.set("11.0") // optional, default "9.0"
-//}
 
 room {
     schemaDirectory("$projectDir/schemas")

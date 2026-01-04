@@ -50,7 +50,6 @@ import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 
 private const val TAG = "HramActivityTrackingManager"
-private const val SCAN_DEBOUNCE_MS = 500L
 
 @OptIn(
     FlowPreview::class,

@@ -4,10 +4,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
@@ -20,15 +18,10 @@ import com.achub.hram.ext.permissionController
 import com.achub.hram.ext.requestBluetooth
 import com.achub.hram.style.Dimen16
 import com.achub.hram.style.Dimen32
-import com.achub.hram.style.Dimen48
-import com.achub.hram.style.LabelMediumBold
-import com.achub.hram.style.LabelSmall
-import com.achub.hram.style.Red
-import com.achub.hram.style.White
-import com.achub.hram.view.components.HrButton
 import com.achub.hram.view.dialogs.InfoDialog
 import com.achub.hram.view.dialogs.NameActivityDialog
 import com.achub.hram.view.dialogs.choosedevice.HrConnectDialog
+import com.achub.hram.view.section.DeviceSection
 import com.achub.hram.view.section.RecordSection
 import com.achub.hram.view.section.TrackingIndicationsSection
 import hram.composeapp.generated.resources.Res
@@ -42,9 +35,6 @@ import hram.composeapp.generated.resources.dialog_name_activity_title
 import hram.composeapp.generated.resources.dialog_open_setting_button_text
 import hram.composeapp.generated.resources.dialog_open_setting_message
 import hram.composeapp.generated.resources.dialog_open_setting_title
-import hram.composeapp.generated.resources.record_screen_connect_device
-import hram.composeapp.generated.resources.record_screen_device_from
-import hram.composeapp.generated.resources.record_screen_disconnect_device
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -93,45 +83,6 @@ fun RecordScreen() {
             onActivityNameChanged = ::onActivityNameChanged,
             onActivityNameConfirmed = ::stopRecording,
         )
-    }
-}
-
-@Composable
-private fun DeviceSection(device: BleDevice?, onConnectClick: () -> Unit, onDisconnectClick: () -> Unit) {
-    if (device == null) {
-        HrButton(
-            modifier = Modifier.height(Dimen48),
-            onClick = onConnectClick,
-            enabled = true,
-        ) {
-            Text(
-                modifier = Modifier.padding(horizontal = Dimen32),
-                text = stringResource(Res.string.record_screen_connect_device).uppercase(),
-                style = LabelSmall.copy(color = Red.copy(alpha = it)),
-            )
-        }
-    } else {
-        Text(
-            modifier = Modifier.padding(Dimen32),
-            text = stringResource(
-                Res.string.record_screen_device_from,
-                device.name,
-                device.manufacturer ?: ""
-            ),
-            style = LabelMediumBold.copy(color = White.copy(alpha = 0.7f))
-        )
-        Spacer(Modifier.size(Dimen16))
-        HrButton(
-            modifier = Modifier.height(Dimen48),
-            onClick = onDisconnectClick,
-            enabled = true,
-        ) {
-            Text(
-                modifier = Modifier.padding(horizontal = Dimen32),
-                text = stringResource(Res.string.record_screen_disconnect_device).uppercase(),
-                style = LabelSmall.copy(color = Red.copy(alpha = it)),
-            )
-        }
     }
 }
 
