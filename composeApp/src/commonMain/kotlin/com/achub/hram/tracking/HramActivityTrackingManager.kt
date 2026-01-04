@@ -6,6 +6,7 @@ import com.achub.hram.ble.models.BleNotification
 import com.achub.hram.data.db.entity.ACTIVE_ACTIVITY
 import com.achub.hram.data.db.entity.HeartRateEntity
 import com.achub.hram.data.repo.HrActivityRepo
+import com.achub.hram.data.repo.state.TrackingStateRepo
 import com.achub.hram.di.WorkerThread
 import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.createActivity
@@ -28,9 +29,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.parameter.parametersOf
-import kotlin.concurrent.atomics.AtomicInt
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
-import kotlin.concurrent.atomics.update
 import kotlin.time.Clock.System.now
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
@@ -54,11 +53,12 @@ class HramActivityTrackingManager(
     private val stopWatch: StopWatch by inject()
     private val hrDeviceRepo: HrDeviceRepo by inject(parameters = { parametersOf(scope) })
     private val hrActivityRepo: HrActivityRepo by inject()
+    private val trackingStateRepo: TrackingStateRepo by inject()
 
     private var scope = CoroutineScope(dispatcher + SupervisorJob())
-    private val trackingState = AtomicInt(TrackingStateStage.TRACKING_INIT_STATE.ordinal)
+
     private var jobs = mutableListOf<Job>()
-    private val isRecording get() = trackingState.load() == TrackingStateStage.ACTIVE_TRACKING_STATE.ordinal
+
     private var currentActId: String? = null
 
     override fun startTracking() {
@@ -69,19 +69,19 @@ class HramActivityTrackingManager(
                 currentActId = activity.id
                 hrActivityRepo.insert(activity)
             }
-            trackingState.update { TrackingStateStage.ACTIVE_TRACKING_STATE.ordinal }
+            trackingStateRepo.update(TrackingStateStage.ACTIVE_TRACKING_STATE)
             stopWatch.start()
         }.let { jobs.add(it) }
     }
 
     override fun pauseTracking() {
-        trackingState.update { TrackingStateStage.PAUSED_TRACKING_STATE.ordinal }
+        scope.launch { trackingStateRepo.update(TrackingStateStage.PAUSED_TRACKING_STATE) }
         stopWatch.pause()
     }
 
     override fun finishTracking(name: String?) {
         scope.launch(dispatcher) {
-            trackingState.update { TrackingStateStage.TRACKING_INIT_STATE.ordinal }
+            trackingStateRepo.update(TrackingStateStage.TRACKING_INIT_STATE)
             val duration = stopWatch.elapsedTimeSeconds()
             stopWatch.reset()
             val newName = name ?: "${now().epochSeconds}__$duration"
@@ -97,12 +97,19 @@ class HramActivityTrackingManager(
     override fun listen(): Flow<BleNotification> =
         hrDeviceRepo.listen()
             .combine(
-                tickerFlow(1.toDuration(DurationUnit.SECONDS)).filter { isRecording }.onStart { emit(Unit) }
+                tickerFlow(1.toDuration(DurationUnit.SECONDS)).filter { isTracking() }.onStart { emit(Unit) }
             ) { bleNotification, _ -> bleNotification }
             .onStart { emit(BleNotification.Empty) }
             .map { it.copy(elapsedTime = stopWatch.elapsedTimeSeconds()) }
-            .onEach { bleIndication -> if (isRecording && bleIndication.isBleConnected) store(bleIndication) }
+            .onEach { bleIndication -> if (isTracking() && bleIndication.isBleConnected) store(bleIndication) }
             .catch { loggerE(TAG) { "listen error : $it" } }
+
+    override fun disconnect() {
+        scope.launch(dispatcher) {
+            hrDeviceRepo.disconnect()
+            jobs.cancelAndClear()
+        }
+    }
 
     private suspend fun store(bleIndication: BleNotification) {
         bleIndication.hrNotification?.let { hrNotification ->
@@ -117,10 +124,5 @@ class HramActivityTrackingManager(
         }
     }
 
-    override fun disconnect() {
-        scope.launch(dispatcher) {
-            hrDeviceRepo.disconnect()
-            jobs.cancelAndClear()
-        }
-    }
+    private suspend fun isTracking() = trackingStateRepo.get() == TrackingStateStage.ACTIVE_TRACKING_STATE
 }

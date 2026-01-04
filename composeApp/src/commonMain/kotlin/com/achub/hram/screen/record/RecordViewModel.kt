@@ -126,9 +126,11 @@ class RecordViewModel(
         }
     }
 
-    private fun handleNotificationUpdate(state: BleState.NotificationUpdate) =
-        _uiState.indications(state.bleNotification)
-            .also { _uiState.update { it.copy(connectedDevice = state.device) } }
+    private fun handleNotificationUpdate(state: BleState.NotificationUpdate) {
+        _uiState.indications(state.bleNotification).also {
+            if (state.bleNotification.isBleConnected) _uiState.update { it.copy(connectedDevice = state.device) }
+        }
+    }
 
     private fun handleConnectedState(state: BleState.Connected) = if (state.error != null) {
         _uiState.update { it.copy(dialog = RecordScreenDialog.ConnectionErrorDialog, connectedDevice = null) }

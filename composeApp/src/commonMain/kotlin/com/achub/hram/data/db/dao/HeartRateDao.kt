@@ -16,6 +16,9 @@ interface HeartRateDao {
     @Query("SELECT * FROM HeartRateEntity")
     fun getAll(): Flow<List<HeartRateEntity>>
 
+    @Query("SELECT * FROM HeartRateEntity WHERE activityId = :activityId")
+    fun getAllForActivity(activityId: String): Flow<List<HeartRateEntity>>
+
     @Query(
         """
     SELECT 

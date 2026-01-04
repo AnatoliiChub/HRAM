@@ -43,7 +43,7 @@ class HramHrActivityRepo(
             val flows = activities.map { activity ->
                 combine(
                     hrDao.getAggregatedHeartRateForActivity(activity.id, activity.duration),
-                    hrDao.getAll()
+                    hrDao.getAllForActivity(activity.id)
                 ) { aggregated, all ->
                     ActivityGraphInfo(
                         activity = activity,
