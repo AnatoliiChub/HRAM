@@ -112,6 +112,7 @@ class RecordViewModel(
 
     override fun onCleared() {
         super.onCleared()
+        trackingController.clear()
         jobs.cancelAndClear()
     }
 

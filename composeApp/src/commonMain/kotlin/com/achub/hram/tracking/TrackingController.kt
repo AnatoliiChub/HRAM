@@ -16,4 +16,6 @@ expect class TrackingController {
     fun finishTracking(name: String)
 
     fun cancelScanning()
+
+    fun clear()
 }

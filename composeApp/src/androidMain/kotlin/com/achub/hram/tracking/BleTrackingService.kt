@@ -85,6 +85,24 @@ class BleTrackingService : Service(), KoinComponent {
         return START_STICKY
     }
 
+    override fun onBind(intent: Intent?): IBinder? {
+        return null
+    }
+
+    override fun onDestroy() {
+        logger(TAG) { "Service destroyed" }
+        jobs.cancelAndClear()
+        scope.cancel()
+    }
+
+    private fun trackBleState() {
+        tracker.observeBleState()
+            .onEach { updateNotification(it) }
+            .flowOn(dispatcher)
+            .launchIn(scope)
+            .let { jobs.add(it) }
+    }
+
     private fun stopTracking(intent: Intent) =
         scope.launch { tracker.finishTracking(intent.getStringExtra(EXTRA_ACTIVITY_NAME)) }
 
@@ -106,16 +124,6 @@ class BleTrackingService : Service(), KoinComponent {
             .let { jobs.add(it) }
     }
 
-    override fun onBind(intent: Intent?): IBinder? {
-        return null
-    }
-
-    override fun onDestroy() {
-        logger(TAG) { "Service destroyed" }
-        jobs.cancelAndClear()
-        scope.cancel()
-    }
-
     private fun createNotification(): Notification {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(getString(R.string.notification_title))
@@ -123,14 +131,6 @@ class BleTrackingService : Service(), KoinComponent {
             .setSilent(true)
             .setOngoing(true)
             .build()
-    }
-
-    private fun trackBleState() {
-        tracker.observeBleState()
-            .onEach { updateNotification(it) }
-            .flowOn(dispatcher)
-            .launchIn(scope)
-            .let { jobs.add(it) }
     }
 
     private suspend fun updateNotification(state: BleState) {
@@ -210,16 +210,6 @@ class BleTrackingService : Service(), KoinComponent {
 
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(NOTIFICATION_ID, notification)
-    }
-
-    enum class Action {
-        Scan,
-        Connect,
-        Disconnect,
-        StartTracking,
-        PauseTracking,
-        StopTracking,
-        CancelScanning
     }
 }
 

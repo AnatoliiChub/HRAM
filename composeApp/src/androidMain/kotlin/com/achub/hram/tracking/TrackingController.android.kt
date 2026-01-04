@@ -10,7 +10,7 @@ actual class TrackingController(
     actual fun scan(id: String?) {
         context.startForegroundService(
             Intent(context, BleTrackingService::class.java).apply {
-                putExtra(ACTION, BleTrackingService.Action.Scan.ordinal)
+                putExtra(ACTION, Action.Scan.ordinal)
             }
         )
     }
@@ -18,7 +18,7 @@ actual class TrackingController(
     actual fun connectDevice(device: BleDevice) {
         context.startForegroundService(
             Intent(context, BleTrackingService::class.java).apply {
-                putExtra(ACTION, BleTrackingService.Action.Connect.ordinal)
+                putExtra(ACTION, Action.Connect.ordinal)
                 putExtra(BleTrackingService.EXTRA_DEVICE_ID, device.identifier)
                 putExtra(BleTrackingService.EXTRA_DEVICE_NAME, device.name)
             }
@@ -28,7 +28,7 @@ actual class TrackingController(
     actual fun disconnectDevice() {
         context.startForegroundService(
             Intent(context, BleTrackingService::class.java).apply {
-                putExtra(ACTION, BleTrackingService.Action.Disconnect.ordinal)
+                putExtra(ACTION, Action.Disconnect.ordinal)
             }
         )
     }
@@ -36,7 +36,7 @@ actual class TrackingController(
     actual fun startTracking() {
         context.startForegroundService(
             Intent(context, BleTrackingService::class.java).apply {
-                putExtra(ACTION, BleTrackingService.Action.StartTracking.ordinal)
+                putExtra(ACTION, Action.StartTracking.ordinal)
             }
         )
     }
@@ -44,7 +44,7 @@ actual class TrackingController(
     actual fun pauseTracking() {
         context.startForegroundService(
             Intent(context, BleTrackingService::class.java).apply {
-                putExtra(ACTION, BleTrackingService.Action.PauseTracking.ordinal)
+                putExtra(ACTION, Action.PauseTracking.ordinal)
             }
         )
     }
@@ -52,7 +52,7 @@ actual class TrackingController(
     actual fun finishTracking(name: String) {
         context.startForegroundService(
             Intent(context, BleTrackingService::class.java).apply {
-                putExtra(ACTION, BleTrackingService.Action.StopTracking.ordinal)
+                putExtra(ACTION, Action.StopTracking.ordinal)
                 putExtra(BleTrackingService.EXTRA_ACTIVITY_NAME, name)
             }
         )
@@ -61,8 +61,12 @@ actual class TrackingController(
     actual fun cancelScanning() {
         context.startForegroundService(
             Intent(context, BleTrackingService::class.java).apply {
-                putExtra(ACTION, BleTrackingService.Action.CancelScanning.ordinal)
+                putExtra(ACTION, Action.CancelScanning.ordinal)
             }
         )
+    }
+
+    actual fun clear() {
+        // No-op for Android
     }
 }
