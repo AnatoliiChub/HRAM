@@ -6,6 +6,7 @@ import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.BleNotification
 import com.achub.hram.ble.models.HramBleDevice
 import com.achub.hram.di.WorkerThread
+import com.achub.hram.ext.cancelAfter
 import com.achub.hram.ext.logger
 import com.achub.hram.ext.loggerE
 import com.juul.kable.Peripheral
@@ -21,7 +22,6 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.timeout
 import kotlinx.coroutines.flow.withIndex
 import org.koin.core.component.KoinComponent
 import kotlin.time.Duration
@@ -37,20 +37,21 @@ class HramHrDeviceRepo(
     val bleConnectionManager: BleConnectionManager
 ) : HrDeviceRepo, KoinComponent {
     @OptIn(FlowPreview::class, ExperimentalUuidApi::class)
-    override fun scan(duration: Duration): Flow<ScanResult> = bleConnectionManager.scanHrDevices()
-        .map { HramBleDevice(name = it.peripheralName ?: "", identifier = it.identifier.toString()) }
-        .distinctUntilChanged()
-        .map { device -> ScanResult.ScanUpdate(device) as ScanResult }
-        .timeout(duration)
-        .catch {
-            if (it is kotlinx.coroutines.TimeoutCancellationException) {
-                logger(TAG) { "Scan completed after timeout of $duration" }
-                emit(ScanResult.Complete)
-            } else {
-                loggerE(TAG) { "Error while scanning for devices: $it" }
-                emit(ScanResult.Error(it))
+    override fun scan(duration: Duration): Flow<ScanResult> =
+        bleConnectionManager.scanHrDevices()
+            .cancelAfter(duration)
+            .map { HramBleDevice(name = it.peripheralName ?: "", identifier = it.identifier.toString()) }
+            .distinctUntilChanged()
+            .map { device -> ScanResult.ScanUpdate(device) as ScanResult }
+            .catch {
+                if (it is kotlinx.coroutines.TimeoutCancellationException) {
+                    logger(TAG) { "Scan completed after timeout of $duration" }
+                    emit(ScanResult.Complete)
+                } else {
+                    loggerE(TAG) { "Error while scanning for devices: $it" }
+                    emit(ScanResult.Error(it))
+                }
             }
-        }
 
     @OptIn(ExperimentalUuidApi::class)
     override fun connect(device: BleDevice): Flow<ConnectionResult> =

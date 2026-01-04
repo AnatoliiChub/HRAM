@@ -7,6 +7,7 @@
     <string name="activity_screen_unnamed_act">Untitled Activity</string>
     <string name="activity_screen_created_at">Created on %1$s</string>
     <string name="activity_screen_elapsed_time">Elapsed time: %1$s</string>
+    <string name="activity_screen_seconds_unit">s</string>
     <string name="activity_screen_avg_hr">Avg Heart Rate:</string>
     <string name="activity_screen_max_hr">Max Heart Rate:</string>
     <string name="activity_screen_min_hr">Min Heart Rate:</string>

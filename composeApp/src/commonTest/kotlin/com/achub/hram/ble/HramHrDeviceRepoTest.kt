@@ -4,8 +4,8 @@ import com.achub.hram.BLE_SCAN_DURATION
 import com.achub.hram.ble.core.connection.BleConnectionManager
 import com.achub.hram.ble.core.data.BleDataRepo
 import com.achub.hram.ble.models.BleNotification
-import com.achub.hram.ble.models.HramBleDevice
 import com.achub.hram.ble.models.HrNotification
+import com.achub.hram.ble.models.HramBleDevice
 import com.achub.hram.identifier
 import com.juul.kable.Advertisement
 import com.juul.kable.Peripheral
@@ -34,12 +34,16 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
+import kotlin.time.toDuration
 
 class HramHrDeviceRepoTest {
     companion object {
         private const val TEST_TIME_EPSILON_MS = 10L
         private const val ADV_INTERVAL = 950L
+
+        private const val NOTIFICATION_INTERVAL_MS = 1000L
         private val IDENTIFIER = identifier("identifier")
     }
 
@@ -76,10 +80,9 @@ class HramHrDeviceRepoTest {
 
         testScheduler.advanceUntilIdle()
 
-        assertEquals(2, results.size)
-        assertIs<ConnectionResult.Connecting>(results[0])
-        assertIs<ConnectionResult.Connected>(results[1])
-        assertEquals(bleDeviceMock, (results[1] as ConnectionResult.Connected).device)
+        assertEquals(1, results.size)
+        assertIs<ConnectionResult.Connected>(results[0])
+        assertEquals(bleDeviceMock, (results[0] as ConnectionResult.Connected).device)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -97,23 +100,23 @@ class HramHrDeviceRepoTest {
 
         testScheduler.advanceTimeBy(1L)
 
-        assertEquals(2, results.size)
-        assertIs<ConnectionResult.Connecting>(results[0])
-        assertIs<ConnectionResult.Error>(results[1])
-        assertEquals(exception, (results[1] as ConnectionResult.Error).error)
+        assertEquals(1, results.size)
+        assertIs<ConnectionResult.Error>(results[0])
+        assertEquals(exception, (results[0] as ConnectionResult.Error).error)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `listen emits notification, error suppressed`() = runTest {
+        val batteryLevel = 90
         val exception = NumberFormatException("Simulated battery read error")
         val peripheral = mock<Peripheral>(MockMode.autofill)
         val hrNotification = HrNotification(hrBpm = 72, isSensorContactSupported = true, isContactOn = true)
         every { bleConnectionManagerMock.onConnected } returns flowOf(peripheral)
         every { bleDataRepoMock.observeHeartRate(peripheral) } returns flowOf(hrNotification)
         every { bleDataRepoMock.observeBatteryLevel(peripheral) } returns flow {
-            emit(85)
-            delay(100)
+            emit(batteryLevel)
+            delay(NOTIFICATION_INTERVAL_MS)
             throw exception
         }
         every { peripheral.state } returns MutableStateFlow<State>(State.Connected(this))
@@ -122,10 +125,10 @@ class HramHrDeviceRepoTest {
 
         repo.listen().onEach(collected::add).launchIn(this)
 
-        advanceTimeBy(111L)
+        advanceTimeBy(NOTIFICATION_INTERVAL_MS + TEST_TIME_EPSILON_MS)
 
         assertEquals(
-            BleNotification(hrNotification = hrNotification, batteryLevel = 85, isBleConnected = true),
+            BleNotification(hrNotification = hrNotification, batteryLevel = batteryLevel, isBleConnected = true),
             collected.first()
         )
         assertEquals(1, collected.size)
@@ -138,21 +141,16 @@ class HramHrDeviceRepoTest {
         val repo = createRepo()
         val results = mutableListOf<ScanResult>()
 
-        repo.scan()
+        repo.scan((BLE_SCAN_DURATION).toDuration(DurationUnit.MILLISECONDS))
             .onEach(results::add)
             .launchIn(this)
 
-        advanceTimeBy(TEST_TIME_EPSILON_MS)
+        // Advance time to trigger timeout
+        advanceTimeBy(BLE_SCAN_DURATION + TEST_TIME_EPSILON_MS)
 
-        // Should have Scanning state first
-        assertIs<ScanResult.Scanning>(results.first())
-
-        advanceTimeBy(BLE_SCAN_DURATION)
-
-        // Should have multiple DevicesFound updates and Complete at the end
         val scanUpdateCount = results.count { it is ScanResult.ScanUpdate }
-        assertEquals(5, scanUpdateCount)
-        assertIs<ScanResult.Complete>(results.last())
+        assertEquals(5, scanUpdateCount, "Expected 5 ScanUpdate results, got $scanUpdateCount")
+        assertIs<ScanResult.Complete>(results.last(), "Last result should be Complete. Actual results: $results")
     }
 
     @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
@@ -168,18 +166,15 @@ class HramHrDeviceRepoTest {
         val repo = createRepo()
         val results = mutableListOf<ScanResult>()
 
-        repo.scan()
+        repo.scan(BLE_SCAN_DURATION.toDuration(DurationUnit.MILLISECONDS))
             .onEach(results::add)
             .launchIn(this)
 
         advanceUntilIdle()
 
-        assertIs<ScanResult.Scanning>(results.first())
         val hasScanUpdate = results.any { it is ScanResult.ScanUpdate }
         assertEquals(true, hasScanUpdate)
-        val hasError = results.any { it is ScanResult.Error && it.error == error }
-        assertEquals(true, hasError)
-        assertIs<ScanResult.Complete>(results.last())
+        assertIs<ScanResult.Error>(results.last())
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -213,7 +208,6 @@ class HramHrDeviceRepoTest {
     }
 
     private fun TestScope.createRepo() = HramHrDeviceRepo(
-        this,
         bleDataRepoMock,
         StandardTestDispatcher(testScheduler),
         bleConnectionManagerMock

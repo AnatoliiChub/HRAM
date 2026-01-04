@@ -14,11 +14,14 @@ import dev.icerock.moko.permissions.compose.BindEffect
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.timeout
 import kotlinx.coroutines.launch
 import kotlin.math.round
 import kotlin.time.Duration
@@ -103,6 +106,14 @@ fun createActivity(name: String, currentTime: Long): ActivityEntity {
     )
     return activity
 }
+
+@OptIn(FlowPreview::class)
+fun <T> Flow<T>.cancelAfter(duration: Duration) = this.combine(
+    flow {
+        emit(Unit)
+        delay(duration.inWholeMilliseconds + 1)
+    }.timeout(duration)
+) { result, _ -> result }
 
 @Composable
 fun Dp.dpToPx() = with(LocalDensity.current) { this@dpToPx.toPx() }

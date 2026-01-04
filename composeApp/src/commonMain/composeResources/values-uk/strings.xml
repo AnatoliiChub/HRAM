@@ -7,6 +7,7 @@
     <string name="activity_screen_unnamed_act">Без назви</string>
     <string name="activity_screen_created_at">Створено: %1$s</string>
     <string name="activity_screen_elapsed_time">Минуло часу: %1$s</string>
+    <string name="activity_screen_seconds_unit">c</string>
     <string name="activity_screen_avg_hr">Ср. пульс:</string>
     <string name="activity_screen_max_hr">Макс. пульс:</string>
     <string name="activity_screen_min_hr">Мін. пульс:</string>

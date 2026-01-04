@@ -13,10 +13,10 @@ private const val SECONDS_IN_MINUTE = 60L
 private const val SECONDS_IN_HOUR = 3600L
 private const val LEADING_ZERO_THRESHOLD = 10
 
-fun formatTime(seconds: Long): String {
+fun formatTime(seconds: Long, secondsLabel: String): String {
     fun formatSixty(seconds: Long) = "${if (seconds < LEADING_ZERO_THRESHOLD) "0" else ""}$seconds"
     return when {
-        seconds < SECONDS_IN_MINUTE -> "$seconds s"
+        seconds < SECONDS_IN_MINUTE -> "$seconds $secondsLabel"
 
         seconds < SECONDS_IN_HOUR -> "${seconds / SECONDS_IN_MINUTE}:${formatSixty(seconds % SECONDS_IN_MINUTE)}"
 

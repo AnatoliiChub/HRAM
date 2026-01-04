@@ -84,8 +84,7 @@ class HramBleConnectionManager(
     }
 
     private fun startConnectionTracking(peripheral: Peripheral) {
-        connectionTrackerJob =
-            connectionTracker.trackConnectionState(peripheral).launchIn(scope)
+        connectionTrackerJob = connectionTracker.trackConnectionState(peripheral).launchIn(scope)
     }
 
     private fun stopConnectionTracking() {
