@@ -5,12 +5,12 @@
 
     <!-- Notification texts -->
     <string name="notification_title">HRAM</string>
-    <string name="notification_initializing">Initializing...</string>
-    <string name="notification_scanning_started">Scanning for devices...</string>
+    <string name="notification_initializing">Initializing…</string>
+    <string name="notification_scanning_started">Scanning for devices…</string>
     <string name="notification_scanning_found_device">Found device: %1$s</string>
     <string name="notification_scanning_complete">Scan complete.</string>
     <string name="notification_scanning_error">Scan error: %1$s</string>
-    <string name="notification_connecting">Connecting to device: %1$s...</string>
+    <string name="notification_connecting">Connecting to device: %1$s…</string>
     <string name="notification_connected">Connected to device: %1$s.</string>
     <string name="notification_connection_lost">Connection Lost.</string>
     <string name="notification_no_contact">No Contact with sensor.</string>
