@@ -21,7 +21,7 @@
     <string name="empty"> </string>
     <string name="notification_tracking">Tracking</string>
     <string name="notification_no_tracking">No tracking</string>
-    <string name="notification_tracking_paused">Tracking paused</string>
+    <string name="notification_tracking_paused">Paused</string>
     <string name="notification_battery_level" translatable="false">%1$d%%</string>
 </resources>
 

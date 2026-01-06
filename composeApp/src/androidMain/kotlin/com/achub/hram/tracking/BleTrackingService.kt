@@ -22,10 +22,10 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
@@ -36,7 +36,7 @@ import kotlin.time.Duration.Companion.milliseconds
 const val CHANNEL_ID = "BLE_TRACKING_CHANNEL_ID"
 const val ACTION = "com.achub.hram.tracking.BleTrackingService.ACTION"
 const val NOTIFICATION_ID = 1
-private const val NOTIFICATION_DEBOUNCE_DURATION_MS = 1000L
+private const val NOTIFICATION_SAMPLE_DURATION_MS = 1000L
 private const val TAG = "BleTrackingService"
 
 class BleTrackingService : Service(), KoinComponent {
@@ -99,8 +99,7 @@ class BleTrackingService : Service(), KoinComponent {
     @OptIn(FlowPreview::class)
     private fun trackBleState() {
         tracker.observeBleState()
-            .debounce { NOTIFICATION_DEBOUNCE_DURATION_MS }
-            .onEach { logger(TAG) { "before notify: $it" } }
+            .sample(NOTIFICATION_SAMPLE_DURATION_MS)
             .onEach { notificator.updateNotification(it) }
             .flowOn(dispatcher)
             .launchIn(scope)
