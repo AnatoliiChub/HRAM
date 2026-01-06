@@ -12,13 +12,16 @@
     <string name="notification_scanning_error">Scan error: %1$s</string>
     <string name="notification_connecting">Connecting to device: %1$s…</string>
     <string name="notification_connected">Connected to device: %1$s.</string>
+    <string name="notification_connected_status">Connected</string>
     <string name="notification_connection_lost">Connection Lost.</string>
     <string name="notification_no_contact">No Contact with sensor.</string>
     <string name="notification_current_hr">%1$sCurrent Heart Rate: %2$s bpm</string>
     <string name="notification_disconnected">Disconnected from device.</string>
     <string name="notification_scanning_cancelled">Scanning was canceled.</string>
     <string name="empty"> </string>
-    <string name="notification_tracking">"Tracking, "</string>
-    <string name="notification_tracking_paused">"Tracking paused, "</string>
+    <string name="notification_tracking">Tracking</string>
+    <string name="notification_no_tracking">No tracking</string>
+    <string name="notification_tracking_paused">Tracking paused</string>
+    <string name="notification_battery_level" translatable="false">%1$d%%</string>
 </resources>
 

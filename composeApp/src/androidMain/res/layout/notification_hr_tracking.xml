@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <FrameLayout
+        android:id="@+id/flMainIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/llDeviceInfoRow"
+        android:layout_alignParentTop="true">
+
+        <ImageView
+            android:id="@+id/ivBleStatusIcon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center"
+            android:contentDescription="@string/notification_title"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_heart_contact_off"
+            android:visibility="invisible"
+            tools:visibility="visible"
+            tools:ignore="ContentDescription" />
+
+        <ProgressBar
+            android:id="@+id/pbAnimatedHeart"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center"
+            android:indeterminate="true"
+            android:indeterminateDrawable="@drawable/ic_heart"
+            android:visibility="invisible" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/tvHeartRateUnit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/heartRateValue"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="4dp"
+        android:textColor="#999999"
+        android:textSize="12sp"
+        tools:text="bpm" />
+
+    <TextView
+        android:id="@+id/heartRateValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toStartOf="@id/tvHeartRateUnit"
+        android:layout_marginEnd="8dp"
+        android:fontFamily="sans-serif"
+        android:textColor="#FF0000"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        tools:text="75" />
+
+    <TextView
+        android:id="@+id/tvBleStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/llDeviceInfoRow"
+        android:layout_alignParentTop="true"
+        android:layout_toStartOf="@id/heartRateValue"
+        android:layout_toEndOf="@id/flMainIcon"
+        android:gravity="center_vertical"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:textSize="14sp"
+        android:textColor="#999999"
+        tools:text="Current status:" />
+
+    <TextView
+        android:id="@+id/trackingStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/heartRateValue"
+        android:layout_alignParentEnd="true"
+        android:layout_toStartOf="@id/heartRateValue"
+        android:textColor="#00CC00"
+        android:textSize="14sp"
+        tools:text="Tracking" />
+
+    <LinearLayout
+        android:id="@+id/llDeviceInfoRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/trackingStatus"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tvDeviceName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="#999999"
+            android:textSize="12sp"
+            tools:text="Polar H10" />
+
+        <ImageView
+            android:id="@+id/ivBattery"
+            android:layout_width="16dp"
+            android:layout_height="12dp"
+            android:importantForAccessibility="no"
+            android:layout_gravity="bottom"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_battery_full_green"
+            android:tint="#00CC00"
+            tools:ignore="UseAppTint" />
+
+        <TextView
+            android:id="@+id/tvBatteryLevel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#999999"
+            android:textSize="12sp"
+            tools:text="85%" />
+    </LinearLayout>
+</RelativeLayout>

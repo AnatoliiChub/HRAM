@@ -12,12 +12,14 @@
     <string name="notification_scanning_error">Помилка пошуку: %1$s</string>
     <string name="notification_connecting">Підключення до пристрою: %1$s…</string>
     <string name="notification_connected">Підключено до пристрою: %1$s.</string>
+    <string name="notification_connected_status">Підключено</string>
     <string name="notification_connection_lost">З\&#39;язок втрачено.</string>
     <string name="notification_no_contact">Відсутній контакт із сенсором.</string>
     <string name="notification_current_hr">%1$sПоточний пульс: %2$s уд/хв</string>
     <string name="notification_disconnected">Відключено від пристрою.</string>
     <string name="notification_scanning_cancelled">Сканування девайсiв було зупинено</string>
     <string name="empty" />
-    <string name="notification_tracking">"Запис, "</string>
-    <string name="notification_tracking_paused">"Запис призупинено, "</string>
+    <string name="notification_tracking">Запис</string>
+    <string name="notification_no_tracking">Без запису</string>
+    <string name="notification_tracking_paused">Запис призупинено</string>
 </resources>

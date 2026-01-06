@@ -6,13 +6,10 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
-import android.graphics.drawable.Icon
 import android.os.IBinder
-import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import com.achub.hram.BLE_SCAN_DURATION
 import com.achub.hram.ble.models.HramBleDevice
-import com.achub.hram.data.models.BleState
 import com.achub.hram.di.CoroutineModule.Companion.WORKER_DISPATCHER
 import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.launchIn
@@ -25,6 +22,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onEach
@@ -38,6 +36,7 @@ import kotlin.time.Duration.Companion.milliseconds
 const val CHANNEL_ID = "BLE_TRACKING_CHANNEL_ID"
 const val ACTION = "com.achub.hram.tracking.BleTrackingService.ACTION"
 const val NOTIFICATION_ID = 1
+private const val NOTIFICATION_DEBOUNCE_DURATION_MS = 1000L
 private const val TAG = "BleTrackingService"
 
 class BleTrackingService : Service(), KoinComponent {
@@ -49,9 +48,11 @@ class BleTrackingService : Service(), KoinComponent {
 
     private val tracker: ActivityTrackingManager by inject()
     private val dispatcher: CoroutineDispatcher by inject(qualifier = named(WORKER_DISPATCHER))
+    private val notificator: HramNotificator by inject()
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
     private val currentAction = AtomicInteger(-1)
+
     private val jobs = mutableListOf<Job>()
 
     override fun onCreate() {
@@ -60,7 +61,7 @@ class BleTrackingService : Service(), KoinComponent {
         val notificationChannel = NotificationChannel(CHANNEL_ID, channel, NotificationManager.IMPORTANCE_DEFAULT)
         val notificationManager = getSystemService(NotificationManager::class.java)
         notificationManager.createNotificationChannel(notificationChannel)
-        val notification: Notification = createNotification()
+        val notification: Notification = notificator.createNotification()
         ServiceCompat.startForeground(this, NOTIFICATION_ID, notification, FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE)
         trackBleState()
         logger(TAG) { "Service created" }
@@ -95,9 +96,12 @@ class BleTrackingService : Service(), KoinComponent {
         scope.cancel()
     }
 
+    @OptIn(FlowPreview::class)
     private fun trackBleState() {
         tracker.observeBleState()
-            .onEach { updateNotification(it) }
+            .debounce { NOTIFICATION_DEBOUNCE_DURATION_MS }
+            .onEach { logger(TAG) { "before notify: $it" } }
+            .onEach { notificator.updateNotification(it) }
             .flowOn(dispatcher)
             .launchIn(scope)
             .let { jobs.add(it) }
@@ -123,103 +127,4 @@ class BleTrackingService : Service(), KoinComponent {
             .launchIn(scope)
             .let { jobs.add(it) }
     }
-
-    private fun createNotification(): Notification {
-        return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle(getString(R.string.notification_title))
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setSilent(true)
-            .setOngoing(true)
-            .build()
-    }
-
-    private suspend fun updateNotification(state: BleState) {
-        val notificationData = when (state) {
-            is BleState.Scanning -> when (state) {
-                is BleState.Scanning.Started -> NotificationData(
-                    getString(R.string.notification_scanning_started),
-                    R.drawable.ic_scanning_24
-                )
-
-                is BleState.Scanning.Update -> NotificationData(
-                    getString(R.string.notification_scanning_found_device, state.device.name),
-                    R.drawable.ic_scanning_24
-                )
-
-                is BleState.Scanning.Completed -> NotificationData(
-                    getString(R.string.notification_scanning_complete),
-                    R.drawable.ic_scanning_24
-                )
-
-                is BleState.Scanning.Error -> NotificationData(
-                    getString(
-                        R.string.notification_scanning_error,
-                        state.error
-                    ),
-                    R.drawable.ic_scanning_24
-                )
-            }
-
-            is BleState.Connecting -> NotificationData(
-                getString(R.string.notification_connecting, state.device.identifier),
-                R.drawable.ic_scanning_24
-            )
-
-            is BleState.Connected -> NotificationData(
-                getString(R.string.notification_connected, state.bleDevice.name),
-                R.drawable.ic_heart
-            )
-
-            is BleState.NotificationUpdate -> {
-                with(state.bleNotification) {
-                    if (isBleConnected.not()) {
-                        NotificationData(
-                            getString(R.string.notification_connection_lost),
-                            R.drawable.ic_heart_disconnected
-                        )
-                    } else if (hrNotification?.isContactOn?.not() == true) {
-                        NotificationData(getString(R.string.notification_no_contact), R.drawable.ic_heart_contact_off)
-                    } else {
-                        val hrBpm = hrNotification?.hrBpm ?: "--"
-                        val prefix = getString(tracker.trackingState().text())
-                        val text = getString(R.string.notification_current_hr, prefix, hrBpm)
-                        NotificationData(text, R.drawable.ic_heart)
-                    }
-                }
-            }
-
-            is BleState.Disconnected -> NotificationData(
-                getString(R.string.notification_disconnected),
-                R.drawable.ic_heart_disconnected
-            )
-        }
-
-        updateNotification(notificationData)
-    }
-
-    private fun updateNotification(data: NotificationData) {
-        val title = getString(R.string.notification_title)
-        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setLargeIcon(Icon.createWithResource(this, data.iconRes))
-            .setContentTitle(title)
-            .setContentText(data.text)
-            .setSilent(true)
-            .setOngoing(true)
-            .build()
-
-        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(NOTIFICATION_ID, notification)
-    }
-}
-
-data class NotificationData(
-    val text: String,
-    val iconRes: Int
-)
-
-fun TrackingStateStage.text() = when (this) {
-    TrackingStateStage.TRACKING_INIT_STATE -> R.string.empty
-    TrackingStateStage.ACTIVE_TRACKING_STATE -> R.string.notification_tracking
-    TrackingStateStage.PAUSED_TRACKING_STATE -> R.string.notification_tracking_paused
 }
