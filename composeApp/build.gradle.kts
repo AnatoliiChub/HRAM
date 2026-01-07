@@ -102,6 +102,14 @@ kotlin {
             }
             linkerOpts.add("-lsqlite3")
         }
+        iosTarget.compilations.getByName("main") {
+            cinterops.create("LiveActivitiBridge") {
+                definitionFile.set(
+                    file(rootDir.absolutePath + "/iosApp/iosApp/Bridge/LiveActivityBridge.def")
+                )
+                includeDirs.allHeaders(rootDir.absolutePath + "/iosApp/iosApp/Bridge/")
+            }
+        }
     }
 
     sourceSets {
@@ -210,4 +218,3 @@ ksp {
     arg("KOIN_LOG_TIMES", "true")
     arg("KOIN_CONFIG_CHECK", "true")
 }
-

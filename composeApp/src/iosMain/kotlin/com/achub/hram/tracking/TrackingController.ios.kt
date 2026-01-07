@@ -33,8 +33,22 @@ actual class TrackingController : KoinComponent {
 
     private var currentAction: Action? = null
 
+    // Live Activity Manager for iOS
+    private val liveActivityManager = LiveActivityManager()
+
     init {
         logger(TAG) { "TrackingController initialized" }
+        // Start observing BLE state for Live Activities
+        liveActivityManager.startObserving(tracker.observeBleState())
+
+        // Observe tracking state changes
+        scope.launch {
+            while (true) {
+                val trackingState = tracker.trackingState()
+                liveActivityManager.updateTrackingState(trackingState)
+                kotlinx.coroutines.delay(1000) // Check every second
+            }
+        }
     }
 
     actual fun scan(id: String?) {
@@ -98,7 +112,18 @@ actual class TrackingController : KoinComponent {
 
     actual fun clear() {
         logger(TAG) { "Cleaning up TrackingController" }
+        liveActivityManager.cleanup()
         jobs.cancelAndClear()
         job.cancel()
+    }
+
+    private enum class Action {
+        Scan,
+        Connect,
+        Disconnect,
+        StartTracking,
+        PauseTracking,
+        StopTracking,
+        CancelScanning
     }
 }
