@@ -71,6 +71,7 @@ public func endLiveActivity(activityId: UnsafePointer<CChar>) {
 @objc(LiveActivityBridgeImpl)
 public class LiveActivityBridgeImpl: NSObject {
     private static var activeActivities: [String: Activity<HRActivityAttributes>] = [:]
+    private static var currentActivityId: String?
 
     @objc public static func startActivity(
         activityName: String,
@@ -86,6 +87,14 @@ public class LiveActivityBridgeImpl: NSObject {
             return nil
         }
 
+        // Check if there's already an active activity for this app
+        // If yes, return its ID instead of creating a new one
+        if let existingId = currentActivityId, activeActivities[existingId] != nil {
+            print("Live Activity already exists with ID: \(existingId), reusing it")
+            return existingId
+        }
+
+
         let attributes = HRActivityAttributes(activityName: activityName)
         let contentState = HRActivityAttributes.ContentState(
             heartRate: heartRate,
@@ -99,12 +108,29 @@ public class LiveActivityBridgeImpl: NSObject {
         do {
             let activity = try Activity<HRActivityAttributes>.request(
                 attributes: attributes,
-                contentState: contentState,
+                content: .init(state: contentState, staleDate: nil),
                 pushType: nil
             )
 
             let actId = activity.id
             activeActivities[actId] = activity
+            currentActivityId = actId
+
+            // Monitor activity state changes to detect dismissal
+            Task {
+                for await state in activity.activityStateUpdates {
+                    print("Live Activity state changed to: \(state)")
+
+                    if state == .dismissed || state == .ended {
+                        print("Live Activity was \(state)")
+                        activeActivities.removeValue(forKey: actId)
+                        if currentActivityId == actId {
+                            currentActivityId = nil
+                        }
+                        break
+                    }
+                }
+            }
 
             print("Live Activity started with ID: \(actId)")
             return actId
@@ -154,6 +180,9 @@ public class LiveActivityBridgeImpl: NSObject {
                 dismissalPolicy: .after(.now + 3)
             )
             activeActivities.removeValue(forKey: activityId)
+            if currentActivityId == activityId {
+                currentActivityId = nil
+            }
             print("Live Activity ended: \(activityId)")
         }
     }

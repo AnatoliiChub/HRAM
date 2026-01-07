@@ -57,7 +57,7 @@ struct TrackingStatusText: View {
 
     var body: some View {
 
-        Text(trackingState ?? "")
+        Text(trackingState)
             .font(.caption.bold())
             .foregroundColor(.green)
     }
@@ -84,7 +84,7 @@ public struct HRLiveActivity: Widget {
                             isContactOn: context.state.isContactOn
                         )
                         Spacer().frame(height: 8)
-                        Text(context.state.trackingState ?? "")
+                        Text(context.state.trackingState)
                             .font(.caption)
                             .foregroundColor(.green)
                         Spacer().frame(height: 6)

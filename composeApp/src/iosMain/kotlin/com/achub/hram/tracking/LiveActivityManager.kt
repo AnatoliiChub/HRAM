@@ -7,9 +7,11 @@ import com.hram.bridge.LiveActivityBridgeImpl
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 
 private const val TAG = "LiveActivityManager"
@@ -28,12 +30,13 @@ class LiveActivityManager {
     /**
      * Starts observing BLE state and updates Live Activity accordingly
      */
+    @OptIn(FlowPreview::class)
     fun startObserving(bleStateFlow: Flow<BleState>) {
         logger(TAG) { "Starting Live Activity observation" }
 
         observerJob?.cancel()
-        observerJob = scope.launch {
-            bleStateFlow.collect { state ->
+        observerJob = scope.launch(Dispatchers.Default) {
+            bleStateFlow.sample(1000L).collect { state ->
                 handleBleStateUpdate(state)
             }
         }
@@ -52,7 +55,7 @@ class LiveActivityManager {
     private fun handleBleStateUpdate(state: BleState) {
         when (state) {
             is BleState.Scanning.Started -> {
-                startActivity(HRAM_ACTIVITY)
+                ensureActivityStarted(HRAM_ACTIVITY)
                 updateActivityState(
                     heartRate = 0,
                     isConnected = false,
@@ -98,9 +101,7 @@ class LiveActivityManager {
 
             is BleState.Connecting -> {
                 currentDeviceName = state.device.name
-                if (currentActivityId == null) {
-                    startActivity(HRAM_ACTIVITY)
-                }
+                ensureActivityStarted(HRAM_ACTIVITY)
                 updateActivityState(
                     heartRate = 0,
                     isConnected = false,
@@ -125,8 +126,8 @@ class LiveActivityManager {
 
             is BleState.NotificationUpdate -> {
                 currentDeviceName = state.device.name
-                if (currentActivityId == null && state.bleNotification.isBleConnected) {
-                    startActivity(HRAM_ACTIVITY)
+                if (state.bleNotification.isBleConnected) {
+                    ensureActivityStarted(HRAM_ACTIVITY)
                 }
 
                 val notification = state.bleNotification
@@ -156,6 +157,13 @@ class LiveActivityManager {
                 }
             }
         }
+    }
+
+    /**
+     * Ensures an activity is started only if one doesn't already exist
+     */
+    private fun ensureActivityStarted(activityName: String) {
+        startActivity(activityName)
     }
 
     /**
