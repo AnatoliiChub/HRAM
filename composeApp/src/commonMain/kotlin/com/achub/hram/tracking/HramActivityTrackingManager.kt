@@ -27,6 +27,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
@@ -49,6 +50,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 
+private const val DISCONNECTION_DELAY = 100L
 private const val TAG = "HramActivityTrackingManager"
 
 @OptIn(
@@ -142,9 +144,7 @@ class HramActivityTrackingManager(
         .catch { loggerE(TAG) { "listen error : $it" } }
 
     override fun releaseState() {
-        scope.launch {
-            trackingStateRepo.release()
-        }
+        scope.launch { trackingStateRepo.release() }
     }
 
     override suspend fun trackingState() = trackingStateRepo.get()
@@ -159,8 +159,9 @@ class HramActivityTrackingManager(
     override fun disconnect() {
         scope.launch(dispatcher) {
             hrDeviceRepo.disconnect()
+            delay(DISCONNECTION_DELAY)
+            updateBleState(BleState.Disconnected)
             jobs.cancelAndClear()
-            scope.launch { updateBleState(BleState.Disconnected) }
         }
     }
 
