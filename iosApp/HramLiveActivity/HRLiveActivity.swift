@@ -15,12 +15,8 @@ public struct HRLiveActivityView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    StatusIconView(
-                        isConnected: context.state.isConnected,
-                        isContactOn: context.state.isContactOn
-                        )
-                    TrackingStatusText(trackingState: context.state.trackingState)
-
+                    StatusIconView(iconName: context.state.iconName, isContactOn: context.state.isContactOn)
+                    TrackingStatusText(trackingState: context.state.bleState)
                 }
                 Spacer()
                 VStack {
@@ -79,11 +75,13 @@ public struct HRLiveActivity: Widget {
                 DynamicIslandExpandedRegion(.leading) {
                     VStack {
                         Spacer().frame(height: 4)
-                        StatusIconView(
-                            isConnected: context.state.isConnected,
-                            isContactOn: context.state.isContactOn
-                        )
+                        StatusIconView(iconName: context.state.iconName, isContactOn: context.state.isContactOn)
+
                         Spacer().frame(height: 8)
+                        Text(context.state.bleState)
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                        Spacer().frame(height: 2)
                         Text(context.state.trackingState)
                             .font(.caption)
                             .foregroundColor(.green)
@@ -114,10 +112,8 @@ public struct HRLiveActivity: Widget {
                 }
             } compactLeading: {
                 // Compact leading (left side of Dynamic Island)
-                StatusIconView(
-                    isConnected: context.state.isConnected,
-                    isContactOn: context.state.isContactOn
-                )
+                StatusIconView(iconName: context.state.iconName, isContactOn: context.state.isContactOn)
+
             } compactTrailing: {
                 // Compact trailing (right side of Dynamic Island)
                 if context.state.isConnected && context.state.isContactOn {
@@ -131,10 +127,8 @@ public struct HRLiveActivity: Widget {
                 }
             } minimal: {
                 // Minimal view (when multiple Live Activities are active)
-                StatusIconView(
-                    isConnected: context.state.isConnected,
-                    isContactOn: context.state.isContactOn
-                )
+                StatusIconView(iconName: context.state.iconName, isContactOn: context.state.isContactOn)
+
             }
             .keylineTint(.red)
         }
@@ -181,25 +175,24 @@ struct BatteryView: View {
 }
 
 struct StatusIconView: View {
-    let isConnected: Bool
+    let iconName: String
     let isContactOn: Bool
 
     var body: some View {
         Group {
-            if !isConnected {
-                Image(systemName: "heart.slash.fill")
-                    .imageScale(.large)
-                    .foregroundColor(.gray)
-            } else if !isContactOn {
-                Image(systemName: "heart.fill")
-                    .imageScale(.large)
-                    .foregroundColor(.yellow)
-            } else {
-                Image(systemName: "heart.fill")
-                    .imageScale(.large)
-                    .foregroundColor(.red)
-
+            let color: Color = switch iconName {
+            case "dot.radiowaves.right":
+                .gray
+            case "heart.slash.fill":
+                .gray
+            case "heart.fill":
+                isContactOn ? .red : .yellow
+            default:
+                .gray
             }
+            Image(systemName: iconName)
+                .imageScale(.large)
+                .foregroundColor(color)
         }
     }
 }
@@ -213,7 +206,7 @@ struct HeartRateView: View {
         HStack(alignment: .firstTextBaseline, spacing: 4) {
             let heartRateLabel = if isConnected && isContactOn {
                 "\(heartRate)"
-            } else  {
+            } else {
                 "--"
             }
             let unitLabel = isConnected ? "bpm" : ""

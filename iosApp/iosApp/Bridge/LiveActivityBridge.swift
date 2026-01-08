@@ -3,6 +3,7 @@ import ActivityKit
 
 // MARK: - Kotlin/Native C Bridge Functions
 // These @_cdecl functions allow Kotlin to call Swift code
+import ComposeApp
 
 @_cdecl("startLiveActivity")
 public func startLiveActivity(
@@ -10,12 +11,14 @@ public func startLiveActivity(
     heartRate: Int32,
     isConnected: Bool,
     isContactOn: Bool,
+    bleState: UnsafePointer<CChar>,
     trackingState: UnsafePointer<CChar>,
     batteryLevel: Int32,
     deviceName: UnsafePointer<CChar>
 ) -> UnsafePointer<CChar>? {
     let name = String(cString: activityName)
-    let state = String(cString: trackingState)
+    let bleStateStr = String(cString: bleState)
+    let trackingStateStr = String(cString: trackingState)
     let device = String(cString: deviceName)
 
     let activityId = LiveActivityBridgeImpl.startActivity(
@@ -23,7 +26,8 @@ public func startLiveActivity(
         heartRate: Int(heartRate),
         isConnected: isConnected,
         isContactOn: isContactOn,
-        trackingState: state,
+        bleState: bleStateStr,
+        trackingState: trackingStateStr,
         batteryLevel: Int(batteryLevel),
         deviceName: device
     )
@@ -41,12 +45,14 @@ public func updateLiveActivity(
     heartRate: Int32,
     isConnected: Bool,
     isContactOn: Bool,
+    bleState: UnsafePointer<CChar>,
     trackingState: UnsafePointer<CChar>,
     batteryLevel: Int32,
     deviceName: UnsafePointer<CChar>
 ) {
     let id = String(cString: activityId)
-    let state = String(cString: trackingState)
+    let bleStateStr = String(cString: bleState)
+    let trackingStateStr = String(cString: trackingState)
     let device = String(cString: deviceName)
 
     LiveActivityBridgeImpl.updateActivity(
@@ -54,7 +60,8 @@ public func updateLiveActivity(
         heartRate: Int(heartRate),
         isConnected: isConnected,
         isContactOn: isContactOn,
-        trackingState: state,
+        bleState: bleStateStr,
+        trackingState: trackingStateStr,
         batteryLevel: Int(batteryLevel),
         deviceName: device
     )
@@ -78,6 +85,7 @@ public class LiveActivityBridgeImpl: NSObject {
         heartRate: Int,
         isConnected: Bool,
         isContactOn: Bool,
+        bleState: String,
         trackingState: String,
         batteryLevel: Int,
         deviceName: String
@@ -94,15 +102,19 @@ public class LiveActivityBridgeImpl: NSObject {
             return existingId
         }
 
+        // Parse bleState string to BleStateType enum
+        let bleStateType = BleStateType.from(state: bleState)
 
         let attributes = HRActivityAttributes(activityName: activityName)
         let contentState = HRActivityAttributes.ContentState(
             heartRate: heartRate,
             isConnected: isConnected,
             isContactOn: isContactOn,
+            bleState: bleStateType.displayText(deviceName: deviceName),
             trackingState: trackingState,
             batteryLevel: batteryLevel,
-            deviceName: deviceName
+            deviceName: deviceName,
+            iconName: iconName(bleState: bleStateType, isConnected: isConnected, isContactOn: isContactOn)
         )
 
         do {
@@ -145,6 +157,7 @@ public class LiveActivityBridgeImpl: NSObject {
         heartRate: Int,
         isConnected: Bool,
         isContactOn: Bool,
+        bleState: String,
         trackingState: String,
         batteryLevel: Int,
         deviceName: String
@@ -154,13 +167,18 @@ public class LiveActivityBridgeImpl: NSObject {
             return
         }
 
+        // Parse bleState string to BleStateType enum
+        let bleStateType = BleStateType.from(state: bleState)
+
         let contentState = HRActivityAttributes.ContentState(
             heartRate: heartRate,
             isConnected: isConnected,
             isContactOn: isContactOn,
+            bleState: bleStateType.displayText(deviceName: deviceName),
             trackingState: trackingState,
             batteryLevel: batteryLevel,
-            deviceName: deviceName
+            deviceName: deviceName,
+            iconName: iconName(bleState: bleStateType, isConnected: isConnected, isContactOn: isContactOn)
         )
 
         Task {
@@ -188,3 +206,43 @@ public class LiveActivityBridgeImpl: NSObject {
     }
 }
 
+func iconName(bleState: BleStateType, isConnected: Bool, isContactOn: Bool) -> String {
+    if [.scanningStarted, .connecting, .scanningCompleted, .scanningError, .scanningUpdate].contains(bleState) {
+        "dot.radiowaves.right"
+    } else if !isConnected {
+        "heart.slash.fill"
+    } else if !isContactOn {
+        "heart.fill"
+    } else {
+        "heart.fill"
+    }
+}
+
+public extension BleStateType {
+    func displayText(deviceName: String = "") -> String {
+        switch self {
+        case .scanningStarted:
+            return "Scanning..."
+        case .scanningUpdate:
+            return deviceName.isEmpty ? "Device found" : "Found: \(deviceName)"
+        case .scanningCompleted:
+            return "Scan complete"
+        case .scanningError:
+            return "Scan error"
+        case .connecting:
+            return deviceName.isEmpty ? "Connecting..." : "Connecting to \(deviceName)"
+        case .connected, .notificationUpdate:
+            return "Connected"
+        case .disconnected:
+            return "Disconnected"
+        default:
+            return ""
+        }
+    }
+}
+
+extension BleStateType {
+    static func from(state: String) -> BleStateType {
+        return BleStateType.companion.from(bleState: state)
+    }
+}

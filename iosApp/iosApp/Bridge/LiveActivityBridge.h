@@ -10,6 +10,7 @@
         heartRate:(NSInteger)heartRate
         isConnected:(BOOL)isConnected
         isContactOn:(BOOL)isContactOn
+        bleState:(NSString * _Nonnull)bleState
         trackingState:(NSString * _Nonnull)trackingState
         batteryLevel:(NSInteger)batteryLevel
         deviceName:(NSString * _Nonnull)deviceName;
@@ -17,6 +18,7 @@
         heartRate:(NSInteger)heartRate
         isConnected:(BOOL)isConnected
         isContactOn:(BOOL)isContactOn
+        bleState:(NSString * _Nonnull)bleState
         trackingState:(NSString * _Nonnull)trackingState
         batteryLevel:(NSInteger)batteryLevel
         deviceName:(NSString * _Nonnull)deviceName;

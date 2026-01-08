@@ -13,6 +13,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
+import org.koin.ext.getFullName
 
 private const val TAG = "LiveActivityManager"
 
@@ -26,6 +27,8 @@ class LiveActivityManager {
     private var currentActivityId: String? = null
 
     private var currentDeviceName: String = ""
+    private var currentTrackingState: String = ""
+    private var lastBleState: BleState? = null
 
     /**
      * Starts observing BLE state and updates Live Activity accordingly
@@ -53,6 +56,9 @@ class LiveActivityManager {
     }
 
     private fun handleBleStateUpdate(state: BleState) {
+        lastBleState = state
+        val bleStateType = state::class.getFullName()
+
         when (state) {
             is BleState.Scanning.Started -> {
                 ensureActivityStarted(HRAM_ACTIVITY)
@@ -60,7 +66,8 @@ class LiveActivityManager {
                     heartRate = 0,
                     isConnected = false,
                     isContactOn = false,
-                    bleState = "Scanning...",
+                    bleState = bleStateType,
+                    trackingState = currentTrackingState,
                     batteryLevel = 0,
                     deviceName = ""
                 )
@@ -71,9 +78,10 @@ class LiveActivityManager {
                     heartRate = 0,
                     isConnected = false,
                     isContactOn = false,
-                    bleState = "Found: ${state.device.name}",
+                    bleState = bleStateType,
+                    trackingState = currentTrackingState,
                     batteryLevel = 0,
-                    deviceName = ""
+                    deviceName = state.device.name
                 )
             }
 
@@ -82,7 +90,8 @@ class LiveActivityManager {
                     heartRate = 0,
                     isConnected = false,
                     isContactOn = false,
-                    bleState = "Scan complete",
+                    bleState = bleStateType,
+                    trackingState = currentTrackingState,
                     batteryLevel = 0,
                     deviceName = ""
                 )
@@ -93,7 +102,8 @@ class LiveActivityManager {
                     heartRate = 0,
                     isConnected = false,
                     isContactOn = false,
-                    bleState = "Scan error",
+                    bleState = bleStateType,
+                    trackingState = currentTrackingState,
                     batteryLevel = 0,
                     deviceName = ""
                 )
@@ -106,7 +116,8 @@ class LiveActivityManager {
                     heartRate = 0,
                     isConnected = false,
                     isContactOn = false,
-                    bleState = "Connecting...",
+                    bleState = bleStateType,
+                    trackingState = currentTrackingState,
                     batteryLevel = 0,
                     deviceName = state.device.name
                 )
@@ -118,7 +129,8 @@ class LiveActivityManager {
                     heartRate = 0,
                     isConnected = true,
                     isContactOn = true,
-                    bleState = "Connected",
+                    bleState = bleStateType,
+                    trackingState = currentTrackingState,
                     batteryLevel = 0,
                     deviceName = state.bleDevice.name
                 )
@@ -135,7 +147,8 @@ class LiveActivityManager {
                     heartRate = notification.hrNotification?.hrBpm ?: 0,
                     isConnected = notification.isBleConnected,
                     isContactOn = notification.hrNotification?.isContactOn ?: false,
-                    bleState = "Connected",
+                    bleState = bleStateType,
+                    trackingState = currentTrackingState,
                     batteryLevel = notification.batteryLevel,
                     deviceName = state.device.name
                 )
@@ -146,7 +159,8 @@ class LiveActivityManager {
                     heartRate = 0,
                     isConnected = false,
                     isContactOn = false,
-                    bleState = "Disconnected",
+                    bleState = bleStateType,
+                    trackingState = currentTrackingState,
                     batteryLevel = 0,
                     deviceName = ""
                 )
@@ -169,10 +183,15 @@ class LiveActivityManager {
     /**
      * Updates tracking state text (e.g., "Tracking", "Paused")
      */
-    fun updateTrackingState(state: TrackingStateStage) = when (state) {
-        TrackingStateStage.TRACKING_INIT_STATE -> ""
-        TrackingStateStage.ACTIVE_TRACKING_STATE -> "Tracking"
-        TrackingStateStage.PAUSED_TRACKING_STATE -> "Paused"
+    fun updateTrackingState(state: TrackingStateStage) {
+        currentTrackingState = when (state) {
+            TrackingStateStage.TRACKING_INIT_STATE -> ""
+            TrackingStateStage.ACTIVE_TRACKING_STATE -> "Tracking"
+            TrackingStateStage.PAUSED_TRACKING_STATE -> "Paused"
+        }
+
+        // Re-apply the last BLE state update with the new tracking state
+        lastBleState?.let { handleBleStateUpdate(it) }
     }
 
     private fun startActivity(activityName: String) {
@@ -185,6 +204,7 @@ class LiveActivityManager {
                 heartRate = 0,
                 isConnected = false,
                 isContactOn = false,
+                bleState = BleState.Disconnected::class.getFullName(),
                 trackingState = "",
                 batteryLevel = 0,
                 deviceName = ""
@@ -202,6 +222,7 @@ class LiveActivityManager {
         isConnected: Boolean,
         isContactOn: Boolean,
         bleState: String,
+        trackingState: String,
         batteryLevel: Int,
         deviceName: String,
     ) {
@@ -217,7 +238,8 @@ class LiveActivityManager {
                     heartRate = heartRate.toLong(),
                     isConnected = isConnected,
                     isContactOn = isContactOn,
-                    trackingState = bleState,
+                    bleState = bleState,
+                    trackingState = trackingState,
                     batteryLevel = batteryLevel.toLong(),
                     deviceName = deviceName
                 )

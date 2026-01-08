@@ -26,9 +26,11 @@ struct HRLiveActivityPreviews: PreviewProvider {
         heartRate: 72,
         isConnected: true,
         isContactOn: true,
-        trackingState: "Tracking",
+        bleState: "Connected",
+        trackingState: "00:05:23",
         batteryLevel: 85,
-        deviceName: "HRM Belt"
+        deviceName: "HRM Belt",
+        iconName: "heart.fill"
     )
 
     static var previews: some View {
