@@ -22,6 +22,7 @@ import org.koin.core.qualifier.named
 import kotlin.time.Duration.Companion.milliseconds
 
 private const val TAG = "TrackingController"
+private const val TRACKING_UPDATE_INTERVAL_MS = 1000L
 
 actual class TrackingController : KoinComponent {
     private val tracker: ActivityTrackingManager by inject()
@@ -46,7 +47,7 @@ actual class TrackingController : KoinComponent {
             while (true) {
                 val trackingState = tracker.trackingState()
                 liveActivityManager.updateTrackingState(trackingState)
-                kotlinx.coroutines.delay(1000) // Check every second
+                kotlinx.coroutines.delay(TRACKING_UPDATE_INTERVAL_MS)
             }
         }
     }

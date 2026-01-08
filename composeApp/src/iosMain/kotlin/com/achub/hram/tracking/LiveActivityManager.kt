@@ -11,6 +11,9 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 import org.koin.ext.getFullName
@@ -18,6 +21,8 @@ import org.koin.ext.getFullName
 private const val TAG = "LiveActivityManager"
 
 private const val HRAM_ACTIVITY = "Heart Rate Activity"
+private const val END_ACTIVITY_DELAY_MS = 2000L
+private const val BLE_UPDATES_SAMPLE_MS = 1000L
 
 @OptIn(ExperimentalForeignApi::class)
 class LiveActivityManager {
@@ -38,11 +43,11 @@ class LiveActivityManager {
         logger(TAG) { "Starting Live Activity observation" }
 
         observerJob?.cancel()
-        observerJob = scope.launch(Dispatchers.Default) {
-            bleStateFlow.sample(1000L).collect { state ->
-                handleBleStateUpdate(state)
-            }
-        }
+        bleStateFlow.sample(BLE_UPDATES_SAMPLE_MS)
+            .onEach { state -> handleBleStateUpdate(state) }
+            .flowOn(Dispatchers.Default)
+            .launchIn(scope)
+            .let { observerJob = it }
     }
 
     /**
@@ -166,7 +171,7 @@ class LiveActivityManager {
                 )
                 // End activity after a short delay when disconnected
                 scope.launch {
-                    kotlinx.coroutines.delay(2000)
+                    kotlinx.coroutines.delay(END_ACTIVITY_DELAY_MS)
                     endActivity()
                 }
             }

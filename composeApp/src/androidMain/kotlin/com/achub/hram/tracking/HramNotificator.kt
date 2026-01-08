@@ -8,19 +8,17 @@ import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import com.achub.hram.data.models.BleState
 import com.achub.hram.library.R
-import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
 private const val NO_HEART_RATE = "--"
+private const val HIGH_BATTERY_THRESHOLD = 75
+private const val LOW_BATTERY_THRESHOLD = 25
 
 class HramNotificator(
     private val ctx: Context,
     private val notificationManager: NotificationManager,
     private val trackingManager: ActivityTrackingManager,
 ) {
-    @OptIn(ExperimentalAtomicApi::class)
-    private val previousStateIsListening = AtomicBoolean(false)
-
     fun createNotification(): Notification {
         val remoteViews = createRemoteViews()
 
@@ -44,32 +42,7 @@ class HramNotificator(
     @OptIn(ExperimentalAtomicApi::class)
     suspend fun updateNotification(state: BleState) {
         val notificationData = when (state) {
-            is BleState.Scanning -> when (state) {
-                is BleState.Scanning.Started -> NotificationData(
-                    heartRate = null,
-                    heartIcon = R.drawable.ic_scanning_24,
-                    bleStatus = ctx.getString(R.string.notification_scanning_started)
-                )
-
-                is BleState.Scanning.Update -> NotificationData(
-                    heartRate = null,
-                    heartIcon = R.drawable.ic_scanning_24,
-                    deviceName = state.device.name,
-                    bleStatus = ctx.getString(R.string.notification_scanning_found_device, state.device.name)
-                )
-
-                is BleState.Scanning.Completed -> NotificationData(
-                    heartRate = null,
-                    heartIcon = R.drawable.ic_scanning_24,
-                    bleStatus = ctx.getString(R.string.notification_scanning_complete)
-                )
-
-                is BleState.Scanning.Error -> NotificationData(
-                    heartRate = null,
-                    heartIcon = R.drawable.ic_scanning_24,
-                    bleStatus = ctx.getString(R.string.notification_scanning_error, state.error)
-                )
-            }
+            is BleState.Scanning -> handleScanning(state)
 
             is BleState.Connecting -> NotificationData(
                 heartRate = null,
@@ -87,37 +60,7 @@ class HramNotificator(
                 bleStatus = ctx.getString(R.string.notification_connected, state.bleDevice.name)
             )
 
-            is BleState.NotificationUpdate -> {
-                with(state.bleNotification) {
-                    val isConnected = isBleConnected
-                    val isContactOn = hrNotification?.isContactOn ?: false
-                    val heartRate = if (isConnected && isContactOn) hrNotification.hrBpm.toString() else NO_HEART_RATE
-
-                    val heartIcon = when {
-                        !isConnected -> R.drawable.ic_heart_disconnected
-                        !isContactOn -> R.drawable.ic_heart_contact_off
-                        else -> R.drawable.ic_heart
-                    }
-                    val bleStatus = when {
-                        !isConnected -> ctx.getString(R.string.notification_connection_lost)
-                        !isContactOn -> ctx.getString(R.string.notification_no_contact)
-                        else -> ctx.getString(R.string.notification_connected_status)
-                    }
-
-                    val trackingStatus = ctx.getString(trackingManager.trackingState().text())
-
-                    NotificationData(
-                        heartRate = heartRate,
-                        heartIcon = heartIcon,
-                        trackingStatus = trackingStatus,
-                        deviceName = state.device.name,
-                        batteryLevel = batteryLevel,
-                        isConnected = isConnected,
-                        isContactOn = isContactOn,
-                        bleStatus = bleStatus
-                    )
-                }
-            }
+            is BleState.NotificationUpdate -> handleNotificationUpdate(state)
 
             is BleState.Disconnected -> NotificationData(
                 heartRate = null,
@@ -132,6 +75,64 @@ class HramNotificator(
         }
 
         updateNotification(notificationData)
+    }
+
+    private suspend fun handleNotificationUpdate(state: BleState.NotificationUpdate): NotificationData =
+        with(state.bleNotification) {
+            val isConnected = isBleConnected
+            val isContactOn = hrNotification?.isContactOn ?: false
+            val heartRate = if (isConnected && isContactOn) hrNotification.hrBpm.toString() else NO_HEART_RATE
+
+            val heartIcon = when {
+                !isConnected -> R.drawable.ic_heart_disconnected
+                !isContactOn -> R.drawable.ic_heart_contact_off
+                else -> R.drawable.ic_heart
+            }
+            val bleStatus = when {
+                !isConnected -> ctx.getString(R.string.notification_connection_lost)
+                !isContactOn -> ctx.getString(R.string.notification_no_contact)
+                else -> ctx.getString(R.string.notification_connected_status)
+            }
+
+            val trackingStatus = ctx.getString(trackingManager.trackingState().text())
+
+            NotificationData(
+                heartRate = heartRate,
+                heartIcon = heartIcon,
+                trackingStatus = trackingStatus,
+                deviceName = state.device.name,
+                batteryLevel = batteryLevel,
+                isConnected = isConnected,
+                isContactOn = isContactOn,
+                bleStatus = bleStatus
+            )
+        }
+
+    private fun handleScanning(state: BleState.Scanning): NotificationData = when (state) {
+        is BleState.Scanning.Started -> NotificationData(
+            heartRate = null,
+            heartIcon = R.drawable.ic_scanning_24,
+            bleStatus = ctx.getString(R.string.notification_scanning_started)
+        )
+
+        is BleState.Scanning.Update -> NotificationData(
+            heartRate = null,
+            heartIcon = R.drawable.ic_scanning_24,
+            deviceName = state.device.name,
+            bleStatus = ctx.getString(R.string.notification_scanning_found_device, state.device.name)
+        )
+
+        is BleState.Scanning.Completed -> NotificationData(
+            heartRate = null,
+            heartIcon = R.drawable.ic_scanning_24,
+            bleStatus = ctx.getString(R.string.notification_scanning_complete)
+        )
+
+        is BleState.Scanning.Error -> NotificationData(
+            heartRate = null,
+            heartIcon = R.drawable.ic_scanning_24,
+            bleStatus = ctx.getString(R.string.notification_scanning_error, state.error)
+        )
     }
 
     @OptIn(ExperimentalAtomicApi::class)
@@ -195,8 +196,8 @@ class HramNotificator(
     }
 
     private fun getBatteryIcon(level: Int) = when {
-        level > 75 -> R.drawable.ic_battery_full_green
-        level > 25 -> R.drawable.ic_battery_half_green
+        level > HIGH_BATTERY_THRESHOLD -> R.drawable.ic_battery_full_green
+        level > LOW_BATTERY_THRESHOLD -> R.drawable.ic_battery_half_green
         else -> R.drawable.ic_battery_low_red
     }
 }
