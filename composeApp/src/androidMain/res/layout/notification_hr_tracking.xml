@@ -60,7 +60,7 @@
         tools:text="Current status:" />
 
     <TextView
-        android:id="@+id/trackingStatus"
+        android:id="@+id/tvElapsedTime"
         style="@style/NotificationTrackingStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -73,7 +73,7 @@
         android:id="@+id/llDeviceInfoRow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/trackingStatus"
+        android:layout_below="@id/tvElapsedTime"
         android:orientation="horizontal">
 
         <TextView

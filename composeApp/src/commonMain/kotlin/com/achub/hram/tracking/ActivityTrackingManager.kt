@@ -12,7 +12,9 @@ import kotlin.time.Duration
 enum class TrackingStateStage {
     TRACKING_INIT_STATE,
     ACTIVE_TRACKING_STATE,
-    PAUSED_TRACKING_STATE
+    PAUSED_TRACKING_STATE;
+
+    fun isActive() = this == ACTIVE_TRACKING_STATE
 }
 
 interface ActivityTrackingManager {

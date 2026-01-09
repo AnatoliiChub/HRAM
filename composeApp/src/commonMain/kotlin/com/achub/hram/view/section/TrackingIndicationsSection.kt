@@ -12,18 +12,8 @@ import com.achub.hram.ble.models.BleNotification
 import com.achub.hram.ble.models.HrNotification
 import com.achub.hram.style.Dimen16
 import com.achub.hram.style.Heading3
+import com.achub.hram.utils.formatElapsedTime
 import com.achub.hram.view.indications.HeartIndicationRow
-import kotlinx.datetime.LocalTime
-import kotlinx.datetime.format
-import kotlinx.datetime.format.char
-
-val dateFormat = LocalTime.Format {
-    hour()
-    char(':')
-    minute()
-    char(':')
-    second()
-}
 
 @Composable
 fun TrackingIndicationsSection(bleNotification: BleNotification) {
@@ -31,7 +21,7 @@ fun TrackingIndicationsSection(bleNotification: BleNotification) {
         HeartIndicationRow(bleNotification = bleNotification)
         Text(
             modifier = Modifier.align(CenterHorizontally),
-            text = LocalTime.fromSecondOfDay(bleNotification.elapsedTime.toInt()).format(dateFormat),
+            text = formatElapsedTime(bleNotification.elapsedTime),
             style = Heading3
         )
         Spacer(modifier = Modifier.height(Dimen16))

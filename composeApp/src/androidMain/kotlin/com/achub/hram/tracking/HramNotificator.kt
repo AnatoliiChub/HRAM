@@ -6,8 +6,10 @@ import android.content.Context
 import android.view.View
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.achub.hram.data.models.BleState
 import com.achub.hram.library.R
+import com.achub.hram.utils.formatElapsedTime
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
 private const val NO_HEART_RATE = "--"
@@ -26,7 +28,7 @@ class HramNotificator(
         remoteViews.setViewVisibility(R.id.tvBleStatus, View.VISIBLE)
         remoteViews.setViewVisibility(R.id.heartRateValue, View.GONE)
         remoteViews.setViewVisibility(R.id.llDeviceInfoRow, View.GONE)
-        remoteViews.setViewVisibility(R.id.trackingStatus, View.GONE)
+        remoteViews.setViewVisibility(R.id.tvElapsedTime, View.GONE)
 
         return NotificationCompat.Builder(ctx, CHANNEL_ID)
             .setContentTitle(ctx.getString(R.string.notification_title))
@@ -65,7 +67,7 @@ class HramNotificator(
             is BleState.Disconnected -> NotificationData(
                 heartRate = null,
                 heartIcon = R.drawable.ic_heart_disconnected,
-                trackingStatus = null,
+                elapsedTime = null,
                 deviceName = null,
                 batteryLevel = null,
                 isConnected = false,
@@ -94,17 +96,16 @@ class HramNotificator(
                 else -> ctx.getString(R.string.notification_connected_status)
             }
 
-            val trackingStatus = ctx.getString(trackingManager.trackingState().text())
-
             NotificationData(
                 heartRate = heartRate,
                 heartIcon = heartIcon,
-                trackingStatus = trackingStatus,
+                elapsedTime = formatElapsedTime(state.bleNotification.elapsedTime),
                 deviceName = state.device.name,
                 batteryLevel = batteryLevel,
                 isConnected = isConnected,
                 isContactOn = isContactOn,
-                bleStatus = bleStatus
+                bleStatus = bleStatus,
+                trackingStatus = trackingManager.trackingState()
             )
         }
 
@@ -153,11 +154,17 @@ class HramNotificator(
             remoteViews.setImageViewResource(R.id.ivBleStatusIcon, data.heartIcon)
         }
         // Update tracking status
-        if (data.trackingStatus != null) {
-            remoteViews.setTextViewText(R.id.trackingStatus, data.trackingStatus)
-            remoteViews.setViewVisibility(R.id.trackingStatus, View.VISIBLE)
+        if (data.elapsedTime != null) {
+            val timeColor = if (data.trackingStatus?.isActive() == true) {
+                R.color.notification_tracking_active_color
+            } else {
+                R.color.notification_heart_rate_color
+            }
+            remoteViews.setTextViewText(R.id.tvElapsedTime, data.elapsedTime)
+            remoteViews.setTextColor(R.id.tvElapsedTime, ContextCompat.getColor(ctx, timeColor))
+            remoteViews.setViewVisibility(R.id.tvElapsedTime, View.VISIBLE)
         } else {
-            remoteViews.setViewVisibility(R.id.trackingStatus, View.INVISIBLE)
+            remoteViews.setViewVisibility(R.id.tvElapsedTime, View.INVISIBLE)
         }
 
         // Update device info row
@@ -205,16 +212,11 @@ class HramNotificator(
 data class NotificationData(
     val heartRate: String? = null,
     val heartIcon: Int,
-    val trackingStatus: String? = null,
+    val elapsedTime: String? = null,
     val deviceName: String? = null,
     val batteryLevel: Int? = null,
     val isConnected: Boolean = false,
     val isContactOn: Boolean = false,
-    val bleStatus: String
+    val bleStatus: String,
+    val trackingStatus: TrackingStateStage? = null
 )
-
-fun TrackingStateStage.text() = when (this) {
-    TrackingStateStage.TRACKING_INIT_STATE -> R.string.notification_no_tracking
-    TrackingStateStage.ACTIVE_TRACKING_STATE -> R.string.notification_tracking
-    TrackingStateStage.PAUSED_TRACKING_STATE -> R.string.notification_tracking_paused
-}
