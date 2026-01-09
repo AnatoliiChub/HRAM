@@ -1,5 +1,6 @@
 package com.achub.hram.view.components
 
+import OnBackground
 import androidx.compose.animation.core.KeyframesSpec
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -9,6 +10,9 @@ import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
@@ -41,15 +45,23 @@ fun HeartBeatingAnimView(
     icon: DrawableResource,
     color: Color
 ) {
-    val infiniteTransition = rememberInfiniteTransition()
-    val animatedScale by infiniteTransition.animateFloat(
-        initialValue = MIN_HEART_SCALE,
-        targetValue = MAX_HEART_SCALE,
-        animationSpec = infiniteRepeatable(
-            animation = heartBeatingSpec(),
-            repeatMode = RepeatMode.Restart
+    var isAppInBackground by remember { mutableStateOf(true) }
+    OnBackground { isAppInBackground = it }
+
+    val animatedScale by if (isAppInBackground.not() && isBeating) {
+        val infiniteTransition = rememberInfiniteTransition()
+        infiniteTransition.animateFloat(
+            initialValue = MIN_HEART_SCALE,
+            targetValue = MAX_HEART_SCALE,
+            animationSpec = infiniteRepeatable(
+                animation = heartBeatingSpec(),
+                repeatMode = RepeatMode.Restart
+            )
         )
-    )
+    } else {
+        mutableStateOf(DEFAULT_HEART_SCALE)
+    }
+
     IndicationImage(
         modifier = modifier.scale(if (isBeating) animatedScale else DEFAULT_HEART_SCALE),
         imageSize = Dimen76,

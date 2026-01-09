@@ -1,0 +1,60 @@
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:ordering="together">
+
+    <objectAnimator
+        android:duration="1000"
+        android:interpolator="@android:anim/linear_interpolator"
+        android:propertyName="scaleX"
+        android:repeatCount="infinite"
+        android:valueType="floatType">
+        <propertyValuesHolder android:propertyName="scaleX">
+            <keyframe
+                android:fraction="0"
+                android:value="0.6666667" />
+            <keyframe
+                android:fraction="0.24"
+                android:value="1.0" />
+            <keyframe
+                android:fraction="0.42"
+                android:value="0.6666667" />
+            <keyframe
+                android:fraction="0.58"
+                android:value="1.0" />
+            <keyframe
+                android:fraction="0.68"
+                android:value="0.75" />
+            <keyframe
+                android:fraction="1.0"
+                android:value="0.6666667" />
+        </propertyValuesHolder>
+    </objectAnimator>
+
+    <objectAnimator
+        android:duration="1000"
+        android:interpolator="@android:anim/linear_interpolator"
+        android:propertyName="scaleY"
+        android:repeatCount="infinite"
+        android:valueType="floatType">
+        <propertyValuesHolder android:propertyName="scaleY">
+            <keyframe
+                android:fraction="0"
+                android:value="0.6666667" />
+            <keyframe
+                android:fraction="0.24"
+                android:value="1.0" />
+            <keyframe
+                android:fraction="0.42"
+                android:value="0.6666667" />
+            <keyframe
+                android:fraction="0.58"
+                android:value="1.0" />
+            <keyframe
+                android:fraction="0.68"
+                android:value="0.75" />
+            <keyframe
+                android:fraction="1.0"
+                android:value="0.6666667" />
+        </propertyValuesHolder>
+    </objectAnimator>
+
+</set>

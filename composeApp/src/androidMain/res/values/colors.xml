@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Notification colors -->
+    <color name="notification_heart_rate_color">#FF0000</color>
+    <color name="notification_tracking_active_color">#00CC00</color>
+    <color name="notification_secondary_text_color">#999999</color>
+    <color name="notification_battery_good_color">#00CC00</color>
+    <color name="notification_battery_low_color">#FF0000</color>
+</resources>
+

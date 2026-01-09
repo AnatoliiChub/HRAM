@@ -15,9 +15,13 @@ import com.achub.hram.style.White10
 import com.achub.hram.style.White30
 import com.achub.hram.view.X_LABEL_COUNT
 import com.achub.hram.view.Y_LABEL_COUNT
+import hram.composeapp.generated.resources.Res
+import hram.composeapp.generated.resources.activity_screen_seconds_unit
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun defaultChartStyle(): ChartStyle {
+    val secondsLabel = stringResource(Res.string.activity_screen_seconds_unit)
     return ChartStyle(
         bubbleXOverlap = Dimen16.dpToPx(),
         bubbleYOffset = Dimen8.dpToPx(),
@@ -34,6 +38,6 @@ fun defaultChartStyle(): ChartStyle {
         pathColor = Red,
         areaColor = Red20,
         yLabelFormatter = { "${it.toInt()}" },
-        xLabelFormatter = { formatTime(it.toLong()) }
+        xLabelFormatter = { formatTime(it.toLong(), secondsLabel) }
     )
 }

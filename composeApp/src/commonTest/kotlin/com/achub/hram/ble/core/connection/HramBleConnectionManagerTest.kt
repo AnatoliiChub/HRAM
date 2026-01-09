@@ -2,6 +2,7 @@ package com.achub.hram.ble.core.connection
 
 import com.achub.hram.ble.models.BleConnectionsException
 import com.achub.hram.ble.models.BleDevice
+import com.achub.hram.ble.models.HramBleDevice
 import com.achub.hram.ble.models.PeripheralConvertor
 import com.achub.hram.identifier
 import com.juul.kable.Advertisement
@@ -54,7 +55,7 @@ class HramBleConnectionManagerTest {
     // Data mocks
     private lateinit var advertisementMock: Advertisement
     private lateinit var peripheralMock: Peripheral
-    private lateinit var bleDeviceMock: BleDevice
+    private lateinit var bleDeviceMock: HramBleDevice
     private lateinit var trackConnectionMock: Flow<Boolean>
     private lateinit var disconnectionFlow: MutableStateFlow<Boolean>
     private lateinit var collectedDevices: MutableList<BleDevice>

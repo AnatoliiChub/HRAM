@@ -54,6 +54,7 @@ import hram.composeapp.generated.resources.activity_screen_elapsed_time
 import hram.composeapp.generated.resources.activity_screen_heart_indication_bpm
 import hram.composeapp.generated.resources.activity_screen_max_hr
 import hram.composeapp.generated.resources.activity_screen_min_hr
+import hram.composeapp.generated.resources.activity_screen_seconds_unit
 import hram.composeapp.generated.resources.activity_screen_unnamed_act
 import hram.composeapp.generated.resources.ic_not_selected
 import hram.composeapp.generated.resources.ic_selected
@@ -94,7 +95,8 @@ fun ActivityCard(
             .clip(RoundedCornerShape(Dimen12)),
         colors = CardDefaults.cardColors(containerColor = if (selected) Gray40 else DarkGray)
     ) {
-        val elapsedTime = formatTime(activity.duration)
+        val secondsLabel = stringResource(Res.string.activity_screen_seconds_unit)
+        val elapsedTime = formatTime(activity.duration, secondsLabel)
         Column(modifier = Modifier.padding(Dimen16)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),

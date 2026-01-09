@@ -1,5 +1,8 @@
 package com.achub.hram.ble.models
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class BleNotification(
     val hrNotification: HrNotification? = null,
     val batteryLevel: Int,

@@ -14,11 +14,14 @@ import dev.icerock.moko.permissions.compose.BindEffect
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.timeout
 import kotlinx.coroutines.launch
 import kotlin.math.round
 import kotlin.time.Duration
@@ -27,6 +30,7 @@ import kotlin.uuid.Uuid
 
 private const val DECIMAL_MULTIPLIER = 100
 private const val PAD_END_LENGTH = 2
+private const val BLE_OFF_MESSAGE = "Bluetooth is powered off"
 
 /**
  * round numbers to 2 decimal places and format as string
@@ -72,19 +76,15 @@ fun tickerFlow(period: Duration, initialDelay: Duration = Duration.ZERO) = flow 
 suspend fun PermissionsController.requestBleBefore(
     action: () -> Unit,
     onFailure: () -> Unit,
-    requestTurnOnBle: () -> Unit
 ) {
     try {
         providePermission(Permission.BLUETOOTH_SCAN)
         providePermission(Permission.BLUETOOTH_CONNECT)
         action()
-    } catch (exception: Exception) {
-        loggerE("PermissionsController") { "requestBlePermissionBeforeAction Error : $exception" }
-        when (exception) {
-            is DeniedException if exception.message == "Bluetooth is powered off" -> requestTurnOnBle()
-            is UnmetRequirementException -> requestTurnOnBle()
-            else -> onFailure()
-        }
+    } catch (ex: Exception) {
+        loggerE("PermissionsController") { "requestBlePermissionBeforeAction Error : $ex" }
+        val bleOff = (ex is DeniedException) && (ex.message == BLE_OFF_MESSAGE) || (ex is UnmetRequirementException)
+        if (bleOff) return else onFailure()
     }
 }
 
@@ -103,6 +103,14 @@ fun createActivity(name: String, currentTime: Long): ActivityEntity {
     )
     return activity
 }
+
+@OptIn(FlowPreview::class)
+fun <T> Flow<T>.cancelAfter(duration: Duration) = this.combine(
+    flow {
+        emit(Unit)
+        delay(duration.inWholeMilliseconds + 1)
+    }.timeout(duration)
+) { result, _ -> result }
 
 @Composable
 fun Dp.dpToPx() = with(LocalDensity.current) { this@dpToPx.toPx() }

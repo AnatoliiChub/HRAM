@@ -10,11 +10,9 @@ import com.achub.hram.data.models.GraphLimits
 import com.achub.hram.ext.logger
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.onEach
 import org.koin.core.annotation.Provided
 
 private const val TAG = "HramHrActivityRepo"
@@ -39,12 +37,11 @@ class HramHrActivityRepo(
     override fun getActivityByName(name: String): ActivityEntity? = getActivityByName(name)
 
     override fun getActivitiesGraph(): Flow<List<ActivityGraphInfo>> = actDao.getAll().flatMapLatest { activities ->
-        if (activities.isNotEmpty()) {
-            val flows = activities.map { activity ->
-                combine(
-                    hrDao.getAggregatedHeartRateForActivity(activity.id, activity.duration),
-                    hrDao.getAll()
-                ) { aggregated, all ->
+        flowOf(
+            if (activities.isNotEmpty()) {
+                activities.map { activity ->
+                    val all = hrDao.getAllForActivity(activity.id)
+                    val aggregated = hrDao.getAggregatedHeartRateForActivity(activity.id, activity.duration)
                     ActivityGraphInfo(
                         activity = activity,
                         buckets = aggregated,
@@ -65,13 +62,11 @@ class HramHrActivityRepo(
                         maxHr = aggregated.maxOfOrNull { it.avgHr }?.toInt() ?: 0,
                         minHr = aggregated.minOfOrNull { it.avgHr }?.toInt() ?: 0,
                     )
-                }.onEach { logger(TAG) { "ActivityGraphInfo for ${activity.name}: ${it.limits}" } }
+                }.onEach { logger(TAG) { "ActivityGraphInfo for ${it.activity}: ${it.limits}" } }
+            } else {
+                emptyList()
             }
-
-            combine(flows) { it.toList() }
-        } else {
-            flowOf(emptyList())
-        }
+        )
     }
 
     override fun getActivityWithHeartRates(id: String): Flow<ActivityWithHeartRates> =

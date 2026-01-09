@@ -2,32 +2,43 @@ package com.achub.hram.ble
 
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.BleNotification
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
-import kotlin.uuid.ExperimentalUuidApi
+import kotlin.time.Duration
+
+sealed interface ScanResult {
+    data class ScanUpdate(val device: BleDevice) : ScanResult
+
+    data class Error(val error: Throwable) : ScanResult
+
+    data object Complete : ScanResult
+
+    data object Initiated : ScanResult
+}
+
+sealed interface ConnectionResult {
+    data class Connected(val device: BleDevice) : ConnectionResult
+
+    data class Error(val error: Throwable) : ConnectionResult
+}
 
 interface HrDeviceRepo {
-    @OptIn(ExperimentalCoroutinesApi::class)
+    /**
+     * Returns a flow of BLE notifications with heart rate data
+     */
     fun listen(): Flow<BleNotification>
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    fun connect(
-        device: BleDevice,
-        onInitConnection: () -> Unit,
-        onConnected: (BleDevice) -> Unit,
-        onError: (Throwable) -> Unit
-    )
+    /**
+     * Returns a flow of connection states when connecting to a device
+     */
+    fun connect(device: BleDevice): Flow<ConnectionResult>
 
-    fun cancelScanning()
+    /**
+     * Returns a flow of scan results when scanning for HR devices
+     */
+    fun scan(duration: Duration): Flow<ScanResult>
 
-    fun disconnect()
-
-    @OptIn(FlowPreview::class, ExperimentalUuidApi::class)
-    fun scan(
-        onInit: () -> Unit,
-        onUpdate: (List<BleDevice>) -> Unit,
-        onComplete: () -> Unit,
-        onError: (Throwable) -> Unit
-    )
+    /**
+     * Disconnects from the currently connected device
+     */
+    suspend fun disconnect()
 }
