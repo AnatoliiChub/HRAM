@@ -11,9 +11,11 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 import org.koin.ext.getFullName
@@ -39,12 +41,14 @@ class LiveActivityManager {
      * Starts observing BLE state and updates Live Activity accordingly
      */
     @OptIn(FlowPreview::class)
-    fun startObserving(bleStateFlow: Flow<BleState>) {
+    fun startObserving(bleStateFlow: Flow<BleState>, trackingStateFlow: Flow<TrackingStateStage>) {
         logger(TAG) { "Starting Live Activity observation" }
 
         observerJob?.cancel()
         bleStateFlow.sample(BLE_UPDATES_SAMPLE_MS)
-            .onEach { state -> handleBleStateUpdate(state) }
+            .combine(trackingStateFlow.onStart { TrackingStateStage.TRACKING_INIT_STATE }) { bleState, trackingState ->
+                Pair(bleState, trackingState)
+            }.onEach { state -> handleStateUpdate(state.first, state.second) }
             .flowOn(Dispatchers.Default)
             .launchIn(scope)
             .let { observerJob = it }
@@ -60,11 +64,12 @@ class LiveActivityManager {
         endActivity()
     }
 
-    private fun handleBleStateUpdate(state: BleState) {
-        lastBleState = state
-        val bleStateType = state::class.getFullName()
+    private fun handleStateUpdate(bleState: BleState, trackingState: TrackingStateStage? = null) {
+        lastBleState = bleState
+        val bleStateType = bleState::class.getFullName()
+        val isTrackingActive = trackingState?.isActive() == true
 
-        when (state) {
+        when (bleState) {
             is BleState.Scanning.Started -> {
                 ensureActivityStarted(HRAM_ACTIVITY)
                 updateActivityState(
@@ -72,7 +77,7 @@ class LiveActivityManager {
                     isConnected = false,
                     isContactOn = false,
                     bleState = bleStateType,
-                    trackingState = currentTrackingState,
+                    isTrackingActive = isTrackingActive,
                     batteryLevel = 0,
                     deviceName = ""
                 )
@@ -84,9 +89,9 @@ class LiveActivityManager {
                     isConnected = false,
                     isContactOn = false,
                     bleState = bleStateType,
-                    trackingState = currentTrackingState,
+                    isTrackingActive = isTrackingActive,
                     batteryLevel = 0,
-                    deviceName = state.device.name
+                    deviceName = bleState.device.name
                 )
             }
 
@@ -96,7 +101,7 @@ class LiveActivityManager {
                     isConnected = false,
                     isContactOn = false,
                     bleState = bleStateType,
-                    trackingState = currentTrackingState,
+                    isTrackingActive = isTrackingActive,
                     batteryLevel = 0,
                     deviceName = ""
                 )
@@ -108,54 +113,55 @@ class LiveActivityManager {
                     isConnected = false,
                     isContactOn = false,
                     bleState = bleStateType,
-                    trackingState = currentTrackingState,
+                    isTrackingActive = isTrackingActive,
                     batteryLevel = 0,
                     deviceName = ""
                 )
             }
 
             is BleState.Connecting -> {
-                currentDeviceName = state.device.name
+                currentDeviceName = bleState.device.name
                 ensureActivityStarted(HRAM_ACTIVITY)
                 updateActivityState(
                     heartRate = 0,
                     isConnected = false,
                     isContactOn = false,
                     bleState = bleStateType,
-                    trackingState = currentTrackingState,
+                    isTrackingActive = isTrackingActive,
                     batteryLevel = 0,
-                    deviceName = state.device.name
+                    deviceName = bleState.device.name
                 )
             }
 
             is BleState.Connected -> {
-                currentDeviceName = state.bleDevice.name
+                currentDeviceName = bleState.bleDevice.name
                 updateActivityState(
                     heartRate = 0,
                     isConnected = true,
                     isContactOn = true,
                     bleState = bleStateType,
-                    trackingState = currentTrackingState,
+                    isTrackingActive = isTrackingActive,
                     batteryLevel = 0,
-                    deviceName = state.bleDevice.name
+                    deviceName = bleState.bleDevice.name
                 )
             }
 
             is BleState.NotificationUpdate -> {
-                currentDeviceName = state.device.name
-                if (state.bleNotification.isBleConnected) {
+                currentDeviceName = bleState.device.name
+                if (bleState.bleNotification.isBleConnected) {
                     ensureActivityStarted(HRAM_ACTIVITY)
                 }
 
-                val notification = state.bleNotification
+                val notification = bleState.bleNotification
                 updateActivityState(
                     heartRate = notification.hrNotification?.hrBpm ?: 0,
                     isConnected = notification.isBleConnected,
                     isContactOn = notification.hrNotification?.isContactOn ?: false,
                     bleState = bleStateType,
-                    trackingState = currentTrackingState,
+                    isTrackingActive = isTrackingActive,
                     batteryLevel = notification.batteryLevel,
-                    deviceName = state.device.name
+                    deviceName = bleState.device.name,
+                    elapsedTime = notification.elapsedTime
                 )
             }
 
@@ -165,9 +171,10 @@ class LiveActivityManager {
                     isConnected = false,
                     isContactOn = false,
                     bleState = bleStateType,
-                    trackingState = currentTrackingState,
+                    isTrackingActive = isTrackingActive,
                     batteryLevel = 0,
-                    deviceName = ""
+                    deviceName = "",
+                    elapsedTime = 0
                 )
                 // End activity after a short delay when disconnected
                 scope.launch {
@@ -196,7 +203,7 @@ class LiveActivityManager {
         }
 
         // Re-apply the last BLE state update with the new tracking state
-        lastBleState?.let { handleBleStateUpdate(it) }
+        lastBleState?.let { handleStateUpdate(it) }
     }
 
     private fun startActivity(activityName: String) {
@@ -210,9 +217,10 @@ class LiveActivityManager {
                 isConnected = false,
                 isContactOn = false,
                 bleState = BleState.Disconnected::class.getFullName(),
-                trackingState = "",
+                isTrackingActive = false,
                 batteryLevel = 0,
-                deviceName = ""
+                deviceName = "",
+                elapsedTime = 0
             )
 
             currentActivityId = activityId
@@ -227,15 +235,16 @@ class LiveActivityManager {
         isConnected: Boolean,
         isContactOn: Boolean,
         bleState: String,
-        trackingState: String,
+        isTrackingActive: Boolean,
         batteryLevel: Int,
         deviceName: String,
+        elapsedTime: Long = 0
     ) {
         currentActivityId?.let { activityId ->
             try {
                 logger(TAG) {
                     "Updating Live Activity: HR=$heartRate, connected=$isConnected, " +
-                        "contact=$isContactOn, state=$bleState, battery=$batteryLevel%, device=$deviceName"
+                        "contact=$isContactOn, state=$bleState, battery=$batteryLevel%, device=$deviceName, time=$elapsedTime"
                 }
 
                 LiveActivityBridgeImpl.updateActivityWithActivityId(
@@ -244,9 +253,10 @@ class LiveActivityManager {
                     isConnected = isConnected,
                     isContactOn = isContactOn,
                     bleState = bleState,
-                    trackingState = trackingState,
+                    isTrackingActive = isTrackingActive,
                     batteryLevel = batteryLevel.toLong(),
-                    deviceName = deviceName
+                    deviceName = deviceName,
+                    elapsedTime = elapsedTime
                 )
             } catch (e: Exception) {
                 loggerE(TAG) { "Failed to update Live Activity: ${e.message}" }

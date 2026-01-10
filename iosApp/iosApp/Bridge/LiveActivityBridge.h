@@ -11,16 +11,18 @@
         isConnected:(BOOL)isConnected
         isContactOn:(BOOL)isContactOn
         bleState:(NSString * _Nonnull)bleState
-        trackingState:(NSString * _Nonnull)trackingState
+        isTrackingActive:(BOOL)isTrackingActive
         batteryLevel:(NSInteger)batteryLevel
-        deviceName:(NSString * _Nonnull)deviceName;
+        deviceName:(NSString * _Nonnull)deviceName
+        elapsedTime:(int64_t)elapsedTime;
 + (void)updateActivityWithActivityId:(NSString * _Nonnull)activityId
         heartRate:(NSInteger)heartRate
         isConnected:(BOOL)isConnected
         isContactOn:(BOOL)isContactOn
         bleState:(NSString * _Nonnull)bleState
-        trackingState:(NSString * _Nonnull)trackingState
+        isTrackingActive:(BOOL)isTrackingActive
         batteryLevel:(NSInteger)batteryLevel
-        deviceName:(NSString * _Nonnull)deviceName;
+        deviceName:(NSString * _Nonnull)deviceName
+        elapsedTime:(int64_t)elapsedTime;
 + (void)endActivityWithActivityId:(NSString * _Nonnull)activityId;
 @end

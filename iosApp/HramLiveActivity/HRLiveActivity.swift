@@ -25,7 +25,7 @@ public struct HRLiveActivityView: View {
                         isConnected: context.state.isConnected,
                         isContactOn: context.state.isContactOn
                     )
-                    TrackingStatusText(trackingState: context.state.trackingState)
+                    ElapsedTimeView(elapsedTime: context.state.elapsedTimeString, isActive: context.state.isTrackingActive)
                 }
             }
 
@@ -82,9 +82,7 @@ public struct HRLiveActivity: Widget {
                             .font(.caption2)
                             .foregroundColor(.secondary)
                         Spacer().frame(height: 2)
-                        Text(context.state.trackingState)
-                            .font(.caption)
-                            .foregroundColor(.green)
+                        ElapsedTimeView(elapsedTime: context.state.elapsedTimeString, isActive: context.state.isTrackingActive)
                         Spacer().frame(height: 6)
                         Text(context.state.deviceName)
                             .font(.caption2)
@@ -100,9 +98,7 @@ public struct HRLiveActivity: Widget {
                             isConnected: context.state.isConnected,
                             isContactOn: context.state.isContactOn
                         )
-                        Text(context.state.trackingState)
-                            .font(.caption)
-                            .foregroundColor(.green)
+                        ElapsedTimeView(elapsedTime: context.state.elapsedTimeString, isActive: context.state.isTrackingActive)
                         BatteryView(level: context.state.batteryLevel)
                     }
                 }
@@ -219,5 +215,16 @@ struct HeartRateView: View {
                 .foregroundColor(.secondary)
                 .opacity(isConnected ? 1 : 0)
         }
+    }
+}
+
+struct ElapsedTimeView: View {
+    let elapsedTime: String
+    let isActive: Bool
+
+    var body: some View {
+        Text(elapsedTime)
+            .font(.caption.bold())
+            .foregroundColor(isActive ? .green : .red)
     }
 }

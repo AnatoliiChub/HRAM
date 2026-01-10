@@ -12,13 +12,13 @@ public func startLiveActivity(
     isConnected: Bool,
     isContactOn: Bool,
     bleState: UnsafePointer<CChar>,
-    trackingState: UnsafePointer<CChar>,
+    isTrackingActive: Bool,
     batteryLevel: Int32,
-    deviceName: UnsafePointer<CChar>
+    deviceName: UnsafePointer<CChar>,
+    elapsedTime: Int64
 ) -> UnsafePointer<CChar>? {
     let name = String(cString: activityName)
     let bleStateStr = String(cString: bleState)
-    let trackingStateStr = String(cString: trackingState)
     let device = String(cString: deviceName)
 
     let activityId = LiveActivityBridgeImpl.startActivity(
@@ -27,9 +27,10 @@ public func startLiveActivity(
         isConnected: isConnected,
         isContactOn: isContactOn,
         bleState: bleStateStr,
-        trackingState: trackingStateStr,
+        isTrackingActive: isTrackingActive,
         batteryLevel: Int(batteryLevel),
-        deviceName: device
+        deviceName: device,
+        elapsedTime: elapsedTime
     )
 
     guard let id = activityId else {
@@ -46,13 +47,13 @@ public func updateLiveActivity(
     isConnected: Bool,
     isContactOn: Bool,
     bleState: UnsafePointer<CChar>,
-    trackingState: UnsafePointer<CChar>,
+    isTrackingActive: Bool,
     batteryLevel: Int32,
-    deviceName: UnsafePointer<CChar>
+    deviceName: UnsafePointer<CChar>,
+    elapsedTime: Int64
 ) {
     let id = String(cString: activityId)
     let bleStateStr = String(cString: bleState)
-    let trackingStateStr = String(cString: trackingState)
     let device = String(cString: deviceName)
 
     LiveActivityBridgeImpl.updateActivity(
@@ -61,9 +62,10 @@ public func updateLiveActivity(
         isConnected: isConnected,
         isContactOn: isContactOn,
         bleState: bleStateStr,
-        trackingState: trackingStateStr,
+        isTrackingActive: isTrackingActive,
         batteryLevel: Int(batteryLevel),
-        deviceName: device
+        deviceName: device,
+        elapsedTime: elapsedTime
     )
 }
 
@@ -86,9 +88,10 @@ public class LiveActivityBridgeImpl: NSObject {
         isConnected: Bool,
         isContactOn: Bool,
         bleState: String,
-        trackingState: String,
+        isTrackingActive: Bool,
         batteryLevel: Int,
-        deviceName: String
+        deviceName: String,
+        elapsedTime: Int64
     ) -> String? {
         guard ActivityAuthorizationInfo().areActivitiesEnabled else {
             print("Live Activities are not enabled")
@@ -104,6 +107,7 @@ public class LiveActivityBridgeImpl: NSObject {
 
         // Parse bleState string to BleStateType enum
         let bleStateType = BleStateType.from(state: bleState)
+        let elapsedTimeString = DateUtilsKt.formatElapsedTime(elapsedTimeSeconds: elapsedTime)
 
         let attributes = HRActivityAttributes(activityName: activityName)
         let contentState = HRActivityAttributes.ContentState(
@@ -111,10 +115,11 @@ public class LiveActivityBridgeImpl: NSObject {
             isConnected: isConnected,
             isContactOn: isContactOn,
             bleState: bleStateType.displayText(deviceName: deviceName),
-            trackingState: trackingState,
+            isTrackingActive: isTrackingActive,
             batteryLevel: batteryLevel,
             deviceName: deviceName,
-            iconName: iconName(bleState: bleStateType, isConnected: isConnected, isContactOn: isContactOn)
+            iconName: iconName(bleState: bleStateType, isConnected: isConnected, isContactOn: isContactOn),
+            elapsedTimeString: elapsedTimeString
         )
 
         do {
@@ -158,9 +163,10 @@ public class LiveActivityBridgeImpl: NSObject {
         isConnected: Bool,
         isContactOn: Bool,
         bleState: String,
-        trackingState: String,
+        isTrackingActive: Bool,
         batteryLevel: Int,
-        deviceName: String
+        deviceName: String,
+        elapsedTime: Int64
     ) {
         guard let activity = activeActivities[activityId] else {
             print("No active Live Activity found with ID: \(activityId)")
@@ -169,16 +175,18 @@ public class LiveActivityBridgeImpl: NSObject {
 
         // Parse bleState string to BleStateType enum
         let bleStateType = BleStateType.from(state: bleState)
+        let elapsedTimeString = DateUtilsKt.formatElapsedTime(elapsedTimeSeconds: elapsedTime)
 
         let contentState = HRActivityAttributes.ContentState(
             heartRate: heartRate,
             isConnected: isConnected,
             isContactOn: isContactOn,
             bleState: bleStateType.displayText(deviceName: deviceName),
-            trackingState: trackingState,
+            isTrackingActive: isTrackingActive,
             batteryLevel: batteryLevel,
             deviceName: deviceName,
-            iconName: iconName(bleState: bleStateType, isConnected: isConnected, isContactOn: isContactOn)
+            iconName: iconName(bleState: bleStateType, isConnected: isConnected, isContactOn: isContactOn),
+            elapsedTimeString: elapsedTimeString
         )
 
         Task {

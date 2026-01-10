@@ -3,6 +3,8 @@ package com.achub.hram.tracking
 import com.achub.hram.BLE_SCAN_DURATION
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.HramBleDevice
+import com.achub.hram.data.repo.state.BleStateRepo
+import com.achub.hram.data.repo.state.TrackingStateRepo
 import com.achub.hram.di.CoroutineModule.Companion.WORKER_DISPATCHER
 import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.launchIn
@@ -27,6 +29,8 @@ private const val TRACKING_UPDATE_INTERVAL_MS = 1000L
 actual class TrackingController : KoinComponent {
     private val tracker: ActivityTrackingManager by inject()
     private val dispatcher: CoroutineDispatcher by inject(qualifier = named(WORKER_DISPATCHER))
+    private val trackingStateRepo: TrackingStateRepo by inject()
+    private val bleStateRepo: BleStateRepo by inject()
 
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.Main + job)
@@ -40,7 +44,7 @@ actual class TrackingController : KoinComponent {
     init {
         logger(TAG) { "TrackingController initialized" }
         // Start observing BLE state for Live Activities
-        liveActivityManager.startObserving(tracker.observeBleState())
+        liveActivityManager.startObserving(bleStateRepo.listen(), trackingStateRepo.listen())
 
         // Observe tracking state changes
         scope.launch {

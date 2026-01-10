@@ -14,7 +14,7 @@ import WidgetKit
 @main
 struct HRWidgetBundle: WidgetBundle {
     var body: some Widget {
-            HRLiveActivity()
+        HRLiveActivity()
     }
 }
 
@@ -27,10 +27,11 @@ struct HRLiveActivityPreviews: PreviewProvider {
         isConnected: true,
         isContactOn: true,
         bleState: "Connected",
-        trackingState: "00:05:23",
+        isTrackingActive: true,
         batteryLevel: 85,
         deviceName: "HRM Belt",
-        iconName: "heart.fill"
+        iconName: "heart.fill",
+        elapsedTimeString: "00:05:23"
     )
 
     static var previews: some View {
