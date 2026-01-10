@@ -17,5 +17,7 @@ expect class TrackingController {
 
     fun cancelScanning()
 
+    fun onAppForeground()
+
     fun clear()
 }

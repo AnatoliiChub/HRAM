@@ -7,7 +7,6 @@ import ComposeApp
 
 @_cdecl("startLiveActivity")
 public func startLiveActivity(
-    activityName: UnsafePointer<CChar>,
     heartRate: Int32,
     isConnected: Bool,
     isContactOn: Bool,
@@ -17,12 +16,10 @@ public func startLiveActivity(
     deviceName: UnsafePointer<CChar>,
     elapsedTime: Int64
 ) -> UnsafePointer<CChar>? {
-    let name = String(cString: activityName)
     let bleStateStr = String(cString: bleState)
     let device = String(cString: deviceName)
 
     let activityId = LiveActivityBridgeImpl.startActivity(
-        activityName: name,
         heartRate: Int(heartRate),
         isConnected: isConnected,
         isContactOn: isContactOn,
@@ -42,7 +39,6 @@ public func startLiveActivity(
 
 @_cdecl("updateLiveActivity")
 public func updateLiveActivity(
-    activityId: UnsafePointer<CChar>,
     heartRate: Int32,
     isConnected: Bool,
     isContactOn: Bool,
@@ -52,12 +48,10 @@ public func updateLiveActivity(
     deviceName: UnsafePointer<CChar>,
     elapsedTime: Int64
 ) {
-    let id = String(cString: activityId)
     let bleStateStr = String(cString: bleState)
     let device = String(cString: deviceName)
 
     LiveActivityBridgeImpl.updateActivity(
-        activityId: id,
         heartRate: Int(heartRate),
         isConnected: isConnected,
         isContactOn: isContactOn,
@@ -70,20 +64,17 @@ public func updateLiveActivity(
 }
 
 @_cdecl("endLiveActivity")
-public func endLiveActivity(activityId: UnsafePointer<CChar>) {
-    let id = String(cString: activityId)
-    LiveActivityBridgeImpl.endActivity(activityId: id)
+public func endLiveActivity() {
+    LiveActivityBridgeImpl.endActivity()
 }
 
 // MARK: - Implementation Class
 
 @objc(LiveActivityBridgeImpl)
 public class LiveActivityBridgeImpl: NSObject {
-    private static var activeActivities: [String: Activity<HRActivityAttributes>] = [:]
-    private static var currentActivityId: String?
+    private static var activity: Activity<HRActivityAttributes>?
 
     @objc public static func startActivity(
-        activityName: String,
         heartRate: Int,
         isConnected: Bool,
         isContactOn: Bool,
@@ -100,16 +91,16 @@ public class LiveActivityBridgeImpl: NSObject {
 
         // Check if there's already an active activity for this app
         // If yes, return its ID instead of creating a new one
-        if let existingId = currentActivityId, activeActivities[existingId] != nil {
-            print("Live Activity already exists with ID: \(existingId), reusing it")
-            return existingId
+        if activity != nil {
+            print("Live Activity already exists with ID: \(activity?.id ?? ""), reusing it")
+            return activity?.id
         }
 
         // Parse bleState string to BleStateType enum
         let bleStateType = BleStateType.from(state: bleState)
         let elapsedTimeString = DateUtilsKt.formatElapsedTime(elapsedTimeSeconds: elapsedTime)
 
-        let attributes = HRActivityAttributes(activityName: activityName)
+        let attributes = HRActivityAttributes()
         let contentState = HRActivityAttributes.ContentState(
             heartRate: heartRate,
             isConnected: isConnected,
@@ -123,34 +114,29 @@ public class LiveActivityBridgeImpl: NSObject {
         )
 
         do {
-            let activity = try Activity<HRActivityAttributes>.request(
+            activity = try Activity<HRActivityAttributes>.request(
                 attributes: attributes,
                 content: .init(state: contentState, staleDate: nil),
                 pushType: nil
             )
 
-            let actId = activity.id
-            activeActivities[actId] = activity
-            currentActivityId = actId
+            guard let existingActivity = activity else {
+                print("Failed to create Live Activity")
+                return nil
+            }
 
             // Monitor activity state changes to detect dismissal
             Task {
-                for await state in activity.activityStateUpdates {
+                for await state in existingActivity.activityStateUpdates {
                     print("Live Activity state changed to: \(state)")
 
                     if state == .dismissed || state == .ended {
-                        print("Live Activity was \(state)")
-                        activeActivities.removeValue(forKey: actId)
-                        if currentActivityId == actId {
-                            currentActivityId = nil
-                        }
-                        break
+                        self.activity = nil
                     }
                 }
             }
 
-            print("Live Activity started with ID: \(actId)")
-            return actId
+            return existingActivity.id
         } catch {
             print("Failed to start Live Activity: \(error.localizedDescription)")
             return nil
@@ -158,7 +144,6 @@ public class LiveActivityBridgeImpl: NSObject {
     }
 
     @objc public static func updateActivity(
-        activityId: String,
         heartRate: Int,
         isConnected: Bool,
         isContactOn: Bool,
@@ -168,8 +153,8 @@ public class LiveActivityBridgeImpl: NSObject {
         deviceName: String,
         elapsedTime: Int64
     ) {
-        guard let activity = activeActivities[activityId] else {
-            print("No active Live Activity found with ID: \(activityId)")
+        guard let activity = activity else {
+            print("No active Live Activity found to update")
             return
         }
 
@@ -194,22 +179,19 @@ public class LiveActivityBridgeImpl: NSObject {
         }
     }
 
-    @objc public static func endActivity(activityId: String) {
-        guard let activity = activeActivities[activityId] else {
-            print("No active Live Activity found with ID: \(activityId)")
+    @objc public static func endActivity() {
+        guard let activity = activity else {
+            print("No active Live Activity found")
             return
         }
 
         Task {
             await activity.end(
                 using: activity.contentState,
-                dismissalPolicy: .after(.now + 3)
+                dismissalPolicy: .immediate
             )
-            activeActivities.removeValue(forKey: activityId)
-            if currentActivityId == activityId {
-                currentActivityId = nil
-            }
-            print("Live Activity ended: \(activityId)")
+            print("Live Activity ended: \(activity.id)")
+            self.activity = nil
         }
     }
 }

@@ -23,7 +23,6 @@ import com.achub.hram.tracking.TrackingStateStage.TRACKING_INIT_STATE
 import com.achub.hram.utils.ActivityNameErrorMapper
 import com.achub.hram.view.section.RecordingState
 import dev.icerock.moko.permissions.PermissionsController
-import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -56,19 +55,12 @@ class RecordViewModel(
             _uiState.update { it.copy(recordingState = state.toRecordingState()) }
         }.flowOn(dispatcher).launchIn(viewModelScope).let { jobs.add(it) }
         bleStateRepo.listen().onStart { bleStateRepo.release() }.onEach { state ->
-            Napier.d { "new state : $state" }
             when (state) {
                 is BleState.Scanning -> handleScanning(state)
-
                 is BleState.Connecting -> _uiState.connectingProgressDialog(state.device)
-
                 is BleState.Connected -> handleConnectedState(state)
-
                 is BleState.NotificationUpdate -> handleNotificationUpdate(state)
-
-                is BleState.Disconnected -> _uiState.update {
-                    it.copy(connectedDevice = null, bleNotification = BleNotification.Empty)
-                }
+                is BleState.Disconnected -> handleDisconnected()
             }
         }.flowOn(dispatcher).launchIn(viewModelScope).let { jobs.add(it) }
     }
@@ -149,6 +141,10 @@ class RecordViewModel(
         _uiState.update { it.copy(dialog = RecordScreenDialog.ConnectionErrorDialog, connectedDevice = null) }
     } else {
         _uiState.deviceConnectedDialog(state.bleDevice)
+    }
+
+    private fun handleDisconnected() {
+        _uiState.update { it.copy(connectedDevice = null, bleNotification = BleNotification.Empty) }
     }
 }
 

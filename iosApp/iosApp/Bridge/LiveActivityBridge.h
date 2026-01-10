@@ -6,8 +6,7 @@
 #import <Foundation/Foundation.h>
 
 @interface LiveActivityBridgeImpl : NSObject
-+ (NSString * _Nullable)startActivityWithActivityName:(NSString * _Nonnull)activityName
-        heartRate:(NSInteger)heartRate
++ (NSString * _Nullable)startActivityWithHeartRate:(NSInteger)heartRate
         isConnected:(BOOL)isConnected
         isContactOn:(BOOL)isContactOn
         bleState:(NSString * _Nonnull)bleState
@@ -15,8 +14,7 @@
         batteryLevel:(NSInteger)batteryLevel
         deviceName:(NSString * _Nonnull)deviceName
         elapsedTime:(int64_t)elapsedTime;
-+ (void)updateActivityWithActivityId:(NSString * _Nonnull)activityId
-        heartRate:(NSInteger)heartRate
++ (void)updateActivityWithHeartRate:(NSInteger)heartRate
         isConnected:(BOOL)isConnected
         isContactOn:(BOOL)isContactOn
         bleState:(NSString * _Nonnull)bleState
@@ -24,5 +22,5 @@
         batteryLevel:(NSInteger)batteryLevel
         deviceName:(NSString * _Nonnull)deviceName
         elapsedTime:(int64_t)elapsedTime;
-+ (void)endActivityWithActivityId:(NSString * _Nonnull)activityId;
++ (void)endActivity;
 @end

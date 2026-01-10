@@ -1,6 +1,5 @@
 package com.achub.hram.view.components
 
-import OnBackground
 import androidx.compose.animation.core.KeyframesSpec
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -17,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import appStateChanged
 import com.achub.hram.style.Dimen76
 import hram.composeapp.generated.resources.Res
 import hram.composeapp.generated.resources.ic_heart
@@ -46,8 +46,7 @@ fun HeartBeatingAnimView(
     color: Color
 ) {
     var isAppInBackground by remember { mutableStateOf(true) }
-    OnBackground { isAppInBackground = it }
-
+    appStateChanged { isAppInBackground = it.isBackground() }
     val animatedScale by if (isAppInBackground.not() && isBeating) {
         val infiniteTransition = rememberInfiniteTransition()
         infiniteTransition.animateFloat(

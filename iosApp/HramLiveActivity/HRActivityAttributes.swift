@@ -34,10 +34,4 @@ public struct HRActivityAttributes: ActivityAttributes {
             self.elapsedTimeString = elapsedTimeString
         }
     }
-
-    public var activityName: String
-
-    public init(activityName: String) {
-        self.activityName = activityName
-    }
 }

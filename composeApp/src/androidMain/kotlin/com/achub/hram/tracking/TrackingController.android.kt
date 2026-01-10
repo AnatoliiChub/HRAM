@@ -69,4 +69,8 @@ actual class TrackingController(
     actual fun clear() {
         // No-op for Android
     }
+
+    actual fun onAppForeground() {
+        // No-op for Android
+    }
 }

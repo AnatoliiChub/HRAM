@@ -3,10 +3,10 @@ package com.achub.hram.tracking
 import com.achub.hram.BLE_SCAN_DURATION
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.HramBleDevice
+import com.achub.hram.data.models.BleState
 import com.achub.hram.data.repo.state.BleStateRepo
 import com.achub.hram.data.repo.state.TrackingStateRepo
 import com.achub.hram.di.CoroutineModule.Companion.WORKER_DISPATCHER
-import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.launchIn
 import com.achub.hram.ext.logger
 import kotlinx.coroutines.CoroutineDispatcher
@@ -24,7 +24,6 @@ import org.koin.core.qualifier.named
 import kotlin.time.Duration.Companion.milliseconds
 
 private const val TAG = "TrackingController"
-private const val TRACKING_UPDATE_INTERVAL_MS = 1000L
 
 actual class TrackingController : KoinComponent {
     private val tracker: ActivityTrackingManager by inject()
@@ -34,8 +33,8 @@ actual class TrackingController : KoinComponent {
 
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.Main + job)
-    private val jobs = mutableListOf<Job>()
-
+    private var scanJob: Job? = null
+    private var connectJob: Job? = null
     private var currentAction: Action? = null
 
     // Live Activity Manager for iOS
@@ -45,15 +44,6 @@ actual class TrackingController : KoinComponent {
         logger(TAG) { "TrackingController initialized" }
         // Start observing BLE state for Live Activities
         liveActivityManager.startObserving(bleStateRepo.listen(), trackingStateRepo.listen())
-
-        // Observe tracking state changes
-        scope.launch {
-            while (true) {
-                val trackingState = tracker.trackingState()
-                liveActivityManager.updateTrackingState(trackingState)
-                kotlinx.coroutines.delay(TRACKING_UPDATE_INTERVAL_MS)
-            }
-        }
     }
 
     actual fun scan(id: String?) {
@@ -100,26 +90,29 @@ actual class TrackingController : KoinComponent {
 
     @OptIn(FlowPreview::class)
     private fun performScan() {
+        scanJob?.cancel()
         tracker.scan(BLE_SCAN_DURATION.milliseconds)
             .filter { currentAction == Action.Scan }
             .flowOn(dispatcher)
             .launchIn(scope)
-            .let { jobs.add(it) }
+            .let { scanJob = it }
     }
 
     private fun performConnect(device: BleDevice) {
+        connectJob?.cancel()
         val hramDevice = device as? HramBleDevice ?: HramBleDevice(name = device.name, identifier = device.identifier)
         tracker.connectAndSubscribe(device = hramDevice)
             .flowOn(dispatcher)
             .launchIn(scope)
-            .let { jobs.add(it) }
+            .let { connectJob = it }
     }
 
     actual fun clear() {
         logger(TAG) { "Cleaning up TrackingController" }
         liveActivityManager.cleanup()
-        jobs.cancelAndClear()
         job.cancel()
+        connectJob = null
+        scanJob = null
     }
 
     private enum class Action {
@@ -130,5 +123,15 @@ actual class TrackingController : KoinComponent {
         PauseTracking,
         StopTracking,
         CancelScanning
+    }
+
+    actual fun onAppForeground() {
+        scope.launch {
+            val bleState = bleStateRepo.get()
+            if (bleState != BleState.Disconnected) {
+                val trackingState = trackingStateRepo.get()
+                liveActivityManager.startActivity(bleState, trackingState)
+            }
+        }
     }
 }

@@ -4,15 +4,16 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 
+@Suppress("ComposableNaming")
 @Composable
-fun OnBackground(onChanged: (isInBackground: Boolean) -> Unit) {
+fun appStateChanged(onChanged: (state: AppState) -> Unit) {
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val lifecycle = lifecycleOwner.lifecycle
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
-                Lifecycle.Event.ON_PAUSE -> onChanged(true)
-                Lifecycle.Event.ON_RESUME -> onChanged(false)
+                Lifecycle.Event.ON_PAUSE -> onChanged(AppState.BACKGROUND)
+                Lifecycle.Event.ON_RESUME -> onChanged(AppState.FOREGROUND)
                 else -> {}
             }
         }
@@ -21,4 +22,11 @@ fun OnBackground(onChanged: (isInBackground: Boolean) -> Unit) {
             lifecycle.removeObserver(observer)
         }
     }
+}
+
+enum class AppState {
+    FOREGROUND,
+    BACKGROUND;
+
+    fun isBackground() = this == BACKGROUND
 }

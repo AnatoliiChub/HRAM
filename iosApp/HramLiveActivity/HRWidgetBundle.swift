@@ -21,7 +21,7 @@ struct HRWidgetBundle: WidgetBundle {
 // MARK: - Preview Provider (Optional)
 #if DEBUG
 struct HRLiveActivityPreviews: PreviewProvider {
-    static let attributes = HRActivityAttributes(activityName: "Preview Activity")
+    static let attributes = HRActivityAttributes()
     static let contentState = HRActivityAttributes.ContentState(
         heartRate: 72,
         isConnected: true,
