@@ -10,6 +10,7 @@ import android.os.IBinder
 import androidx.core.app.ServiceCompat
 import com.achub.hram.BLE_SCAN_DURATION
 import com.achub.hram.ble.models.HramBleDevice
+import com.achub.hram.data.repo.state.TrackingStateRepo
 import com.achub.hram.di.CoroutineModule.Companion.WORKER_DISPATCHER
 import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.launchIn
@@ -22,9 +23,12 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -36,7 +40,6 @@ import kotlin.time.Duration.Companion.milliseconds
 const val CHANNEL_ID = "BLE_TRACKING_CHANNEL_ID"
 const val ACTION = "com.achub.hram.tracking.BleTrackingService.ACTION"
 const val NOTIFICATION_ID = 1
-private const val NOTIFICATION_SAMPLE_DURATION_MS = 1000L
 private const val TAG = "BleTrackingService"
 
 class BleTrackingService : Service(), KoinComponent {
@@ -47,6 +50,7 @@ class BleTrackingService : Service(), KoinComponent {
     }
 
     private val tracker: ActivityTrackingManager by inject()
+    private val trackerRepo: TrackingStateRepo by inject()
     private val dispatcher: CoroutineDispatcher by inject(qualifier = named(WORKER_DISPATCHER))
     private val notificator: HramNotificator by inject()
     private val job = SupervisorJob()
@@ -99,8 +103,13 @@ class BleTrackingService : Service(), KoinComponent {
     @OptIn(FlowPreview::class)
     private fun trackBleState() {
         tracker.observeBleState()
-            .sample(NOTIFICATION_SAMPLE_DURATION_MS)
-            .onEach { notificator.updateNotification(it) }
+            .combine(
+                trackerRepo.listen().onStart { TrackingStateStage.TRACKING_INIT_STATE }
+            ) { bleState, trackingState ->
+                Pair(bleState, trackingState)
+            }.sample(NOTIFICATION_SAMPLE_MS)
+            .distinctUntilChanged()
+            .onEach { notificator.updateNotification(it.first, it.second) }
             .flowOn(dispatcher)
             .launchIn(scope)
             .let { jobs.add(it) }

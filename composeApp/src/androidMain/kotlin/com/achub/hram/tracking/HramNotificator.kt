@@ -19,7 +19,6 @@ private const val LOW_BATTERY_THRESHOLD = 25
 class HramNotificator(
     private val ctx: Context,
     private val notificationManager: NotificationManager,
-    private val trackingManager: ActivityTrackingManager,
 ) {
     fun createNotification(): Notification {
         val remoteViews = createRemoteViews()
@@ -42,7 +41,7 @@ class HramNotificator(
     }
 
     @OptIn(ExperimentalAtomicApi::class)
-    suspend fun updateNotification(state: BleState) {
+    suspend fun updateNotification(state: BleState, trackingStateStage: TrackingStateStage) {
         val notificationData = when (state) {
             is BleState.Scanning -> handleScanning(state)
 
@@ -62,7 +61,7 @@ class HramNotificator(
                 bleStatus = ctx.getString(R.string.notification_connected, state.bleDevice.name)
             )
 
-            is BleState.NotificationUpdate -> handleNotificationUpdate(state)
+            is BleState.NotificationUpdate -> handleNotificationUpdate(state, trackingStateStage)
 
             is BleState.Disconnected -> NotificationData(
                 heartRate = null,
@@ -79,7 +78,10 @@ class HramNotificator(
         updateNotification(notificationData)
     }
 
-    private suspend fun handleNotificationUpdate(state: BleState.NotificationUpdate): NotificationData =
+    private suspend fun handleNotificationUpdate(
+        state: BleState.NotificationUpdate,
+        trackingStateStage: TrackingStateStage
+    ): NotificationData =
         with(state.bleNotification) {
             val isConnected = isBleConnected
             val isContactOn = hrNotification?.isContactOn ?: false
@@ -105,7 +107,7 @@ class HramNotificator(
                 isConnected = isConnected,
                 isContactOn = isContactOn,
                 bleStatus = bleStatus,
-                trackingStatus = trackingManager.trackingState()
+                trackingStatus = trackingStateStage
             )
         }
 
