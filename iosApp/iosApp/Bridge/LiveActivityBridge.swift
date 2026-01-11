@@ -3,6 +3,7 @@ import ActivityKit
 
 // MARK: - Kotlin/Native C Bridge Functions
 // These @_cdecl functions allow Kotlin to call Swift code
+
 import ComposeApp
 
 @_cdecl("startLiveActivity")
@@ -162,7 +163,7 @@ public class LiveActivityBridgeImpl: NSObject {
         let bleStateType = BleStateType.from(state: bleState)
         let elapsedTimeString = DateUtilsKt.formatElapsedTime(elapsedTimeSeconds: elapsedTime)
 
-        let contentState = HRActivityAttributes.ContentState(
+        let content = ActivityContent(state: HRActivityAttributes.ContentState(
             heartRate: heartRate,
             isConnected: isConnected,
             isContactOn: isContactOn,
@@ -172,10 +173,10 @@ public class LiveActivityBridgeImpl: NSObject {
             deviceName: deviceName,
             iconName: iconName(bleState: bleStateType, isConnected: isConnected, isContactOn: isContactOn),
             elapsedTimeString: elapsedTimeString
-        )
+        ), staleDate: nil)
 
         Task {
-            await activity.update(using: contentState)
+            await activity.update(content)
         }
     }
 
@@ -186,10 +187,7 @@ public class LiveActivityBridgeImpl: NSObject {
         }
 
         Task {
-            await activity.end(
-                using: activity.contentState,
-                dismissalPolicy: .immediate
-            )
+            await activity.end(activity.content, dismissalPolicy: .immediate)
             print("Live Activity ended: \(activity.id)")
             self.activity = nil
         }
@@ -217,8 +215,7 @@ public extension BleStateType {
             if deviceName.isEmpty {
                 return String(localized: "ble.device_found", defaultValue: "Device found")
             } else {
-                let format = String(localized: "ble.found_device", defaultValue: "Found: %@")
-                return String(format: format, deviceName)
+                return String(localized: .bleFoundDevice(device: deviceName))
             }
         case .scanningCompleted:
             return String(localized: "ble.scan_complete", defaultValue: "Scan complete")
@@ -228,15 +225,14 @@ public extension BleStateType {
             if deviceName.isEmpty {
                 return String(localized: "ble.connecting", defaultValue: "Connecting...")
             } else {
-                let format = String(localized: "ble.connecting_to_device", defaultValue: "Connecting to %@")
-                return String(format: format, deviceName)
+                return String(localized: .connectingToDevice(device: deviceName))
             }
         case .connected, .notificationUpdate:
-            return if(connectionLost) {
+            return if (connectionLost) {
                 String(localized: "ble.connection.lost", defaultValue: "Connection Lost")
-            } else if(!isContactOn) {
+            } else if (!isContactOn) {
                 String(localized: "ble.contact.off", defaultValue: "Contact off")
-            }else {
+            } else {
                 String(localized: "ble.connected", defaultValue: "Connected")
             }
         case .disconnected:
