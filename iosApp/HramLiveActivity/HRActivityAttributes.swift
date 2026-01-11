@@ -8,7 +8,6 @@
 import ActivityKit
 import WidgetKit
 
-// MARK: - Activity Attributes
 public struct HRActivityAttributes: ActivityAttributes {
     public struct ContentState: Codable, Hashable {
         public var heartRate: Int

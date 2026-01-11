@@ -8,9 +8,6 @@
 import SwiftUI
 import WidgetKit
 
-
-// MARK: - Widget Bundle Entry Point
-// Add this file to your Widget Extension target
 @main
 struct HRWidgetBundle: WidgetBundle {
     var body: some Widget {
@@ -18,7 +15,6 @@ struct HRWidgetBundle: WidgetBundle {
     }
 }
 
-// MARK: - Preview Provider (Optional)
 #if DEBUG
 struct HRLiveActivityPreviews: PreviewProvider {
     static let attributes = HRActivityAttributes()

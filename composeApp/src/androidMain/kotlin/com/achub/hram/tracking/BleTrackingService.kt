@@ -12,7 +12,6 @@ import com.achub.hram.BLE_SCAN_DURATION
 import com.achub.hram.ble.models.HramBleDevice
 import com.achub.hram.data.repo.state.TrackingStateRepo
 import com.achub.hram.di.CoroutineModule.Companion.WORKER_DISPATCHER
-import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.launchIn
 import com.achub.hram.ext.logger
 import com.achub.hram.library.R
@@ -52,12 +51,13 @@ class BleTrackingService : Service(), KoinComponent {
     private val tracker: ActivityTrackingManager by inject()
     private val trackerRepo: TrackingStateRepo by inject()
     private val dispatcher: CoroutineDispatcher by inject(qualifier = named(WORKER_DISPATCHER))
-    private val notificator: HramNotificator by inject()
+    private val notificator: Notificator by inject()
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
     private val currentAction = AtomicInteger(-1)
-
-    private val jobs = mutableListOf<Job>()
+    private var scanJob: Job? = null
+    private var connectJob: Job? = null
+    private var trackingJob: Job? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -96,12 +96,16 @@ class BleTrackingService : Service(), KoinComponent {
 
     override fun onDestroy() {
         logger(TAG) { "Service destroyed" }
-        jobs.cancelAndClear()
+        job.cancel()
+        scanJob = null
+        connectJob = null
+        trackingJob = null
         scope.cancel()
     }
 
     @OptIn(FlowPreview::class)
     private fun trackBleState() {
+        trackingJob?.cancel()
         tracker.observeBleState()
             .combine(
                 trackerRepo.listen().onStart { TrackingStateStage.TRACKING_INIT_STATE }
@@ -112,27 +116,29 @@ class BleTrackingService : Service(), KoinComponent {
             .onEach { notificator.updateNotification(it.first, it.second) }
             .flowOn(dispatcher)
             .launchIn(scope)
-            .let { jobs.add(it) }
+            .let { trackingJob = it }
     }
 
     private fun stopTracking(intent: Intent) =
         scope.launch { tracker.finishTracking(intent.getStringExtra(EXTRA_ACTIVITY_NAME)) }
 
     private fun connect(intent: Intent) {
+        connectJob?.cancel()
         intent.getStringExtra(EXTRA_DEVICE_ID)?.let { identifier ->
             val device = HramBleDevice(name = intent.getStringExtra(EXTRA_DEVICE_NAME) ?: "", identifier = identifier)
             tracker.connectAndSubscribe(device = device)
                 .launchIn(scope)
-                .let { jobs.add(it) }
+                .let { connectJob = it }
         }
     }
 
     @OptIn(FlowPreview::class)
     private fun scan() {
+        scanJob?.cancel()
         tracker.scan(BLE_SCAN_DURATION.milliseconds)
             .filter { currentAction.get() == Action.Scan.ordinal }
             .flowOn(dispatcher)
             .launchIn(scope)
-            .let { jobs.add(it) }
+            .let { scanJob = it }
     }
 }

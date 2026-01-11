@@ -220,7 +220,7 @@
       }
     },
     "Connecting to device" : {
-      "comment" : "Text to display when device it connecting to device",
+      "comment" : "Text to display when device is connecting to device",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {

@@ -13,7 +13,6 @@
             Q3,44 4,42
             Q22,6 23,6
             Z" />
-    <!-- Bold exclamation mark: vertical bar -->
     <path
         android:fillColor="#FF000000"
         android:pathData="M22,18
@@ -21,7 +20,6 @@
             V32
             H22
             Z" />
-    <!-- Bold exclamation mark: dot -->
     <path
         android:fillColor="#FF000000"
         android:pathData="M22,36

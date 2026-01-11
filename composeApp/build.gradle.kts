@@ -205,7 +205,6 @@ tasks {
             this.dependsOn("generateActualResourceCollectorsForAndroidMain")
             this.dependsOn("generateComposeResClass")
             this.dependsOn("generateExpectResourceCollectorsForCommonMain")
-            this.dependsOn("generateActualResourceCollectorsForAndroidMain")
             this.dependsOn("kspCommonMainKotlinMetadata")
         }
         if (this.name.contains("kspKotlinIos")) {

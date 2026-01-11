@@ -25,7 +25,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 private const val TAG = "TrackingController"
 
-actual class TrackingController : KoinComponent {
+actual class TrackingController(private val liveActivityManager: LiveActivityManager) : KoinComponent {
     private val tracker: ActivityTrackingManager by inject()
     private val dispatcher: CoroutineDispatcher by inject(qualifier = named(WORKER_DISPATCHER))
     private val trackingStateRepo: TrackingStateRepo by inject()
@@ -38,7 +38,6 @@ actual class TrackingController : KoinComponent {
     private var currentAction: Action? = null
 
     // Live Activity Manager for iOS
-    private val liveActivityManager = LiveActivityManager()
 
     init {
         logger(TAG) { "TrackingController initialized" }

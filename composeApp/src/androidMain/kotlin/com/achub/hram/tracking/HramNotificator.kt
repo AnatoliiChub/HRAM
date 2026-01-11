@@ -19,8 +19,8 @@ private const val LOW_BATTERY_THRESHOLD = 25
 class HramNotificator(
     private val ctx: Context,
     private val notificationManager: NotificationManager,
-) {
-    fun createNotification(): Notification {
+) : Notificator {
+    override fun createNotification(): Notification {
         val remoteViews = createRemoteViews()
 
         // Set initial state
@@ -41,7 +41,7 @@ class HramNotificator(
     }
 
     @OptIn(ExperimentalAtomicApi::class)
-    suspend fun updateNotification(state: BleState, trackingStateStage: TrackingStateStage) {
+    override suspend fun updateNotification(state: BleState, trackingStateStage: TrackingStateStage) {
         val notificationData = when (state) {
             is BleState.Scanning -> handleScanning(state)
 

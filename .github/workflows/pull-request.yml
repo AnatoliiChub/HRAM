@@ -1,5 +1,5 @@
-name: Code Review
-run-name: Running pre-merge code review tasks
+name: Pull Request
+run-name: Running pre-merge pull requests tasks
 on:
   pull_request:
     branches:

@@ -1,9 +1,6 @@
 import Foundation
 import ActivityKit
 
-// MARK: - Kotlin/Native C Bridge Functions
-// These @_cdecl functions allow Kotlin to call Swift code
-
 import ComposeApp
 
 @_cdecl("startLiveActivity")
@@ -68,8 +65,6 @@ public func updateLiveActivity(
 public func endLiveActivity() {
     LiveActivityBridgeImpl.endActivity()
 }
-
-// MARK: - Implementation Class
 
 @objc(LiveActivityBridgeImpl)
 public class LiveActivityBridgeImpl: NSObject {

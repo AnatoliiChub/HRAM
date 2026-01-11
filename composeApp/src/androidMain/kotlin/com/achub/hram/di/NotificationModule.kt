@@ -3,6 +3,7 @@ package com.achub.hram.di
 import android.app.NotificationManager
 import android.content.Context
 import com.achub.hram.tracking.HramNotificator
+import com.achub.hram.tracking.Notificator
 import org.koin.core.annotation.Configuration
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Single
@@ -14,12 +15,7 @@ class NotificationModule {
     fun provideHramNotificator(
         ctx: Context,
         notificationManager: NotificationManager,
-    ): HramNotificator {
-        return HramNotificator(
-            ctx = ctx,
-            notificationManager = notificationManager,
-        )
-    }
+    ): Notificator = HramNotificator(ctx = ctx, notificationManager = notificationManager)
 
     @Single
     fun provideNotificationManager(ctx: Context): NotificationManager {

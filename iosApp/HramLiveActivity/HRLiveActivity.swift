@@ -7,7 +7,6 @@ import WidgetKit
 import SwiftUI
 
 
-// MARK: - Live Activity Views
 public struct HRLiveActivityView: View {
     let context: ActivityViewContext<HRActivityAttributes>
 
@@ -59,7 +58,6 @@ struct TrackingStatusText: View {
     }
 }
 
-// MARK: - Widget Configuration
 public struct HRLiveActivity: Widget {
     public init() {
     }

@@ -1,4 +1,3 @@
 language = Objective-C
 headers = LiveActivityBridge.h
-#below, set the package id for the import
 package = com.hram.bridge
