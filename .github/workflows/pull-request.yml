@@ -86,7 +86,7 @@ jobs:
 
   iOSBuild:
     needs: [ Detekt ]
-    runs-on: macos-latest
+    runs-on: macos-26
     outputs:
       output1: ${{ steps.artifact-upload-step.outputs.artifact-id }}
     steps:
