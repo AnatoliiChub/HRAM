@@ -214,7 +214,6 @@ flowchart TB
         direction LR
         %% Android Platform
         subgraph Android ["Android Platform"]
-            direction 
             TC_And[TrackingController <br> Android]
             Service[BleTrackingService]
               Notif[Notification <br> Manager]
@@ -224,7 +223,6 @@ flowchart TB
 
         %% Shared KMP
         subgraph Shared ["Shared Logic (KMP)"]
-            direction 
             VM[ViewModel]
             TC_Shared[TrackingController]
             ATM[ActivityTrackingManager]
@@ -235,7 +233,6 @@ flowchart TB
 
         %% iOS Platform
         subgraph iOS ["iOS Platform"]
-            direction 
             LAM[LiveActivityManager]
             LA[Native Live Activities <br> Swift Code]
             TC_iOS[TrackingController <br> iOS]
@@ -257,21 +254,6 @@ flowchart TB
 
 ---
 
-### StateManagement
-
-The app persists transient state (like current BLE connection status or active tracking session info) to survive process death or navigation.
-
-**Packages:**
-- `com.achub.hram.data.repo.state`: Repository interfaces and implementations for reactive state exposure.
-- `com.achub.hram.data.store`: logic for serialization and storage (using DataStore).
-
-**Key Components:**
-- **BleStateRepo**: reflects the current state of BLE connection state(Disconnected, Connecting, Connected, etc.).
-- **TrackingStateRepo**: Manages the state of the activity (Idle, Active, Paused).
-- **DataStore**: Uses `BleStateSerializer` and `TrackingStateStageSerializer` to save state to disk asynchronously.
-
----
-
 ### Data layer & database
 
 Located under `hram/data`:
@@ -289,6 +271,22 @@ Located under `hram/data`:
 
 - Persisting activity data (heart rate sessions) locally.
 - Querying history via the repository layer.
+
+#### StateManagement
+
+The app persists transient state (like current BLE connection status or active tracking session info) to survive process death or navigation.
+Ble-Notifications state will be extracted to in-memory singleton repo, in the near future.
+
+**Packages:**
+- `com.achub.hram.data.repo.state`: Repository interfaces and implementations for reactive state exposure.
+- `com.achub.hram.data.store`: logic for serialization and storage (using DataStore).
+
+**Key Components:**
+- **BleStateRepo**: reflects the current state of BLE connection state(Disconnected, Connecting, Connected, etc.).
+- **TrackingStateRepo**: Manages the state of the activity (Idle, Active, Paused).
+- **DataStore**: Uses `BleStateSerializer` and `TrackingStateStageSerializer` to save state to disk asynchronously.
+
+---
 
 ---
 
@@ -336,6 +334,10 @@ To keep the user informed during a workout (even when the device is locked), the
     - Implemented using SwiftUI and WidgetKit.
     - Shows heart rate, session duration, and battery level on the Lock Screen and Dynamic Island.
     - Updates are pushed from the shared Kotlin code via `LiveActivityManager`.
+
+| iOS                                                                                                     | Android                                                                                                 |
+|---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
+|  <img src="https://github.com/user-attachments/assets/2d36adf1-1771-4bde-b7c9-241383129105" width="280">| <img src="https://github.com/user-attachments/assets/bc8cb7a4-3bd0-4425-bd9a-9c0ccf6dcbc6" width="280"> |
 
 
 ---
