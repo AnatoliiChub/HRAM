@@ -105,7 +105,7 @@ public class LiveActivityBridgeImpl: NSObject {
             heartRate: heartRate,
             isConnected: isConnected,
             isContactOn: isContactOn,
-            bleState: bleStateType.displayText(deviceName: deviceName),
+            bleState: bleStateType.displayText(deviceName: deviceName, connectionLost: !isConnected, isContactOn: isContactOn),
             isTrackingActive: isTrackingActive,
             batteryLevel: batteryLevel,
             deviceName: deviceName,
@@ -166,7 +166,7 @@ public class LiveActivityBridgeImpl: NSObject {
             heartRate: heartRate,
             isConnected: isConnected,
             isContactOn: isContactOn,
-            bleState: bleStateType.displayText(deviceName: deviceName),
+            bleState: bleStateType.displayText(deviceName: deviceName, connectionLost: !isConnected, isContactOn: isContactOn),
             isTrackingActive: isTrackingActive,
             batteryLevel: batteryLevel,
             deviceName: deviceName,
@@ -209,22 +209,38 @@ func iconName(bleState: BleStateType, isConnected: Bool, isContactOn: Bool) -> S
 }
 
 public extension BleStateType {
-    func displayText(deviceName: String = "") -> String {
+    func displayText(deviceName: String = "", connectionLost: Bool, isContactOn: Bool) -> String {
         switch self {
         case .scanningStarted:
-            return "Scanning..."
+            return String(localized: "ble.scanning_started", defaultValue: "Scanning...")
         case .scanningUpdate:
-            return deviceName.isEmpty ? "Device found" : "Found: \(deviceName)"
+            if deviceName.isEmpty {
+                return String(localized: "ble.device_found", defaultValue: "Device found")
+            } else {
+                let format = String(localized: "ble.found_device", defaultValue: "Found: %@")
+                return String(format: format, deviceName)
+            }
         case .scanningCompleted:
-            return "Scan complete"
+            return String(localized: "ble.scan_complete", defaultValue: "Scan complete")
         case .scanningError:
-            return "Scan error"
+            return String(localized: "ble.scan_error", defaultValue: "Scan error")
         case .connecting:
-            return deviceName.isEmpty ? "Connecting..." : "Connecting to \(deviceName)"
+            if deviceName.isEmpty {
+                return String(localized: "ble.connecting", defaultValue: "Connecting...")
+            } else {
+                let format = String(localized: "ble.connecting_to_device", defaultValue: "Connecting to %@")
+                return String(format: format, deviceName)
+            }
         case .connected, .notificationUpdate:
-            return "Connected"
+            return if(connectionLost) {
+                String(localized: "ble.connection.lost", defaultValue: "Connection Lost")
+            } else if(!isContactOn) {
+                String(localized: "ble.contact.off", defaultValue: "Contact off")
+            }else {
+                String(localized: "ble.connected", defaultValue: "Connected")
+            }
         case .disconnected:
-            return "Disconnected"
+            return String(localized: "ble.disconnected", defaultValue: "Disconnected")
         default:
             return ""
         }

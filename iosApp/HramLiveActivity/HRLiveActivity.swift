@@ -115,11 +115,11 @@ public struct HRLiveActivity: Widget {
                 if context.state.isConnected && context.state.isContactOn {
                     Text("\(context.state.heartRate)")
                         .font(.caption.bold())
-                        .foregroundColor(.red)
+                        .foregroundColor(.green)
                 } else {
                     Text("--")
                         .font(.caption)
-                        .foregroundColor(.gray)
+                        .foregroundColor(.red)
                 }
             } minimal: {
                 // Minimal view (when multiple Live Activities are active)
@@ -203,16 +203,17 @@ struct HeartRateView: View {
             let heartRateLabel = if isConnected && isContactOn {
                 "\(heartRate)"
             } else {
-                "--"
+                String(localized: "--", defaultValue: "--")
             }
-            let unitLabel = isConnected ? "bpm" : ""
+            let color = isConnected && isContactOn ? Color.green : Color.red
+            let unitLabel = isConnected ? String(localized: "bpm", defaultValue: "bpm") : ""
             Text(heartRateLabel)
                 .font(.system(size: 22, weight: .bold, design: .rounded))
-                .foregroundColor(.red)
+                .foregroundColor(color)
                 .opacity(isConnected ? 1 : 0)
             Text(unitLabel)
                 .font(.caption.bold())
-                .foregroundColor(.secondary)
+                .foregroundColor(color)
                 .opacity(isConnected ? 1 : 0)
         }
     }
