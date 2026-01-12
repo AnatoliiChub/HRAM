@@ -1,147 +1,68 @@
 name: Pull Request
-run-name: Running pre-merge pull requests tasks
+run-name: Running pre-merge pull request tasks
+
 on:
   pull_request:
     branches:
       - main
 
-jobs:
-  Detekt:
-    runs-on: ubuntu-latest
-    outputs:
-      output1: ${{ steps.artifact-upload-step.outputs.artifact-id }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-      - name: set up
-        uses: ./.github/actions/setup
-      - name: Run Detekt Analysis
-        run: ./gradlew clean detekt --no-daemon --parallel --configuration-cache --stacktrace
-      - name: Upload Detekt report (HTML)
-        if: always()
-        uses: actions/upload-artifact@v4
-        id: artifact-upload-step
-        with:
-          name: detekt-report
-          path: |
-            **/build/reports/detekt.html
-          if-no-files-found: warn
+# Cancel in-progress runs of the same workflow
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
-  UnitTests:
-    runs-on: ubuntu-latest
+jobs:
+  # Static code analysis
+  detekt:
+    name: Static Code Analysis
+    uses: ./.github/workflows/detekt-analysis.yml
+
+  # Unit tests and coverage
+  unit-tests:
+    name: Unit Tests & Coverage
+    uses: ./.github/workflows/unit-tests.yml
     permissions:
       contents: read
       pull-requests: write
-    outputs:
-      output1: ${{ steps.artifact-upload-step.outputs.artifact-id }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-      - name: set up
-        uses: ./.github/actions/setup
-      - name: Run Unit Tests and Generate Coverage Report
-        run: ./gradlew clean koverXmlReport koverHtmlReport  --no-daemon --parallel --configuration-cache
-      - name: Upload Test Results and Coverage Reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        id: artifact-upload-step
-        with:
-          name: test-reports
-          path: |
-            **/build/reports/tests/
-            **/build/reports/kover/
-          if-no-files-found: warn
-      - name: Add coverage report to PR
-        id: kover
-        uses: mi-kas/kover-report@v1
-        with:
-          path: |
-            ${{ github.workspace }}/composeApp/build/reports/kover/report.xml
-          title: Code Coverage for BLE package and Utils
-          update-comment: true
-          min-coverage-overall: 80
-          min-coverage-changed-files: 80
-          coverage-counter-type: LINE
 
-  AndroidBuild:
-    needs: [ Detekt ]
-    runs-on: ubuntu-latest
-    outputs:
-      output1: ${{ steps.artifact-upload-step.outputs.artifact-id }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-      - name: set up
-        uses: ./.github/actions/setup
-      - name: Build Android Debug APK
-        run: ./gradlew clean assembleDebug --no-daemon --stacktrace
-      - name: Upload Android Debug APK
-        if: always()
-        uses: actions/upload-artifact@v4
-        id: artifact-upload-step
-        with:
-          name: android-debug-apk
-          path: androidApp/build/outputs/apk/debug/*.apk
-          if-no-files-found: warn
+  # Android debug build
+  android-build:
+    name: Android Build
+    needs: [detekt]
+    uses: ./.github/workflows/android-build.yml
 
-  iOSBuild:
-    needs: [ Detekt ]
-    runs-on: macos-26
-    outputs:
-      output1: ${{ steps.artifact-upload-step.outputs.artifact-id }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-      - name: set up
-        uses: ./.github/actions/setup
-      - name: Build iOS Debug App
-        run: |
-          # 1) Build the Compose framework for iOS Simulator (arm64)
-          ./gradlew :composeApp:linkDebugFrameworkIosSimulatorArm64 --no-daemon --stacktrace
-          
-          # 2) Determine the SDK name for the framework path
-          SDK_NAME=$(xcodebuild -showsdks | grep -o "iphonesimulator[0-9.]*" | head -1)
-          
-          # 3) Create the xcode-frameworks directory and copy the framework
-          mkdir -p composeApp/build/xcode-frameworks/Debug/${SDK_NAME}
-          cp -R composeApp/build/bin/iosSimulatorArm64/debugFramework/ComposeApp.framework \
-                composeApp/build/xcode-frameworks/Debug/${SDK_NAME}/
-          
-          # 4) Build Xcode project for simulator
-          xcodebuild \
-            -project iosApp/iosApp.xcodeproj \
-            -scheme iosApp \
-            -configuration Debug \
-            -sdk iphonesimulator \
-           -destination 'platform=iOS Simulator,name=iPhone 16e' \
-            -derivedDataPath ./build/ios-simulator \
-            ONLY_ACTIVE_ARCH=YES \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            -verbose \
-            clean build
-      - name: Upload iOS Debug App
-        if: always()
-        uses: actions/upload-artifact@v4
-        id: artifact-upload-step
-        with:
-          name: ios-debug-app
-          path: build/ios-simulator/Build/Products/Debug-iphonesimulator/*.app
-          if-no-files-found: warn
+  # iOS debug build
+  ios-build:
+    name: iOS Build
+    needs: [detekt]
+    uses: ./.github/workflows/ios-build.yml
 
-  SummaryComment:
-    needs: [ UnitTests, Detekt, AndroidBuild, iOSBuild ]
+  # Summary comment on PR
+  summary:
+    name: Post PR Summary
+    needs: [detekt, unit-tests, android-build, ios-build]
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
+    if: always()
+
     steps:
-      - name: Comment on PR
+      - name: Generate PR summary comment
         uses: mshick/add-pr-comment@v2
         with:
           message: |
-            Code analysis, unit tests, and builds have completed. Here are the results:
-            [Detekt report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.Detekt.outputs.output1 }}).
-            [Test reports](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.UnitTests.outputs.output1 }}) including code coverage.
-            Android Debug [APK](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.AndroidBuild.outputs.output1 }}).
-            iOS Debug [App](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.iOSBuild.outputs.output1 }}).
+            ## 🚀 Pull Request Build Summary
+            
+            All pre-merge checks have completed. Review the results below:
+            
+            ### 📊 Reports & Artifacts
+            
+            | Check | Status | Artifact |
+            |-------|--------|----------|
+            | 🔍 Detekt Analysis | ${{ needs.detekt.result == 'success' && '✅ Passed' || '❌ Failed' }} | [View Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.detekt.outputs.artifact-id }}) |
+            | 🧪 Unit Tests & Coverage | ${{ needs.unit-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} | [View Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.unit-tests.outputs.artifact-id }}) |
+            | 🤖 Android Debug Build | ${{ needs.android-build.result == 'success' && '✅ Passed' || '❌ Failed' }} | [Download APK](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.android-build.outputs.artifact-id }}) |
+            | 🍎 iOS Debug Build | ${{ needs.ios-build.result == 'success' && '✅ Passed' || '❌ Failed' }} | [Download App](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.ios-build.outputs.artifact-id }}) |
+            
+            ---
+            *Workflow run: [#${{ github.run_number }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})*
