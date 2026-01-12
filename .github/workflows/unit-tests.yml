@@ -1,0 +1,57 @@
+name: Unit Tests & Coverage
+run-name: Running unit tests and generating coverage report
+
+on:
+  workflow_call:
+    outputs:
+      artifact-id:
+        description: "The artifact ID of the test and coverage reports"
+        value: ${{ jobs.unit-tests.outputs.artifact-id }}
+
+jobs:
+  unit-tests:
+    name: Run Unit Tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    outputs:
+      artifact-id: ${{ steps.artifact-upload-step.outputs.artifact-id }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup environment
+        uses: ./.github/actions/setup
+
+      - name: Run unit tests and generate coverage
+        run: |
+          ./gradlew clean koverXmlReport koverHtmlReport \
+            --no-daemon \
+            --parallel \
+            --configuration-cache
+
+      - name: Upload test and coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        id: artifact-upload-step
+        with:
+          name: test-reports
+          path: |
+            **/build/reports/tests/
+            **/build/reports/kover/
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Add coverage report to PR
+        if: github.event_name == 'pull_request'
+        uses: mi-kas/kover-report@v1
+        with:
+          path: ${{ github.workspace }}/composeApp/build/reports/kover/report.xml
+          title: Code Coverage for BLE package and Utils
+          update-comment: true
+          min-coverage-overall: 80
+          min-coverage-changed-files: 80
+          coverage-counter-type: LINE
+

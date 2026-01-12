@@ -1,0 +1,66 @@
+name: iOS Build
+run-name: Building iOS debug app
+
+on:
+  workflow_call:
+    outputs:
+      artifact-id:
+        description: "The artifact ID of the iOS debug app"
+        value: ${{ jobs.ios-build.outputs.artifact-id }}
+
+jobs:
+  ios-build:
+    name: Build iOS Debug App
+    runs-on: macos-26
+    outputs:
+      artifact-id: ${{ steps.artifact-upload-step.outputs.artifact-id }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup environment
+        uses: ./.github/actions/setup
+
+      - name: Build Compose framework for iOS Simulator
+        run: |
+          ./gradlew :composeApp:linkDebugFrameworkIosSimulatorArm64 \
+            --no-daemon \
+            --stacktrace
+
+      - name: Prepare Xcode frameworks directory
+        run: |
+          # Determine the SDK name for the framework path
+          SDK_NAME=$(xcodebuild -showsdks | grep -o "iphonesimulator[0-9.]*" | head -1)
+          
+          # Create the xcode-frameworks directory and copy the framework
+          mkdir -p composeApp/build/xcode-frameworks/Debug/${SDK_NAME}
+          cp -R composeApp/build/bin/iosSimulatorArm64/debugFramework/ComposeApp.framework \
+                composeApp/build/xcode-frameworks/Debug/${SDK_NAME}/
+
+      - name: Build Xcode project for simulator
+        run: |
+          xcodebuild \
+            -project iosApp/iosApp.xcodeproj \
+            -scheme iosApp \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 16e' \
+            -derivedDataPath ./build/ios-simulator \
+            ONLY_ACTIVE_ARCH=YES \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            -verbose \
+            clean build
+
+      - name: Upload iOS debug app
+        if: always()
+        uses: actions/upload-artifact@v4
+        id: artifact-upload-step
+        with:
+          name: ios-debug-app
+          path: build/ios-simulator/Build/Products/Debug-iphonesimulator/*.app
+          if-no-files-found: warn
+          retention-days: 7
+

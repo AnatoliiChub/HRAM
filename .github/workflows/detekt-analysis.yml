@@ -1,0 +1,42 @@
+name: Detekt Analysis
+run-name: Running Detekt static code analysis
+
+on:
+  workflow_call:
+    outputs:
+      artifact-id:
+        description: "The artifact ID of the Detekt report"
+        value: ${{ jobs.detekt.outputs.artifact-id }}
+
+jobs:
+  detekt:
+    name: Run Detekt
+    runs-on: ubuntu-latest
+    outputs:
+      artifact-id: ${{ steps.artifact-upload-step.outputs.artifact-id }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup environment
+        uses: ./.github/actions/setup
+
+      - name: Run Detekt static analysis
+        run: |
+          ./gradlew clean detekt \
+            --no-daemon \
+            --parallel \
+            --configuration-cache \
+            --stacktrace
+
+      - name: Upload Detekt report
+        if: always()
+        uses: actions/upload-artifact@v4
+        id: artifact-upload-step
+        with:
+          name: detekt-report
+          path: '**/build/reports/detekt.html'
+          if-no-files-found: warn
+          retention-days: 7
+
