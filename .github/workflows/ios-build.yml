@@ -22,37 +22,11 @@ jobs:
       - name: Setup environment
         uses: ./.github/actions/setup
 
-      - name: Build Compose framework for iOS Simulator
-        run: |
-          ./gradlew :composeApp:linkDebugFrameworkIosSimulatorArm64 \
-            --no-daemon \
-            --stacktrace
+      - name: Build Compose framework
+        run: ./scripts/build-framework.sh iphonesimulator Debug
 
-      - name: Prepare Xcode frameworks directory
-        run: |
-          # Determine the SDK name for the framework path
-          SDK_NAME=$(xcodebuild -showsdks | grep -o "iphonesimulator[0-9.]*" | head -1)
-          
-          # Create the xcode-frameworks directory and copy the framework
-          mkdir -p composeApp/build/xcode-frameworks/Debug/${SDK_NAME}
-          cp -R composeApp/build/bin/iosSimulatorArm64/debugFramework/ComposeApp.framework \
-                composeApp/build/xcode-frameworks/Debug/${SDK_NAME}/
-
-      - name: Build Xcode project for simulator
-        run: |
-          xcodebuild \
-            -project iosApp/iosApp.xcodeproj \
-            -scheme iosApp \
-            -configuration Debug \
-            -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 16e' \
-            -derivedDataPath ./build/ios-simulator \
-            ONLY_ACTIVE_ARCH=YES \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            -verbose \
-            clean build
+      - name: Build Xcode project
+        run: ./scripts/build-xcode.sh iphonesimulator Debug "iPhone 16e"
 
       - name: Upload iOS debug app
         if: always()
@@ -60,7 +34,7 @@ jobs:
         id: artifact-upload-step
         with:
           name: ios-debug-app
-          path: build/ios-simulator/Build/Products/Debug-iphonesimulator/*.app
+          path: build/ios-iphonesimulator/Build/Products/Debug-iphonesimulator/*.app
           if-no-files-found: warn
           retention-days: 7
 
