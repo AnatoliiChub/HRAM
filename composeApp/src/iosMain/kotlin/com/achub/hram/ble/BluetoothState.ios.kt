@@ -15,7 +15,6 @@ import platform.CoreBluetooth.CBCentralManagerOptionShowPowerAlertKey
 import platform.CoreBluetooth.CBManagerStatePoweredOn
 import platform.darwin.NSObject
 
-// Suppress "turn on bluetooth" popup
 private val options = mapOf<Any?, Any>(CBCentralManagerOptionShowPowerAlertKey to false)
 
 private const val TAG = "BluetoothStateIos"

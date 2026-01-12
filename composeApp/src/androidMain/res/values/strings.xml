@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">HRAM</string>
+    <string name="channel_name">Heart Rate Tracking</string>
+
+    <!-- Notification texts -->
+    <string name="notification_title">HRAM</string>
+    <string name="notification_initializing">Initializing…</string>
+    <string name="notification_scanning_started">Scanning for devices…</string>
+    <string name="notification_scanning_found_device">Found device: %1$s</string>
+    <string name="notification_scanning_complete">Scan complete.</string>
+    <string name="notification_scanning_error">Scan error: %1$s</string>
+    <string name="notification_connecting">Connecting to device: %1$s…</string>
+    <string name="notification_connected">Connected to device: %1$s.</string>
+    <string name="notification_connected_status">Connected</string>
+    <string name="notification_connection_lost">Connection Lost.</string>
+    <string name="notification_no_contact">No Contact with sensor.</string>
+    <string name="notification_current_hr">%1$sCurrent Heart Rate: %2$s bpm</string>
+    <string name="notification_disconnected">Disconnected from device.</string>
+    <string name="notification_scanning_cancelled">Scanning was canceled.</string>
+    <string name="empty"> </string>
+    <string name="notification_tracking">Tracking</string>
+    <string name="notification_no_tracking">No tracking</string>
+    <string name="notification_tracking_paused">Paused</string>
+    <string name="notification_battery_level" translatable="false">%1$d%%</string>
+</resources>
+

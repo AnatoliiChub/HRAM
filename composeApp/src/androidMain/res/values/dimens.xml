@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Notification dimensions -->
+    <dimen name="notification_padding">16dp</dimen>
+    <dimen name="notification_icon_size">32dp</dimen>
+    <dimen name="font_size_20">20sp</dimen>
+    <dimen name="font_size_14">14sp</dimen>
+    <dimen name="font_size_12">12sp</dimen>
+    <dimen name="notification_battery_icon_width">16dp</dimen>
+    <dimen name="notification_battery_icon_height">12dp</dimen>
+    <dimen name="notification_spacing_small">4dp</dimen>
+    <dimen name="notification_spacing_medium">8dp</dimen>
+</resources>
+

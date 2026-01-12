@@ -1,6 +1,5 @@
 @file:OptIn(ExperimentalKotlinGradlePluginApi::class)
 
-import com.android.build.api.dsl.androidLibrary
 import io.gitlab.arturbosch.detekt.Detekt
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -61,7 +60,7 @@ kover {
 
 kotlin {
     androidLibrary {
-        namespace = "com.achub.hram"
+        namespace = "com.achub.hram.library"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 
@@ -103,6 +102,14 @@ kotlin {
             }
             linkerOpts.add("-lsqlite3")
         }
+        iosTarget.compilations.getByName("main") {
+            cinterops.create("LiveActivitiBridge") {
+                definitionFile.set(
+                    file(rootDir.absolutePath + "/iosApp/iosApp/Bridge/LiveActivityBridge.def")
+                )
+                includeDirs.allHeaders(rootDir.absolutePath + "/iosApp/iosApp/Bridge/")
+            }
+        }
     }
 
     sourceSets {
@@ -141,6 +148,10 @@ kotlin {
             implementation(libs.datastore.preferences)
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)
+
+            // Serialization
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.okio)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -165,7 +176,6 @@ dependencies {
     add("kspAndroid", libs.androidx.room.compiler)
     add("kspIosSimulatorArm64", libs.androidx.room.compiler)
     add("kspIosArm64", libs.androidx.room.compiler)
-    add("androidRuntimeClasspath", libs.ui.tooling.preview)
 }
 
 room {
@@ -195,7 +205,6 @@ tasks {
             this.dependsOn("generateActualResourceCollectorsForAndroidMain")
             this.dependsOn("generateComposeResClass")
             this.dependsOn("generateExpectResourceCollectorsForCommonMain")
-            this.dependsOn("generateActualResourceCollectorsForAndroidMain")
             this.dependsOn("kspCommonMainKotlinMetadata")
         }
         if (this.name.contains("kspKotlinIos")) {
@@ -208,4 +217,3 @@ ksp {
     arg("KOIN_LOG_TIMES", "true")
     arg("KOIN_CONFIG_CHECK", "true")
 }
-

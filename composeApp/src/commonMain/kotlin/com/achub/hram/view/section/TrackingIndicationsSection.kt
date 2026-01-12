@@ -1,6 +1,8 @@
 package com.achub.hram.view.section
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
@@ -8,19 +10,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.achub.hram.ble.models.BleNotification
 import com.achub.hram.ble.models.HrNotification
+import com.achub.hram.style.Dimen16
 import com.achub.hram.style.Heading3
+import com.achub.hram.utils.formatElapsedTime
 import com.achub.hram.view.indications.HeartIndicationRow
-import kotlinx.datetime.LocalTime
-import kotlinx.datetime.format
-import kotlinx.datetime.format.char
-
-val dateFormat = LocalTime.Format {
-    hour()
-    char(':')
-    minute()
-    char(':')
-    second()
-}
 
 @Composable
 fun TrackingIndicationsSection(bleNotification: BleNotification) {
@@ -28,9 +21,10 @@ fun TrackingIndicationsSection(bleNotification: BleNotification) {
         HeartIndicationRow(bleNotification = bleNotification)
         Text(
             modifier = Modifier.align(CenterHorizontally),
-            text = LocalTime.fromSecondOfDay(bleNotification.elapsedTime.toInt()).format(dateFormat),
+            text = formatElapsedTime(bleNotification.elapsedTime),
             style = Heading3
         )
+        Spacer(modifier = Modifier.height(Dimen16))
     }
 }
 
@@ -44,5 +38,7 @@ private fun TrackingIndicationsSectionPreview() {
         isBleConnected = true,
         elapsedTime = 1268L,
     )
-    TrackingIndicationsSection(bleNotification = bleNotification)
+    TrackingIndicationsSection(
+        bleNotification = bleNotification,
+    )
 }

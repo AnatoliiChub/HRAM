@@ -8,10 +8,12 @@ import com.juul.kable.Identifier
 import com.juul.kable.Peripheral
 import com.juul.kable.characteristicOf
 import com.juul.kable.toIdentifier
+import kotlinx.serialization.Serializable
 import kotlin.uuid.ExperimentalUuidApi
 
 @OpenForMokkery
-interface BleDevice {
+@Serializable
+sealed interface BleDevice {
     val name: String
     val identifier: String
     val manufacturer: String?
@@ -21,6 +23,7 @@ interface BleDevice {
 }
 
 @OpenForMokkery
+@Serializable
 data class HramBleDevice(
     override val name: String,
     override val identifier: String,

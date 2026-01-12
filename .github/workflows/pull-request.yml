@@ -1,5 +1,5 @@
-name: Code Review
-run-name: Running pre-merge code review tasks
+name: Pull Request
+run-name: Running pre-merge pull requests tasks
 on:
   pull_request:
     branches:
@@ -86,7 +86,7 @@ jobs:
 
   iOSBuild:
     needs: [ Detekt ]
-    runs-on: macos-latest
+    runs-on: macos-26
     outputs:
       output1: ${{ steps.artifact-upload-step.outputs.artifact-id }}
     steps:
@@ -96,13 +96,26 @@ jobs:
         uses: ./.github/actions/setup
       - name: Build iOS Debug App
         run: |
+          # 1) Build the Compose framework for iOS Simulator (arm64)
+          ./gradlew :composeApp:linkDebugFrameworkIosSimulatorArm64 --no-daemon --stacktrace
+          
+          # 2) Determine the SDK name for the framework path
+          SDK_NAME=$(xcodebuild -showsdks | grep -o "iphonesimulator[0-9.]*" | head -1)
+          
+          # 3) Create the xcode-frameworks directory and copy the framework
+          mkdir -p composeApp/build/xcode-frameworks/Debug/${SDK_NAME}
+          cp -R composeApp/build/bin/iosSimulatorArm64/debugFramework/ComposeApp.framework \
+                composeApp/build/xcode-frameworks/Debug/${SDK_NAME}/
+          
+          # 4) Build Xcode project for simulator
           xcodebuild \
             -project iosApp/iosApp.xcodeproj \
             -scheme iosApp \
             -configuration Debug \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 16e' \
+           -destination 'platform=iOS Simulator,name=iPhone 16e' \
             -derivedDataPath ./build/ios-simulator \
+            ONLY_ACTIVE_ARCH=YES \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \

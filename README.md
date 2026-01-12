@@ -178,7 +178,83 @@ Tracking is implemented in `hram/tracking`:
 
 ---
 
-### Data layer \& database
+### Background mode
+
+**Implementation Details:**
+
+Background execution is nuanced per platform. `TrackingController` is the central entry point found in `hram/tracking/TrackingController.kt`. It provides a unified interface but has platform-specific implementations that leverage the shared `ActivityTrackingManager` and reactive state repositories:
+
+1.  **Android**:
+    - Uses a **Foreground Service** (`BleTrackingService`) to keep the app alive.
+    - `TrackingController` sends Intents to the service.
+    - The Service delegates work to `ActivityTrackingManager` and observes shared state repositories to update **Notifications** (remote views).
+
+2.  **iOS**:
+    - Relies on iOS background modes (CoreBluetooth).
+    - `TrackingController` delegates to `ActivityTrackingManager`.
+    - `LiveActivityManager` observes shared state repositories and pushes updates to **Live Activities**.
+
+```mermaid
+
+flowchart TB
+    %% Shared UI
+    subgraph Shared CMP ["Shared UI (CMP)"]
+        direction TB
+        UI[User Command]
+        subgraph VM[ViewModel]
+            TC_Shared[TrackingController]
+        end
+
+        VM --> TC_Shared
+        UI --> VM
+    end
+      
+    %% Background Mode
+    subgraph BG[Background Mode Implementation]
+        direction LR
+        %% Android Platform
+        subgraph Android ["Android Platform"]
+            TC_And[TrackingController <br> Android]
+            Service[BleTrackingService]
+              Notif[Notification <br> Manager]
+          
+            Service -- "Updates RemoteViews" --> Notif
+        end
+
+        %% Shared KMP
+        subgraph Shared ["Shared Logic (KMP)"]
+            VM[ViewModel]
+            TC_Shared[TrackingController]
+            ATM[ActivityTrackingManager]
+            Repos[(State Repo)]
+
+            ATM -- "Update State" --> Repos
+        end
+
+        %% iOS Platform
+        subgraph iOS ["iOS Platform"]
+            LAM[LiveActivityManager]
+            LA[Native Live Activities <br> Swift Code]
+            TC_iOS[TrackingController <br> iOS]
+
+            TC_iOS -- "Controls" --> LAM
+            LAM -- "Interop call" --> LA
+        end
+    end
+
+    %% Cross-layer connections
+    TC_Shared -- "Implementation" --> TC_And
+    TC_Shared -- "Implementation" --> TC_iOS
+    Service -- "Calls" --> ATM
+    TC_iOS -- "Calls" --> ATM
+    Service -. "Listen" .-> Repos
+    TC_iOS -. "Listen" .-> Repos
+    TC_And -. "Intents (Start/Stop)" .-> Service
+```
+
+---
+
+### Data layer & database
 
 Located under `hram/data`:
 
@@ -195,6 +271,22 @@ Located under `hram/data`:
 
 - Persisting activity data (heart rate sessions) locally.
 - Querying history via the repository layer.
+
+#### StateManagement
+
+The app persists transient state (like current BLE connection status or active tracking session info) to survive process death or navigation.
+Ble-Notifications state will be extracted to in-memory singleton repo, in the near future.
+
+**Packages:**
+- `com.achub.hram.data.repo.state`: Repository interfaces and implementations for reactive state exposure.
+- `com.achub.hram.data.store`: logic for serialization and storage (using DataStore).
+
+**Key Components:**
+- **BleStateRepo**: reflects the current state of BLE connection state(Disconnected, Connecting, Connected, etc.).
+- **TrackingStateRepo**: Manages the state of the activity (Idle, Active, Paused).
+- **DataStore**: Uses `BleStateSerializer` and `TrackingStateStageSerializer` to save state to disk asynchronously.
+
+---
 
 ---
 
@@ -229,6 +321,24 @@ Common UI code lives under `hram/screen` and `hram/view`:
 | iOS                                                                                                     | Android                                                                                                 |
 |---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
 | <img src="https://github.com/user-attachments/assets/c7a61873-c63c-4ead-9355-360d5b069e79" width="280"> | <img src="https://github.com/user-attachments/assets/fcd85206-a383-4fea-803d-87aa671f6de3" width="280"> |
+
+#### Notifications / Live Activities
+
+To keep the user informed during a workout (even when the device is locked), the app uses platform-specific ongoing notifications:
+
+- **Android**: Custom **Notifications** with `RemoteViews`.
+    - Displays real-time heart rate.
+    - Includes a "breathing" animation synced to the heart rate.
+
+- **iOS**: **Live Activities** \& Dynamic Island.
+    - Implemented using SwiftUI and WidgetKit.
+    - Shows heart rate, session duration, and battery level on the Lock Screen and Dynamic Island.
+    - Updates are pushed from the shared Kotlin code via `LiveActivityManager`.
+
+| iOS                                                                                                     | Android                                                                                                 |
+|---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
+|  <img src="https://github.com/user-attachments/assets/2d36adf1-1771-4bde-b7c9-241383129105" width="280">| <img src="https://github.com/user-attachments/assets/bc8cb7a4-3bd0-4425-bd9a-9c0ccf6dcbc6" width="280"> |
+
 
 ---
 
@@ -266,7 +376,6 @@ Dependency injection is implemented using Koin under `hram/di`:
 
 ## Current limitations
 
-- No background activity tracking is wired yet - tracking works while the app is active.
 - No external cloud sync/export.
 - Limited error handling and UX for BLE edge cases.
 

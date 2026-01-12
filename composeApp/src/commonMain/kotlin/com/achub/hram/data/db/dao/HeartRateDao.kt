@@ -16,6 +16,9 @@ interface HeartRateDao {
     @Query("SELECT * FROM HeartRateEntity")
     fun getAll(): Flow<List<HeartRateEntity>>
 
+    @Query("SELECT * FROM HeartRateEntity WHERE activityId = :activityId")
+    suspend fun getAllForActivity(activityId: String): List<HeartRateEntity>
+
     @Query(
         """
     SELECT 
@@ -28,10 +31,10 @@ interface HeartRateDao {
     ORDER BY bucketNumber
 """
     )
-    fun getAggregatedHeartRateForActivity(
+    suspend fun getAggregatedHeartRateForActivity(
         activityId: String,
         activityDuration: Long
-    ): Flow<List<AvgHrBucketByActivity>>
+    ): List<AvgHrBucketByActivity>
 
     @Query("DELETE from HeartRateEntity where activityId in (:ids)")
     suspend fun deleteRecordsByIds(ids: Set<String>)

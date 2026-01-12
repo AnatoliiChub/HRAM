@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <FrameLayout
+        android:id="@+id/flMainIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/llDeviceInfoRow"
+        android:layout_alignParentTop="true">
+
+        <ImageView
+            android:id="@+id/ivBleStatusIcon"
+            style="@style/NotificationIcon"
+            android:visibility="invisible"
+            tools:ignore="ContentDescription"
+            tools:src="@drawable/ic_heart_contact_off"
+            tools:visibility="visible" />
+
+        <ProgressBar
+            android:id="@+id/pbAnimatedHeart"
+            style="@style/NotificationIcon"
+            android:visibility="invisible" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/tvHeartRateUnit"
+        style="@style/NotificationUnitText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/heartRateValue"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="@dimen/notification_spacing_small"
+        tools:text="bpm" />
+
+    <TextView
+        android:id="@+id/heartRateValue"
+        style="@style/NotificationHeartRateValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="@dimen/notification_spacing_medium"
+        android:layout_toStartOf="@id/tvHeartRateUnit"
+        tools:text="75" />
+
+    <TextView
+        android:id="@+id/tvBleStatus"
+        style="@style/NotificationStatusText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/llDeviceInfoRow"
+        android:layout_alignParentTop="true"
+        android:layout_toStartOf="@id/heartRateValue"
+        android:layout_toEndOf="@id/flMainIcon"
+        android:gravity="center_vertical"
+        android:paddingStart="@dimen/notification_spacing_medium"
+        android:paddingEnd="@dimen/notification_spacing_medium"
+        tools:text="Current status:" />
+
+    <TextView
+        android:id="@+id/tvElapsedTime"
+        style="@style/NotificationTrackingStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/heartRateValue"
+        android:layout_alignParentEnd="true"
+        android:layout_toStartOf="@id/heartRateValue"
+        tools:text="Tracking" />
+
+    <LinearLayout
+        android:id="@+id/llDeviceInfoRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvElapsedTime"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tvDeviceName"
+            style="@style/NotificationDeviceText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            tools:text="Polar H10" />
+
+        <ImageView
+            android:id="@+id/ivBattery"
+            style="@style/NotificationBatteryIcon"
+            android:src="@drawable/ic_battery_full_green"
+            android:tint="@color/notification_battery_good_color"
+            tools:ignore="UseAppTint" />
+
+        <TextView
+            android:id="@+id/tvBatteryLevel"
+            style="@style/NotificationUnitText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="85%" />
+    </LinearLayout>
+</RelativeLayout>

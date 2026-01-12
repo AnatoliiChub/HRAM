@@ -7,6 +7,7 @@
     <string name="activity_screen_unnamed_act">Без назви</string>
     <string name="activity_screen_created_at">Створено: %1$s</string>
     <string name="activity_screen_elapsed_time">Минуло часу: %1$s</string>
+    <string name="activity_screen_seconds_unit">c</string>
     <string name="activity_screen_avg_hr">Ср. пульс:</string>
     <string name="activity_screen_max_hr">Макс. пульс:</string>
     <string name="activity_screen_min_hr">Мін. пульс:</string>
@@ -29,6 +30,9 @@
     <string name="record_screen_heart_indication_contact_off">Немає контакту</string>
     <string name="record_screen_heart_indication_battery_level"> %1$s %</string>
     <string name="record_scree_choose_at_least_one_option">Оберіть хоча б один параметр для відстеження</string>
+    <string name="record_screen_connect_device">Підключити пристрій</string>
+    <string name="record_screen_disconnect_device">Відключити пристрій</string>
+    <string name="record_screen_device_from">%1$s від %2$s</string>
 
     <!-- Dialogs -->
     <string name="dialog_choose_hr_device_connecting">Підключення…</string>
