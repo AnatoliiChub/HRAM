@@ -1,0 +1,40 @@
+name: iOS Build
+run-name: Building iOS debug app
+
+on:
+  workflow_call:
+    outputs:
+      artifact-id:
+        description: "The artifact ID of the iOS debug app"
+        value: ${{ jobs.ios-build.outputs.artifact-id }}
+
+jobs:
+  ios-build:
+    name: Build iOS Debug App
+    runs-on: macos-26
+    outputs:
+      artifact-id: ${{ steps.artifact-upload-step.outputs.artifact-id }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup environment
+        uses: ./.github/actions/setup
+
+      - name: Build Compose framework
+        run: ./scripts/build-framework.sh iphonesimulator Debug
+
+      - name: Build Xcode project
+        run: ./scripts/build-xcode.sh iphonesimulator Debug "iPhone 16e"
+
+      - name: Upload iOS debug app
+        if: always()
+        uses: actions/upload-artifact@v4
+        id: artifact-upload-step
+        with:
+          name: ios-debug-app
+          path: build/ios-iphonesimulator/Build/Products/Debug-iphonesimulator/*.app
+          if-no-files-found: warn
+          retention-days: 7
+

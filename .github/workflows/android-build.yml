@@ -1,0 +1,40 @@
+name: Android Build
+run-name: Building Android debug APK
+
+on:
+  workflow_call:
+    outputs:
+      artifact-id:
+        description: "The artifact ID of the Android debug APK"
+        value: ${{ jobs.android-build.outputs.artifact-id }}
+
+jobs:
+  android-build:
+    name: Build Android Debug APK
+    runs-on: ubuntu-latest
+    outputs:
+      artifact-id: ${{ steps.artifact-upload-step.outputs.artifact-id }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup environment
+        uses: ./.github/actions/setup
+
+      - name: Build debug APK
+        run: |
+          ./gradlew clean assembleDebug \
+            --no-daemon \
+            --stacktrace
+
+      - name: Upload Android debug APK
+        if: always()
+        uses: actions/upload-artifact@v4
+        id: artifact-upload-step
+        with:
+          name: android-debug-apk
+          path: androidApp/build/outputs/apk/debug/*.apk
+          if-no-files-found: warn
+          retention-days: 7
+

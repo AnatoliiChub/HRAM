@@ -38,7 +38,7 @@ The project is currently under active development, and only a debug version of t
 
 ### Android
 
-Open HRAM in Android Studio. Select the Android configuration for composeApp. Choose a
+Open HRAM in Android Studio. Select the Android configuration for androidApp. Choose a
 device/emulator. Run.
 Useful tasks:
 
@@ -47,15 +47,73 @@ Useful tasks:
 
 ### iOS
 
-1. Open iosApp/iosApp.xcodeproj in Xcode.
-2. Select a simulator.
-3. Run.
+Open HRAM in Android Studio. Select the iOS configuration for iosApp. Choose a
+device/emulator. Run.
 
-To create a build for a real device run in terminal:
+#### Scripts
 
-`xcodebuild  -project iosApp/iosApp.xcodeproj -configuration Debug -scheme iosApp -sdk iphoneos  DEVELOPMENT_TEAM=“YOUR_DEVELOPMENT_TEAMID”  CODE_SIGN_STYLE=Automatic CODE_SIGN_IDENTITY="Apple Development" -verbose`
+`/scripts` - This directory contains shell scripts for building the iOS application.
 
-Just replace `YOUR_DEVELOPMENT_TEAMID` with your team ID.
+#### build-framework.sh
+Builds the Compose Multiplatform framework for iOS.
+
+**Usage:**
+```bash
+./scripts/build-framework.sh [SDK] [CONFIGURATION]
+```
+
+**Parameters:**
+- `SDK` (default: `iphonesimulator`): Target SDK - `iphonesimulator` or `iphoneos`
+- `CONFIGURATION` (default: `Debug`): Build configuration
+
+**Examples:**
+```bash
+./scripts/build-framework.sh iphonesimulator Debug
+./scripts/build-framework.sh iphoneos
+./scripts/build-framework.sh  # Uses defaults
+```
+
+**Output:**
+- Framework location: `composeApp/build/xcode-frameworks/{CONFIGURATION}/{SDK}/ComposeApp.framework`
+
+---
+
+#### build-xcode.sh
+Builds the iOS Xcode project.
+
+**Usage:**
+```bash
+./scripts/build-xcode.sh [SDK] [CONFIGURATION] [SIMULATOR_NAME]
+```
+
+**Parameters:**
+- `SDK` (default: `iphonesimulator`): Target SDK - `iphonesimulator` or `iphoneos`
+- `CONFIGURATION` (default: `Debug`): Build configuration
+- `SIMULATOR_NAME` (default: `iPhone 16e`): Simulator device name (only used for iphonesimulator)
+
+**Examples:**
+```bash
+./scripts/build-xcode.sh iphonesimulator Debug "iPhone 16e"
+./scripts/build-xcode.sh iphoneos Debug
+./scripts/build-xcode.sh  # Uses defaults
+```
+
+**Output:**
+- App location: `./build/ios-{SDK}/Build/Products/{CONFIGURATION}-{SDK}/`
+
+---
+
+#### Complete Build Process
+
+To build the complete iOS application, run both scripts in sequence:
+
+```bash
+# Build the framework
+./scripts/build-framework.sh iphonesimulator Debug
+
+# Build the Xcode project
+./scripts/build-xcode.sh iphonesimulator Debug "iPhone 16e"
+```
 
 ---
 
@@ -91,7 +149,7 @@ HRAM focuses on:
 - Tracking heart rate sessions basic info.
 - Visualizing heart rate data using charts and indication views.
 - Storing activity data in a local database.
-- Sharing core logic (tracking, BLE, database, view models) between Android and iOS.
+- Sharing core logic (tracking, BLE, database, view models) and UI between Android and iOS.
 
 For compatibility, devices must implement the standard Heart Rate Service (UUID: 0x180D).
 
