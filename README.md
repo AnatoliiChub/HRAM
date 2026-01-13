@@ -250,7 +250,7 @@ Background execution is nuanced per platform. `TrackingController` is the centra
 2.  **iOS**:
     - Relies on iOS background modes (CoreBluetooth).
     - `TrackingController` delegates to `ActivityTrackingManager`.
-    - `LiveActivityManager` observes shared state repositories and pushes updates to **Live Activities**.
+    - `TrackingController` observes shared state repositories and call `LiveActivityManager` to push updates to **Live Activities**.
 
 ```mermaid
 
