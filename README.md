@@ -397,6 +397,14 @@ To keep the user informed during a workout (even when the device is locked), the
 |---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
 |  <img src="https://github.com/user-attachments/assets/2d36adf1-1771-4bde-b7c9-241383129105" width="280">| <img src="https://github.com/user-attachments/assets/bc8cb7a4-3bd0-4425-bd9a-9c0ccf6dcbc6" width="280"> |
 
+| Dynamic Island on iOS                                                                                                             |
+|------------------------------------------------------------------------------------------------------------------------------------
+|<img width="441" height="226" alt="image" src="https://github.com/user-attachments/assets/935fa63c-a783-42fa-bcc9-ae38e8b461b9" /> |
+|<img width="444" height="226" alt="image" src="https://github.com/user-attachments/assets/99d933f5-9e8c-4e4d-b71c-55a81d2f027f" /> |
+|<img width="441" height="227" alt="image" src="https://github.com/user-attachments/assets/071756d2-3e35-4364-9d57-0cb5a3301665" /> |
+
+
+
 
 ---
 
