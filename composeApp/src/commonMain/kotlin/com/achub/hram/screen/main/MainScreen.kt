@@ -16,8 +16,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.achub.hram.screen.activities.ActivitiesScreen
 import com.achub.hram.screen.record.RecordScreen
 import com.achub.hram.style.Black
-import com.achub.hram.view.tabs.MainTabLayout
 import com.achub.hram.view.tabs.MainTabType
+import com.achub.hram.view.tabs.ProperLiquidBottomBar
 
 @Composable
 fun MainScreen() {
@@ -39,7 +39,7 @@ fun MainScreen() {
                     MainTabType.Record -> RecordScreen()
                 }
             }
-            MainTabLayout(pagerState.currentPage, pagerState)
+            ProperLiquidBottomBar(pagerState.currentPage, pagerState::animateScrollToPage)
         }
     }
 }

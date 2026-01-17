@@ -8,8 +8,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -19,7 +19,7 @@ import com.achub.hram.style.Red
 import hram.composeapp.generated.resources.Res
 import hram.composeapp.generated.resources.ic_distance
 import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.vectorResource
+import org.jetbrains.compose.resources.painterResource
 
 private const val IMAGE_PADDING_DIVISOR = 10
 
@@ -46,9 +46,8 @@ fun IndicationImage(
     color: Color?
 ) {
     Image(
-        modifier = modifier.size(imageSize).padding(imageSize / IMAGE_PADDING_DIVISOR),
-        imageVector = vectorResource(drawable),
-        colorFilter = color?.let { ColorFilter.tint(it) },
+        modifier = modifier.size(imageSize).padding(imageSize / IMAGE_PADDING_DIVISOR).alpha(0.7f),
+        painter = painterResource(drawable),
         contentDescription = null
     )
 }
