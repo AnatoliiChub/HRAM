@@ -3,7 +3,6 @@ package com.achub.hram.view.shader
 import android.content.res.Resources
 import android.graphics.RenderEffect
 import android.graphics.RuntimeShader
-import android.os.Build
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.Offset
@@ -22,10 +21,6 @@ actual fun rememberLiquidRenderEffect(
     resolution: IntSize,
     minRadius: Float
 ): androidx.compose.ui.graphics.RenderEffect? {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-        return null
-    }
-
     val runtimeShader = remember(shaderSrc) { RuntimeShader(shaderSrc) }
 
     // Resolve resolution (use provided resolution if available, otherwise fallback to screen)
