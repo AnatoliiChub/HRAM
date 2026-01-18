@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.IntSize
 import com.achub.hram.ext.loggerE
 
 private const val TAG = "LiquidEffect"
+
 @Composable
 actual fun rememberLiquidRenderEffect(
     shaderSrc: String,
@@ -38,25 +39,24 @@ actual fun rememberLiquidRenderEffect(
         Resources.getSystem().displayMetrics.heightPixels.toFloat()
     }
 
-    try {
-        runtimeShader.setFloatUniform("time", time)
-        runtimeShader.setFloatUniform("density", density)
-        runtimeShader.setFloatUniform("minRadius", minRadius)
-        runtimeShader.setFloatUniform("resolution", floatArrayOf(resX, resY))
-
-        val cx = if (center != Offset.Unspecified) center.x else resX / 2f
-        val cy = if (center != Offset.Unspecified) center.y else resY / 2f
-        // normalized origin expected by shader
-        val ox = cx / maxOf(1f, resX)
-        val oy = cy / maxOf(1f, resY)
-        runtimeShader.setFloatUniform("origin", floatArrayOf(ox, oy))
-
-        runtimeShader.setColorUniform("color", baseColor.toArgb())
-    } catch (exception: Throwable) {
-        loggerE(TAG) { "Error setting shader uniforms: ${exception.localizedMessage}" }
-    }
-
     return remember(runtimeShader, time, density, center, baseColor, resolution, minRadius) {
+        try {
+            runtimeShader.setFloatUniform("time", time)
+            runtimeShader.setFloatUniform("density", density)
+            runtimeShader.setFloatUniform("minRadius", minRadius)
+            runtimeShader.setFloatUniform("resolution", floatArrayOf(resX, resY))
+
+            val cx = if (center != Offset.Unspecified) center.x else resX / 2f
+            val cy = if (center != Offset.Unspecified) center.y else resY / 2f
+            // normalized origin expected by shader
+            val ox = cx / maxOf(1f, resX)
+            val oy = cy / maxOf(1f, resY)
+            runtimeShader.setFloatUniform("origin", floatArrayOf(ox, oy))
+
+            runtimeShader.setColorUniform("color", baseColor.toArgb())
+        } catch (exception: Throwable) {
+            loggerE(TAG) { "Error setting shader uniforms: ${exception.localizedMessage}" }
+        }
         RenderEffect.createRuntimeShaderEffect(runtimeShader, "content").asComposeRenderEffect()
     }
 }

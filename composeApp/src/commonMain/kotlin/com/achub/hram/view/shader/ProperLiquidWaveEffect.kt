@@ -35,7 +35,6 @@ fun ProperLiquidWaveEffect(
     minRadius: Dp = 0.dp,
     content: @Composable BoxScope.() -> Unit
 ) {
-    if (isAppInBackground()) return
     // Track size so we can provide rects to the shader and center calculations if needed
     var size by remember { mutableStateOf(IntSize.Zero) }
 
@@ -43,11 +42,15 @@ fun ProperLiquidWaveEffect(
 
     // Normalized animated time [0f..1f)
     val infinite = rememberInfiniteTransition()
-    val animatedProgress by infinite.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(tween(durationMillis = durationMillis, easing = LinearEasing))
-    )
+    val animatedProgress by if (isAppInBackground()) {
+        mutableStateOf(0f)
+    } else {
+        infinite.animateFloat(
+            initialValue = 0f,
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(tween(durationMillis = durationMillis, easing = LinearEasing))
+        )
+    }
 
     val minRadiusPx = with(LocalDensity.current) { minRadius.toPx() }
 
@@ -77,7 +80,6 @@ fun ProperLiquidWaveEffect(
                 .graphicsLayer {
                     // Only set renderEffect when visible; graphicsLayer accepts null
                     this.renderEffect = if (apply) effect else null
-                    this.alpha = alpha
                 }
         ) {
             content()
