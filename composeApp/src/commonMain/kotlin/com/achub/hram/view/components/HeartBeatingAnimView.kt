@@ -61,7 +61,6 @@ fun HeartBeatingAnimView(
         modifier = modifier.scale(if (isBeating) animatedScale else DEFAULT_HEART_SCALE),
         imageSize = Dimen76,
         drawable = icon,
-        color = color
     )
 }
 

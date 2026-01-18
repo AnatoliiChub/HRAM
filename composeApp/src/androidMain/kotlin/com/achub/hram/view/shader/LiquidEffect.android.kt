@@ -10,7 +10,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.IntSize
+import com.achub.hram.ext.loggerE
 
+private const val TAG = "LiquidEffect"
 @Composable
 actual fun rememberLiquidRenderEffect(
     shaderSrc: String,
@@ -50,8 +52,8 @@ actual fun rememberLiquidRenderEffect(
         runtimeShader.setFloatUniform("origin", floatArrayOf(ox, oy))
 
         runtimeShader.setColorUniform("color", baseColor.toArgb())
-    } catch (_: Throwable) {
-        // Ignore uniform failures on preview or older environments
+    } catch (exception: Throwable) {
+        loggerE(TAG) { "Error setting shader uniforms: ${exception.localizedMessage}" }
     }
 
     return remember(runtimeShader, time, density, center, baseColor, resolution, minRadius) {

@@ -43,7 +43,6 @@ import org.jetbrains.compose.resources.vectorResource
 
 @Composable
 fun HeartIndicationRow(
-    modifier: Modifier = Modifier,
     bleNotification: BleNotification,
     heartPosUpdated: (Offset) -> Unit
 ) {

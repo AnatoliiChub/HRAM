@@ -43,15 +43,14 @@ fun RowScope.ImageTab(
             .weight(1f)
             .onGloballyPositioned { coordinates ->
                 tabRootPosition = coordinates.positionInRoot()
-            }
+            }.padding(Dimen4)
             .pointerInput(Unit) {
                 detectTapGestures { offset ->
                     if (tabRootPosition != Offset.Unspecified) {
                         onTap(tabRootPosition + offset)
                     }
                 }
-            }
-            .padding(Dimen4),
+            },
         horizontalAlignment = CenterHorizontally,
     ) {
         val color = if (isSelected) Red else White

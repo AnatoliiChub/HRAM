@@ -18,7 +18,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.layout.positionOnScreen
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.achub.hram.ble.models.BleDevice
@@ -68,7 +68,7 @@ fun RecordScreen() {
         var boxGlobalPosition by remember { mutableStateOf(Offset.Zero) }
 
         val device = state.connectedDevice
-        Box(Modifier.fillMaxSize().onGloballyPositioned { boxGlobalPosition = it.positionInRoot() }) {
+        Box(Modifier.fillMaxSize().onGloballyPositioned { boxGlobalPosition = it.positionOnScreen() }) {
             ProperLiquidWaveEffect(
                 center = heartIconCenter(heartGlobalCenter, boxGlobalPosition),
                 apply = indications.hrNotification?.hrBpm != null && indications.hrNotification.isContactOn,

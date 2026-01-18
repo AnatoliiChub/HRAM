@@ -21,7 +21,7 @@ half4 main(float2 coord) {
     float p = time * 3.0 - offset;
     float a = 0.0;
     float bodyAlpha = 0.0;
-    if (p >= 0.0 || p <= 1.0) {
+    if (p >= 0.0 && p <= 1.0) {
 
         // 1. Chaos/Noise Calculation
         float waveOffset = sin(theta * 6.0 + p * 8.0) + (cos(theta * 10.0 - p * 12.0) * 0.5);
