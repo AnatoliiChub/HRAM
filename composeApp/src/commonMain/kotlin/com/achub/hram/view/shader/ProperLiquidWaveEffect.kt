@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.achub.hram.style.DarkRed
 import com.achub.hram.view.shader
+import isAppInBackground
 
 @Composable
 fun ProperLiquidWaveEffect(
@@ -34,6 +35,7 @@ fun ProperLiquidWaveEffect(
     minRadius: Dp = 0.dp,
     content: @Composable BoxScope.() -> Unit
 ) {
+    if (isAppInBackground()) return
     // Track size so we can provide rects to the shader and center calculations if needed
     var size by remember { mutableStateOf(IntSize.Zero) }
 
