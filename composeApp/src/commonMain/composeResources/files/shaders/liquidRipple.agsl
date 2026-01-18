@@ -17,8 +17,7 @@ half4 main(float2 coord) {
     half4 accColor = half4(0.0);
     float totalDisplacement = 0.0;
 
-    float offset = 0;
-    float p = time * 3.0 - offset;
+    float p = time * 3.0;
     float a = 0.0;
     float bodyAlpha = 0.0;
     if (p >= 0.0 && p <= 1.0) {
@@ -50,7 +49,7 @@ half4 main(float2 coord) {
             // 5. Draw Liquid
             float normD = d / expansion;
 
-             // Calculate the base gradient (0.0 at edge, 1.0 at center)
+            // Calculate the base gradient (0.0 at edge, 1.0 at center)
             float baseBody = smoothstep(1.0, 0.0, normD);
             bodyAlpha = pow(baseBody, 5.0);
             float coreAlpha = smoothstep(1.0, 0.0, normD);

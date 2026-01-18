@@ -12,7 +12,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.achub.hram.style.Dimen76
 import hram.composeapp.generated.resources.Res
@@ -41,7 +40,6 @@ fun HeartBeatingAnimView(
     isBeating: Boolean,
     modifier: Modifier,
     icon: DrawableResource,
-    color: Color
 ) {
     val animatedScale by if (isAppInBackground().not() && isBeating) {
         val infiniteTransition = rememberInfiniteTransition()
@@ -88,6 +86,5 @@ fun HeartBeatingAnimViewPreview() {
         isBeating = true,
         modifier = Modifier,
         icon = Res.drawable.ic_heart,
-        color = Color.Red
     )
 }

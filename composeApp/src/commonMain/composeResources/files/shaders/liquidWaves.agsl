@@ -65,7 +65,7 @@ half4 main(float2 coord) {
         // 1. Calculate the base linear falloff (0.0 to 1.0)
         float baseGlow = 1.0 - smoothstep(0.0, glowWidth, d);
 
-        // 2. THE FIX: Raise it to a power to make sides transparent faster
+        //  Raise it to a power to make sides transparent faster
         // 1.0 = Linear (What you have now)
         // 2.0 = Soft Quadratic fade
         // 4.0 = Very sharp center, barely visible sides (Gas/Fire look)

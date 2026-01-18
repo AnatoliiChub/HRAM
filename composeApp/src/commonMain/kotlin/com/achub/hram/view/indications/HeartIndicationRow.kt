@@ -22,7 +22,6 @@ import com.achub.hram.ble.models.BleNotification
 import com.achub.hram.ble.models.HrNotification
 import com.achub.hram.style.Dimen132
 import com.achub.hram.style.Dimen32
-import com.achub.hram.style.Gray
 import com.achub.hram.style.HeadingMediumBold
 import com.achub.hram.style.LabelMedium
 import com.achub.hram.style.Red
@@ -55,7 +54,6 @@ fun HeartIndicationRow(
     val noBle = bleNotification.isBleConnected.not()
     val isContactOff = isSensorContactSupported && isContactOn.not()
     val hrValueStub = isEmpty || noBle || isContactOff || hrIndication == null
-    val heartColor = if (hrValueStub) Gray else Red
     val hrLabel = if (hrValueStub) {
         stringResource(Res.string.record_screen_heart_indication_stub)
     } else {
@@ -86,7 +84,6 @@ fun HeartIndicationRow(
                 heartPosUpdated(center)
             },
             heartIcon,
-            heartColor
         )
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
