@@ -11,7 +11,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionOnScreen
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
@@ -19,15 +22,14 @@ import com.achub.hram.ble.models.BleNotification
 import com.achub.hram.ble.models.HrNotification
 import com.achub.hram.style.Dimen132
 import com.achub.hram.style.Dimen32
-import com.achub.hram.style.Gray
 import com.achub.hram.style.HeadingMediumBold
 import com.achub.hram.style.LabelMedium
 import com.achub.hram.style.Red
 import com.achub.hram.style.White
 import com.achub.hram.view.components.HeartBeatingAnimView
 import hram.composeapp.generated.resources.Res
+import hram.composeapp.generated.resources.heart3d
 import hram.composeapp.generated.resources.ic_battery_full
-import hram.composeapp.generated.resources.ic_heart
 import hram.composeapp.generated.resources.ic_heart_contact_off
 import hram.composeapp.generated.resources.ic_heart_disconnected
 import hram.composeapp.generated.resources.record_screen_heart_indication_battery_level
@@ -40,8 +42,8 @@ import org.jetbrains.compose.resources.vectorResource
 
 @Composable
 fun HeartIndicationRow(
-    modifier: Modifier = Modifier,
-    bleNotification: BleNotification
+    bleNotification: BleNotification,
+    heartPosUpdated: (Offset) -> Unit
 ) {
     val isEmpty = bleNotification.isEmpty()
     val hrIndication = bleNotification.hrNotification
@@ -52,7 +54,6 @@ fun HeartIndicationRow(
     val noBle = bleNotification.isBleConnected.not()
     val isContactOff = isSensorContactSupported && isContactOn.not()
     val hrValueStub = isEmpty || noBle || isContactOff || hrIndication == null
-    val heartColor = if (hrValueStub) Gray else Red
     val hrLabel = if (hrValueStub) {
         stringResource(Res.string.record_screen_heart_indication_stub)
     } else {
@@ -69,10 +70,21 @@ fun HeartIndicationRow(
     val heartIcon = when {
         noBle -> Res.drawable.ic_heart_disconnected
         isContactOff -> Res.drawable.ic_heart_contact_off
-        else -> Res.drawable.ic_heart
+        else -> Res.drawable.heart3d
     }
     Row(verticalAlignment = CenterVertically) {
-        HeartBeatingAnimView(hrValueStub.not(), modifier, heartIcon, heartColor)
+        HeartBeatingAnimView(
+            hrValueStub.not(),
+            Modifier.onGloballyPositioned {
+                val position = it.positionOnScreen()
+                val center = Offset(
+                    x = position.x + it.size.width / 2f,
+                    y = position.y + it.size.height / 2f
+                )
+                heartPosUpdated(center)
+            },
+            heartIcon,
+        )
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 modifier = Modifier.align(Alignment.CenterHorizontally).widthIn(min = Dimen132),
@@ -108,5 +120,5 @@ private fun HeartIndicationRowPreview() {
         isBleConnected = true,
         elapsedTime = 120L,
     )
-    HeartIndicationRow(bleNotification = bleNotification)
+    HeartIndicationRow(bleNotification = bleNotification, heartPosUpdated = {})
 }

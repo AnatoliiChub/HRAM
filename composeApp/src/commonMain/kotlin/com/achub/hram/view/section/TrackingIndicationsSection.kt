@@ -7,6 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.tooling.preview.Preview
 import com.achub.hram.ble.models.BleNotification
 import com.achub.hram.ble.models.HrNotification
@@ -16,9 +17,9 @@ import com.achub.hram.utils.formatElapsedTime
 import com.achub.hram.view.indications.HeartIndicationRow
 
 @Composable
-fun TrackingIndicationsSection(bleNotification: BleNotification) {
+fun TrackingIndicationsSection(bleNotification: BleNotification, heartPosUpdated: (Offset) -> Unit) {
     Column(horizontalAlignment = CenterHorizontally) {
-        HeartIndicationRow(bleNotification = bleNotification)
+        HeartIndicationRow(bleNotification = bleNotification, heartPosUpdated = heartPosUpdated)
         Text(
             modifier = Modifier.align(CenterHorizontally),
             text = formatElapsedTime(bleNotification.elapsedTime),
@@ -40,5 +41,6 @@ private fun TrackingIndicationsSectionPreview() {
     )
     TrackingIndicationsSection(
         bleNotification = bleNotification,
+        heartPosUpdated = {}
     )
 }

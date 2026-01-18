@@ -8,9 +8,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.achub.hram.ble.models.BleDevice
-import com.achub.hram.style.Dimen16
 import com.achub.hram.style.Dimen32
 import com.achub.hram.style.Dimen48
+import com.achub.hram.style.Dimen8
 import com.achub.hram.style.LabelMediumBold
 import com.achub.hram.style.LabelSmall
 import com.achub.hram.style.Red
@@ -46,7 +46,7 @@ fun DeviceSection(device: BleDevice?, onConnectClick: () -> Unit, onDisconnectCl
             ),
             style = LabelMediumBold.copy(color = White.copy(alpha = 0.7f))
         )
-        Spacer(Modifier.size(Dimen16))
+        Spacer(Modifier.size(Dimen8))
         HrButton(
             modifier = Modifier.height(Dimen48),
             onClick = onDisconnectClick,

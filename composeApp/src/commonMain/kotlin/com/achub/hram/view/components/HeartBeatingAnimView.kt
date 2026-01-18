@@ -10,16 +10,13 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import appStateChanged
 import com.achub.hram.style.Dimen76
 import hram.composeapp.generated.resources.Res
 import hram.composeapp.generated.resources.ic_heart
+import isAppInBackground
 import org.jetbrains.compose.resources.DrawableResource
 
 private const val MIN_HEART_SCALE = 0.75f
@@ -43,11 +40,8 @@ fun HeartBeatingAnimView(
     isBeating: Boolean,
     modifier: Modifier,
     icon: DrawableResource,
-    color: Color
 ) {
-    var isAppInBackground by remember { mutableStateOf(true) }
-    appStateChanged { isAppInBackground = it.isBackground() }
-    val animatedScale by if (isAppInBackground.not() && isBeating) {
+    val animatedScale by if (isAppInBackground().not() && isBeating) {
         val infiniteTransition = rememberInfiniteTransition()
         infiniteTransition.animateFloat(
             initialValue = MIN_HEART_SCALE,
@@ -65,7 +59,6 @@ fun HeartBeatingAnimView(
         modifier = modifier.scale(if (isBeating) animatedScale else DEFAULT_HEART_SCALE),
         imageSize = Dimen76,
         drawable = icon,
-        color = color
     )
 }
 
@@ -93,6 +86,5 @@ fun HeartBeatingAnimViewPreview() {
         isBeating = true,
         modifier = Modifier,
         icon = Res.drawable.ic_heart,
-        color = Color.Red
     )
 }

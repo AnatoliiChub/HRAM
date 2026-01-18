@@ -365,6 +365,7 @@ Common UI code lives under `hram/screen` and `hram/view`:
 
 - Compose-based UI shared across platforms.
 - Custom charts for heart rate data.
+- Custom AGSL shaders for visual effects (Liquid Ripple for Bottom Bar, Liquid Wave for Heart animation).
 - Custom components using new Material 3 Expressive
 - Localization support for English and Ukrainian.
 
@@ -448,6 +449,4 @@ Dependency injection is implemented using Koin under `hram/di`:
 ## Video Demo: iOS - Android
 
 https://github.com/user-attachments/assets/e88b0a23-735c-469a-849d-84a6222fd4a3
-
-
 

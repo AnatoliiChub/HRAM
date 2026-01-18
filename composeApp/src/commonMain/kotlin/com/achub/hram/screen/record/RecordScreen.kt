@@ -8,15 +8,24 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionOnScreen
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ext.permissionController
 import com.achub.hram.ext.requestBluetooth
 import com.achub.hram.style.Dimen16
+import com.achub.hram.style.Dimen24
 import com.achub.hram.style.Dimen32
 import com.achub.hram.view.dialogs.InfoDialog
 import com.achub.hram.view.dialogs.NameActivityDialog
@@ -24,6 +33,7 @@ import com.achub.hram.view.dialogs.choosedevice.HrConnectDialog
 import com.achub.hram.view.section.DeviceSection
 import com.achub.hram.view.section.RecordSection
 import com.achub.hram.view.section.TrackingIndicationsSection
+import com.achub.hram.view.shader.ProperLiquidWaveEffect
 import hram.composeapp.generated.resources.Res
 import hram.composeapp.generated.resources.dialog_device_connected_message
 import hram.composeapp.generated.resources.dialog_device_connected_title
@@ -54,26 +64,35 @@ fun RecordScreen() {
             clearRequestBluetooth()
         }
         val indications = state.bleNotification
+        var heartGlobalCenter by remember { mutableStateOf(Offset.Unspecified) }
+        var boxGlobalPosition by remember { mutableStateOf(Offset.Zero) }
+
         val device = state.connectedDevice
-        Box(Modifier.fillMaxSize()) {
-            Column(
-                modifier = Modifier.fillMaxSize().padding(Dimen16),
-                horizontalAlignment = CenterHorizontally
+        Box(Modifier.fillMaxSize().onGloballyPositioned { boxGlobalPosition = it.positionOnScreen() }) {
+            ProperLiquidWaveEffect(
+                center = heartIconCenter(heartGlobalCenter, boxGlobalPosition),
+                apply = indications.hrNotification?.hrBpm != null && indications.hrNotification.isContactOn,
+                minRadius = Dimen24
             ) {
-                Spacer(Modifier.weight(COLUMN_SPACER_WEIGHT))
-                TrackingIndicationsSection(indications)
-                Spacer(Modifier.size(Dimen32))
-                DeviceSection(device, onConnectClick = { requestScanning() }, onDisconnectClick = { disconnect() })
-                Spacer(Modifier.weight(COLUMN_SPACER_WEIGHT))
-                RecordSection(
-                    recordingState = state.recordingState,
-                    onPlay = ::toggleRecording,
-                    onStop = ::showNameActivityDialog,
-                    isRecordingEnabled = state.isRecordingEnabled
-                )
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(Dimen16),
+                    horizontalAlignment = CenterHorizontally
+                ) {
+                    Spacer(Modifier.weight(COLUMN_SPACER_WEIGHT))
+                    TrackingIndicationsSection(indications, heartPosUpdated = { heartGlobalCenter = it })
+                    Spacer(Modifier.size(Dimen32))
+                    DeviceSection(device, onConnectClick = { requestScanning() }, onDisconnectClick = { disconnect() })
+                    Spacer(Modifier.weight(COLUMN_SPACER_WEIGHT))
+                    RecordSection(
+                        recordingState = state.recordingState,
+                        onPlay = ::toggleRecording,
+                        onStop = ::showNameActivityDialog,
+                        isRecordingEnabled = state.isRecordingEnabled
+                    )
+                }
             }
         }
-        Dialog(
+        Dialogs(
             state,
             onDeviceSelected = ::onHrDeviceSelected,
             onRequestScanning = ::requestScanning,
@@ -87,7 +106,7 @@ fun RecordScreen() {
 }
 
 @Composable
-private fun Dialog(
+private fun Dialogs(
     state: RecordScreenState,
     onDeviceSelected: (BleDevice) -> Unit,
     onRequestScanning: () -> Unit,
@@ -168,4 +187,13 @@ private fun Dialog(
 
         else -> {}
     }
+}
+
+private fun heartIconCenter(
+    heartGlobalCenter: Offset,
+    boxGlobalPosition: Offset
+): Offset = if (heartGlobalCenter.isSpecified) {
+    heartGlobalCenter - boxGlobalPosition
+} else {
+    Offset.Unspecified
 }
