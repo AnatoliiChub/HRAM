@@ -45,13 +45,13 @@ class HramStopWatch : StopWatch {
     }
 
     override fun listen() = tickerFlow(STOP_WATCH_TICK_DURATION)
-        .map { elapsedTimeSeconds() }
+        .map { elapsedTime() }
         .distinctUntilChanged()
         .onEach { elapsedTime.value = it }
 
-    override fun elapsedTimeSeconds(): Long = when (isRunning) {
+    override fun elapsedTime(): Long = when (isRunning) {
         true -> accumulatedOnLastPaused.load() + (now().toEpochMilliseconds() - startedTimestamp)
         false -> accumulatedOnLastPaused.load()
         null -> 0
-    }.milliseconds.inWholeSeconds
+    }
 }

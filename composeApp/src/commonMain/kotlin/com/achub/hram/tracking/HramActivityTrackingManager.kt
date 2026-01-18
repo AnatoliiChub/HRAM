@@ -96,10 +96,10 @@ class HramActivityTrackingManager(
     override fun finishTracking(name: String?) {
         scope.launch(dispatcher) {
             trackingStateRepo.update(TrackingStateStage.TRACKING_INIT_STATE)
-            val duration = stopWatch.elapsedTimeSeconds()
+            val duration = stopWatch.elapsedTime()
             stopWatch.reset()
             val newName = name ?: "${now().epochSeconds}__$duration"
-            currentActId?.let { hrActivityRepo.updateNameById(id = it, name = newName, duration = duration) }
+            currentActId?.let { hrActivityRepo.updateById(id = it, name = newName, duration = duration) }
             currentActId = null
         }.let { jobs.add(it) }
     }
@@ -139,7 +139,7 @@ class HramActivityTrackingManager(
             tickerFlow(1.seconds).filter { isTracking() }.onStart { emit(Unit) }
         ) { bleNotification, _ -> bleNotification }
         .onStart { emit(BleNotification.Empty) }
-        .map { it.copy(elapsedTime = stopWatch.elapsedTimeSeconds()) }
+        .map { it.copy(elapsedTime = stopWatch.elapsedTime()) }
         .onEach { bleIndication -> if (isTracking() && bleIndication.isBleConnected) store(bleIndication) }
         .catch { loggerE(TAG) { "listen error : $it" } }
 
@@ -171,7 +171,7 @@ class HramActivityTrackingManager(
                 val entity = HeartRateEntity(
                     activityId = it,
                     heartRate = hrNotification.hrBpm,
-                    timeStamp = bleIndication.elapsedTime
+                    elapsedTime = bleIndication.elapsedTime,
                 )
                 hrActivityRepo.insert(entity)
             }

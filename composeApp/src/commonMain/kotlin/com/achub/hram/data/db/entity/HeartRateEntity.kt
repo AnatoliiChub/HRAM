@@ -3,17 +3,17 @@ package com.achub.hram.data.db.entity
 import androidx.room.Entity
 import com.achub.hram.data.models.GraphLimits
 
-@Entity(primaryKeys = ["activityId", "timeStamp"])
+@Entity(primaryKeys = ["activityId", "elapsedTime"])
 data class HeartRateEntity(
     var activityId: String,
     var heartRate: Int,
-    var timeStamp: Long,
+    var elapsedTime: Long,
 )
 
 data class AvgHrBucketByActivity(
     val bucketNumber: Int,
     val avgHr: Float,
-    val timestamp: Long,
+    val elapsedTime: Long,
 )
 
 data class ActivityGraphInfo(

@@ -27,10 +27,10 @@ class HramHrActivityRepo(
 
     override suspend fun insert(item: ActivityEntity) = actDao.insert(item)
 
-    override suspend fun updateNameById(id: String, name: String, duration: Long) =
+    override suspend fun updateById(id: String, name: String, duration: Long) =
         actDao.updateNameById(id = id, name = name, duration = duration)
 
-    override suspend fun updateNameById(id: String, name: String) {
+    override suspend fun updateById(id: String, name: String) {
         actDao.updateNameById(id = id, name = name)
     }
 
@@ -42,15 +42,16 @@ class HramHrActivityRepo(
                 activities.map { activity ->
                     val all = hrDao.getAllForActivity(activity.id)
                     val aggregated = hrDao.getAggregatedHeartRateForActivity(activity.id, activity.duration)
+                        .map { bucket -> bucket.copy(elapsedTime = bucket.elapsedTime / 1000) }
                     ActivityGraphInfo(
-                        activity = activity,
+                        activity = activity.copy(duration = activity.duration / 1000),
                         buckets = aggregated,
                         totalRecords = all.count {
                             it.activityId == activity.id
                         },
                         limits = GraphLimits(
                             0f,
-                            aggregated.maxOfOrNull { it.timestamp }?.toFloat() ?: 1f,
+                            aggregated.maxOfOrNull { it.elapsedTime }?.toFloat() ?: 1f,
                             0f,
                             (aggregated.maxOfOrNull { it.avgHr } ?: 1f) * MAX_HR_FACTOR
                         ),
@@ -62,7 +63,12 @@ class HramHrActivityRepo(
                         maxHr = aggregated.maxOfOrNull { it.avgHr }?.toInt() ?: 0,
                         minHr = aggregated.minOfOrNull { it.avgHr }?.toInt() ?: 0,
                     )
-                }.onEach { logger(TAG) { "ActivityGraphInfo for ${it.activity}: ${it.limits}" } }
+                }
+                    .onEach {
+                        logger(
+                            TAG
+                        ) { "ActivityGraphInfo for ${it.activity}: ${it.limits}, size: ${it.buckets.size}" }
+                    }
             } else {
                 emptyList()
             }

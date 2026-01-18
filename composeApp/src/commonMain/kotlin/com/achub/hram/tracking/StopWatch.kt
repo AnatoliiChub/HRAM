@@ -11,5 +11,5 @@ interface StopWatch {
 
     fun listen(): Flow<Long>
 
-    fun elapsedTimeSeconds(): Long
+    fun elapsedTime(): Long
 }

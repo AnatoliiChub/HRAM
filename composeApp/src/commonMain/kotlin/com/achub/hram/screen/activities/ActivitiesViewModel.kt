@@ -86,7 +86,7 @@ class ActivitiesViewModel(
         if (selectedIds.size != 1) return
         val activityId = selectedIds.first()
         viewModelScope.launch(dispatcher) {
-            hrActivityRepo.updateNameById(activityId, currentDialog.activityName)
+            hrActivityRepo.updateById(activityId, currentDialog.activityName)
             dismissDialog()
             _uiState.update { it.copy(selectedActivitiesId = emptySet()) }
         }

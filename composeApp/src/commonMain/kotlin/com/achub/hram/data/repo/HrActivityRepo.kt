@@ -11,9 +11,9 @@ interface HrActivityRepo {
 
     suspend fun insert(item: ActivityEntity)
 
-    suspend fun updateNameById(id: String, name: String, duration: Long)
+    suspend fun updateById(id: String, name: String, duration: Long)
 
-    suspend fun updateNameById(id: String, name: String)
+    suspend fun updateById(id: String, name: String)
 
     fun getActivityByName(name: String): ActivityEntity?
 

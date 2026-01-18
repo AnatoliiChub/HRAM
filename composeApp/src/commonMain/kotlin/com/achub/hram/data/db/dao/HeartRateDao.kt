@@ -22,9 +22,9 @@ interface HeartRateDao {
     @Query(
         """
     SELECT 
-        CAST((timeStamp * 100.0) / :activityDuration AS INT) AS bucketNumber,
+        CAST((elapsedTime * 100.0) / (:activityDuration) AS INT) AS bucketNumber,
         AVG(hr.heartRate) AS avgHr,
-        MIN(hr.timeStamp) AS timestamp
+        MIN(hr.elapsedTime) AS elapsedTime
     FROM HeartRateEntity hr
     WHERE hr.activityId = :activityId
     GROUP BY bucketNumber
