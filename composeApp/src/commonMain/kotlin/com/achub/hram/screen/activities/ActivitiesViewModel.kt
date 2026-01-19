@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.achub.hram.data.models.HighlightedItem
 import com.achub.hram.data.repo.HrActivityRepo
+import com.achub.hram.export.FileExporter
 import com.achub.hram.ext.stateInExt
 import com.achub.hram.utils.ActivityNameErrorMapper
 import kotlinx.coroutines.CoroutineDispatcher
@@ -16,6 +17,7 @@ import kotlinx.coroutines.launch
 class ActivitiesViewModel(
     val hrActivityRepo: HrActivityRepo,
     val activityNameErrorMapper: ActivityNameErrorMapper,
+    val fileExporter: FileExporter,
     val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ActivitiesUiState())
@@ -78,6 +80,23 @@ class ActivitiesViewModel(
     }
 
     fun dismissDialog() = _uiState.update { it.copy(dialog = null) }
+
+    fun exportActivity(id: String) {
+        viewModelScope.launch(dispatcher) {
+            val hearts = hrActivityRepo.getHeartRatesForActivity(id)
+            if (hearts.isNotEmpty()) {
+                val csvHeader = "elapsedTime,heartRate\n"
+                val csvContent = hearts.joinToString(separator = "\n") {
+                    "${it.elapsedTime},${it.heartRate}"
+                }
+                val fullContent = csvHeader + csvContent
+                val activity = hrActivityRepo.getActivity(id)
+                // Use activity name for filename, or id if name is empty, sanitized
+                val safeName = (activity?.name ?: "").map { if (it.isLetterOrDigit()) it else '_' }.joinToString("")
+                fileExporter.exportData("activity_${safeName}_$id.csv", fullContent)
+            }
+        }
+    }
 
     fun onActivityNameConfirmed() {
         val state = _uiState.value

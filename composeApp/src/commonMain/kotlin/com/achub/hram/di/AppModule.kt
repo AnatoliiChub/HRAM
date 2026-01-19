@@ -11,6 +11,7 @@ import org.koin.core.annotation.KoinApplication
         TrackingModule::class,
         DataModule::class,
         UtilsModule::class,
+        ExportModule::class,
     ]
 )
 object AppModule

@@ -1,8 +1,9 @@
 package com.achub.hram.di
 
-import com.achub.hram.data.repo.state.BleStateRepo
 import com.achub.hram.data.repo.HrActivityRepo
+import com.achub.hram.data.repo.state.BleStateRepo
 import com.achub.hram.data.repo.state.TrackingStateRepo
+import com.achub.hram.export.FileExporter
 import com.achub.hram.screen.activities.ActivitiesViewModel
 import com.achub.hram.screen.record.RecordViewModel
 import com.achub.hram.tracking.TrackingController
@@ -41,6 +42,7 @@ class ViewModelModule {
     fun activitiesViewModel(
         hrActivityRepo: HrActivityRepo,
         activityNameErrorMapper: ActivityNameErrorMapper,
+        fileExporter: FileExporter,
         @WorkerThread dispatcher: CoroutineDispatcher,
-    ) = ActivitiesViewModel(hrActivityRepo, activityNameErrorMapper, dispatcher)
+    ) = ActivitiesViewModel(hrActivityRepo, activityNameErrorMapper, fileExporter, dispatcher)
 }

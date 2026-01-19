@@ -23,6 +23,9 @@ interface ActivityDao {
     @Query("UPDATE ActivityEntity SET name = :name WHERE id = :id")
     suspend fun updateNameById(id: String, name: String)
 
+    @Query("SELECT * FROM ActivityEntity WHERE id = :id LIMIT 1")
+    suspend fun getActivity(id: String): ActivityEntity?
+
     @Query("SELECT * FROM ActivityEntity WHERE duration > 0 ORDER BY startDate DESC")
     fun getAll(): Flow<List<ActivityEntity>>
 

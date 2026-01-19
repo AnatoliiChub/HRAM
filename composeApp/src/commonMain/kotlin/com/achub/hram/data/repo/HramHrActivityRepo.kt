@@ -34,7 +34,7 @@ class HramHrActivityRepo(
         actDao.updateNameById(id = id, name = name)
     }
 
-    override fun getActivityByName(name: String): ActivityEntity? = getActivityByName(name)
+    override suspend fun getActivity(id: String) = actDao.getActivity(id)
 
     override fun getActivitiesGraph(): Flow<List<ActivityGraphInfo>> = actDao.getAll().flatMapLatest { activities ->
         flowOf(
@@ -77,6 +77,9 @@ class HramHrActivityRepo(
 
     override fun getActivityWithHeartRates(id: String): Flow<ActivityWithHeartRates> =
         actDao.getActivityWithHeartRates(id).filterNotNull()
+
+    override suspend fun getHeartRatesForActivity(activityId: String): List<HeartRateEntity> =
+        hrDao.getAllForActivity(activityId)
 
     override suspend fun deleteActivitiesById(ids: Set<String>) {
         actDao.deleteByIds(ids)

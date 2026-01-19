@@ -15,11 +15,13 @@ interface HrActivityRepo {
 
     suspend fun updateById(id: String, name: String)
 
-    fun getActivityByName(name: String): ActivityEntity?
+    suspend fun getActivity(id: String): ActivityEntity?
 
     fun getActivitiesGraph(): Flow<List<ActivityGraphInfo>>
 
     fun getActivityWithHeartRates(id: String): Flow<ActivityWithHeartRates>
+
+    suspend fun getHeartRatesForActivity(activityId: String): List<HeartRateEntity>
 
     suspend fun deleteActivitiesById(ids: Set<String>)
 }

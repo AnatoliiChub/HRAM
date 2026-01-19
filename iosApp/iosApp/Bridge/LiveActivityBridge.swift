@@ -94,7 +94,7 @@ public class LiveActivityBridgeImpl: NSObject {
 
         // Parse bleState string to BleStateType enum
         let bleStateType = BleStateType.from(state: bleState)
-        let elapsedTimeString = DateUtilsKt.formatElapsedTime(elapsedTimeSeconds: elapsedTime)
+        let elapsedTimeString = DateUtilsKt.formatElapsedTime(timeInMs: elapsedTime)
 
         let attributes = HRActivityAttributes()
         let contentState = HRActivityAttributes.ContentState(
@@ -156,7 +156,7 @@ public class LiveActivityBridgeImpl: NSObject {
 
         // Parse bleState string to BleStateType enum
         let bleStateType = BleStateType.from(state: bleState)
-        let elapsedTimeString = DateUtilsKt.formatElapsedTime(elapsedTimeSeconds: elapsedTime)
+        let elapsedTimeString = DateUtilsKt.formatElapsedTime(timeInMs: elapsedTime)
 
         let content = ActivityContent(state: HRActivityAttributes.ContentState(
             heartRate: heartRate,
