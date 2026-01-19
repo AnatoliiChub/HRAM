@@ -4,7 +4,7 @@
 
 | **Android**                                                                                             | **iOS**                                                                                                 |
 |---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
-| <img src="https://github.com/user-attachments/assets/2496db1f-9d6d-421f-b678-334ca482647f" width="280"> | <img src="https://github.com/user-attachments/assets/ed85f462-0922-47c9-82ab-8071af28d618" width="280"> |
+| <img src="https://github.com/user-attachments/assets/709f2167-d628-40b2-8fa4-10ae4b441762" width="280"> | <img src="https://github.com/user-attachments/assets/d3aa997d-3564-459d-894f-01eb95cb3550" width="280"> |
 
 HRAM is a Kotlin Multiplatform app for heart rate \& activity tracking with BLE heart rate monitors.  
 It uses Compose Multiplatform for shared UI, Kotlin Multiplatform for shared logic, Koin for DI, and an SQL
@@ -379,7 +379,7 @@ Common UI code lives under `hram/screen` and `hram/view`:
 
 | iOS                                                                                                     | Android                                                                                                 |
 |---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
-| <img src="https://github.com/user-attachments/assets/c7a61873-c63c-4ead-9355-360d5b069e79" width="280"> | <img src="https://github.com/user-attachments/assets/fcd85206-a383-4fea-803d-87aa671f6de3" width="280"> |
+| <img src="https://github.com/user-attachments/assets/53cc386f-1df6-4a5b-a33a-8d037f99a0b9" width="280"> | <img src="https://github.com/user-attachments/assets/54656da8-e7d9-45fb-abee-d476a6dc480b" width="280"> |
 
 #### Notifications / Live Activities
 
@@ -448,5 +448,4 @@ Dependency injection is implemented using Koin under `hram/di`:
 
 ## Video Demo: iOS - Android
 
-https://github.com/user-attachments/assets/e88b0a23-735c-469a-849d-84a6222fd4a3
-
+https://github.com/user-attachments/assets/873f56e3-3539-4111-abcf-27ce0266e24d
