@@ -1,4 +1,4 @@
-# HRAM: Heart Rate, Activity & Motion.
+# HRAM: Heart Rate Activity Monitoring
 
 ### Kotlin Multiplatform project targeting Android \& iOS
 
