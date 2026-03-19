@@ -45,8 +45,8 @@ jobs:
           retention-days: 7
 
       - name: Add coverage report to PR
-        if: github.event_name == 'pull_request'
-        uses: mi-kas/kover-report@v1
+        id: kover
+        uses: mi-kas/kover-report@v1.9
         with:
           path: ${{ github.workspace }}/composeApp/build/reports/kover/report.xml
           title: Code Coverage for BLE package and Utils
