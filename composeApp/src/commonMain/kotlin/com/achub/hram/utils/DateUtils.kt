@@ -12,7 +12,7 @@ val dateFormat = LocalTime.Format {
     second()
 }
 
-fun formatElapsedTime(elapsedTimeSeconds: Long): String {
-    val time = LocalTime.fromSecondOfDay(elapsedTimeSeconds.toInt())
+fun formatElapsedTime(timeInMs: Long): String {
+    val time = LocalTime.fromMillisecondOfDay(timeInMs.toInt())
     return time.format(dateFormat)
 }

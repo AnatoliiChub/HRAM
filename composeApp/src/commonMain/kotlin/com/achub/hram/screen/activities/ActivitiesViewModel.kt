@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.achub.hram.data.models.HighlightedItem
 import com.achub.hram.data.repo.HrActivityRepo
 import com.achub.hram.ext.stateInExt
+import com.achub.hram.usecase.ExportCsvUseCase
 import com.achub.hram.utils.ActivityNameErrorMapper
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +17,7 @@ import kotlinx.coroutines.launch
 class ActivitiesViewModel(
     val hrActivityRepo: HrActivityRepo,
     val activityNameErrorMapper: ActivityNameErrorMapper,
+    val exportCsvUseCase: ExportCsvUseCase,
     val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ActivitiesUiState())
@@ -79,6 +81,12 @@ class ActivitiesViewModel(
 
     fun dismissDialog() = _uiState.update { it.copy(dialog = null) }
 
+    fun exportActivity(id: String) {
+        viewModelScope.launch(dispatcher) {
+            exportCsvUseCase(id)
+        }
+    }
+
     fun onActivityNameConfirmed() {
         val state = _uiState.value
         val currentDialog = state.dialog as? ActivitiesScreenDialog.ReNameActivity ?: return
@@ -86,7 +94,7 @@ class ActivitiesViewModel(
         if (selectedIds.size != 1) return
         val activityId = selectedIds.first()
         viewModelScope.launch(dispatcher) {
-            hrActivityRepo.updateNameById(activityId, currentDialog.activityName)
+            hrActivityRepo.updateById(activityId, currentDialog.activityName)
             dismissDialog()
             _uiState.update { it.copy(selectedActivitiesId = emptySet()) }
         }

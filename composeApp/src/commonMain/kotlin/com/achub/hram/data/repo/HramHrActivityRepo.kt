@@ -5,7 +5,7 @@ import com.achub.hram.data.db.dao.HeartRateDao
 import com.achub.hram.data.db.entity.ActivityEntity
 import com.achub.hram.data.db.entity.ActivityGraphInfo
 import com.achub.hram.data.db.entity.ActivityWithHeartRates
-import com.achub.hram.data.db.entity.HeartRateEntity
+import com.achub.hram.data.db.entity.HeartRateBleEntity
 import com.achub.hram.data.models.GraphLimits
 import com.achub.hram.ext.logger
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,18 +23,18 @@ class HramHrActivityRepo(
     @Provided val actDao: ActivityDao,
     @Provided val hrDao: HeartRateDao
 ) : HrActivityRepo {
-    override suspend fun insert(item: HeartRateEntity) = hrDao.insert(item)
+    override suspend fun insert(item: HeartRateBleEntity) = hrDao.insert(item)
 
     override suspend fun insert(item: ActivityEntity) = actDao.insert(item)
 
-    override suspend fun updateNameById(id: String, name: String, duration: Long) =
+    override suspend fun updateById(id: String, name: String, duration: Long) =
         actDao.updateNameById(id = id, name = name, duration = duration)
 
-    override suspend fun updateNameById(id: String, name: String) {
+    override suspend fun updateById(id: String, name: String) {
         actDao.updateNameById(id = id, name = name)
     }
 
-    override fun getActivityByName(name: String): ActivityEntity? = getActivityByName(name)
+    override suspend fun getActivity(id: String) = actDao.getActivity(id)
 
     override fun getActivitiesGraph(): Flow<List<ActivityGraphInfo>> = actDao.getAll().flatMapLatest { activities ->
         flowOf(
@@ -42,15 +42,16 @@ class HramHrActivityRepo(
                 activities.map { activity ->
                     val all = hrDao.getAllForActivity(activity.id)
                     val aggregated = hrDao.getAggregatedHeartRateForActivity(activity.id, activity.duration)
+                        .map { bucket -> bucket.copy(elapsedTime = bucket.elapsedTime / 1000) }
                     ActivityGraphInfo(
-                        activity = activity,
+                        activity = activity.copy(duration = activity.duration / 1000),
                         buckets = aggregated,
                         totalRecords = all.count {
                             it.activityId == activity.id
                         },
                         limits = GraphLimits(
                             0f,
-                            aggregated.maxOfOrNull { it.timestamp }?.toFloat() ?: 1f,
+                            aggregated.maxOfOrNull { it.elapsedTime }?.toFloat() ?: 1f,
                             0f,
                             (aggregated.maxOfOrNull { it.avgHr } ?: 1f) * MAX_HR_FACTOR
                         ),
@@ -62,7 +63,11 @@ class HramHrActivityRepo(
                         maxHr = aggregated.maxOfOrNull { it.avgHr }?.toInt() ?: 0,
                         minHr = aggregated.minOfOrNull { it.avgHr }?.toInt() ?: 0,
                     )
-                }.onEach { logger(TAG) { "ActivityGraphInfo for ${it.activity}: ${it.limits}" } }
+                }.onEach {
+                    logger(
+                        TAG
+                    ) { "ActivityGraphInfo for ${it.activity}: ${it.limits}, size: ${it.buckets.size}" }
+                }
             } else {
                 emptyList()
             }
@@ -71,6 +76,9 @@ class HramHrActivityRepo(
 
     override fun getActivityWithHeartRates(id: String): Flow<ActivityWithHeartRates> =
         actDao.getActivityWithHeartRates(id).filterNotNull()
+
+    override suspend fun getHeartRatesForActivity(activityId: String): List<HeartRateBleEntity> =
+        hrDao.getAllForActivity(activityId)
 
     override suspend fun deleteActivitiesById(ids: Set<String>) {
         actDao.deleteByIds(ids)

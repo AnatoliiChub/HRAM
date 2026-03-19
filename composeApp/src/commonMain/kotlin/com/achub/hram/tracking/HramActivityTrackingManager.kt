@@ -6,7 +6,7 @@ import com.achub.hram.ble.ScanResult
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.BleNotification
 import com.achub.hram.data.db.entity.ACTIVE_ACTIVITY
-import com.achub.hram.data.db.entity.HeartRateEntity
+import com.achub.hram.data.db.entity.HeartRateBleEntity
 import com.achub.hram.data.models.BleState
 import com.achub.hram.data.models.ScanError
 import com.achub.hram.data.repo.HrActivityRepo
@@ -96,10 +96,10 @@ class HramActivityTrackingManager(
     override fun finishTracking(name: String?) {
         scope.launch(dispatcher) {
             trackingStateRepo.update(TrackingStateStage.TRACKING_INIT_STATE)
-            val duration = stopWatch.elapsedTimeSeconds()
+            val duration = stopWatch.elapsedTime()
             stopWatch.reset()
             val newName = name ?: "${now().epochSeconds}__$duration"
-            currentActId?.let { hrActivityRepo.updateNameById(id = it, name = newName, duration = duration) }
+            currentActId?.let { hrActivityRepo.updateById(id = it, name = newName, duration = duration) }
             currentActId = null
         }.let { jobs.add(it) }
     }
@@ -139,7 +139,7 @@ class HramActivityTrackingManager(
             tickerFlow(1.seconds).filter { isTracking() }.onStart { emit(Unit) }
         ) { bleNotification, _ -> bleNotification }
         .onStart { emit(BleNotification.Empty) }
-        .map { it.copy(elapsedTime = stopWatch.elapsedTimeSeconds()) }
+        .map { it.copy(elapsedTime = stopWatch.elapsedTime()) }
         .onEach { bleIndication -> if (isTracking() && bleIndication.isBleConnected) store(bleIndication) }
         .catch { loggerE(TAG) { "listen error : $it" } }
 
@@ -167,11 +167,15 @@ class HramActivityTrackingManager(
 
     private suspend fun store(bleIndication: BleNotification) {
         bleIndication.hrNotification?.let { hrNotification ->
+            val isContactOn = if (hrNotification.isSensorContactSupported) hrNotification.isContactOn else true
             currentActId?.let {
-                val entity = HeartRateEntity(
+                val entity = HeartRateBleEntity(
                     activityId = it,
                     heartRate = hrNotification.hrBpm,
-                    timeStamp = bleIndication.elapsedTime
+                    elapsedTime = bleIndication.elapsedTime,
+                    isContactOn = isContactOn,
+                    batteryLevel = bleIndication.batteryLevel,
+                    timestamp = now().toEpochMilliseconds(),
                 )
                 hrActivityRepo.insert(entity)
             }

@@ -5,27 +5,27 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy.Companion.REPLACE
 import androidx.room.Query
 import com.achub.hram.data.db.entity.AvgHrBucketByActivity
-import com.achub.hram.data.db.entity.HeartRateEntity
+import com.achub.hram.data.db.entity.HeartRateBleEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface HeartRateDao {
     @Insert(onConflict = REPLACE)
-    suspend fun insert(item: HeartRateEntity)
+    suspend fun insert(item: HeartRateBleEntity)
 
-    @Query("SELECT * FROM HeartRateEntity")
-    fun getAll(): Flow<List<HeartRateEntity>>
+    @Query("SELECT * FROM HeartRateBleEntity")
+    fun getAll(): Flow<List<HeartRateBleEntity>>
 
-    @Query("SELECT * FROM HeartRateEntity WHERE activityId = :activityId")
-    suspend fun getAllForActivity(activityId: String): List<HeartRateEntity>
+    @Query("SELECT * FROM HeartRateBleEntity WHERE activityId = :activityId ORDER BY elapsedTime ASC")
+    suspend fun getAllForActivity(activityId: String): List<HeartRateBleEntity>
 
     @Query(
         """
     SELECT 
-        CAST((timeStamp * 100.0) / :activityDuration AS INT) AS bucketNumber,
+        CAST((elapsedTime * 100.0) / (:activityDuration) AS INT) AS bucketNumber,
         AVG(hr.heartRate) AS avgHr,
-        MIN(hr.timeStamp) AS timestamp
-    FROM HeartRateEntity hr
+        MIN(hr.elapsedTime) AS elapsedTime
+    FROM HeartRateBleEntity hr
     WHERE hr.activityId = :activityId
     GROUP BY bucketNumber
     ORDER BY bucketNumber
@@ -36,6 +36,6 @@ interface HeartRateDao {
         activityDuration: Long
     ): List<AvgHrBucketByActivity>
 
-    @Query("DELETE from HeartRateEntity where activityId in (:ids)")
+    @Query("DELETE from HeartRateBleEntity where activityId in (:ids)")
     suspend fun deleteRecordsByIds(ids: Set<String>)
 }

@@ -80,7 +80,7 @@ fun ActivityCard(
     val activity = activityInfo.activity
     val buckets = activityInfo.buckets
     val chartData = ChartData(
-        points = buckets.map { it.timestamp.toFloat() to it.avgHr },
+        points = buckets.map { it.elapsedTime.toFloat() to it.avgHr },
         limits = activityInfo.limits,
         highLighted = if (activity.id == highLighted?.activityId) highLighted.point else null
     )
@@ -171,11 +171,11 @@ private fun ActivityCardPreview() {
     )
 
     val buckets = listOf(
-        AvgHrBucketByActivity(1, timestamp = 60L, avgHr = 90f),
-        AvgHrBucketByActivity(2, timestamp = 120L, avgHr = 110f),
-        AvgHrBucketByActivity(3, timestamp = 180L, avgHr = 130f),
-        AvgHrBucketByActivity(4, timestamp = 240L, avgHr = 125f),
-        AvgHrBucketByActivity(5, timestamp = 300L, avgHr = 115f),
+        AvgHrBucketByActivity(1, elapsedTime = 60L, avgHr = 90f),
+        AvgHrBucketByActivity(2, elapsedTime = 120L, avgHr = 110f),
+        AvgHrBucketByActivity(3, elapsedTime = 180L, avgHr = 130f),
+        AvgHrBucketByActivity(4, elapsedTime = 240L, avgHr = 125f),
+        AvgHrBucketByActivity(5, elapsedTime = 300L, avgHr = 115f),
     )
 
     val info = ActivityGraphInfo(
@@ -186,13 +186,13 @@ private fun ActivityCardPreview() {
         minHr = 80,
         totalRecords = buckets.size,
         limits = GraphLimits(
-            minX = buckets.minOf { it.timestamp }.toFloat(),
-            maxX = buckets.maxOf { it.timestamp }.toFloat(),
+            minX = buckets.minOf { it.elapsedTime }.toFloat(),
+            maxX = buckets.maxOf { it.elapsedTime }.toFloat(),
             minY = 60f,
             maxY = 190f
         )
     )
-    val point = buckets[2].timestamp.toFloat() to buckets[2].avgHr
+    val point = buckets[2].elapsedTime.toFloat() to buckets[2].avgHr
 
     ActivityCard(
         modifier = Modifier,

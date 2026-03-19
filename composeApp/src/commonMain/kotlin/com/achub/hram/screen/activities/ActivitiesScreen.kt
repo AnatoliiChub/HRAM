@@ -77,7 +77,8 @@ fun ActivitiesScreen() {
             Toolbar(
                 selectedIds = selectedIds,
                 onDelete = { viewModel.showActivityDeletionDialog() },
-                onEdit = { viewModel.showNameActivityDialog() }
+                onEdit = { viewModel.showNameActivityDialog() },
+                onExport = { selectedIds.firstOrNull()?.let { viewModel.exportActivity(it) } }
             )
         }
     }
@@ -93,7 +94,12 @@ fun ActivitiesScreen() {
 }
 
 @Composable
-fun BoxScope.Toolbar(selectedIds: Set<String>, onDelete: () -> Unit = {}, onEdit: () -> Unit = {}) {
+fun BoxScope.Toolbar(
+    selectedIds: Set<String>,
+    onDelete: () -> Unit = {},
+    onEdit: () -> Unit = {},
+    onExport: () -> Unit = {}
+) {
     FloatingToolbar(
         modifier = Modifier.align(Alignment.BottomEnd)
             .padding(Dimen16),
@@ -102,6 +108,7 @@ fun BoxScope.Toolbar(selectedIds: Set<String>, onDelete: () -> Unit = {}, onEdit
         when (opt) {
             ActivityOptions.DELETE -> onDelete()
             ActivityOptions.EDIT -> onEdit()
+            ActivityOptions.EXPORT -> onExport()
         }
     }
 }
