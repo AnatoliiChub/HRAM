@@ -22,5 +22,5 @@ data class ActivityWithHeartRates(
         parentColumn = "id",
         entityColumn = "activityId"
     )
-    val heartRates: List<HeartRateEntity>
+    val heartRates: List<HeartRateBleEntity>
 )

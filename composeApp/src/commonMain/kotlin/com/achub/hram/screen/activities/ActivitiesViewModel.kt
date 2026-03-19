@@ -85,9 +85,9 @@ class ActivitiesViewModel(
         viewModelScope.launch(dispatcher) {
             val hearts = hrActivityRepo.getHeartRatesForActivity(id)
             if (hearts.isNotEmpty()) {
-                val csvHeader = "elapsedTime,heartRate\n"
+                val csvHeader = "Timestamp (ms),Elapsed Time (ms),Heart Rate (bpm),Contact On,Battery Level\n"
                 val csvContent = hearts.joinToString(separator = "\n") {
-                    "${it.elapsedTime},${it.heartRate}"
+                    "${it.timestamp},${it.elapsedTime},${it.heartRate},${it.isContactOn},${it.batteryLevel}"
                 }
                 val fullContent = csvHeader + csvContent
                 val activity = hrActivityRepo.getActivity(id)

@@ -5,7 +5,7 @@ import com.achub.hram.data.db.dao.HeartRateDao
 import com.achub.hram.data.db.entity.ActivityEntity
 import com.achub.hram.data.db.entity.ActivityGraphInfo
 import com.achub.hram.data.db.entity.ActivityWithHeartRates
-import com.achub.hram.data.db.entity.HeartRateEntity
+import com.achub.hram.data.db.entity.HeartRateBleEntity
 import com.achub.hram.data.models.GraphLimits
 import com.achub.hram.ext.logger
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,7 +23,7 @@ class HramHrActivityRepo(
     @Provided val actDao: ActivityDao,
     @Provided val hrDao: HeartRateDao
 ) : HrActivityRepo {
-    override suspend fun insert(item: HeartRateEntity) = hrDao.insert(item)
+    override suspend fun insert(item: HeartRateBleEntity) = hrDao.insert(item)
 
     override suspend fun insert(item: ActivityEntity) = actDao.insert(item)
 
@@ -78,7 +78,7 @@ class HramHrActivityRepo(
     override fun getActivityWithHeartRates(id: String): Flow<ActivityWithHeartRates> =
         actDao.getActivityWithHeartRates(id).filterNotNull()
 
-    override suspend fun getHeartRatesForActivity(activityId: String): List<HeartRateEntity> =
+    override suspend fun getHeartRatesForActivity(activityId: String): List<HeartRateBleEntity> =
         hrDao.getAllForActivity(activityId)
 
     override suspend fun deleteActivitiesById(ids: Set<String>) {

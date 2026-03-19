@@ -8,11 +8,11 @@ import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.achub.hram.data.db.dao.ActivityDao
 import com.achub.hram.data.db.dao.HeartRateDao
 import com.achub.hram.data.db.entity.ActivityEntity
-import com.achub.hram.data.db.entity.HeartRateEntity
+import com.achub.hram.data.db.entity.HeartRateBleEntity
 import com.achub.hram.di.WorkerIOThread
 import kotlinx.coroutines.CoroutineDispatcher
 
-@Database(entities = [ActivityEntity::class, HeartRateEntity::class], version = 1)
+@Database(entities = [ActivityEntity::class, HeartRateBleEntity::class], version = 1)
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class HramDatabase : RoomDatabase() {
     abstract fun getActivityDao(): ActivityDao
