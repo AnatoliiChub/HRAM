@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.achub.hram.BLE_SCAN_DURATION
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.BleNotification
+import com.achub.hram.ble.models.HramBleDevice
 import com.achub.hram.data.models.BleState
 import com.achub.hram.data.models.ScanError
 import com.achub.hram.data.repo.state.BleStateRepo
@@ -132,8 +133,19 @@ class RecordViewModel(
     }
 
     private fun handleNotificationUpdate(state: BleState.NotificationUpdate) {
+        val manufacturer = uiState.value.connectedDevice?.manufacturer
+        val identifier = uiState.value.connectedDevice?.identifier
         _uiState.indications(state.bleNotification).also {
-            if (state.bleNotification.isBleConnected) _uiState.update { it.copy(connectedDevice = state.device) }
+            val device = if (manufacturer != null && identifier == state.device.identifier) {
+                HramBleDevice(
+                    name = state.device.name,
+                    identifier = state.device.identifier,
+                    manufacturer = manufacturer
+                )
+            } else {
+                state.device
+            }
+            if (state.bleNotification.isBleConnected) _uiState.update { it.copy(connectedDevice = device) }
         }
     }
 
