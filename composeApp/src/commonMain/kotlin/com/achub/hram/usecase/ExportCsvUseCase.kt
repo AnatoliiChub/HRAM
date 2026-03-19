@@ -18,7 +18,7 @@ class ExportCsvUseCase(
         val fullContent = csvHeader + csvContent
 
         val activity = hrActivityRepo.getActivity(activityId)
-        // Use activity name for filename, or id if name is empty, sanitized.
+
         val safeName = (activity?.name ?: "").map { if (it.isLetterOrDigit()) it else '_' }.joinToString("")
         fileExporter.exportData("activity_${safeName}_$activityId.csv", fullContent)
     }

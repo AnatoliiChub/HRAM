@@ -63,12 +63,11 @@ class HramHrActivityRepo(
                         maxHr = aggregated.maxOfOrNull { it.avgHr }?.toInt() ?: 0,
                         minHr = aggregated.minOfOrNull { it.avgHr }?.toInt() ?: 0,
                     )
+                }.onEach {
+                    logger(
+                        TAG
+                    ) { "ActivityGraphInfo for ${it.activity}: ${it.limits}, size: ${it.buckets.size}" }
                 }
-                    .onEach {
-                        logger(
-                            TAG
-                        ) { "ActivityGraphInfo for ${it.activity}: ${it.limits}, size: ${it.buckets.size}" }
-                    }
             } else {
                 emptyList()
             }
