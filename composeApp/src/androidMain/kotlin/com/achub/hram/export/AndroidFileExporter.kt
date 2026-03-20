@@ -19,7 +19,7 @@ class AndroidFileExporter(private val context: Context) : FileExporter {
         }
 
         val chooser = Intent.createChooser(intent, "Export Activity").apply {
-             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         context.startActivity(chooser)
     }

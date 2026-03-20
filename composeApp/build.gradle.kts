@@ -1,68 +1,20 @@
 @file:OptIn(ExperimentalKotlinGradlePluginApi::class)
 
-import io.gitlab.arturbosch.detekt.Detekt
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    alias(libs.plugins.android.kotlin.multiplatform.library)
-    alias(libs.plugins.kotlinMultiplatform)
+    id("kmp-library-convention")
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.kotlinComposeCompiler)
     alias(libs.plugins.kotlinxSerialization)
-    alias(libs.plugins.ksp)
     alias(libs.plugins.androidx.room)
-    alias(libs.plugins.detekt)
-    alias(libs.plugins.mokkery)
-    alias(libs.plugins.kover)
-    alias(libs.plugins.kotlin.allopen)
 }
 
-mokkery {
-    ignoreInlineMembers.set(true) // ignores only inline members
-    ignoreFinalMembers.set(true) // ignores final members (inline included)
-}
-
-allOpen {
-    annotation("com.achub.hram.OpenForMokkery")
-}
-
-detekt {
-    toolVersion = libs.versions.detekt.get()
-    allRules = false
-    parallel = true
-    source.setFrom(
-        files(
-            "src/commonMain/kotlin",
-            "src/androidMain/kotlin",
-            "src/iosMain/kotlin"
-        )
-    )
-    config.setFrom(files("$rootDir/detekt/detekt.yml"))
-}
-
-kover {
-    reports {
-        filters {
-            includes {
-                // ble is a critical part of the app, so we include it in coverage
-                classes("com.achub.hram.ble.**")
-                classes("com.achub.hram.utils.**")
-            }
-            excludes {
-                classes("*.models.*")
-                classes("*Android*")
-                classes("*Ios*")
-            }
-        }
-    }
-}
+extra["koverIncludes"] = listOf("com.achub.hram.utils.**")
 
 kotlin {
     androidLibrary {
         namespace = "com.achub.hram.library"
-        compileSdk = libs.versions.android.compileSdk.get().toInt()
-        minSdk = libs.versions.android.minSdk.get().toInt()
 
         packaging {
             resources {
@@ -70,19 +22,6 @@ kotlin {
             }
         }
 
-        compilerOptions {
-            freeCompilerArgs.add("-Xexpect-actual-classes")
-        }
-
-        compilations.all {
-            compileTaskProvider.configure {
-                compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
-            }
-        }
-
-        withHostTest {
-            isIncludeAndroidResources = true
-        }
         androidResources {
             enable = true
         }
@@ -136,7 +75,7 @@ kotlin {
             api(libs.koin.annotations)
 
             // BLE
-            implementation(libs.kable)
+            api(project(":ble"))
 
             // Permission
             api(libs.moko.compose)
@@ -158,21 +97,9 @@ kotlin {
             implementation(libs.kotlinx.coroutines.test)
         }
     }
-
-    sourceSets.named("commonMain").configure {
-        kotlin.srcDir("build/generated/ksp/metadata/commonMain/kotlin")
-    }
-
-    compilerOptions {
-        freeCompilerArgs.add("-Xcontext-parameters")
-    }
 }
 
 dependencies {
-    add("kspCommonMainMetadata", libs.koin.ksp.compiler)
-    add("kspAndroid", libs.koin.ksp.compiler)
-    add("kspIosArm64", libs.koin.ksp.compiler)
-    add("kspIosSimulatorArm64", libs.koin.ksp.compiler)
     add("kspAndroid", libs.androidx.room.compiler)
     add("kspIosSimulatorArm64", libs.androidx.room.compiler)
     add("kspIosArm64", libs.androidx.room.compiler)
@@ -180,21 +107,6 @@ dependencies {
 
 room {
     schemaDirectory("$projectDir/schemas")
-}
-
-tasks.withType<Detekt>().configureEach {
-    reports {
-        html.required.set(true)
-        html.outputLocation.set(file("${projectDir.path}/build/reports/detekt.html"))
-        xml.required.set(false)
-        txt.required.set(false)
-        sarif.required.set(false)
-        md.required.set(false)
-    }
-}
-
-tasks.matching { it.name.startsWith("ksp") && it.name != "kspCommonMainKotlinMetadata" }.configureEach {
-    dependsOn("kspCommonMainKotlinMetadata")
 }
 
 tasks {
@@ -213,7 +125,3 @@ tasks {
     }
 }
 
-ksp {
-    arg("KOIN_LOG_TIMES", "true")
-    arg("KOIN_CONFIG_CHECK", "true")
-}

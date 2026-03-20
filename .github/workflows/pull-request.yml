@@ -28,19 +28,19 @@ jobs:
   # Android debug build
   android-build:
     name: Android Build
-    needs: [detekt]
+    needs: [ detekt ]
     uses: ./.github/workflows/android-build.yml
 
   # iOS debug build
   ios-build:
     name: iOS Build
-    needs: [detekt]
+    needs: [ detekt ]
     uses: ./.github/workflows/ios-build.yml
 
   # Summary comment on PR
   summary:
     name: Post PR Summary
-    needs: [detekt, unit-tests, android-build, ios-build]
+    needs: [ detekt, unit-tests, android-build, ios-build ]
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write

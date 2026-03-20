@@ -4,7 +4,7 @@ package com.achub.hram.screen.record
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.achub.hram.BLE_SCAN_DURATION
+import com.achub.hram.ble.BLE_SCAN_DURATION
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.BleNotification
 import com.achub.hram.ble.models.HramBleDevice

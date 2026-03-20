@@ -24,7 +24,7 @@ ktlint_standard_multiline-loop = disabled
 ktlint_standard_function-signature = disabled
 ktlint_experimental = enabled
 ktlint_standard_multiline-expression-wrapping = disabled
-ktlint_function_naming_ignore_when_annotated_with=Composable
+ktlint_function_naming_ignore_when_annotated_with = Composable
 
 # --------------------------
 # Overrides for generated files

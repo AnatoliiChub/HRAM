@@ -6,8 +6,10 @@
 |---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
 | <img src="https://github.com/user-attachments/assets/709f2167-d628-40b2-8fa4-10ae4b441762" width="280"> | <img src="https://github.com/user-attachments/assets/d3aa997d-3564-459d-894f-01eb95cb3550" width="280"> |
 
-HRAM is a Kotlin Multiplatform app for heart rate \& activity tracking with BLE heart rate monitors.  
-It uses Compose Multiplatform for shared UI, Kotlin Multiplatform for shared logic, Koin for DI, and an SQL
+HRAM is a Kotlin Multiplatform app for heart rate \& activity tracking with BLE heart rate
+monitors.  
+It uses Compose Multiplatform for shared UI, Kotlin Multiplatform for shared logic, Koin for DI, and
+an SQL
 database for storing heart rate activities.
 
 Tested with a Decathlon HRM Belt as an example device.
@@ -18,7 +20,8 @@ Status: **Work in progress / Prototype**
 
 No implied warranty or guarantee of functionality. Use at your own risk.  
 This project is for educational purposes in software development only.
-It is **not a medical application** and must **not be used for medical assessment, diagnosis, monitoring, or treatment**.
+It is **not a medical application** and must **not be used for medical assessment, diagnosis,
+monitoring, or treatment**.
 
 ---
 
@@ -34,7 +37,8 @@ It is **not a medical application** and must **not be used for medical assessmen
 
 ## Run targets
 
-The project is currently under active development, and only a debug version of the application is available.
+The project is currently under active development, and only a debug version of the application is
+available.
 
 ### Android
 
@@ -55,18 +59,22 @@ device/emulator. Run.
 `/scripts` - This directory contains shell scripts for building the iOS application.
 
 #### build-framework.sh
+
 Builds the Compose Multiplatform framework for iOS.
 
 **Usage:**
+
 ```bash
 ./scripts/build-framework.sh [SDK] [CONFIGURATION]
 ```
 
 **Parameters:**
+
 - `SDK` (default: `iphonesimulator`): Target SDK - `iphonesimulator` or `iphoneos`
 - `CONFIGURATION` (default: `Debug`): Build configuration
 
 **Examples:**
+
 ```bash
 ./scripts/build-framework.sh iphonesimulator Debug
 ./scripts/build-framework.sh iphoneos
@@ -74,24 +82,29 @@ Builds the Compose Multiplatform framework for iOS.
 ```
 
 **Output:**
+
 - Framework location: `composeApp/build/xcode-frameworks/{CONFIGURATION}/{SDK}/ComposeApp.framework`
 
 ---
 
 #### build-xcode.sh
+
 Builds the iOS Xcode project.
 
 **Usage:**
+
 ```bash
 ./scripts/build-xcode.sh [SDK] [CONFIGURATION] [SIMULATOR_NAME]
 ```
 
 **Parameters:**
+
 - `SDK` (default: `iphonesimulator`): Target SDK - `iphonesimulator` or `iphoneos`
 - `CONFIGURATION` (default: `Debug`): Build configuration
 - `SIMULATOR_NAME` (default: `iPhone 16e`): Simulator device name (only used for iphonesimulator)
 
 **Examples:**
+
 ```bash
 ./scripts/build-xcode.sh iphonesimulator Debug "iPhone 16e"
 ./scripts/build-xcode.sh iphoneos Debug
@@ -99,6 +112,7 @@ Builds the iOS Xcode project.
 ```
 
 **Output:**
+
 - App location: `./build/ios-{SDK}/Build/Products/{CONFIGURATION}-{SDK}/`
 
 ---
@@ -119,7 +133,8 @@ To build the complete iOS application, run both scripts in sequence:
 
 ## Testing
 
-Unit tests for the shared logic are located in `composeApp/src/commonTest`. The project utilizes the following testing libraries:
+Unit tests for the shared logic are located in `composeApp/src/commonTest` and `ble/src/commonTest`.
+The project utilizes the following testing libraries:
 
 - **`kotlin.test`**: For standard assertions.
 - **`kotlinx-coroutines-test`**: For testing coroutine-based asynchronous code.
@@ -127,19 +142,22 @@ Unit tests for the shared logic are located in `composeApp/src/commonTest`. The 
 
 ### Running Tests
 
-To execute all tests in the `composeApp` module, run:
+To execute all tests, run:
 
 `./gradlew testDebugUnitTest`
 
+To run BLE module tests:
+
+`./gradlew :ble:testAndroidHostTest`
+
 To run a specific test class:
 
-`./gradlew :composeApp:testDebugUnitTest --tests "com.achub.hram.ble.core.connection.HramConnectionTrackerTest"`
+`./gradlew :ble:testAndroidHostTest --tests "com.achub.hram.ble.core.connection.HramConnectionTrackerTest"`
 
 **Test coverage** is generated using [Kover](https://github.com/Kotlin/kotlinx-kover)
 To generate an HTML coverage report, run the following command:
 
 `./gradlew koverHtmlReport`
-
 
 ## Project description
 
@@ -157,10 +175,17 @@ For compatibility, devices must implement the standard Heart Rate Service (UUID:
 
 ## Project structure
 
-The project is organized into packages, with the core logic residing in `composeApp/src/commonMain`.
+The project is organized into modules, with BLE logic in its own `:ble` module and the core app
+logic in `composeApp/src/commonMain`. A `build-logic` convention plugin provides reusable KMP build
+configuration.
 
+- `ble/` - Standalone BLE module (scanning, connection, data parsing, models, DI).
+    - `src/commonMain/` — Shared BLE interfaces and implementations.
+    - `src/androidMain/` — Android Bluetooth state observer.
+    - `src/iosMain/` — iOS CoreBluetooth state observer.
+    - `src/commonTest/` — BLE unit tests.
+- `build-logic/` — Gradle convention plugins for reusable KMP module configuration.
 - `composeApp/src/commonMain/kotlin/com/achub/hram/`
-    - `ble/` - BLE scanning, connection, and data handling.
     - `data/` - Database entities, DAOs, and activity repository.
     - `di/` - Koin dependency injection modules.
     - `screen/` - screens for each feature (Main, Activities, Record).
@@ -173,16 +198,20 @@ The project is organized into packages, with the core logic residing in `compose
 
 ### BLE
 
-- BLE Layer is implemented in `hram/ble`:
+- BLE Layer is implemented in the standalone `:ble` module (`ble/`):
     - The app communicates with BLE devices that implement the standard Heart Rate Service.
-    - `BleDevice` model describing discovered devices; `identifier` field used for mac address (Android) or UUID (iOS).
+    - `BleDevice` model describing discovered devices; `identifier` field used for mac address (
+      Android) or UUID (iOS).
     - `HrNotification` model for heart rate data (from the Heart Rate Measurement characteristic).
     - `BleNotification` encapsulates `HrNotification`, battery level, and BLE connection status.
     - Core components:
-        - `BleConnectionManager`: Manages Bluetooth state, device scanning, and the connection lifecycle (
+        - `BleConnectionManager`: Manages Bluetooth state, device scanning, and the connection
+          lifecycle (
           connect/disconnect/reconnect).
-        - `BleDataRepo`: Provides streams for BLE characteristic data (heart rate measurement, battery level).
-        - `HrDeviceRepo`: A high-level repo that coordinates the `BleConnectionManager` and `BleDataRepo` to
+        - `BleDataRepo`: Provides streams for BLE characteristic data (heart rate measurement,
+          battery level).
+        - `HrDeviceRepo`: A high-level repo that coordinates the `BleConnectionManager` and
+          `BleDataRepo` to
           provide a unified interface for interacting with HR devices.
 
 **What implemented:**
@@ -240,17 +269,21 @@ Tracking is implemented in `hram/tracking`:
 
 **Implementation Details:**
 
-Background execution is nuanced per platform. `TrackingController` is the central entry point found in `hram/tracking/TrackingController.kt`. It provides a unified interface but has platform-specific implementations that leverage the shared `ActivityTrackingManager` and reactive state repositories:
+Background execution is nuanced per platform. `TrackingController` is the central entry point found
+in `hram/tracking/TrackingController.kt`. It provides a unified interface but has platform-specific
+implementations that leverage the shared `ActivityTrackingManager` and reactive state repositories:
 
-1.  **Android**:
+1. **Android**:
     - Uses a **Foreground Service** (`BleTrackingService`) to keep the app alive.
     - `TrackingController` sends Intents to the service.
-    - The Service delegates work to `ActivityTrackingManager` and observes shared state repositories to update **Notifications** (remote views).
+    - The Service delegates work to `ActivityTrackingManager` and observes shared state repositories
+      to update **Notifications** (remote views).
 
-2.  **iOS**:
+2. **iOS**:
     - Relies on iOS background modes (CoreBluetooth).
     - `TrackingController` delegates to `ActivityTrackingManager`.
-    - `TrackingController` observes shared state repositories and call `LiveActivityManager` to push updates to **Live Activities**.
+    - `TrackingController` observes shared state repositories and call `LiveActivityManager` to push
+      updates to **Live Activities**.
 
 ```mermaid
 
@@ -322,7 +355,8 @@ Located under `hram/data`:
     - `HramDatabase` in `hram/data/db`.
     - Heart rate and activity entities.
     - Queries to read \& write activity data.
-    - Optimized heart rate aggregation per activity: splits sessions into time buckets and calculates average heart rate
+    - Optimized heart rate aggregation per activity: splits sessions into time buckets and
+      calculates average heart rate
       directly in the database for fast, efficient queries.
 
 **What works:**
@@ -332,17 +366,23 @@ Located under `hram/data`:
 
 #### StateManagement
 
-The app persists transient state (like current BLE connection status or active tracking session info) to survive process death or navigation.
+The app persists transient state (like current BLE connection status or active tracking session
+info) to survive process death or navigation.
 Ble-Notifications state will be extracted to in-memory singleton repo, in the near future.
 
 **Packages:**
-- `com.achub.hram.data.repo.state`: Repository interfaces and implementations for reactive state exposure.
+
+- `com.achub.hram.data.repo.state`: Repository interfaces and implementations for reactive state
+  exposure.
 - `com.achub.hram.data.store`: logic for serialization and storage (using DataStore).
 
 **Key Components:**
-- **BleStateRepo**: reflects the current state of BLE connection state(Disconnected, Connecting, Connected, etc.).
+
+- **BleStateRepo**: reflects the current state of BLE connection state(Disconnected, Connecting,
+  Connected, etc.).
 - **TrackingStateRepo**: Manages the state of the activity (Idle, Active, Paused).
-- **DataStore**: Uses `BleStateSerializer` and `TrackingStateStageSerializer` to save state to disk asynchronously.
+- **DataStore**: Uses `BleStateSerializer` and `TrackingStateStageSerializer` to save state to disk
+  asynchronously.
 
 ---
 
@@ -365,7 +405,8 @@ Common UI code lives under `hram/screen` and `hram/view`:
 
 - Compose-based UI shared across platforms.
 - Custom charts for heart rate data.
-- Custom AGSL shaders for visual effects (Liquid Ripple for Bottom Bar, Liquid Wave for Heart animation).
+- Custom AGSL shaders for visual effects (Liquid Ripple for Bottom Bar, Liquid Wave for Heart
+  animation).
 - Custom components using new Material 3 Expressive
 - Localization support for English and Ukrainian.
 
@@ -383,7 +424,8 @@ Common UI code lives under `hram/screen` and `hram/view`:
 
 #### Notifications / Live Activities
 
-To keep the user informed during a workout (even when the device is locked), the app uses platform-specific ongoing notifications:
+To keep the user informed during a workout (even when the device is locked), the app uses
+platform-specific ongoing notifications:
 
 - **Android**: Custom **Notifications** with `RemoteViews`.
     - Displays real-time heart rate.
@@ -396,16 +438,13 @@ To keep the user informed during a workout (even when the device is locked), the
 
 | iOS                                                                                                     | Android                                                                                                 |
 |---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
-|  <img src="https://github.com/user-attachments/assets/2d36adf1-1771-4bde-b7c9-241383129105" width="280">| <img src="https://github.com/user-attachments/assets/bc8cb7a4-3bd0-4425-bd9a-9c0ccf6dcbc6" width="280"> |
+| <img src="https://github.com/user-attachments/assets/2d36adf1-1771-4bde-b7c9-241383129105" width="280"> | <img src="https://github.com/user-attachments/assets/bc8cb7a4-3bd0-4425-bd9a-9c0ccf6dcbc6" width="280"> |
 
-| Dynamic Island on iOS                                                                                                             |
+| Dynamic Island on iOS                                                                                                              |
 |------------------------------------------------------------------------------------------------------------------------------------
-|<img width="441" height="226" alt="image" src="https://github.com/user-attachments/assets/935fa63c-a783-42fa-bcc9-ae38e8b461b9" /> |
-|<img width="444" height="226" alt="image" src="https://github.com/user-attachments/assets/99d933f5-9e8c-4e4d-b71c-55a81d2f027f" /> |
-|<img width="441" height="227" alt="image" src="https://github.com/user-attachments/assets/071756d2-3e35-4364-9d57-0cb5a3301665" /> |
-
-
-
+| <img width="441" height="226" alt="image" src="https://github.com/user-attachments/assets/935fa63c-a783-42fa-bcc9-ae38e8b461b9" /> |
+| <img width="444" height="226" alt="image" src="https://github.com/user-attachments/assets/99d933f5-9e8c-4e4d-b71c-55a81d2f027f" /> |
+| <img width="441" height="227" alt="image" src="https://github.com/user-attachments/assets/071756d2-3e35-4364-9d57-0cb5a3301665" /> |
 
 ---
 

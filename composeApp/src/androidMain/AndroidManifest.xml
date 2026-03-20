@@ -18,7 +18,7 @@
         <service
             android:name="com.achub.hram.tracking.BleTrackingService"
             android:exported="false"
-            android:foregroundServiceType="connectedDevice"/>
+            android:foregroundServiceType="connectedDevice" />
     </application>
 
 </manifest>

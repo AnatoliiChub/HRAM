@@ -1,6 +1,6 @@
 package com.achub.hram.screen.record
 
-import com.achub.hram.BLE_SCAN_DURATION
+import com.achub.hram.ble.BLE_SCAN_DURATION
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.BleNotification
 import com.achub.hram.view.section.RecordingState

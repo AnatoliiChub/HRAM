@@ -84,8 +84,9 @@ class HramNotificator(
     ): NotificationData =
         with(state.bleNotification) {
             val isConnected = isBleConnected
-            val isContactOn = hrNotification?.isContactOn ?: false
-            val heartRate = if (isConnected && isContactOn) hrNotification.hrBpm.toString() else NO_HEART_RATE
+            val hr = hrNotification
+            val isContactOn = hr?.isContactOn ?: false
+            val heartRate = if (isConnected && isContactOn) hr.hrBpm.toString() else NO_HEART_RATE
 
             val heartIcon = when {
                 !isConnected -> R.drawable.ic_heart_disconnected

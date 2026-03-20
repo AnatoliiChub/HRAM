@@ -1,10 +1,13 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this
+repository.
 
 ## Project Overview
 
-HRAM is a Kotlin Multiplatform (KMP) heart rate monitoring app using Compose Multiplatform for shared UI across Android and iOS. It connects to BLE heart rate monitors, tracks activity sessions, and displays live metrics.
+HRAM is a Kotlin Multiplatform (KMP) heart rate monitoring app using Compose Multiplatform for
+shared UI across Android and iOS. It connects to BLE heart rate monitors, tracks activity sessions,
+and displays live metrics.
 
 ## Build Commands
 
@@ -19,7 +22,7 @@ HRAM is a Kotlin Multiplatform (KMP) heart rate monitoring app using Compose Mul
 
 # Tests
 ./gradlew testDebugUnitTest
-./gradlew :composeApp:testDebugUnitTest --tests "com.achub.hram.ble.core.connection.HramConnectionTrackerTest"
+./gradlew :ble:testAndroidHostTest --tests "com.achub.hram.ble.core.connection.HramConnectionTrackerTest"
 
 # Code quality
 ./gradlew detekt
@@ -41,36 +44,55 @@ Shared UI (Compose Multiplatform)
 
 ### Source Set Organization
 
-- **`composeApp/src/commonMain/`** — All shared business logic and UI
+- **`ble/`** — Standalone BLE module (scanning, connection, data parsing, models, DI)
+    - `src/commonMain/` — Shared BLE interfaces and implementations
+    - `src/androidMain/` — Android Bluetooth state observer
+    - `src/iosMain/` — iOS CoreBluetooth state observer
+    - `src/commonTest/` — BLE unit tests
+- **`build-logic/`** — Gradle convention plugins (`kmp-library-convention`) for reusable KMP module
+  config
+- **`composeApp/src/commonMain/`** — Shared business logic and UI (depends on `:ble`)
 - **`composeApp/src/androidMain/`** — Android-specific implementations
 - **`composeApp/src/iosMain/`** — iOS-specific implementations (Kotlin/Native)
 - **`composeApp/src/commonTest/`** — Shared unit tests
 - **`androidApp/`** — Android shell (MainActivity)
 - **`iosApp/`** — iOS shell (SwiftUI entry point, Live Activity widgets)
 
-### Key Packages (commonMain)
+### Key Packages
 
-| Package | Purpose |
-|---------|---------|
+#### `:ble` module
+
+| Package                | Purpose                                                    |
+|------------------------|------------------------------------------------------------|
 | `ble/core/connection/` | BLE scanning, connection, reconnect retry (max 3 attempts) |
-| `ble/core/data/` | BLE characteristic parsing, HR + battery streams |
-| `data/db/` | Room database with heart rate and activity entities |
-| `data/repo/` | Repository layer (HR activities, BLE state, tracking state) |
-| `data/store/` | DataStore-backed persistence for BLE and tracking state |
-| `tracking/` | `ActivityTrackingManager`, `StopWatch`, `TrackingController` (expect/actual) |
-| `screen/` | UI screens: `main/`, `activities/`, `record/` |
-| `view/` | Reusable Compose components, charts, AGSL shaders |
-| `di/` | Koin DI modules — most have platform-specific counterparts |
-| `export/` | CSV data export (platform-specific implementations) |
+| `ble/core/data/`       | BLE characteristic parsing, HR + battery streams           |
+| `ble/models/`          | BLE device, notification, and exception models             |
+| `ble/di/`              | Koin DI modules for BLE (expect/actual per platform)       |
+| `ble/utils/`           | BLE UUID constants, byte parsing, logging utilities        |
+
+#### `composeApp` module (commonMain)
+
+| Package       | Purpose                                                                      |
+|---------------|------------------------------------------------------------------------------|
+| `data/db/`    | Room database with heart rate and activity entities                          |
+| `data/repo/`  | Repository layer (HR activities, BLE state, tracking state)                  |
+| `data/store/` | DataStore-backed persistence for BLE and tracking state                      |
+| `tracking/`   | `ActivityTrackingManager`, `StopWatch`, `TrackingController` (expect/actual) |
+| `screen/`     | UI screens: `main/`, `activities/`, `record/`                                |
+| `view/`       | Reusable Compose components, charts, AGSL shaders                            |
+| `di/`         | Koin DI modules — most have platform-specific counterparts                   |
+| `export/`     | CSV data export (platform-specific implementations)                          |
 
 ### Platform Differences
 
 **Android** (`androidMain/`):
+
 - `BleTrackingService` — Foreground service for background tracking
 - `TrackingController` sends Intents to the service
 - `Notificator` manages persistent notification with RemoteViews
 
 **iOS** (`iosMain/` + `iosApp/`):
+
 - `LiveActivityManager` updates WidgetKit Live Activities during tracking
 - `TrackingController` directly calls `ActivityTrackingManager`
 - Swift bridge in `iosApp/Bridge/` connects Kotlin to Swift Live Activity APIs
@@ -78,7 +100,8 @@ Shared UI (Compose Multiplatform)
 
 ### Dependency Injection
 
-Koin with KSP annotations. Each platform has companion DI modules for database, DataStore, BLE, tracking, and export. Entry point: `di/Koin.kt`.
+Koin with KSP annotations. Each platform has companion DI modules for database, DataStore, BLE,
+tracking, and export. Entry point: `di/Koin.kt`.
 
 ### BLE Device Identifier Note
 

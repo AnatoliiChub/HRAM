@@ -23,4 +23,5 @@ Execute the following commands in sequence and report the outcome of each:
    | Unit Tests | ✅/❌ | N passed, N failed |
    | Coverage | ✅/❌ | X% (threshold: 80%) |
 
-If any check fails, show the specific error output and suggest the most likely fix based on the error message.
+If any check fails, show the specific error output and suggest the most likely fix based on the
+error message.

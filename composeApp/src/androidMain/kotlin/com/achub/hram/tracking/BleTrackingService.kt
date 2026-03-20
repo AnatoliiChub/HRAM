@@ -8,11 +8,10 @@ import android.content.Intent
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
 import android.os.IBinder
 import androidx.core.app.ServiceCompat
-import com.achub.hram.BLE_SCAN_DURATION
+import com.achub.hram.ble.BLE_SCAN_DURATION
 import com.achub.hram.ble.models.HramBleDevice
 import com.achub.hram.data.repo.state.TrackingStateRepo
 import com.achub.hram.di.CoroutineModule.Companion.WORKER_DISPATCHER
-import com.achub.hram.ext.launchIn
 import com.achub.hram.ext.logger
 import com.achub.hram.library.R
 import kotlinx.coroutines.CoroutineDispatcher
@@ -26,6 +25,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.sample

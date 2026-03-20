@@ -69,9 +69,10 @@ fun RecordScreen() {
 
         val device = state.connectedDevice
         Box(Modifier.fillMaxSize().onGloballyPositioned { boxGlobalPosition = it.positionOnScreen() }) {
+            val hrNotification = indications.hrNotification
             ProperLiquidWaveEffect(
                 center = heartIconCenter(heartGlobalCenter, boxGlobalPosition),
-                apply = indications.hrNotification?.hrBpm != null && indications.hrNotification.isContactOn,
+                apply = hrNotification?.hrBpm != null && hrNotification.isContactOn,
                 minRadius = Dimen24
             ) {
                 Column(

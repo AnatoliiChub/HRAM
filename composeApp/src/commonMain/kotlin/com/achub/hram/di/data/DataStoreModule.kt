@@ -15,6 +15,7 @@ import org.koin.core.scope.Scope
 
 const val BLE_STATE_QUALIFIER = "BleState"
 const val TRACKING_STATE_QUALIFIER = "TrackingStateStage"
+
 @Module(includes = [CoroutineModule::class, JsonModule::class])
 @Configuration
 expect class DataStoreModule() {

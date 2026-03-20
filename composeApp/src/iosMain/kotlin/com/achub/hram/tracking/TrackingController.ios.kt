@@ -1,6 +1,6 @@
 package com.achub.hram.tracking
 
-import com.achub.hram.BLE_SCAN_DURATION
+import com.achub.hram.ble.BLE_SCAN_DURATION
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.HramBleDevice
 import com.achub.hram.data.models.BleState

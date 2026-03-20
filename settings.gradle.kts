@@ -2,6 +2,7 @@ rootProject.name = "HRAM"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google {
             mavenContent {
@@ -31,4 +32,4 @@ dependencyResolutionManagement {
     }
 }
 
-include(":composeApp", ":androidApp")
+include(":composeApp", ":androidApp", ":ble")
