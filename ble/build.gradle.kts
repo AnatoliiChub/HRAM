@@ -1,5 +1,7 @@
 plugins {
     id("kmp-library-convention")
+    id("koin-convention")
+    id("quality-convention")
     alias(libs.plugins.kotlinxSerialization)
 }
 
@@ -15,20 +17,9 @@ kotlin {
             implementation(libs.androidx.core.ktx)
         }
         commonMain.dependencies {
-            // Coroutines
             implementation(libs.runtime)
-
-            // BLE
             api(libs.kable)
-
-            // Logging
             implementation(libs.logger)
-
-            // DI
-            implementation(libs.koin.core)
-            api(libs.koin.annotations)
-
-            // Serialization
             implementation(libs.kotlinx.serialization.json)
         }
         commonTest.dependencies {
@@ -37,4 +28,3 @@ kotlin {
         }
     }
 }
-

@@ -4,6 +4,8 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
 plugins {
     id("kmp-library-convention")
+    id("koin-convention")
+    id("quality-convention")
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.kotlinComposeCompiler)
     alias(libs.plugins.kotlinxSerialization)
@@ -54,7 +56,6 @@ kotlin {
     sourceSets {
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
-            implementation(libs.koin.android)
             implementation(libs.androidx.ui.tooling)
         }
         commonMain.dependencies {
@@ -70,9 +71,7 @@ kotlin {
             implementation(libs.kotlinx.datetime)
 
             // Dependency Injection
-            implementation(libs.koin.core)
             implementation(libs.koin.compose.viewmodel)
-            api(libs.koin.annotations)
 
             // BLE
             api(project(":ble"))
