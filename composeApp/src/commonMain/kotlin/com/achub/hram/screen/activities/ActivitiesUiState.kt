@@ -1,12 +1,12 @@
 package com.achub.hram.screen.activities
 
-import com.achub.hram.data.db.entity.ActivityGraphInfo
-import com.achub.hram.data.models.HighlightedItem
+import com.achub.hram.models.HighlightedItemUi
+import com.achub.hram.view.cards.ActivityGraphInfo
 import org.jetbrains.compose.resources.StringResource
 
 data class ActivitiesUiState(
     val activities: List<ActivityGraphInfo> = emptyList(),
-    val highlightedItem: HighlightedItem? = null,
+    val highlightedItem: HighlightedItemUi? = null,
     val selectedActivitiesId: Set<String> = emptySet(),
     val dialog: ActivitiesScreenDialog? = null
 ) {

@@ -3,11 +3,11 @@ package com.achub.hram.data.repo
 import com.achub.hram.data.db.dao.ActivityDao
 import com.achub.hram.data.db.dao.HeartRateDao
 import com.achub.hram.data.db.entity.ActivityEntity
-import com.achub.hram.data.db.entity.ActivityGraphInfo
 import com.achub.hram.data.db.entity.ActivityWithHeartRates
 import com.achub.hram.data.db.entity.HeartRateBleEntity
-import com.achub.hram.data.models.GraphLimits
+import com.achub.hram.models.GraphLimitsUi
 import com.achub.hram.ext.logger
+import com.achub.hram.view.cards.ActivityGraphInfo
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
@@ -44,12 +44,15 @@ class HramHrActivityRepo(
                     val aggregated = hrDao.getAggregatedHeartRateForActivity(activity.id, activity.duration)
                         .map { bucket -> bucket.copy(elapsedTime = bucket.elapsedTime / 1000) }
                     ActivityGraphInfo(
-                        activity = activity.copy(duration = activity.duration / 1000),
+                        duration =  activity.duration / 1000L,
+                        id = activity.id,
+                        name = activity.name,
+                        startDate = activity.startDate,
                         buckets = aggregated,
                         totalRecords = all.count {
                             it.activityId == activity.id
                         },
-                        limits = GraphLimits(
+                        limits = GraphLimitsUi(
                             0f,
                             aggregated.maxOfOrNull { it.elapsedTime }?.toFloat() ?: 1f,
                             0f,
@@ -66,7 +69,7 @@ class HramHrActivityRepo(
                 }.onEach {
                     logger(
                         TAG
-                    ) { "ActivityGraphInfo for ${it.activity}: ${it.limits}, size: ${it.buckets.size}" }
+                    ) { "ActivityGraphInfo for ${it.name}: ${it.limits}, size: ${it.buckets.size}" }
                 }
             } else {
                 emptyList()

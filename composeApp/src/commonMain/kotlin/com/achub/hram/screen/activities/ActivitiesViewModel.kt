@@ -2,11 +2,11 @@ package com.achub.hram.screen.activities
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.achub.hram.data.models.HighlightedItem
+import com.achub.hram.models.HighlightedItemUi
 import com.achub.hram.data.repo.HrActivityRepo
 import com.achub.hram.ext.stateInExt
 import com.achub.hram.usecase.ExportCsvUseCase
-import com.achub.hram.utils.ActivityNameErrorMapper
+import com.achub.hram.usecase.ActivityNameErrorMapper
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,14 +27,14 @@ class ActivitiesViewModel(
     init {
         viewModelScope.launch(dispatcher) {
             hrActivityRepo.getActivitiesGraph()
-                .map { list -> list.filter { it.activity.name.isNotEmpty() } }
+                .map { list -> list.filter { it.name.isNotEmpty() } }
                 .collect { activities ->
                     _uiState.update { it.copy(activities = activities) }
                 }
         }
     }
 
-    fun onHighlighted(highlightedItem: HighlightedItem?) =
+    fun onHighlighted(highlightedItem: HighlightedItemUi?) =
         _uiState.update { it.copy(highlightedItem = highlightedItem) }
 
     fun toggleSelection(id: String) {
@@ -64,8 +64,8 @@ class ActivitiesViewModel(
 
     fun showNameActivityDialog() {
         val state = _uiState.value
-        val editedGraph = state.activities.firstOrNull { it.activity.id == state.selectedActivitiesId.firstOrNull() }
-        val name = editedGraph?.activity?.name ?: ""
+        val editedGraph = state.activities.firstOrNull { it.id == state.selectedActivitiesId.firstOrNull() }
+        val name = editedGraph?.name ?: ""
         _uiState.update { it.copy(dialog = ActivitiesScreenDialog.ReNameActivity(activityName = name)) }
     }
 

@@ -175,8 +175,7 @@ For compatibility, devices must implement the standard Heart Rate Service (UUID:
 
 ## Project structure
 
-The project is organized into modules, with BLE logic in its own `:ble` module and the core app
-logic in `composeApp/src/commonMain`. A `build-logic` convention plugin provides reusable KMP build
+The project is organized into modules. A `build-logic` convention plugin provides reusable KMP build
 configuration.
 
 - `ble/` - Standalone BLE module (scanning, connection, data parsing, models, DI).
@@ -184,13 +183,25 @@ configuration.
     - `src/androidMain/` — Android Bluetooth state observer.
     - `src/iosMain/` — iOS CoreBluetooth state observer.
     - `src/commonTest/` — BLE unit tests.
+- `ui-lib/` — Shared Compose UI library (styles, reusable components, shaders, charts).
+    - `src/commonMain/kotlin/com/achub/hram/style/` — Colors, dimensions, text styles.
+    - `src/commonMain/kotlin/com/achub/hram/view/` — All reusable Compose components (charts,
+      dialogs, sections, shaders, tabs, indications).
+    - `src/commonMain/composeResources/` — All shared string/drawable/shader resources.
+    - `src/androidMain/` & `src/iosMain/` — Platform-specific AGSL shader implementations.
+    - Depends on `:ble` (exposes it via `api`).
 - `build-logic/` — Gradle convention plugins for reusable KMP module configuration.
+    - `kmp-library-convention` — Base KMP multiplatform library setup.
+    - `cmp-ui-lib-convention` — Extends `kmp-library-convention` with Compose Multiplatform plugins
+      and common Compose dependencies; used by `:ui-components` and `:composeApp`.
+    - `koin-convention` — Koin DI + KSP wiring.
+    - `quality-convention` — Detekt, Kover, Mokkery.
 - `composeApp/src/commonMain/kotlin/com/achub/hram/`
     - `data/` - Database entities, DAOs, and activity repository.
     - `di/` - Koin dependency injection modules.
     - `screen/` - screens for each feature (Main, Activities, Record).
     - `tracking/` - Business logic for managing activity tracking sessions.
-    - `view/` - Reusable UI components like charts and dialogs.
+    - `view/ActivityInfoCard.kt` - Domain-aware activity card (depends on DB entities).
 
 ---
 
@@ -390,16 +401,21 @@ Ble-Notifications state will be extracted to in-memory singleton repo, in the ne
 
 ### UI \& screens
 
-Common UI code lives under `hram/screen` and `hram/view`:
+Shared UI lives in the `:ui-components` module (`ui-lib/`) and app-specific screens in
+`composeApp/screen/`:
 
-- Screens:
-    - `screen/main`:
-        - Entry Compose screen(s) for main app navigation.
-    - `screen/activities`:
-        - Screens for listing activities and viewing details (history).
-        - `hram/view/chart` \- chart components for visualizing HR/metrics.
-    - `screen/record`:
-        - Screens for recording an activity (live HR, timer, etc.).
+- **`:ui-components`** — all reusable components, styles, shaders, charts, dialogs, sections, tabs.
+    - `style/` — Colors, dimensions, text styles.
+    - `view/chart/` — Chart components for visualizing HR/metrics.
+    - `view/components/` — Buttons, text fields, progress indicators, heart animation.
+    - `view/dialogs/` — Info, name-activity, and BLE device chooser dialogs.
+    - `view/indications/` — Heart indication row, warning labels.
+    - `view/section/` — Record, device, and tracking indication sections.
+    - `view/shader/` — AGSL-based Liquid Ripple and Liquid Wave effects (expect/actual).
+    - `view/tabs/` — Bottom navigation bar with liquid ripple tab indicator.
+    - `composeResources/` — All string resources (EN/UK) and drawables.
+- **`composeApp/screen/`** — Screens for each feature (Main, Activities, Record).
+- **`composeApp/view/ActivityInfoCard.kt`** — Domain-aware activity card (depends on DB entities).
 
 **What works:**
 

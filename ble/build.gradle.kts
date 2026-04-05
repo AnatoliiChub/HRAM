@@ -8,7 +8,7 @@ plugins {
 extra["koverIncludes"] = listOf("com.achub.hram.ble.**")
 
 kotlin {
-    androidLibrary {
+    android {
         namespace = "com.achub.hram.ble"
     }
 
@@ -17,7 +17,6 @@ kotlin {
             implementation(libs.androidx.core.ktx)
         }
         commonMain.dependencies {
-            implementation(libs.runtime)
             api(libs.kable)
             implementation(libs.logger)
             implementation(libs.kotlinx.serialization.json)

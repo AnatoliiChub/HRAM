@@ -32,4 +32,4 @@ dependencyResolutionManagement {
     }
 }
 
-include(":composeApp", ":androidApp", ":ble")
+include(":composeApp", ":androidApp", ":ble", ":ui-lib")

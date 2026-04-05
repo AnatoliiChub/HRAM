@@ -24,6 +24,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ext.permissionController
 import com.achub.hram.ext.requestBluetooth
+import com.achub.hram.ext.toDto
 import com.achub.hram.style.Dimen16
 import com.achub.hram.style.Dimen24
 import com.achub.hram.style.Dimen32
@@ -39,7 +40,6 @@ import hram.composeapp.generated.resources.dialog_device_connected_message
 import hram.composeapp.generated.resources.dialog_device_connected_title
 import hram.composeapp.generated.resources.dialog_device_connection_failed_message
 import hram.composeapp.generated.resources.dialog_device_connection_failed_title
-import hram.composeapp.generated.resources.dialog_info_ok
 import hram.composeapp.generated.resources.dialog_name_activity_message
 import hram.composeapp.generated.resources.dialog_name_activity_title
 import hram.composeapp.generated.resources.dialog_open_setting_button_text
@@ -63,11 +63,11 @@ fun RecordScreen() {
             requestBluetooth()
             clearRequestBluetooth()
         }
-        val indications = state.bleNotification
+        val indications = state.bleNotification.toDto()
         var heartGlobalCenter by remember { mutableStateOf(Offset.Unspecified) }
         var boxGlobalPosition by remember { mutableStateOf(Offset.Zero) }
 
-        val device = state.connectedDevice
+        val device = state.connectedDevice?.toDto()
         Box(Modifier.fillMaxSize().onGloballyPositioned { boxGlobalPosition = it.positionOnScreen() }) {
             val hrNotification = indications.hrNotification
             ProperLiquidWaveEffect(
@@ -121,10 +121,13 @@ private fun Dialogs(
         is RecordScreenDialog.ChooseHRDevice -> {
             HrConnectDialog(
                 isLoading = dialog.isLoading,
-                devices = dialog.scannedDevices,
+                devices = dialog.scannedDevices.map { it.toDto() },
                 isDeviceConfirmed = dialog.isDeviceConfirmed,
                 loadingDuration = dialog.loadingDuration,
-                onConfirmClick = onDeviceSelected,
+                onConfirmClick = { deviceDto ->
+                    dialog.scannedDevices.find { it.identifier == deviceDto.identifier }
+                        ?.let { onDeviceSelected(it) }
+                },
                 onRefresh = onRequestScanning,
                 onDismissRequest = {
                     onDismissDialog()
@@ -180,7 +183,6 @@ private fun Dialogs(
             InfoDialog(
                 title = Res.string.dialog_device_connection_failed_title,
                 message = stringResource(Res.string.dialog_device_connection_failed_message),
-                buttonText = Res.string.dialog_info_ok,
                 onDismiss = onDismissDialog,
                 onButtonClick = onDismissDialog,
             )

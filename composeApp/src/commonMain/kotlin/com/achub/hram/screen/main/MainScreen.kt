@@ -16,13 +16,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.achub.hram.screen.activities.ActivitiesScreen
 import com.achub.hram.screen.record.RecordScreen
 import com.achub.hram.style.Black
-import com.achub.hram.view.tabs.MainTabType
 import com.achub.hram.view.tabs.ProperLiquidBottomBar
+
+private val tabs = listOf(Activities(), Record())
 
 @Composable
 fun MainScreen() {
     MaterialTheme {
-        val pagerState = rememberPagerState(initialPage = 0, pageCount = { MainTabType.entries.size })
+        val pagerState = rememberPagerState(initialPage = 0, pageCount = { tabs.size })
         Column(
             modifier = Modifier
                 .background(color = Black)
@@ -34,12 +35,12 @@ fun MainScreen() {
                 userScrollEnabled = false,
                 modifier = Modifier.fillMaxWidth().weight(1f)
             ) { index ->
-                when (MainTabType.entries[index]) {
-                    MainTabType.Activities -> ActivitiesScreen()
-                    MainTabType.Record -> RecordScreen()
+                when (tabs[index]) {
+                    is Activities -> ActivitiesScreen()
+                    is Record -> RecordScreen()
                 }
             }
-            ProperLiquidBottomBar(pagerState.currentPage, pagerState::animateScrollToPage)
+            ProperLiquidBottomBar(tabs,pagerState.currentPage, pagerState::animateScrollToPage)
         }
     }
 }

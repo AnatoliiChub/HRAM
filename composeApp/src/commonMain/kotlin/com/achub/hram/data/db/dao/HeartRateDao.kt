@@ -4,8 +4,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy.Companion.REPLACE
 import androidx.room.Query
-import com.achub.hram.data.db.entity.AvgHrBucketByActivity
 import com.achub.hram.data.db.entity.HeartRateBleEntity
+import com.achub.hram.view.cards.AvgHrBucketByActivity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

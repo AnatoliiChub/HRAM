@@ -21,7 +21,7 @@ import com.achub.hram.tracking.TrackingStateStage
 import com.achub.hram.tracking.TrackingStateStage.ACTIVE_TRACKING_STATE
 import com.achub.hram.tracking.TrackingStateStage.PAUSED_TRACKING_STATE
 import com.achub.hram.tracking.TrackingStateStage.TRACKING_INIT_STATE
-import com.achub.hram.utils.ActivityNameErrorMapper
+import com.achub.hram.usecase.ActivityNameErrorMapper
 import com.achub.hram.view.section.RecordingState
 import dev.icerock.moko.permissions.PermissionsController
 import kotlinx.coroutines.CoroutineDispatcher

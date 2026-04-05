@@ -4,10 +4,9 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
 plugins {
     id("kmp-library-convention")
+    id("cmp-ui-lib-convention")
     id("koin-convention")
     id("quality-convention")
-    alias(libs.plugins.jetbrainsCompose)
-    alias(libs.plugins.kotlinComposeCompiler)
     alias(libs.plugins.kotlinxSerialization)
     alias(libs.plugins.androidx.room)
 }
@@ -15,7 +14,7 @@ plugins {
 extra["koverIncludes"] = listOf("com.achub.hram.utils.**")
 
 kotlin {
-    androidLibrary {
+    android {
         namespace = "com.achub.hram.library"
 
         packaging {
@@ -54,23 +53,11 @@ kotlin {
     }
 
     sourceSets {
-        androidMain.dependencies {
-            implementation(libs.androidx.activity.compose)
-            implementation(libs.androidx.ui.tooling)
-        }
         commonMain.dependencies {
-            implementation(libs.runtime)
-            implementation(libs.foundation)
-            implementation(libs.material3)
-            implementation(libs.ui)
-            implementation(libs.ui.tooling.preview)
-            implementation(libs.components.resources)
-            implementation(libs.androidx.lifecycle.viewmodelCompose)
-            implementation(libs.androidx.lifecycle.runtimeCompose)
-            implementation(libs.logger)
-            implementation(libs.kotlinx.datetime)
+            // UI components (includes style, view, BLE models transitively)
+            api(project(":ui-lib"))
 
-            // Dependency Injection
+            // Lifecycle + ViewModel
             implementation(libs.koin.compose.viewmodel)
 
             // BLE
@@ -90,6 +77,13 @@ kotlin {
             // Serialization
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.okio)
+            implementation(libs.kotlinx.datetime)
+
+            // Logging
+            implementation(libs.logger)
+        }
+        androidMain.dependencies {
+            implementation(libs.androidx.activity.compose)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -123,4 +117,3 @@ tasks {
         }
     }
 }
-

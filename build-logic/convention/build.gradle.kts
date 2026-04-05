@@ -10,6 +10,8 @@ dependencies {
     implementation(libs.plugins.kover.toProvider())
     implementation(libs.plugins.kotlin.allopen.toProvider())
     implementation(libs.plugins.ksp.toProvider())
+    implementation(libs.plugins.jetbrainsCompose.toProvider())
+    implementation(libs.plugins.kotlinComposeCompiler.toProvider())
 }
 
 private fun Provider<PluginDependency>.toProvider(): Provider<String> =

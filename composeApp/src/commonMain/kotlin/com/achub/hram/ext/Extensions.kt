@@ -1,8 +1,6 @@
 package com.achub.hram.ext
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Dp
 import com.achub.hram.data.db.entity.ActivityEntity
 import com.juul.kable.UnmetRequirementException
 import dev.icerock.moko.permissions.DeniedException
@@ -111,9 +109,3 @@ fun <T> Flow<T>.cancelAfter(duration: Duration) = this.combine(
         delay(duration.inWholeMilliseconds + 1)
     }.timeout(duration)
 ) { result, _ -> result }
-
-@Composable
-fun Dp.dpToPx() = with(LocalDensity.current) { this@dpToPx.toPx() }
-
-@Composable
-fun Int.pxToDp() = with(LocalDensity.current) { this@pxToDp.toDp() }

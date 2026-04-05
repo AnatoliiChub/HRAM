@@ -18,7 +18,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.achub.hram.style.Dimen16
 import com.achub.hram.style.Dimen8
-import com.achub.hram.view.ActivityCard
+import com.achub.hram.view.cards.ActivityCard
 import com.achub.hram.view.components.ActivityOptions
 import com.achub.hram.view.components.FloatingToolbar
 import com.achub.hram.view.dialogs.InfoDialog
@@ -48,8 +48,8 @@ fun ActivitiesScreen() {
                 .padding(Dimen8),
             verticalArrangement = Arrangement.spacedBy(Dimen8)
         ) {
-            items(items = state.activities, key = { it.activity.id }) { activityInfo ->
-                val id = activityInfo.activity.id
+            items(items = state.activities, key = { }) { activityInfo ->
+                val id = activityInfo.id
                 if (activityInfo.buckets.isNotEmpty()) {
                     ActivityCard(
                         modifier = Modifier.combinedClickable(

@@ -11,7 +11,7 @@ val catalog = versionCatalogs.named("libs")
 
 @OptIn(ExperimentalKotlinGradlePluginApi::class)
 kotlin {
-    androidLibrary {
+    android {
         compileSdk = catalog.findVersion("android-compileSdk").get().requiredVersion.toInt()
         minSdk = catalog.findVersion("android-minSdk").get().requiredVersion.toInt()
 

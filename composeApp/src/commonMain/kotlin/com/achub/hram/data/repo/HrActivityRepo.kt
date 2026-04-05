@@ -1,9 +1,9 @@
 package com.achub.hram.data.repo
 
 import com.achub.hram.data.db.entity.ActivityEntity
-import com.achub.hram.data.db.entity.ActivityGraphInfo
 import com.achub.hram.data.db.entity.ActivityWithHeartRates
 import com.achub.hram.data.db.entity.HeartRateBleEntity
+import com.achub.hram.view.cards.ActivityGraphInfo
 import kotlinx.coroutines.flow.Flow
 
 interface HrActivityRepo {
