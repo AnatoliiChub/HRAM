@@ -4,12 +4,15 @@ plugins {
     id("org.jetbrains.kotlin.plugin.allopen")
 }
 
-// Inject the shared OpenForMokkery annotation source into every module's commonMain.
-// Compiling it per-module means it works for all KMP targets (JVM/Android and K/N/iOS).
+// OpenForMokkery is compiled once in the :annotations module.
+// compileOnly makes it available at compile time without being included in
+// this module's output AAR, preventing duplicate-class conflicts at DEX merge.
 kotlin {
     sourceSets {
         commonMain {
-            kotlin.srcDir("${rootDir}/build-logic/shared-sources")
+            dependencies {
+                compileOnly(project(":annotations"))
+            }
         }
     }
 }
@@ -24,4 +27,3 @@ mokkery {
     ignoreInlineMembers.set(true)
     ignoreFinalMembers.set(true)
 }
-

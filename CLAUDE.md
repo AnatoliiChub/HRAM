@@ -49,13 +49,14 @@ Shared UI (Compose Multiplatform)
     - `src/androidMain/` — Android Bluetooth state observer
     - `src/iosMain/` — iOS CoreBluetooth state observer
     - `src/commonTest/` — BLE unit tests
-- **`build-logic/`** — Gradle convention plugins for reusable KMP module config
+- **`build-logic/`** — Gradle convention plugins and build-related modules
     - `convention/` — Precompiled script plugins (`kmp-library-convention`, `cmp-ui-lib-convention`,
       `koin-convention`, `quality-convention`, `test-mocking-convention`)
-    - `shared-sources/` — Kotlin source injected into `commonMain` of every module that applies
-      `test-mocking-convention`. Contains `OpenForMokkery.kt` (`com.achub.hram` package) — the
-      annotation that marks classes to be opened by the `allOpen` compiler plugin for Mokkery
-      mocking. Compiled per-module so it works on all KMP targets (JVM/Android and K/N/iOS).
+    - `annotations/` — `:annotations` KMP module (part of the main build, physically co-located
+      here). Contains `OpenForMokkery.kt` — the `@Retention(SOURCE)` annotation that marks classes
+      to be opened by the `allOpen` compiler plugin for Mokkery mocking. Consumed via
+      `compileOnly(project(":annotations"))` in `test-mocking-convention` to avoid duplicate-class
+      DEX conflicts at Android merge time.
 - **`composeApp/src/commonMain/`** — Shared business logic and UI (depends on `:ble`)
 - **`composeApp/src/androidMain/`** — Android-specific implementations
 - **`composeApp/src/iosMain/`** — iOS-specific implementations (Kotlin/Native)

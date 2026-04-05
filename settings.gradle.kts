@@ -32,4 +32,5 @@ dependencyResolutionManagement {
     }
 }
 
-include(":composeApp", ":androidApp", ":ble", ":ui-lib")
+include(":composeApp", ":androidApp", ":ble", ":ui-lib", ":annotations")
+project(":annotations").projectDir = file("build-logic/annotations")
