@@ -15,14 +15,13 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
-import org.koin.core.annotation.Provided
 import kotlin.uuid.ExperimentalUuidApi
 
 private const val TAG = "ConnectionTracker"
 private const val STATE_CHANGING_DEBOUNCE = 500L
 
 class HramConnectionTracker(
-    @Provided val bluetoothState: BluetoothState,
+    bluetoothState: BluetoothState,
     private val isKeepConnection: Channel<Boolean> = Channel(CONFLATED)
 ) : ConnectionTracker {
     companion object {

@@ -185,10 +185,10 @@ A `build-logic` convention plugin provides reusable KMP build configuration.
     - `koin-convention` — Koin DI + KSP wiring.
     - `quality-convention` — Detekt, Kover, Mokkery.
   
-- `ble/` - Standalone BLE module (scanning, connection, data parsing, models, DI).
+- `ble/` - Standalone BLE module (scanning, connection, data parsing, models). Koin-free — no DI wiring inside.
     - `src/commonMain/` — Shared BLE interfaces and implementations.
-    - `src/androidMain/` — Android Bluetooth state observer.
-    - `src/iosMain/` — iOS CoreBluetooth state observer.
+    - `src/androidMain/` — Android Bluetooth state observer (`BluetoothStateAndroid`).
+    - `src/iosMain/` — iOS CoreBluetooth state observer (`BluetoothStateIos`).
     - `src/commonTest/` — BLE unit tests.
   
 - `ui-lib/` — Shared Compose UI library (styles, reusable components, shaders, charts).
@@ -205,7 +205,7 @@ A `build-logic` convention plugin provides reusable KMP build configuration.
   
 - `composeApp/src/commonMain/kotlin/com/achub/hram/`
     - `data/` - Database entities, DAOs, repositories, state management (DataStore).
-    - `di/` - Koin dependency injection modules.
+    - `di/` - Koin dependency injection modules, including BLE wiring (`BleDataModule`, `BleModule` expect/actual).
     - `export/` - CSV data export interface (`FileExporter`) with platform-specific implementations.
     - `ext/` - BLE notification mappers and Kotlin extensions.
     - `screen/` - Screens for each feature (Main, Activities, Record).
@@ -438,6 +438,7 @@ Shared UI lives in the `:ui-lib` module (`ui-lib/`) and app-specific screens in
     - `utils/` — Date utilities, lifecycle helpers.
     - `composeResources/` — All string resources (EN/UK), drawables, AGSL shader files.
 - **`composeApp/screen/`** — Screens for each feature (Main, Activities, Record).
+
 **What works:**
 
 - Compose-based UI shared across platforms.
@@ -525,7 +526,7 @@ Dependency injection is implemented using Koin under `hram/di`:
 - `data/DatabaseModule.kt`, `data/DataModule.kt`, `data/DataStoreModule.kt` \- database, repository,
   and DataStore bindings (with platform-specific counterparts).
 - `NotificationModule.kt` (Android) \- notification manager bindings.
-- BLE-specific DI lives in the `:ble` module (`BleModule.kt`, `BleDataModule.kt`).
+- `BleDataModule.kt`, `BleModule.kt` (expect/actual) \- BLE wiring moved here from `:ble`; `:ble` is now Koin-free.
 
 ---
 

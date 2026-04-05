@@ -1,4 +1,4 @@
-package com.achub.hram.ble.di
+package com.achub.hram.di
 
 import com.achub.hram.ble.BluetoothState
 import com.achub.hram.ble.HrDeviceRepo
@@ -62,3 +62,4 @@ class BleDataModule {
     @Single
     fun providePeripheralConvertor(): PeripheralConvertor = HramPeripheralConvertor()
 }
+

@@ -1,6 +1,5 @@
 plugins {
     id("kmp-library-convention")
-    id("koin-convention")
     id("quality-convention")
     alias(libs.plugins.kotlinxSerialization)
 }

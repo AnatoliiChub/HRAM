@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.retry
-import org.koin.core.annotation.InjectedParam
 import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.time.Duration.Companion.milliseconds
@@ -46,7 +45,7 @@ class HramBleConnectionManager(
     val scanner: BleScanner,
     val connector: BleConnector,
     val peripheralConverter: PeripheralConvertor,
-    @InjectedParam val scope: CoroutineScope,
+    val scope: CoroutineScope,
 ) : BleConnectionManager {
     @OptIn(ExperimentalApi::class)
     override val onConnected = connector.connected.filterNotNull()

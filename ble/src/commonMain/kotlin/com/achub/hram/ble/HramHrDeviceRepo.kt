@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.withIndex
-import org.koin.core.component.KoinComponent
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
@@ -33,7 +32,7 @@ class HramHrDeviceRepo(
     val bleDataRepo: BleDataRepo,
     val dispatcher: CoroutineDispatcher,
     val bleConnectionManager: BleConnectionManager
-) : HrDeviceRepo, KoinComponent {
+) : HrDeviceRepo {
     @OptIn(FlowPreview::class, ExperimentalUuidApi::class)
     override fun scan(duration: Duration): Flow<ScanResult> =
         bleConnectionManager.scanHrDevices()

@@ -1,4 +1,4 @@
-package com.achub.hram.ble.di
+package com.achub.hram.di
 
 import com.achub.hram.ble.BluetoothState
 import com.achub.hram.ble.BluetoothStateIos
@@ -9,7 +9,8 @@ import org.koin.core.scope.Scope
 
 @Module
 @Configuration
-actual class BleModule {
+actual class BleModule actual constructor() {
     @Single
     actual fun provideBluetoothState(scope: Scope): BluetoothState = BluetoothStateIos()
 }
+
