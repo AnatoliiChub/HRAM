@@ -2,7 +2,7 @@ package com.achub.hram.ext
 
 import androidx.compose.runtime.Composable
 import com.achub.hram.data.db.entity.ActivityEntity
-import com.juul.kable.UnmetRequirementException
+import com.achub.hram.ble.models.BleConnectionsException.BleUnavailableException
 import dev.icerock.moko.permissions.DeniedException
 import dev.icerock.moko.permissions.Permission
 import dev.icerock.moko.permissions.PermissionsController
@@ -81,7 +81,7 @@ suspend fun PermissionsController.requestBleBefore(
         action()
     } catch (ex: Exception) {
         loggerE("PermissionsController") { "requestBlePermissionBeforeAction Error : $ex" }
-        val bleOff = (ex is DeniedException) && (ex.message == BLE_OFF_MESSAGE) || (ex is UnmetRequirementException)
+        val bleOff = (ex is DeniedException) && (ex.message == BLE_OFF_MESSAGE) || (ex is BleUnavailableException)
         if (bleOff) return else onFailure()
     }
 }

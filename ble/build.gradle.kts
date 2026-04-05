@@ -6,7 +6,6 @@ plugins {
 }
 
 extra["koverIncludes"] = listOf("com.achub.hram.ble.**")
-extra["mokkeryAnnotations"] = listOf("com.achub.hram.ble.OpenForMokkery")
 
 kotlin {
     android {
@@ -18,7 +17,7 @@ kotlin {
             implementation(libs.androidx.core.ktx)
         }
         commonMain.dependencies {
-            api(libs.kable)
+            implementation(libs.kable)
             implementation(libs.logger)
             implementation(libs.kotlinx.serialization.json)
         }

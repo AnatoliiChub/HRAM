@@ -1,6 +1,6 @@
 package com.achub.hram.ble.models
 
-import com.achub.hram.ble.OpenForMokkery
+import com.achub.hram.OpenForMokkery
 import com.achub.hram.ble.utils.MANUFACTURER_NAME_CHAR_UUID
 import com.achub.hram.ble.utils.MANUFACTURER_SERVICE_UUID
 import com.juul.kable.ExperimentalApi

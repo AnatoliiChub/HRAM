@@ -179,13 +179,19 @@ For compatibility, devices must implement the standard Heart Rate Service (UUID:
 The project is organized into modules. 
 A `build-logic` convention plugin provides reusable KMP build configuration.
 - `build-logic/` — Gradle convention plugins for reusable KMP module configuration.
-    - `kmp-library-convention` — Base KMP multiplatform library setup.
-    - `cmp-ui-lib-convention` — Extends `kmp-library-convention` with Compose Multiplatform plugins
-      and common Compose dependencies; used by `:ui-lib` and `:composeApp`.
-    - `koin-convention` — Koin DI + KSP wiring.
-    - `quality-convention` — Detekt + Kover. Applied to all library modules.
-    - `test-mocking-convention` — Mokkery + `allopen`. Opt-in for modules that use mocks in tests;
-      configurable via `extra["mokkeryAnnotations"]`.
+    - `convention/` — Precompiled script plugins:
+        - `kmp-library-convention` — Base KMP multiplatform library setup.
+        - `cmp-ui-lib-convention` — Extends `kmp-library-convention` with Compose Multiplatform plugins
+          and common Compose dependencies; used by `:ui-lib` and `:composeApp`.
+        - `koin-convention` — Koin DI + KSP wiring.
+        - `quality-convention` — Detekt + Kover. Applied to all library modules.
+        - `test-mocking-convention` — Mokkery + `allopen`. Opt-in for modules that use mocks in
+          tests. Automatically injects `build-logic/shared-sources/` into `commonMain` and registers
+          `@OpenForMokkery` with the `allOpen` compiler plugin — no per-module configuration needed.
+    - `shared-sources/` — Shared Kotlin source injected into every module that applies
+      `test-mocking-convention`. Currently contains `OpenForMokkery.kt` (package `com.achub.hram`),
+      the annotation used to open classes for Mokkery mocking. Files here are compiled per-module by
+      each target's own compiler (JVM/Android and K/N for iOS), so they work across all KMP targets.
   
 - `ble/` - Standalone BLE module (scanning, connection, data parsing, models). Koin-free — no DI wiring inside.
     - `src/commonMain/` — Shared BLE interfaces and implementations.

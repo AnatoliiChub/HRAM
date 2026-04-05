@@ -18,7 +18,7 @@ import com.achub.hram.ext.createActivity
 import com.achub.hram.ext.logger
 import com.achub.hram.ext.loggerE
 import com.achub.hram.ext.tickerFlow
-import com.juul.kable.UnmetRequirementException
+import com.achub.hram.ble.models.BleConnectionsException.BleUnavailableException
 import dev.icerock.moko.permissions.DeniedException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
@@ -191,7 +191,7 @@ class HramActivityTrackingManager(
         loggerE(TAG) { "Scan failed: $exception" }
         val error = when (exception) {
             is DeniedException if exception.message == "Bluetooth is powered off" -> ScanError.BLUETOOTH_OFF
-            is UnmetRequirementException -> ScanError.BLUETOOTH_OFF
+            is BleUnavailableException -> ScanError.BLUETOOTH_OFF
             else -> ScanError.NO_BLE_PERMISSIONS
         }
         updateBleState(BleState.Scanning.Error(error, now().toEpochMilliseconds()))

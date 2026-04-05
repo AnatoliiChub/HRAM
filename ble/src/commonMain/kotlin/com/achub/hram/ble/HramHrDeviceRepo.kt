@@ -2,6 +2,7 @@ package com.achub.hram.ble
 
 import com.achub.hram.ble.core.connection.BleConnectionManager
 import com.achub.hram.ble.core.data.BleDataRepo
+import com.achub.hram.ble.models.BleConnectionsException.BleUnavailableException
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.BleNotification
 import com.achub.hram.ble.models.HramBleDevice
@@ -10,6 +11,7 @@ import com.achub.hram.ble.utils.logger
 import com.achub.hram.ble.utils.loggerE
 import com.juul.kable.Peripheral
 import com.juul.kable.State
+import com.juul.kable.UnmetRequirementException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -41,12 +43,21 @@ internal class HramHrDeviceRepo(
             .distinctUntilChanged()
             .map { device -> ScanResult.ScanUpdate(device) as ScanResult }
             .catch {
-                if (it is kotlinx.coroutines.TimeoutCancellationException) {
-                    logger(TAG) { "Scan completed after timeout of $duration" }
-                    emit(ScanResult.Complete)
-                } else {
-                    loggerE(TAG) { "Error while scanning for devices: $it" }
-                    emit(ScanResult.Error(it))
+                when (it) {
+                    is kotlinx.coroutines.TimeoutCancellationException -> {
+                        logger(TAG) { "Scan completed after timeout of $duration" }
+                        emit(ScanResult.Complete)
+                    }
+
+                    is UnmetRequirementException -> {
+                        loggerE(TAG) { "BLE unavailable during scan: $it" }
+                        emit(ScanResult.Error(BleUnavailableException(cause = it)))
+                    }
+
+                    else -> {
+                        loggerE(TAG) { "Error while scanning for devices: $it" }
+                        emit(ScanResult.Error(it))
+                    }
                 }
             }
 

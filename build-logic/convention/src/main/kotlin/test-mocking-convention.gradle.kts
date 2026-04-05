@@ -4,20 +4,19 @@ plugins {
     id("org.jetbrains.kotlin.plugin.allopen")
 }
 
-/**
- * Annotation FQNs whose classes should be opened for Mokkery mocking.
- * Set per-module before the plugin runs, e.g.:
- *   extra["mokkeryAnnotations"] = listOf("com.achub.hram.ble.OpenForMokkery")
- */
-extra["mokkeryAnnotations"] = emptyList<String>()
+// Inject the shared OpenForMokkery annotation source into every module's commonMain.
+// Compiling it per-module means it works for all KMP targets (JVM/Android and K/N/iOS).
+kotlin {
+    sourceSets {
+        commonMain {
+            kotlin.srcDir("${rootDir}/build-logic/shared-sources")
+        }
+    }
+}
 
 // --- allOpen ---
-afterEvaluate {
-    @Suppress("UNCHECKED_CAST")
-    val annotations = extra["mokkeryAnnotations"] as List<String>
-    allOpen {
-        annotations.forEach { annotation(it) }
-    }
+allOpen {
+    annotation("com.achub.hram.OpenForMokkery")
 }
 
 // --- Mokkery ---
