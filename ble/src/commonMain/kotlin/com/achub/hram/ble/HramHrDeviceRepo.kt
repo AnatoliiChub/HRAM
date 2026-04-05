@@ -28,7 +28,7 @@ import kotlin.uuid.ExperimentalUuidApi
 
 private const val TAG = "HramHrDeviceRepo"
 
-class HramHrDeviceRepo(
+internal class HramHrDeviceRepo(
     val bleDataRepo: BleDataRepo,
     val dispatcher: CoroutineDispatcher,
     val bleConnectionManager: BleConnectionManager

@@ -20,7 +20,7 @@ import kotlin.uuid.ExperimentalUuidApi
 private const val TAG = "ConnectionTracker"
 private const val STATE_CHANGING_DEBOUNCE = 500L
 
-class HramConnectionTracker(
+internal class HramConnectionTracker(
     bluetoothState: BluetoothState,
     private val isKeepConnection: Channel<Boolean> = Channel(CONFLATED)
 ) : ConnectionTracker {

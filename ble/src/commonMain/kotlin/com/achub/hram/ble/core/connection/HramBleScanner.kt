@@ -13,7 +13,7 @@ import kotlin.time.Duration
 import kotlin.uuid.ExperimentalUuidApi
 
 @OptIn(ExperimentalUuidApi::class)
-class HramBleScanner(
+internal class HramBleScanner(
     val scanner: Scanner<Advertisement> = Scanner { filters { match { services = listOf(HR_SERVICE_UUID) } } }
 ) : BleScanner {
     @OptIn(ExperimentalUuidApi::class, FlowPreview::class)

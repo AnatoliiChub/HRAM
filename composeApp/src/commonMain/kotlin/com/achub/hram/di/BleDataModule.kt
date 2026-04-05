@@ -1,23 +1,15 @@
 package com.achub.hram.di
 
+import com.achub.hram.ble.BleFactory
 import com.achub.hram.ble.BluetoothState
 import com.achub.hram.ble.HrDeviceRepo
-import com.achub.hram.ble.HramHrDeviceRepo
 import com.achub.hram.ble.core.connection.BleConnector
 import com.achub.hram.ble.core.connection.BleScanner
 import com.achub.hram.ble.core.connection.ConnectionTracker
-import com.achub.hram.ble.core.connection.HramBleConnectionManager
-import com.achub.hram.ble.core.connection.HramBleConnector
-import com.achub.hram.ble.core.connection.HramBleScanner
-import com.achub.hram.ble.core.connection.HramConnectionTracker
 import com.achub.hram.ble.core.data.BleDataRepo
 import com.achub.hram.ble.core.data.BleParser
-import com.achub.hram.ble.core.data.HramBleDataRepo
-import com.achub.hram.ble.core.data.HramBleParser
-import com.achub.hram.ble.models.HramPeripheralConvertor
 import com.achub.hram.ble.models.PeripheralConvertor
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import org.koin.core.annotation.Configuration
 import org.koin.core.annotation.Factory
 import org.koin.core.annotation.InjectedParam
@@ -29,13 +21,13 @@ import org.koin.core.annotation.Single
 @Configuration
 class BleDataModule {
     @Factory
-    fun bleScanner(): BleScanner = HramBleScanner()
+    fun bleScanner(): BleScanner = BleFactory.scanner()
 
     @Single
-    fun bleConnector(): BleConnector = HramBleConnector()
+    fun bleConnector(): BleConnector = BleFactory.connector()
 
     @Single(binds = [BleDataRepo::class])
-    fun bleDataRepo(parser: BleParser): BleDataRepo = HramBleDataRepo(parser)
+    fun bleDataRepo(parser: BleParser): BleDataRepo = BleFactory.dataRepo(parser)
 
     @Single
     fun hrDeviceRepo(
@@ -45,21 +37,16 @@ class BleDataModule {
         bleScanner: BleScanner,
         bleConnector: BleConnector,
         peripheralConvertor: PeripheralConvertor,
-    ): HrDeviceRepo = HramHrDeviceRepo(
-        bleDataRepo,
-        Dispatchers.Default,
-        // Assisted injection in AssistedInject is not supported
-        HramBleConnectionManager(connectionTracker, bleScanner, bleConnector, peripheralConvertor, scope)
-    )
+    ): HrDeviceRepo =
+        BleFactory.hrDeviceRepo(scope, connectionTracker, bleDataRepo, bleScanner, bleConnector, peripheralConvertor)
 
     @Single
-    fun provideBleParser(): BleParser = HramBleParser()
+    fun provideBleParser(): BleParser = BleFactory.parser()
 
     @Single
     fun provideConnectionTracker(@Provided bluetoothState: BluetoothState): ConnectionTracker =
-        HramConnectionTracker(bluetoothState)
+        BleFactory.connectionTracker(bluetoothState)
 
     @Single
-    fun providePeripheralConvertor(): PeripheralConvertor = HramPeripheralConvertor()
+    fun providePeripheralConvertor(): PeripheralConvertor = BleFactory.peripheralConvertor()
 }
-

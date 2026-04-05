@@ -22,7 +22,7 @@ val HR_CHAR = characteristicOf(HR_SERVICE_UUID, HR_MEASUREMENT_CHAR_UUID)
 val BATTERY_CHAR = characteristicOf(BATTERY_SERVICE_UUID, BATTERY_LEVEL_CHAR_UUID)
 
 @OptIn(ExperimentalUuidApi::class)
-class HramBleDataRepo(val parser: BleParser) : BleDataRepo {
+internal class HramBleDataRepo(val parser: BleParser) : BleDataRepo {
     override fun observeHeartRate(peripheral: Peripheral): Flow<HrNotification> = peripheral.observe(HR_CHAR)
         .map(parser::parseHrNotification)
 

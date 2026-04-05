@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.update
 
 private const val TAG = "HramBleConnector"
 
-class HramBleConnector(
+internal class HramBleConnector(
     override val connected: MutableStateFlow<Peripheral?> = MutableStateFlow(null),
     private val peripheralBuilder: (Advertisement) -> Peripheral = { Peripheral(it) }
 ) : BleConnector {

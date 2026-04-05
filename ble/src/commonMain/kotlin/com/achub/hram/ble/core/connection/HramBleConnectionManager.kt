@@ -40,7 +40,7 @@ private val ERROR_REQUIRED_RECONNECTION = listOf(
     UnmetRequirementException::class,
 )
 
-class HramBleConnectionManager(
+internal class HramBleConnectionManager(
     val connectionTracker: ConnectionTracker,
     val scanner: BleScanner,
     val connector: BleConnector,

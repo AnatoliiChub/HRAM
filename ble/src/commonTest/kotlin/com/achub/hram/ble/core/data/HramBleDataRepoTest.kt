@@ -33,9 +33,9 @@ class HramBleDataRepoTest {
         val MINIMAL_EPSILON = 10L
     }
 
-    lateinit var parserMock: BleParser
-    lateinit var peripheralMock: Peripheral
-    lateinit var repo: HramBleDataRepo
+    private lateinit var parserMock: BleParser
+    private lateinit var peripheralMock: Peripheral
+    private lateinit var repo: HramBleDataRepo
 
     @BeforeTest
     fun setup() {

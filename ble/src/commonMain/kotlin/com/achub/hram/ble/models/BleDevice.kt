@@ -48,7 +48,7 @@ interface PeripheralConvertor {
     suspend fun convert(peripheral: Peripheral): BleDevice
 }
 
-class HramPeripheralConvertor : PeripheralConvertor {
+internal class HramPeripheralConvertor : PeripheralConvertor {
     @OptIn(ExperimentalApi::class, ExperimentalUuidApi::class)
     override suspend fun convert(peripheral: Peripheral): BleDevice = peripheral.toBleDevice()
 }

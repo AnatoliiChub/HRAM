@@ -29,11 +29,11 @@ import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HramConnectionTrackerTest {
-    lateinit var bluetoothOn: MutableStateFlow<Boolean>
-    lateinit var peripheralStateFlow: MutableStateFlow<State>
-    lateinit var peripheralMock: Peripheral
-    lateinit var isKeepConnectionMock: Channel<Boolean>
-    lateinit var tracker: HramConnectionTracker
+    private lateinit var bluetoothOn: MutableStateFlow<Boolean>
+    private lateinit var peripheralStateFlow: MutableStateFlow<State>
+    private lateinit var peripheralMock: Peripheral
+    private lateinit var isKeepConnectionMock: Channel<Boolean>
+    private lateinit var tracker: HramConnectionTracker
 
     @OptIn(InternalCoroutinesApi::class)
     @BeforeTest
