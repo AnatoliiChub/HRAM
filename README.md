@@ -183,7 +183,9 @@ A `build-logic` convention plugin provides reusable KMP build configuration.
     - `cmp-ui-lib-convention` — Extends `kmp-library-convention` with Compose Multiplatform plugins
       and common Compose dependencies; used by `:ui-lib` and `:composeApp`.
     - `koin-convention` — Koin DI + KSP wiring.
-    - `quality-convention` — Detekt, Kover, Mokkery.
+    - `quality-convention` — Detekt + Kover. Applied to all library modules.
+    - `test-mocking-convention` — Mokkery + `allopen`. Opt-in for modules that use mocks in tests;
+      configurable via `extra["mokkeryAnnotations"]`.
   
 - `ble/` - Standalone BLE module (scanning, connection, data parsing, models). Koin-free — no DI wiring inside.
     - `src/commonMain/` — Shared BLE interfaces and implementations.

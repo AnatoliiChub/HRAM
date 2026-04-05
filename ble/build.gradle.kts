@@ -1,10 +1,12 @@
 plugins {
     id("kmp-library-convention")
     id("quality-convention")
+    id("test-mocking-convention")
     alias(libs.plugins.kotlinxSerialization)
 }
 
 extra["koverIncludes"] = listOf("com.achub.hram.ble.**")
+extra["mokkeryAnnotations"] = listOf("com.achub.hram.ble.OpenForMokkery")
 
 kotlin {
     android {

@@ -7,6 +7,7 @@ plugins {
     id("cmp-ui-lib-convention")
     id("koin-convention")
     id("quality-convention")
+    id("test-mocking-convention")
     alias(libs.plugins.kotlinxSerialization)
     alias(libs.plugins.androidx.room)
 }
@@ -54,19 +55,19 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            // UI components (includes style, view, BLE models transitively)
-            api(project(":ui-lib"))
+            // UI components
+            implementation(project(":ui-lib"))
 
             // Lifecycle + ViewModel
             implementation(libs.koin.compose.viewmodel)
 
             // BLE
-            api(project(":ble"))
+            implementation(project(":ble"))
 
             // Permission
-            api(libs.moko.compose)
-            api(libs.moko.main)
-            api(libs.moko.ble)
+            implementation(libs.moko.compose)
+            implementation(libs.moko.main)
+            implementation(libs.moko.ble)
 
             // Data store
             implementation(libs.datastore)

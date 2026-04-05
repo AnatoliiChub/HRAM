@@ -3,20 +3,13 @@ import io.gitlab.arturbosch.detekt.Detekt
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
     id("io.gitlab.arturbosch.detekt")
-    id("dev.mokkery")
     id("org.jetbrains.kotlinx.kover")
-    id("org.jetbrains.kotlin.plugin.allopen")
 }
 
 val catalog = versionCatalogs.named("libs")
 
-/** Extension: set kover include patterns, e.g. `extra["koverIncludes"] = listOf("com.achub.hram.ble.**")` */
+// Extension: set kover include patterns, e.g. `extra["koverIncludes"] = listOf("com.achub.hram.ble.**")` */
 extra["koverIncludes"] = emptyList<String>()
-
-// --- allOpen ---
-allOpen {
-    annotation("com.achub.hram.ble.OpenForMokkery")
-}
 
 // --- Kover ---
 afterEvaluate {
@@ -36,12 +29,6 @@ afterEvaluate {
             }
         }
     }
-}
-
-// --- Mokkery ---
-mokkery {
-    ignoreInlineMembers.set(true)
-    ignoreFinalMembers.set(true)
 }
 
 // --- Detekt ---
