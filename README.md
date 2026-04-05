@@ -133,7 +133,7 @@ To build the complete iOS application, run both scripts in sequence:
 
 ## Testing
 
-Unit tests for the shared logic are located in `composeApp/src/commonTest` and `ble/src/commonTest`.
+Unit tests for the shared logic are located in `composeApp/src/commonTest` and `shared/ble/src/commonTest`.
 The project utilizes the following testing libraries:
 
 - **`kotlin.test`**: For standard assertions.
@@ -193,23 +193,24 @@ A `build-logic` convention plugin provides reusable KMP build configuration.
       the annotation used to open classes for Mokkery mocking. Files here are compiled per-module by
       each target's own compiler (JVM/Android and K/N for iOS), so they work across all KMP targets.
   
-- `ble/` - Standalone BLE module (scanning, connection, data parsing, models). Koin-free — no DI wiring inside.
-    - `src/commonMain/` — Shared BLE interfaces and implementations.
-    - `src/androidMain/` — Android Bluetooth state observer (`BluetoothStateAndroid`).
-    - `src/iosMain/` — iOS CoreBluetooth state observer (`BluetoothStateIos`).
-    - `src/commonTest/` — BLE unit tests.
-  
-- `ui-lib/` — Shared Compose UI library (styles, reusable components, shaders, charts).
-    - `src/commonMain/kotlin/com/achub/hram/style/` — Colors, dimensions, text styles.
-    - `src/commonMain/kotlin/com/achub/hram/view/` — All reusable Compose components (cards, charts,
-      dialogs, sections, shaders, tabs, indications).
-    - `src/commonMain/kotlin/com/achub/hram/models/` — UI-layer DTOs (`BleNotificationUi`,
-      `DeviceUi`, `HrNotificationUi`, etc.).
-    - `src/commonMain/kotlin/com/achub/hram/ext/` — Time and view extension functions.
-    - `src/commonMain/kotlin/com/achub/hram/utils/` — Date utilities, lifecycle helpers.
-    - `src/commonMain/composeResources/` — Shared string resources (EN/UK), drawables, AGSL shader
-      files.
-    - `src/androidMain/` & `src/iosMain/` — Platform-specific AGSL shader implementations.
+- `shared/` — Standalone KMP library modules shared across app targets.
+    - `shared/ble/` — Standalone BLE module (scanning, connection, data parsing, models). Koin-free — no DI wiring inside.
+        - `src/commonMain/` — Shared BLE interfaces and implementations.
+        - `src/androidMain/` — Android Bluetooth state observer (`BluetoothStateAndroid`).
+        - `src/iosMain/` — iOS CoreBluetooth state observer (`BluetoothStateIos`).
+        - `src/commonTest/` — BLE unit tests.
+
+    - `shared/ui-lib/` — Shared Compose UI library (styles, reusable components, shaders, charts).
+        - `src/commonMain/kotlin/com/achub/hram/style/` — Colors, dimensions, text styles.
+        - `src/commonMain/kotlin/com/achub/hram/view/` — All reusable Compose components (cards, charts,
+          dialogs, sections, shaders, tabs, indications).
+        - `src/commonMain/kotlin/com/achub/hram/models/` — UI-layer DTOs (`BleNotificationUi`,
+          `DeviceUi`, `HrNotificationUi`, etc.).
+        - `src/commonMain/kotlin/com/achub/hram/ext/` — Time and view extension functions.
+        - `src/commonMain/kotlin/com/achub/hram/utils/` — Date utilities, lifecycle helpers.
+        - `src/commonMain/composeResources/` — Shared string resources (EN/UK), drawables, AGSL shader
+          files.
+        - `src/androidMain/` & `src/iosMain/` — Platform-specific AGSL shader implementations.
   
 - `composeApp/src/commonMain/kotlin/com/achub/hram/`
     - `data/` - Database entities, DAOs, repositories, state management (DataStore).
@@ -233,7 +234,7 @@ A `build-logic` convention plugin provides reusable KMP build configuration.
 
 ### BLE
 
-- BLE Layer is implemented in the standalone `:ble` module (`ble/`):
+- BLE Layer is implemented in the standalone `:ble` module (`shared/ble/`):
     - The app communicates with BLE devices that implement the standard Heart Rate Service.
     - `BleDevice` model describing discovered devices; `identifier` field used for mac address (
       Android) or UUID (iOS).
@@ -426,7 +427,7 @@ Ble-Notifications state will be extracted to in-memory singleton repo, in the ne
 
 ### UI \& screens
 
-Shared UI lives in the `:ui-lib` module (`ui-lib/`) and app-specific screens in
+Shared UI lives in the `:ui-lib` module (`shared/ui-lib/`) and app-specific screens in
 `composeApp/screen/`:
 
 - **`:ui-lib`** — all reusable components, styles, shaders, charts, dialogs, sections, tabs.

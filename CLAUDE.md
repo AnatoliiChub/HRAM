@@ -44,11 +44,12 @@ Shared UI (Compose Multiplatform)
 
 ### Source Set Organization
 
-- **`ble/`** — Standalone BLE module (scanning, connection, data parsing, models, DI)
+- **`shared/ble/`** — Standalone BLE module (scanning, connection, data parsing, models, DI)
     - `src/commonMain/` — Shared BLE interfaces and implementations
     - `src/androidMain/` — Android Bluetooth state observer
     - `src/iosMain/` — iOS CoreBluetooth state observer
     - `src/commonTest/` — BLE unit tests
+- **`shared/ui-lib/`** — Shared Compose UI library (styles, reusable components, shaders, charts)
 - **`build-logic/`** — Gradle convention plugins and build-related modules
     - `convention/` — Precompiled script plugins (`kmp-library-convention`, `cmp-ui-lib-convention`,
       `koin-convention`, `quality-convention`, `test-mocking-convention`)
