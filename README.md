@@ -167,6 +167,7 @@ HRAM focuses on:
 - Tracking heart rate sessions basic info.
 - Visualizing heart rate data using charts and indication views.
 - Storing activity data in a local database.
+- Exporting activity data to CSV files.
 - Sharing core logic (tracking, BLE, database, view models) and UI between Android and iOS.
 
 For compatibility, devices must implement the standard Heart Rate Service (UUID: 0x180D).
@@ -175,33 +176,48 @@ For compatibility, devices must implement the standard Heart Rate Service (UUID:
 
 ## Project structure
 
-The project is organized into modules. A `build-logic` convention plugin provides reusable KMP build
-configuration.
-
+The project is organized into modules. 
+A `build-logic` convention plugin provides reusable KMP build configuration.
+- `build-logic/` — Gradle convention plugins for reusable KMP module configuration.
+    - `kmp-library-convention` — Base KMP multiplatform library setup.
+    - `cmp-ui-lib-convention` — Extends `kmp-library-convention` with Compose Multiplatform plugins
+      and common Compose dependencies; used by `:ui-lib` and `:composeApp`.
+    - `koin-convention` — Koin DI + KSP wiring.
+    - `quality-convention` — Detekt, Kover, Mokkery.
+  
 - `ble/` - Standalone BLE module (scanning, connection, data parsing, models, DI).
     - `src/commonMain/` — Shared BLE interfaces and implementations.
     - `src/androidMain/` — Android Bluetooth state observer.
     - `src/iosMain/` — iOS CoreBluetooth state observer.
     - `src/commonTest/` — BLE unit tests.
+  
 - `ui-lib/` — Shared Compose UI library (styles, reusable components, shaders, charts).
     - `src/commonMain/kotlin/com/achub/hram/style/` — Colors, dimensions, text styles.
-    - `src/commonMain/kotlin/com/achub/hram/view/` — All reusable Compose components (charts,
+    - `src/commonMain/kotlin/com/achub/hram/view/` — All reusable Compose components (cards, charts,
       dialogs, sections, shaders, tabs, indications).
-    - `src/commonMain/composeResources/` — All shared string/drawable/shader resources.
+    - `src/commonMain/kotlin/com/achub/hram/models/` — UI-layer DTOs (`BleNotificationUi`,
+      `DeviceUi`, `HrNotificationUi`, etc.).
+    - `src/commonMain/kotlin/com/achub/hram/ext/` — Time and view extension functions.
+    - `src/commonMain/kotlin/com/achub/hram/utils/` — Date utilities, lifecycle helpers.
+    - `src/commonMain/composeResources/` — Shared string resources (EN/UK), drawables, AGSL shader
+      files.
     - `src/androidMain/` & `src/iosMain/` — Platform-specific AGSL shader implementations.
-    - Depends on `:ble` (exposes it via `api`).
-- `build-logic/` — Gradle convention plugins for reusable KMP module configuration.
-    - `kmp-library-convention` — Base KMP multiplatform library setup.
-    - `cmp-ui-lib-convention` — Extends `kmp-library-convention` with Compose Multiplatform plugins
-      and common Compose dependencies; used by `:ui-components` and `:composeApp`.
-    - `koin-convention` — Koin DI + KSP wiring.
-    - `quality-convention` — Detekt, Kover, Mokkery.
+  
 - `composeApp/src/commonMain/kotlin/com/achub/hram/`
-    - `data/` - Database entities, DAOs, and activity repository.
+    - `data/` - Database entities, DAOs, repositories, state management (DataStore).
     - `di/` - Koin dependency injection modules.
-    - `screen/` - screens for each feature (Main, Activities, Record).
+    - `export/` - CSV data export interface (`FileExporter`) with platform-specific implementations.
+    - `ext/` - BLE notification mappers and Kotlin extensions.
+    - `screen/` - Screens for each feature (Main, Activities, Record).
     - `tracking/` - Business logic for managing activity tracking sessions.
+    - `usecase/` - Use cases (`ExportCsvUseCase`, `ActivityNameErrorMapper`).
     - `view/ActivityInfoCard.kt` - Domain-aware activity card (depends on DB entities).
+- `androidApp/` — Android shell (`MainActivity`, `HramApp` Application class).
+- `iosApp/` — iOS shell (SwiftUI entry point, Live Activity widgets, Swift–Kotlin bridge).
+    - `iosApp/` — SwiftUI app entry (`iOSApp.swift`, `ContentView.swift`).
+    - `iosApp/Bridge/` — cinterop bridge for Kotlin ↔ Swift Live Activity communication.
+    - `HramLiveActivity/` — Live Activity UI (SwiftUI + WidgetKit).
+    - `Configuration/` — Xcode build configuration files.
 
 ---
 
@@ -364,7 +380,8 @@ Located under `hram/data`:
     - `HrActivityRepo` stores \& retrieves HR activities.
 - Database:
     - `HramDatabase` in `hram/data/db`.
-    - Heart rate and activity entities.
+    - Heart rate (`HeartRateBleEntity`) and activity (`ActivityEntity`) entities.
+    - DAOs: `HeartRateDao`, `ActivityDao`.
     - Queries to read \& write activity data.
     - Optimized heart rate aggregation per activity: splits sessions into time buckets and
       calculates average heart rate
@@ -401,22 +418,26 @@ Ble-Notifications state will be extracted to in-memory singleton repo, in the ne
 
 ### UI \& screens
 
-Shared UI lives in the `:ui-components` module (`ui-lib/`) and app-specific screens in
+Shared UI lives in the `:ui-lib` module (`ui-lib/`) and app-specific screens in
 `composeApp/screen/`:
 
-- **`:ui-components`** — all reusable components, styles, shaders, charts, dialogs, sections, tabs.
+- **`:ui-lib`** — all reusable components, styles, shaders, charts, dialogs, sections, tabs.
     - `style/` — Colors, dimensions, text styles.
+    - `models/` — UI-layer DTOs (`BleNotificationUi`, `DeviceUi`, `HrNotificationUi`,
+      `GraphLimitsUi`, `HighlightedItemUi`).
+    - `view/cards/` — Activity card, graph info, aggregated HR bucket components.
     - `view/chart/` — Chart components for visualizing HR/metrics.
-    - `view/components/` — Buttons, text fields, progress indicators, heart animation.
+    - `view/components/` — Buttons, text fields, progress indicators, heart animation, floating
+      toolbar, custom ripple, dialog primitives.
     - `view/dialogs/` — Info, name-activity, and BLE device chooser dialogs.
     - `view/indications/` — Heart indication row, warning labels.
     - `view/section/` — Record, device, and tracking indication sections.
     - `view/shader/` — AGSL-based Liquid Ripple and Liquid Wave effects (expect/actual).
     - `view/tabs/` — Bottom navigation bar with liquid ripple tab indicator.
-    - `composeResources/` — All string resources (EN/UK) and drawables.
+    - `ext/` — Time and view extension functions.
+    - `utils/` — Date utilities, lifecycle helpers.
+    - `composeResources/` — All string resources (EN/UK), drawables, AGSL shader files.
 - **`composeApp/screen/`** — Screens for each feature (Main, Activities, Record).
-- **`composeApp/view/ActivityInfoCard.kt`** — Domain-aware activity card (depends on DB entities).
-
 **What works:**
 
 - Compose-based UI shared across platforms.
@@ -464,6 +485,30 @@ platform-specific ongoing notifications:
 
 ---
 
+### Export
+
+Activity data can be exported to CSV files from the Activities screen toolbar (single-activity
+selection). The export pipeline is:
+
+- `ExportCsvUseCase` — fetches all `HeartRateEntity` records for the selected activity and formats
+  them as CSV (timestamp, elapsed time, heart rate, contact status, battery level).
+- `FileExporter` — platform interface (`expect/actual`) with `AndroidFileExporter` and
+  `IosFileExporter` implementations for writing the file to the device's shared/documents directory.
+
+---
+
+### CI / GitHub Actions
+
+The project uses GitHub Actions for continuous integration:
+
+- `android-build.yml` — Builds the Android app.
+- `ios-build.yml` — Builds the iOS app.
+- `unit-tests.yml` — Runs unit tests.
+- `detekt-analysis.yml` — Runs Detekt static analysis.
+- `pull-request.yml` — Pull request checks.
+
+---
+
 ### Dependency injection
 
 Dependency injection is implemented using Koin under `hram/di`:
@@ -471,11 +516,16 @@ Dependency injection is implemented using Koin under `hram/di`:
 - `Koin.kt` \- starting point for DI initialization.
 - `AppModule.kt` \- app-level bindings.
 - `ViewModelModule.kt` \- registrations for view models.
-- `TrackingModule.kt` \- bindings for tracking manager
-- `BleModule.kt`, `BleDataModule.kt` in - BLE-specific bindings.
-- `DatabaseModule.kt`, `DataModule.kt` in - database and repository bindings.
+- `TrackingModule.kt`, `TrackingPlatformModule.kt` \- bindings for tracking manager (with
+  platform-specific counterparts).
+- `ExportModule.kt` \- CSV export bindings (platform-specific implementations on Android/iOS).
+- `CoroutineModule.kt` \- coroutine dispatcher bindings.
+- `JsonModule.kt` \- serialization bindings.
 - `UtilsModule.kt` \- utility bindings.
-- `DatabaseModule.kt` and `BleModule.kt` provide platform-specific implementations where needed.
+- `data/DatabaseModule.kt`, `data/DataModule.kt`, `data/DataStoreModule.kt` \- database, repository,
+  and DataStore bindings (with platform-specific counterparts).
+- `NotificationModule.kt` (Android) \- notification manager bindings.
+- BLE-specific DI lives in the `:ble` module (`BleModule.kt`, `BleDataModule.kt`).
 
 ---
 
@@ -488,17 +538,20 @@ Dependency injection is implemented using Koin under `hram/di`:
 | **Architecture**         | MVVM, Repository Pattern                                              |
 | **Dependency Injection** | Koin Annotations                                                      |
 | **Permissions**          | [moko-permissions](https://github.com/icerockdev/moko-permissions)    |
-| **Persistence**          | Room (KMP)                                                            |
-| **BLE**                  | [Kable](https://github.com/JuulLabs/kable)                            |
-| **Logging**              | [Napier](https://github.com/AAkira/Napier)                            |
+| **Persistence**          | Room (KMP), DataStore                                                 |
+| **Serialization**        | kotlinx-serialization, Okio                                           |
+| **BLE**                  | [Kable](https://github.com/JuulLabs/kable)                           |
+| **Logging**              | [Napier](https://github.com/AAkira/Napier)                           |
 | **Testing**              | kotlin.test, kotlinx-coroutines-test, [Mokkery](https://mokkery.dev/) |
-| **Code Coverage**        | [Kover](https://github.com/Kotlin/kotlinx-kover)                      |
+| **Code Coverage**        | [Kover](https://github.com/Kotlin/kotlinx-kover)                     |
+| **Static Analysis**      | [Detekt](https://detekt.dev/)                                         |
+| **CI**                   | GitHub Actions                                                        |
 
 ---
 
 ## Current limitations
 
-- No external cloud sync/export.
+- No external cloud sync.
 - Limited error handling and UX for BLE edge cases.
 
 ## Video Demo: iOS - Android
