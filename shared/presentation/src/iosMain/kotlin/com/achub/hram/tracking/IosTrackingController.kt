@@ -1,8 +1,7 @@
 package com.achub.hram.tracking
 
 import com.achub.hram.Logger
-import com.achub.hram.data.state.BleStateRepo
-import com.achub.hram.data.state.TrackingStateRepo
+import com.achub.hram.usecase.ObserveTrackingStateUseCase
 import com.achub.hram.di.CoroutineModule.Companion.WORKER_DISPATCHER
 import com.achub.hram.ext.launchIn
 import com.achub.hram.models.BleState
@@ -16,6 +15,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -28,8 +28,7 @@ private const val TAG = "IosTrackingController"
 class IosTrackingController(private val liveActivityManager: LiveActivityManager) : TrackingController, KoinComponent {
     private val tracker: ActivityTrackingManager by inject()
     private val dispatcher: CoroutineDispatcher by inject(qualifier = named(WORKER_DISPATCHER))
-    private val trackingStateRepo: TrackingStateRepo by inject()
-    private val bleStateRepo: BleStateRepo by inject()
+    private val observeTrackingState: ObserveTrackingStateUseCase by inject()
 
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.Main + job)
@@ -39,7 +38,7 @@ class IosTrackingController(private val liveActivityManager: LiveActivityManager
 
     init {
         Logger.d(TAG) { "IosTrackingController initialized" }
-        liveActivityManager.startObserving(bleStateRepo.listen(), trackingStateRepo.listen())
+        liveActivityManager.startObserving(tracker.observeBleState(), observeTrackingState())
     }
 
     override fun scan(id: String?) {
@@ -112,9 +111,9 @@ class IosTrackingController(private val liveActivityManager: LiveActivityManager
 
     override fun onAppForeground() {
         scope.launch {
-            val bleState = bleStateRepo.get()
+            val bleState = tracker.observeBleState().first()
             if (bleState != BleState.Disconnected) {
-                val trackingState = trackingStateRepo.get()
+                val trackingState = tracker.trackingState()
                 liveActivityManager.startActivity(bleState, trackingState)
             }
         }

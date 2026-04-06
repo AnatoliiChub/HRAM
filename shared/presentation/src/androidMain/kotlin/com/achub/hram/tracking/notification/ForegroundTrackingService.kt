@@ -9,7 +9,7 @@ import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
 import android.os.IBinder
 import androidx.core.app.ServiceCompat
 import com.achub.hram.Logger
-import com.achub.hram.data.state.TrackingStateRepo
+import com.achub.hram.usecase.ObserveTrackingStateUseCase
 import com.achub.hram.di.CoroutineModule.Companion.WORKER_DISPATCHER
 import com.achub.hram.library.R
 import com.achub.hram.models.DeviceModel
@@ -53,7 +53,7 @@ class BleTrackingService : Service(), KoinComponent {
     }
 
     private val tracker: ActivityTrackingManager by inject()
-    private val trackerRepo: TrackingStateRepo by inject()
+    private val observeTrackingState: ObserveTrackingStateUseCase by inject()
     private val dispatcher: CoroutineDispatcher by inject(qualifier = named(WORKER_DISPATCHER))
     private val notificator: Notificator by inject()
     private val job = SupervisorJob()
@@ -112,7 +112,7 @@ class BleTrackingService : Service(), KoinComponent {
         trackingJob?.cancel()
         tracker.observeBleState()
             .combine(
-                trackerRepo.listen().onStart { TrackingStateStage.TRACKING_INIT_STATE }
+                observeTrackingState().onStart { emit(TrackingStateStage.TRACKING_INIT_STATE) }
             ) { bleState, trackingState ->
                 Pair(bleState, trackingState)
             }.sample(NOTIFICATION_SAMPLE_MS)
