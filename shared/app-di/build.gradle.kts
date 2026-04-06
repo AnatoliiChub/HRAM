@@ -32,10 +32,8 @@ kotlin {
         commonMain.dependencies {
             // composeApp (UI + domain) — provides all app-level Koin modules
             api(project(":composeApp"))
-            // data — provides DataModule
+            // data — provides DataModule (includes BleDataModule transitively)
             api(project(":data"))
-            // ble — provides BleModule
-            api(project(":ble"))
             // Logging (for initKoin Napier setup)
             implementation(libs.logger)
         }

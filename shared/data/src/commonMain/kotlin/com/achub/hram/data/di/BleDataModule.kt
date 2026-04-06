@@ -1,4 +1,4 @@
-package com.achub.hram.di
+package com.achub.hram.data.di
 
 import com.achub.hram.ble.BleFactory
 import com.achub.hram.ble.BluetoothState
@@ -9,6 +9,8 @@ import com.achub.hram.ble.core.connection.ConnectionTracker
 import com.achub.hram.ble.core.data.BleDataRepo
 import com.achub.hram.ble.core.data.BleParser
 import com.achub.hram.ble.models.PeripheralConvertor
+import com.achub.hram.data.repo.DeviceDataSource
+import com.achub.hram.data.repo.HramDeviceDataSource
 import kotlinx.coroutines.CoroutineScope
 import org.koin.core.annotation.Configuration
 import org.koin.core.annotation.Factory
@@ -20,6 +22,7 @@ import org.koin.core.annotation.Single
 @Module(includes = [BleModule::class])
 @Configuration
 class BleDataModule {
+
     @Factory
     fun bleScanner(): BleScanner = BleFactory.scanner()
 
@@ -30,17 +33,6 @@ class BleDataModule {
     fun bleDataRepo(parser: BleParser): BleDataRepo = BleFactory.dataRepo(parser)
 
     @Single
-    fun hrDeviceRepo(
-        @InjectedParam scope: CoroutineScope,
-        connectionTracker: ConnectionTracker,
-        bleDataRepo: BleDataRepo,
-        bleScanner: BleScanner,
-        bleConnector: BleConnector,
-        peripheralConvertor: PeripheralConvertor,
-    ): HrDeviceRepo =
-        BleFactory.hrDeviceRepo(scope, connectionTracker, bleDataRepo, bleScanner, bleConnector, peripheralConvertor)
-
-    @Single
     fun provideBleParser(): BleParser = BleFactory.parser()
 
     @Single
@@ -49,4 +41,23 @@ class BleDataModule {
 
     @Single
     fun providePeripheralConvertor(): PeripheralConvertor = BleFactory.peripheralConvertor()
+
+    /**
+     * [DeviceDataSource] wraps [HrDeviceRepo] and maps BLE ↔ domain types.
+     * The [CoroutineScope] is passed at the call-site (from HramActivityTrackingManager).
+     */
+    @Factory(binds = [DeviceDataSource::class])
+    fun provideDeviceDataSource(
+        @InjectedParam scope: CoroutineScope,
+        connectionTracker: ConnectionTracker,
+        bleDataRepo: BleDataRepo,
+        bleScanner: BleScanner,
+        bleConnector: BleConnector,
+        peripheralConvertor: PeripheralConvertor,
+    ): DeviceDataSource {
+        val hrDeviceRepo: HrDeviceRepo =
+            BleFactory.hrDeviceRepo(scope, connectionTracker, bleDataRepo, bleScanner, bleConnector, peripheralConvertor)
+        return HramDeviceDataSource(hrDeviceRepo)
+    }
 }
+

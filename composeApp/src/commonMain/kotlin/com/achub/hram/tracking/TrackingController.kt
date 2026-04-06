@@ -1,11 +1,11 @@
 package com.achub.hram.tracking
 
-import com.achub.hram.ble.models.BleDevice
+import com.achub.hram.domain.model.DeviceModel
 
 expect class TrackingController {
     fun scan(id: String? = null)
 
-    fun connectDevice(device: BleDevice)
+    fun connectDevice(device: DeviceModel)
 
     fun disconnectDevice()
 

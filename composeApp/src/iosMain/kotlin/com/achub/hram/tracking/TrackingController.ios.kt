@@ -1,12 +1,11 @@
 package com.achub.hram.tracking
 
-import com.achub.hram.ble.BLE_SCAN_DURATION
-import com.achub.hram.ble.models.BleDevice
-import com.achub.hram.ble.models.HramBleDevice
 import com.achub.hram.data.models.BleState
 import com.achub.hram.data.repo.state.BleStateRepo
 import com.achub.hram.data.repo.state.TrackingStateRepo
 import com.achub.hram.di.CoroutineModule.Companion.WORKER_DISPATCHER
+import com.achub.hram.domain.model.DeviceModel
+import com.achub.hram.domain.model.SCAN_DURATION_MS
 import com.achub.hram.ext.launchIn
 import com.achub.hram.ext.logger
 import kotlinx.coroutines.CoroutineDispatcher
@@ -51,7 +50,7 @@ actual class TrackingController(private val liveActivityManager: LiveActivityMan
         performScan()
     }
 
-    actual fun connectDevice(device: BleDevice) {
+    actual fun connectDevice(device: DeviceModel) {
         logger(TAG) { "Connect device: $device" }
         currentAction = Action.Connect
         performConnect(device)
@@ -90,17 +89,16 @@ actual class TrackingController(private val liveActivityManager: LiveActivityMan
     @OptIn(FlowPreview::class)
     private fun performScan() {
         scanJob?.cancel()
-        tracker.scan(BLE_SCAN_DURATION.milliseconds)
+        tracker.scan(SCAN_DURATION_MS.milliseconds)
             .filter { currentAction == Action.Scan }
             .flowOn(dispatcher)
             .launchIn(scope)
             .let { scanJob = it }
     }
 
-    private fun performConnect(device: BleDevice) {
+    private fun performConnect(device: DeviceModel) {
         connectJob?.cancel()
-        val hramDevice = device as? HramBleDevice ?: HramBleDevice(name = device.name, identifier = device.identifier)
-        tracker.connectAndSubscribe(device = hramDevice)
+        tracker.connectAndSubscribe(device = device)
             .flowOn(dispatcher)
             .launchIn(scope)
             .let { connectJob = it }

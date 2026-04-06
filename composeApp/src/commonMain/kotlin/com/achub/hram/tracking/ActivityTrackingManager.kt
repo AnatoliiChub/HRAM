@@ -1,9 +1,9 @@
 package com.achub.hram.tracking
 
-import com.achub.hram.ble.ScanResult
-import com.achub.hram.ble.models.BleDevice
-import com.achub.hram.ble.models.BleNotification
 import com.achub.hram.data.models.BleState
+import com.achub.hram.domain.model.BleNotificationModel
+import com.achub.hram.domain.model.DeviceModel
+import com.achub.hram.domain.model.ScanResultModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
@@ -26,9 +26,9 @@ interface ActivityTrackingManager {
 
     fun disconnect()
 
-    fun connectAndSubscribe(device: BleDevice): Flow<BleNotification>
+    fun connectAndSubscribe(device: DeviceModel): Flow<BleNotificationModel>
 
-    fun scan(duration: Duration): Flow<ScanResult>
+    fun scan(duration: Duration): Flow<ScanResultModel>
 
     fun releaseState()
 

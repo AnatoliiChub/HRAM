@@ -2,7 +2,7 @@ package com.achub.hram.tracking
 
 import android.content.Context
 import android.content.Intent
-import com.achub.hram.ble.models.BleDevice
+import com.achub.hram.domain.model.DeviceModel
 
 actual class TrackingController(
     val context: Context,
@@ -15,7 +15,7 @@ actual class TrackingController(
         )
     }
 
-    actual fun connectDevice(device: BleDevice) {
+    actual fun connectDevice(device: DeviceModel) {
         context.startForegroundService(
             Intent(context, BleTrackingService::class.java).apply {
                 putExtra(ACTION, Action.Connect.ordinal)

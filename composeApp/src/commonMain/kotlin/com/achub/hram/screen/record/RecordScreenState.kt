@@ -1,8 +1,8 @@
 package com.achub.hram.screen.record
 
-import com.achub.hram.ble.BLE_SCAN_DURATION
-import com.achub.hram.ble.models.BleDevice
-import com.achub.hram.ble.models.BleNotification
+import com.achub.hram.domain.model.BleNotificationModel
+import com.achub.hram.domain.model.DeviceModel
+import com.achub.hram.domain.model.SCAN_DURATION_MS
 import com.achub.hram.view.section.RecordingState
 import com.achub.hram.view.section.RecordingState.Paused
 import com.achub.hram.view.section.RecordingState.Recording
@@ -13,8 +13,8 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 data class RecordScreenState(
-    val bleNotification: BleNotification = BleNotification.Empty,
-    val connectedDevice: BleDevice? = null,
+    val bleNotification: BleNotificationModel = BleNotificationModel.Empty,
+    val connectedDevice: DeviceModel? = null,
     val recordingState: RecordingState = RecordingState.Init,
     val requestBluetooth: Boolean = false,
     val dialog: RecordScreenDialog? = null,
@@ -26,14 +26,14 @@ data class RecordScreenState(
 sealed class RecordScreenDialog {
     data class ChooseHRDevice(
         val isLoading: Boolean = false,
-        val scannedDevices: List<BleDevice> = emptyList(),
+        val scannedDevices: List<DeviceModel> = emptyList(),
         val loadingDuration: Duration,
         val isDeviceConfirmed: Boolean = false
     ) : RecordScreenDialog()
 
     data class NameActivity(val activityName: String, val error: StringResource? = null) : RecordScreenDialog()
 
-    data class DeviceConnectedDialog(val bleDevice: BleDevice) : RecordScreenDialog()
+    data class DeviceConnectedDialog(val bleDevice: DeviceModel) : RecordScreenDialog()
 
     data object OpenSettingsDialog : RecordScreenDialog()
 
@@ -59,7 +59,7 @@ fun MutableStateFlow<RecordScreenState>.hrDeviceDialog(scanDuration: Duration) =
 fun MutableStateFlow<RecordScreenState>.settingsDialog() =
     update { it.copy(dialog = RecordScreenDialog.OpenSettingsDialog) }
 
-fun MutableStateFlow<RecordScreenState>.deviceConnectedDialog(bleDevice: BleDevice) = update {
+fun MutableStateFlow<RecordScreenState>.deviceConnectedDialog(bleDevice: DeviceModel) = update {
     it.copy(connectedDevice = bleDevice, dialog = RecordScreenDialog.DeviceConnectedDialog(bleDevice))
 }
 
@@ -71,16 +71,16 @@ fun MutableStateFlow<RecordScreenState>.stop() = this.update { it.copy(recording
 fun MutableStateFlow<RecordScreenState>.requestBluetooth() =
     this.update { it.copy(requestBluetooth = true, dialog = null) }
 
-fun MutableStateFlow<RecordScreenState>.indications(bleNotification: BleNotification) =
+fun MutableStateFlow<RecordScreenState>.indications(bleNotification: BleNotificationModel) =
     this.update { it.copy(bleNotification = bleNotification) }
 
-fun MutableStateFlow<RecordScreenState>.connectingProgressDialog(device: BleDevice) =
+fun MutableStateFlow<RecordScreenState>.connectingProgressDialog(device: DeviceModel) =
     this.update {
         it.copy(
             dialog = RecordScreenDialog.ChooseHRDevice(
                 isLoading = true,
                 isDeviceConfirmed = true,
-                loadingDuration = BLE_SCAN_DURATION.milliseconds
+                loadingDuration = SCAN_DURATION_MS.milliseconds
             )
         )
     }

@@ -4,14 +4,13 @@ package com.achub.hram.screen.record
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.achub.hram.ble.BLE_SCAN_DURATION
-import com.achub.hram.ble.models.BleDevice
-import com.achub.hram.ble.models.BleNotification
-import com.achub.hram.ble.models.HramBleDevice
 import com.achub.hram.data.models.BleState
 import com.achub.hram.data.models.ScanError
 import com.achub.hram.data.repo.state.BleStateRepo
 import com.achub.hram.data.repo.state.TrackingStateRepo
+import com.achub.hram.domain.model.BleNotificationModel
+import com.achub.hram.domain.model.DeviceModel
+import com.achub.hram.domain.model.SCAN_DURATION_MS
 import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.launchIn
 import com.achub.hram.ext.requestBleBefore
@@ -49,7 +48,7 @@ class RecordViewModel(
     private val _uiState = MutableStateFlow(RecordScreenState())
     val uiState = _uiState.stateInExt(initialValue = RecordScreenState())
     private var jobs = mutableListOf<Job>()
-    private val scanDuration = BLE_SCAN_DURATION.milliseconds
+    private val scanDuration = SCAN_DURATION_MS.milliseconds
 
     init {
         trackingStateRepo.listen().onEach { state ->
@@ -101,7 +100,7 @@ class RecordViewModel(
         permissionController.requestBleBefore(action = ::scan, onFailure = _uiState::settingsDialog)
     }
 
-    fun onHrDeviceSelected(device: BleDevice) = trackingController.connectDevice(device)
+    fun onHrDeviceSelected(device: DeviceModel) = trackingController.connectDevice(device)
 
     override fun onCleared() {
         super.onCleared()
@@ -137,7 +136,7 @@ class RecordViewModel(
         val identifier = uiState.value.connectedDevice?.identifier
         _uiState.indications(state.bleNotification).also {
             val device = if (manufacturer != null && identifier == state.device.identifier) {
-                HramBleDevice(
+                DeviceModel(
                     name = state.device.name,
                     identifier = state.device.identifier,
                     manufacturer = manufacturer
@@ -156,7 +155,7 @@ class RecordViewModel(
     }
 
     private fun handleDisconnected() {
-        _uiState.update { it.copy(connectedDevice = null, bleNotification = BleNotification.Empty) }
+        _uiState.update { it.copy(connectedDevice = null, bleNotification = BleNotificationModel.Empty) }
     }
 }
 

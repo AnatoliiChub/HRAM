@@ -1,22 +1,22 @@
 package com.achub.hram.ext
 
-import com.achub.hram.ble.models.BleDevice
-import com.achub.hram.ble.models.BleNotification
-import com.achub.hram.ble.models.HrNotification
+import com.achub.hram.domain.model.BleNotificationModel
+import com.achub.hram.domain.model.DeviceModel
+import com.achub.hram.domain.model.HrNotificationModel
 import com.achub.hram.models.DeviceUi
 import com.achub.hram.models.BleNotificationUi
 import com.achub.hram.models.HrNotificationUi
 
-fun BleDevice.toDto() = DeviceUi(name = name, identifier = identifier, manufacturer = manufacturer)
+fun DeviceModel.toDto() = DeviceUi(name = name, identifier = identifier, manufacturer = manufacturer)
 
-fun BleNotification.toDto() = BleNotificationUi(
+fun BleNotificationModel.toDto() = BleNotificationUi(
     hrNotification = hrNotification?.toDto(),
     batteryLevel = batteryLevel,
     isBleConnected = isBleConnected,
     elapsedTime = elapsedTime,
 )
 
-fun HrNotification.toDto() = HrNotificationUi(
+fun HrNotificationModel.toDto() = HrNotificationUi(
     hrBpm = hrBpm,
     isSensorContactSupported = isSensorContactSupported,
     isContactOn = isContactOn,

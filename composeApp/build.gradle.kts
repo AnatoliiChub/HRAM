@@ -55,8 +55,6 @@ kotlin {
             // Lifecycle + ViewModel
             implementation(libs.koin.compose.viewmodel)
 
-            // BLE
-            implementation(project(":ble"))
 
             // Permission
             implementation(libs.moko.compose)

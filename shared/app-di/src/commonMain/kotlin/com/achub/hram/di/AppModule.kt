@@ -6,7 +6,6 @@ import org.koin.core.annotation.KoinApplication
 @KoinApplication(
     modules = [
         ViewModelModule::class,
-        BleDataModule::class,
         TrackingModule::class,
         TrackingPlatformModule::class,
         DataModule::class,
@@ -15,4 +14,3 @@ import org.koin.core.annotation.KoinApplication
     ]
 )
 object AppModule
-

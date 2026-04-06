@@ -1,4 +1,4 @@
-package com.achub.hram.di
+package com.achub.hram.data.di
 
 import com.achub.hram.ble.BluetoothState
 import com.achub.hram.ble.BluetoothStateAndroid

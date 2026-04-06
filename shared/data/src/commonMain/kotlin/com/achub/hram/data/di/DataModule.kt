@@ -18,7 +18,7 @@ import org.koin.core.annotation.Named
 import org.koin.core.annotation.Provided
 import org.koin.core.annotation.Single
 
-@Module(includes = [DatabaseModule::class, DataStoreModule::class, SerializerModule::class])
+@Module(includes = [DatabaseModule::class, DataStoreModule::class, SerializerModule::class, BleDataModule::class])
 @Configuration
 class DataModule {
     @Single

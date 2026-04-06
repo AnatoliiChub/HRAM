@@ -1,24 +1,24 @@
 package com.achub.hram.tracking
 
-import com.achub.hram.ble.ConnectionResult
-import com.achub.hram.ble.HrDeviceRepo
-import com.achub.hram.ble.ScanResult
-import com.achub.hram.ble.models.BleDevice
-import com.achub.hram.ble.models.BleNotification
 import com.achub.hram.data.models.BleState
-import com.achub.hram.domain.model.ACTIVE_ACTIVITY
-import com.achub.hram.domain.model.HeartRateRecord
 import com.achub.hram.data.models.ScanError
+import com.achub.hram.data.repo.DeviceDataSource
 import com.achub.hram.data.repo.HrActivityRepo
 import com.achub.hram.data.repo.state.BleStateRepo
 import com.achub.hram.data.repo.state.TrackingStateRepo
 import com.achub.hram.di.WorkerThread
+import com.achub.hram.domain.model.ACTIVE_ACTIVITY
+import com.achub.hram.domain.model.BleNotificationModel
+import com.achub.hram.domain.model.ConnectionResultModel
+import com.achub.hram.domain.model.DeviceModel
+import com.achub.hram.domain.model.DeviceUnavailableException
+import com.achub.hram.domain.model.HeartRateRecord
+import com.achub.hram.domain.model.ScanResultModel
 import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.createActivity
 import com.achub.hram.ext.logger
 import com.achub.hram.ext.loggerE
 import com.achub.hram.ext.tickerFlow
-import com.achub.hram.ble.models.BleConnectionsException.BleUnavailableException
 import dev.icerock.moko.permissions.DeniedException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
@@ -65,7 +65,7 @@ class HramActivityTrackingManager(
     private val dispatcher: CoroutineDispatcher
 ) : ActivityTrackingManager, KoinComponent {
     private val stopWatch: StopWatch by inject()
-    private val hrDeviceRepo: HrDeviceRepo by inject(parameters = { parametersOf(scope) })
+    private val deviceDataSource: DeviceDataSource by inject(parameters = { parametersOf(scope) })
     private val hrActivityRepo: HrActivityRepo by inject()
     private val trackingStateRepo: TrackingStateRepo by inject()
     private val bleStateRepo: BleStateRepo by inject()
@@ -105,26 +105,26 @@ class HramActivityTrackingManager(
     }
 
     override fun scan(duration: Duration) = cancelScanning.apply { tryEmit(false) }
-        .let { hrDeviceRepo.scan(duration) }
-        .onStart { emit(ScanResult.Initiated) }
+        .let { deviceDataSource.scan(duration) }
+        .onStart { emit(ScanResultModel.Initiated) }
         .onStart { logger(TAG) { "Scan started for duration: $duration" } }
         .combine(scanningCancellationTracking()) { scanResult, _ -> scanResult }
         .onEach {
             logger(TAG) { "Scan result: $it" }
             when (it) {
-                is ScanResult.Initiated -> updateBleState(BleState.Scanning.Started)
-                is ScanResult.Complete -> updateBleState(BleState.Scanning.Completed)
-                is ScanResult.Error -> onScanFailed(it.error)
-                is ScanResult.ScanUpdate -> updateBleState(BleState.Scanning.Update(it.device))
+                is ScanResultModel.Initiated -> updateBleState(BleState.Scanning.Started)
+                is ScanResultModel.Complete -> updateBleState(BleState.Scanning.Completed)
+                is ScanResultModel.Error -> onScanFailed(it.error)
+                is ScanResultModel.ScanUpdate -> updateBleState(BleState.Scanning.Update(it.device))
             }
         }.onCompletion { cancelScanning.tryEmit(false) }
 
-    override fun connectAndSubscribe(device: BleDevice) = hrDeviceRepo.connect(device)
+    override fun connectAndSubscribe(device: DeviceModel) = deviceDataSource.connect(device)
         .onStart { cancelScanning.tryEmit(true) }
         .onStart { updateBleState(BleState.Connecting(device)) }
-        .onEach { if (it is ConnectionResult.Error) onConnectionFailed(it.error) }
-        .filter { result -> result is ConnectionResult.Connected }
-        .map { it as ConnectionResult.Connected }
+        .onEach { if (it is ConnectionResultModel.Error) onConnectionFailed(it.error) }
+        .filter { result -> result is ConnectionResultModel.Connected }
+        .map { it as ConnectionResultModel.Connected }
         .map { it.device }
         .onEach { updateBleState(BleState.Connected(it)) }
         .flatMapLatest { listen() }
@@ -134,13 +134,13 @@ class HramActivityTrackingManager(
             updateBleState(state)
         }
 
-    private fun listen(): Flow<BleNotification> = hrDeviceRepo.listen()
+    private fun listen(): Flow<BleNotificationModel> = deviceDataSource.listen()
         .combine(
             tickerFlow(1.seconds).filter { isTracking() }.onStart { emit(Unit) }
-        ) { bleNotification, _ -> bleNotification }
-        .onStart { emit(BleNotification.Empty) }
+        ) { notification, _ -> notification }
+        .onStart { emit(BleNotificationModel.Empty) }
         .map { it.copy(elapsedTime = stopWatch.elapsedTime()) }
-        .onEach { bleIndication -> if (isTracking() && bleIndication.isBleConnected) store(bleIndication) }
+        .onEach { indication -> if (isTracking() && indication.isBleConnected) store(indication) }
         .catch { loggerE(TAG) { "listen error : $it" } }
 
     override fun releaseState() {
@@ -158,23 +158,23 @@ class HramActivityTrackingManager(
 
     override fun disconnect() {
         scope.launch(dispatcher) {
-            hrDeviceRepo.disconnect()
+            deviceDataSource.disconnect()
             delay(DISCONNECTION_DELAY)
             updateBleState(BleState.Disconnected)
             jobs.cancelAndClear()
         }
     }
 
-    private suspend fun store(bleIndication: BleNotification) {
-        bleIndication.hrNotification?.let { hrNotification ->
+    private suspend fun store(indication: BleNotificationModel) {
+        indication.hrNotification?.let { hrNotification ->
             val isContactOn = if (hrNotification.isSensorContactSupported) hrNotification.isContactOn else true
             currentActId?.let {
                 val entity = HeartRateRecord(
                     activityId = it,
                     heartRate = hrNotification.hrBpm,
-                    elapsedTime = bleIndication.elapsedTime,
+                    elapsedTime = indication.elapsedTime,
                     isContactOn = isContactOn,
-                    batteryLevel = bleIndication.batteryLevel,
+                    batteryLevel = indication.batteryLevel,
                     timestamp = now().toEpochMilliseconds(),
                 )
                 hrActivityRepo.insert(entity)
@@ -191,7 +191,7 @@ class HramActivityTrackingManager(
         loggerE(TAG) { "Scan failed: $exception" }
         val error = when (exception) {
             is DeniedException if exception.message == "Bluetooth is powered off" -> ScanError.BLUETOOTH_OFF
-            is BleUnavailableException -> ScanError.BLUETOOTH_OFF
+            is DeviceUnavailableException -> ScanError.BLUETOOTH_OFF
             else -> ScanError.NO_BLE_PERMISSIONS
         }
         updateBleState(BleState.Scanning.Error(error, now().toEpochMilliseconds()))

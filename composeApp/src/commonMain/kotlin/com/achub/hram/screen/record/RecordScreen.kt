@@ -21,7 +21,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionOnScreen
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.achub.hram.ble.models.BleDevice
+import com.achub.hram.domain.model.DeviceModel
 import com.achub.hram.ext.permissionController
 import com.achub.hram.ext.requestBluetooth
 import com.achub.hram.ext.toDto
@@ -109,7 +109,7 @@ fun RecordScreen() {
 @Composable
 private fun Dialogs(
     state: RecordScreenState,
-    onDeviceSelected: (BleDevice) -> Unit,
+    onDeviceSelected: (DeviceModel) -> Unit,
     onRequestScanning: () -> Unit,
     onDismissDialog: () -> Unit,
     onCancelScanning: () -> Unit,

@@ -15,6 +15,9 @@ kotlin {
             // Domain interfaces + models live in composeApp
             api(project(":composeApp"))
 
+            // BLE — only data layer depends on BLE
+            implementation(project(":ble"))
+
             // Room
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)

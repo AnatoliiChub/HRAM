@@ -2,7 +2,7 @@ package com.achub.hram.ext
 
 import androidx.compose.runtime.Composable
 import com.achub.hram.domain.model.ActivityRecord
-import com.achub.hram.ble.models.BleConnectionsException.BleUnavailableException
+import com.achub.hram.domain.model.DeviceUnavailableException
 import dev.icerock.moko.permissions.DeniedException
 import dev.icerock.moko.permissions.Permission
 import dev.icerock.moko.permissions.PermissionsController
@@ -81,7 +81,7 @@ suspend fun PermissionsController.requestBleBefore(
         action()
     } catch (ex: Exception) {
         loggerE("PermissionsController") { "requestBlePermissionBeforeAction Error : $ex" }
-        val bleOff = (ex is DeniedException) && (ex.message == BLE_OFF_MESSAGE) || (ex is BleUnavailableException)
+        val bleOff = (ex is DeniedException) && (ex.message == BLE_OFF_MESSAGE) || (ex is DeviceUnavailableException)
         if (bleOff) return else onFailure()
     }
 }

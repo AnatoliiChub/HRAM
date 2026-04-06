@@ -8,8 +8,8 @@ import android.content.Intent
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
 import android.os.IBinder
 import androidx.core.app.ServiceCompat
-import com.achub.hram.ble.BLE_SCAN_DURATION
-import com.achub.hram.ble.models.HramBleDevice
+import com.achub.hram.domain.model.DeviceModel
+import com.achub.hram.domain.model.SCAN_DURATION_MS
 import com.achub.hram.data.repo.state.TrackingStateRepo
 import com.achub.hram.di.CoroutineModule.Companion.WORKER_DISPATCHER
 import com.achub.hram.ext.logger
@@ -125,7 +125,7 @@ class BleTrackingService : Service(), KoinComponent {
     private fun connect(intent: Intent) {
         connectJob?.cancel()
         intent.getStringExtra(EXTRA_DEVICE_ID)?.let { identifier ->
-            val device = HramBleDevice(name = intent.getStringExtra(EXTRA_DEVICE_NAME) ?: "", identifier = identifier)
+            val device = DeviceModel(name = intent.getStringExtra(EXTRA_DEVICE_NAME) ?: "", identifier = identifier)
             tracker.connectAndSubscribe(device = device)
                 .launchIn(scope)
                 .let { connectJob = it }
@@ -135,7 +135,7 @@ class BleTrackingService : Service(), KoinComponent {
     @OptIn(FlowPreview::class)
     private fun scan() {
         scanJob?.cancel()
-        tracker.scan(BLE_SCAN_DURATION.milliseconds)
+        tracker.scan(SCAN_DURATION_MS.milliseconds)
             .filter { currentAction.get() == Action.Scan.ordinal }
             .flowOn(dispatcher)
             .launchIn(scope)

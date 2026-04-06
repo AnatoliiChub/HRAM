@@ -1,7 +1,7 @@
 package com.achub.hram.data.models
 
-import com.achub.hram.ble.models.BleDevice
-import com.achub.hram.ble.models.BleNotification
+import com.achub.hram.domain.model.BleNotificationModel
+import com.achub.hram.domain.model.DeviceModel
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -9,7 +9,7 @@ sealed class BleState() {
     @Serializable
     sealed class Scanning : BleState() {
         @Serializable
-        data class Update(val device: BleDevice) : Scanning()
+        data class Update(val device: DeviceModel) : Scanning()
 
         @Serializable
         data class Error(val error: ScanError, val timesStamp: Long) : Scanning()
@@ -22,13 +22,13 @@ sealed class BleState() {
     }
 
     @Serializable
-    data class Connecting(val device: BleDevice) : BleState()
+    data class Connecting(val device: DeviceModel) : BleState()
 
     @Serializable
-    data class Connected(val bleDevice: BleDevice, val error: ConnectionError? = null) : BleState()
+    data class Connected(val bleDevice: DeviceModel, val error: ConnectionError? = null) : BleState()
 
     @Serializable
-    data class NotificationUpdate(val bleNotification: BleNotification, val device: BleDevice) : BleState()
+    data class NotificationUpdate(val bleNotification: BleNotificationModel, val device: DeviceModel) : BleState()
 
     @Serializable
     data object Disconnected : BleState()
