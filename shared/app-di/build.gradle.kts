@@ -25,13 +25,17 @@ kotlin {
                 freeCompilerArgs.add("-Xexpect-actual-classes")
             }
             linkerOpts.add("-lsqlite3")
+            // Export API dependencies so their public classes appear in the ObjC/Swift header
+            export(project(":presentation"))
+            export(project(":data"))
+            export(project(":domain"))
         }
     }
 
     sourceSets {
         commonMain.dependencies {
             // composeApp (UI + domain) — provides all app-level Koin modules
-            api(project(":composeApp"))
+            api(project(":presentation"))
             // data — provides DataModule (includes BleDataModule transitively)
             api(project(":data"))
             // Logging (for initKoin Napier setup)

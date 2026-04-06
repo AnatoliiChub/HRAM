@@ -11,7 +11,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                compileOnly(project(":annotations"))
+                api(project(":annotations"))
             }
         }
     }

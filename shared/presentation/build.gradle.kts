@@ -13,7 +13,12 @@ plugins {
 
 extra["koverIncludes"] = listOf("com.achub.hram.utils.**")
 
-// composeApp is a domain/UI module, not the DI root — disable Koin config check
+// Keep the generated resources package name stable (was composeApp, now presentation)
+compose.resources {
+    packageOfResClass = "hram.composeapp.generated.resources"
+}
+
+// presentation is not the DI root — disable Koin config check
 ksp {
     arg("KOIN_CONFIG_CHECK", "false")
 }
