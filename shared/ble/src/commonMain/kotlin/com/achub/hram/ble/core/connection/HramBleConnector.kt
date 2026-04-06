@@ -13,16 +13,16 @@ internal class HramBleConnector(
     private val peripheralBuilder: (Advertisement) -> Peripheral = { Peripheral(it) }
 ) : BleConnector {
     override suspend fun connect(advertisement: Advertisement): Peripheral {
-        Logger.D(TAG) { "initiate connection to device $advertisement" }
+        Logger.d(TAG) { "initiate connection to device $advertisement" }
         val peripheral = peripheralBuilder(advertisement)
         peripheral.connect()
         connected.update { peripheral }
-        Logger.D(TAG) { "connected to device $peripheral" }
+        Logger.d(TAG) { "connected to device $peripheral" }
         return peripheral
     }
 
     override suspend fun disconnect() {
-        Logger.D(TAG) { "disconnecting from device ${connected.value}" }
+        Logger.d(TAG) { "disconnecting from device ${connected.value}" }
         connected.value?.disconnect()
         connected.value = null
     }

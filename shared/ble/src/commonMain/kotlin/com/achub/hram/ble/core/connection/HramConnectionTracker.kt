@@ -36,7 +36,7 @@ internal class HramConnectionTracker(
 
     @OptIn(ExperimentalApi::class, ExperimentalUuidApi::class, FlowPreview::class)
     override fun trackConnectionState(peripheral: Peripheral) = peripheral.state
-        .onEach { Logger.D(TAG) { "${peripheral.name} device current connection state $it" } }
+        .onEach { Logger.d(TAG) { "${peripheral.name} device current connection state $it" } }
         .map { currentState -> CONNECTING_STATES.any { it == currentState }.not() && currentState !is State.Connected }
         .debounce(STATE_CHANGING_DEBOUNCE)
         .combine(isBluetoothOn) { isDisconnected, isBluetoothOn -> isDisconnected && isBluetoothOn }
@@ -44,5 +44,5 @@ internal class HramConnectionTracker(
         .onEach { isKeepConnection.trySend(true) }
 
     override fun observeDisconnection(): Flow<Boolean> = isKeepConnection.receiveAsFlow()
-        .onEach { Logger.D(TAG) { "Keep connection emitted $it" } }
+        .onEach { Logger.d(TAG) { "Keep connection emitted $it" } }
 }

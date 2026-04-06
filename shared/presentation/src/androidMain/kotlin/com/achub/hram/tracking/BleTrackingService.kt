@@ -68,15 +68,15 @@ class BleTrackingService : Service(), KoinComponent {
         val notification: Notification = notificator.createNotification()
         ServiceCompat.startForeground(this, NOTIFICATION_ID, notification, FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE)
         trackBleState()
-        Logger.D(TAG) { "Service created" }
+        Logger.d(TAG) { "Service created" }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Logger.D(TAG) { "onStartCommand with action: $intent $dispatcher" }
+        Logger.d(TAG) { "onStartCommand with action: $intent $dispatcher" }
         if (intent == null) return START_STICKY
         currentAction.set(Action.entries[intent.getIntExtra(ACTION, -1)].ordinal)
         val action = Action.entries[currentAction.get()]
-        Logger.D(TAG) { "Processing action: $action" }
+        Logger.d(TAG) { "Processing action: $action" }
 
         when (action) {
             Action.CancelScanning -> tracker.cancelScanning()
@@ -95,7 +95,7 @@ class BleTrackingService : Service(), KoinComponent {
     }
 
     override fun onDestroy() {
-        Logger.D(TAG) { "Service destroyed" }
+        Logger.d(TAG) { "Service destroyed" }
         job.cancel()
         scanJob = null
         connectJob = null

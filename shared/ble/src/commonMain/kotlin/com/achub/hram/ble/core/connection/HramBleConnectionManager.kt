@@ -94,7 +94,7 @@ internal class HramBleConnectionManager(
     private suspend fun isReconnectionRequired(throwable: Throwable): Boolean {
         val isReconnectionRequired = ERROR_REQUIRED_RECONNECTION.any { throwable::class == it } ||
             (throwable is TimeoutCancellationException && wasConnected.load())
-        Logger.D(TAG) { "try to reconnect: $isReconnectionRequired, because of $throwable" }
+        Logger.d(TAG) { "try to reconnect: $isReconnectionRequired, because of $throwable" }
         if (isReconnectionRequired) delay(RECONNECTION_DELAY_MS)
         return isReconnectionRequired
     }

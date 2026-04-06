@@ -14,7 +14,6 @@ import com.achub.hram.ble.core.data.HramBleParser
 import com.achub.hram.ble.models.HramPeripheralConvertor
 import com.achub.hram.ble.models.PeripheralConvertor
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 
 /**
  * Factory object that constructs all BLE components.
@@ -46,7 +45,6 @@ object BleFactory {
         peripheralConvertor: PeripheralConvertor,
     ): HrDeviceRepo = HramHrDeviceRepo(
         bleDataRepo = bleDataRepo,
-        dispatcher = Dispatchers.Default,
         bleConnectionManager = HramBleConnectionManager(
             connectionTracker = connectionTracker,
             scanner = bleScanner,

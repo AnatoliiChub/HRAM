@@ -48,7 +48,7 @@ suspend fun PermissionsController.requestBleBefore(
         providePermission(Permission.BLUETOOTH_CONNECT)
         action()
     } catch (ex: Exception) {
-        Logger.E("PermissionsController") { "requestBlePermissionBeforeAction Error : $ex" }
+        Logger.e("PermissionsController") { "requestBlePermissionBeforeAction Error : $ex" }
         val bleOff = (ex is DeniedException) && (ex.message == BLE_OFF_MESSAGE) || (ex is DeviceUnavailableException)
         if (bleOff) return else onFailure()
     }

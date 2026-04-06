@@ -23,8 +23,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -204,9 +202,8 @@ class HramHrDeviceRepoTest {
         return adv
     }
 
-    private fun TestScope.createRepo() = HramHrDeviceRepo(
+    private fun createRepo() = HramHrDeviceRepo(
         bleDataRepoMock,
-        StandardTestDispatcher(testScheduler),
         bleConnectionManagerMock
     )
 }

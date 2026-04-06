@@ -37,48 +37,48 @@ class IosTrackingController(private val liveActivityManager: LiveActivityManager
     private var currentAction: ControllerAction? = null
 
     init {
-        Logger.D(TAG) { "IosTrackingController initialized" }
+        Logger.d(TAG) { "IosTrackingController initialized" }
         liveActivityManager.startObserving(bleStateRepo.listen(), trackingStateRepo.listen())
     }
 
     override fun scan(id: String?) {
-        Logger.D(TAG) { "Scan initiated" }
+        Logger.d(TAG) { "Scan initiated" }
         currentAction = ControllerAction.Scan
         performScan()
     }
 
     override fun connectDevice(device: DeviceModel) {
-        Logger.D(TAG) { "Connect device: $device" }
+        Logger.d(TAG) { "Connect device: $device" }
         currentAction = ControllerAction.Connect
         performConnect(device)
     }
 
     override fun disconnectDevice() {
-        Logger.D(TAG) { "Disconnect device" }
+        Logger.d(TAG) { "Disconnect device" }
         currentAction = ControllerAction.Disconnect
         tracker.disconnect()
     }
 
     override fun startTracking() {
-        Logger.D(TAG) { "Start tracking" }
+        Logger.d(TAG) { "Start tracking" }
         currentAction = ControllerAction.StartTracking
         scope.launch { tracker.startTracking() }
     }
 
     override fun pauseTracking() {
-        Logger.D(TAG) { "Pause tracking" }
+        Logger.d(TAG) { "Pause tracking" }
         currentAction = ControllerAction.PauseTracking
         scope.launch { tracker.pauseTracking() }
     }
 
     override fun finishTracking(name: String) {
-        Logger.D(TAG) { "Finish tracking with name: $name" }
+        Logger.d(TAG) { "Finish tracking with name: $name" }
         currentAction = ControllerAction.StopTracking
         scope.launch { tracker.finishTracking(name) }
     }
 
     override fun cancelScanning() {
-        Logger.D(TAG) { "Cancel scanning" }
+        Logger.d(TAG) { "Cancel scanning" }
         currentAction = ControllerAction.CancelScanning
         tracker.cancelScanning()
     }
@@ -102,7 +102,7 @@ class IosTrackingController(private val liveActivityManager: LiveActivityManager
     }
 
     override fun clear() {
-        Logger.D(TAG) { "Cleaning up IosTrackingController" }
+        Logger.d(TAG) { "Cleaning up IosTrackingController" }
         liveActivityManager.cleanup()
         job.cancel()
         connectJob = null

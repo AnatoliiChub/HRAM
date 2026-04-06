@@ -22,7 +22,6 @@ import org.koin.core.annotation.Single
 @Module(includes = [BleModule::class])
 @Configuration
 class BleDataModule {
-
     @Factory
     fun bleScanner(): BleScanner = BleFactory.scanner()
 
@@ -56,8 +55,14 @@ class BleDataModule {
         peripheralConvertor: PeripheralConvertor,
     ): DeviceDataSource {
         val hrDeviceRepo: HrDeviceRepo =
-            BleFactory.hrDeviceRepo(scope, connectionTracker, bleDataRepo, bleScanner, bleConnector, peripheralConvertor)
+            BleFactory.hrDeviceRepo(
+                scope,
+                connectionTracker,
+                bleDataRepo,
+                bleScanner,
+                bleConnector,
+                peripheralConvertor
+            )
         return HramDeviceDataSource(hrDeviceRepo)
     }
 }
-

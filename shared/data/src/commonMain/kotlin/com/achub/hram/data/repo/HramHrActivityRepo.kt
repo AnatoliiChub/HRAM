@@ -55,7 +55,7 @@ class HramHrActivityRepo(
                         minHr = aggregated.minOfOrNull { it.avgHr }?.toInt() ?: 0,
                     )
                 }.onEach {
-                    Logger.D(TAG) { "ActivityInfo for ${it.name}: size=${it.buckets.size}" }
+                    Logger.d(TAG) { "ActivityInfo for ${it.name}: size=${it.buckets.size}" }
                 }
             } else {
                 emptyList()

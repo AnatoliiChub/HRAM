@@ -27,7 +27,7 @@ class BluetoothStateIos : BluetoothState {
         delegate = object : NSObject(), CBCentralManagerDelegateProtocol {
             override fun centralManagerDidUpdateState(central: CBCentralManager) {
                 trySendBlocking(central.state == CBManagerStatePoweredOn)
-                    .onFailure { Logger.D(TAG) { "BluetoothState: failed: $it" } }
+                    .onFailure { Logger.d(TAG) { "BluetoothState: failed: $it" } }
             }
         }
         manager = CBCentralManager(delegate, null, options)

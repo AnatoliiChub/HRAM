@@ -34,7 +34,7 @@ class HramLiveActivityManager : LiveActivityManager {
      */
     @OptIn(FlowPreview::class)
     override fun startObserving(bleStateFlow: Flow<BleState>, trackingStateFlow: Flow<TrackingStateStage>) {
-        Logger.D(TAG) { "Starting Live Activity observation" }
+        Logger.d(TAG) { "Starting Live Activity observation" }
 
         observerJob?.cancel()
         bleStateFlow
@@ -49,14 +49,14 @@ class HramLiveActivityManager : LiveActivityManager {
     }
 
     override fun stopObserving() {
-        Logger.D(TAG) { "Stopping Live Activity observation" }
+        Logger.d(TAG) { "Stopping Live Activity observation" }
         observerJob?.cancel()
         observerJob = null
         endActivity()
     }
 
     override fun cleanup() {
-        Logger.D(TAG) { "Cleaning up LiveActivityManager" }
+        Logger.d(TAG) { "Cleaning up LiveActivityManager" }
         stopObserving()
         job.cancel()
     }
@@ -85,9 +85,9 @@ class HramLiveActivityManager : LiveActivityManager {
                 deviceName = deviceName,
                 elapsedTime = elapsedTime
             )
-            Logger.D(TAG) { "Live Activity started with ID: $activityId" }
+            Logger.d(TAG) { "Live Activity started with ID: $activityId" }
         } catch (e: Exception) {
-            Logger.E(TAG) { "Failed to start Live Activity: ${e.message}" }
+            Logger.e(TAG) { "Failed to start Live Activity: ${e.message}" }
         }
     }
 
@@ -227,7 +227,7 @@ class HramLiveActivityManager : LiveActivityManager {
                 elapsedTime = elapsedTime
             )
         } catch (e: Exception) {
-            Logger.E(TAG) { "Failed to update Live Activity: ${e.message}" }
+            Logger.e(TAG) { "Failed to update Live Activity: ${e.message}" }
         }
     }
 
