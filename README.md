@@ -246,8 +246,6 @@ flowchart TB
         PL ~~~ DL ~~~ BLE
     end
 
-    Logger[":logger · Napier wrapper"]
-
     Android --> AppDI
     iOS --> AppDI
     AppDI --> Presentation
@@ -257,9 +255,6 @@ flowchart TB
     Presentation --> UILib
     Data --> Domain
     Data --> BLE
-    Domain --> Logger
-    UILib --> Logger
-    BLE --> Logger
 ```
 
 ---
