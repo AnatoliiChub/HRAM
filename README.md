@@ -202,8 +202,6 @@ Owns all business logic:
 **Presentation** (`:presentation`) — drives the UI and platform-specific background execution:
 
 - ViewModels talk exclusively to `TrackingController` and use cases — never to data implementations.
-- `AndroidTrackingController` dispatches Intents to `BleTrackingService` (foreground service).
-- `IosTrackingController` calls `ActivityTrackingManager` directly and drives Live Activities.
 
 ### Advantages
 
