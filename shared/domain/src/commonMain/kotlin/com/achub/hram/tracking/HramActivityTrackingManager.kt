@@ -19,7 +19,6 @@ import com.achub.hram.ext.createActivity
 import com.achub.hram.ext.logger
 import com.achub.hram.ext.loggerE
 import com.achub.hram.ext.tickerFlow
-import dev.icerock.moko.permissions.DeniedException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -62,7 +61,8 @@ private const val TAG = "HramActivityTrackingManager"
 )
 class HramActivityTrackingManager(
     @param:WorkerThread
-    private val dispatcher: CoroutineDispatcher
+    private val dispatcher: CoroutineDispatcher,
+    private val platformStateHandler: BlePlatformStateHandler,
 ) : ActivityTrackingManager, KoinComponent {
     private val stopWatch: StopWatch by inject()
     private val deviceDataSource: DeviceDataSource by inject(parameters = { parametersOf(scope) })
@@ -189,11 +189,11 @@ class HramActivityTrackingManager(
 
     private suspend fun onScanFailed(exception: Throwable) {
         loggerE(TAG) { "Scan failed: $exception" }
-        val error = when (exception) {
-            is DeniedException if exception.message == "Bluetooth is powered off" -> ScanError.BLUETOOTH_OFF
-            is DeviceUnavailableException -> ScanError.BLUETOOTH_OFF
-            else -> ScanError.NO_BLE_PERMISSIONS
-        }
+        val error = platformStateHandler.mapScanError(exception)
+            ?: when (exception) {
+                is DeviceUnavailableException -> ScanError.BLUETOOTH_OFF
+                else -> ScanError.NO_BLE_PERMISSIONS
+            }
         updateBleState(BleState.Scanning.Error(error, now().toEpochMilliseconds()))
     }
 

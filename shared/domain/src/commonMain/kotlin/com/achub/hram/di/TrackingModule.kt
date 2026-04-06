@@ -1,6 +1,7 @@
 package com.achub.hram.di
 
 import com.achub.hram.tracking.ActivityTrackingManager
+import com.achub.hram.tracking.BlePlatformStateHandler
 import com.achub.hram.tracking.HramActivityTrackingManager
 import com.achub.hram.tracking.HramStopWatch
 import com.achub.hram.tracking.StopWatch
@@ -13,7 +14,10 @@ import org.koin.core.annotation.Single
 @Configuration
 class TrackingModule {
     @Single(binds = [ActivityTrackingManager::class])
-    fun trackingManager(@WorkerThread dispatcher: CoroutineDispatcher) = HramActivityTrackingManager(dispatcher)
+    fun trackingManager(
+        @WorkerThread dispatcher: CoroutineDispatcher,
+        platformStateHandler: BlePlatformStateHandler,
+    ) = HramActivityTrackingManager(dispatcher, platformStateHandler)
 
     @Single
     fun stopWatch(): StopWatch = HramStopWatch()

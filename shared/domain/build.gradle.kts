@@ -18,18 +18,10 @@ kotlin {
         commonMain.dependencies {
             // Coroutines
             implementation(libs.kotlinx.coroutines.core)
-
             // Serialization (BleState, TrackingStateStage, domain models @Serializable)
             implementation(libs.kotlinx.serialization.json)
 
-            // moko — DeniedException used in HramActivityTrackingManager
-            implementation(libs.moko.main)
-            implementation(libs.moko.ble)
-
-            // Logging
             implementation(libs.logger)
         }
     }
 }
-
-
