@@ -5,8 +5,8 @@ plugins {
 }
 
 // OpenForMokkery is compiled once in the :annotations module.
-// compileOnly makes it available at compile time without being included in
-// this module's output AAR, preventing duplicate-class conflicts at DEX merge.
+// Exposed as api so it is available at compile time on all platforms,
+// including Kotlin/Native where compileOnly is not supported.
 kotlin {
     sourceSets {
         commonMain {

@@ -13,8 +13,8 @@ and displays live metrics.
 
 ```bash
 # Android
-./gradlew :composeApp:assembleDebug
-./gradlew :composeApp:installDebug
+./gradlew :androidApp:assembleDebug
+./gradlew :androidApp:installDebug
 
 # iOS framework (called by Xcode build phase)
 ./scripts/build-framework.sh [SDK] [CONFIGURATION]
@@ -36,7 +36,7 @@ and displays live metrics.
 ```
 Shared UI (Compose Multiplatform)
     → ViewModel (commonMain)
-    → TrackingController (expect/actual per platform)
+    → TrackingController (interface in :domain, platform impl in :presentation)
          → Android: Intent → BleTrackingService (Foreground Service)
          → iOS: ActivityTrackingManager + LiveActivityManager
     → ActivityTrackingManager ← BLE (Kable) + Room Database
@@ -49,20 +49,29 @@ Shared UI (Compose Multiplatform)
     - `src/androidMain/` — Android Bluetooth state observer
     - `src/iosMain/` — iOS CoreBluetooth state observer
     - `src/commonTest/` — BLE unit tests
+- **`shared/domain/`** — Business logic, interfaces, use cases, and shared models
+    - `TrackingController` interface, `ActivityTrackingManager`, `StopWatch`, use cases,
+      repository interfaces, `FileExporter` interface, extension utilities
+- **`shared/data/`** — Data layer: Room database, DataStore, repositories, and export
+    - Room entities + DAOs, repository implementations, `ExportModule` (expect/actual),
+      `AndroidFileExporter`, `IosFileExporter`
+- **`shared/presentation/`** — Shared Compose UI (depends on `:domain`, `:data`, `:ble`)
+    - `src/commonMain/` — ViewModels, UI screens, DI modules
+    - `src/androidMain/` — `AndroidTrackingController`, Android-specific DI
+    - `src/iosMain/` — `IosTrackingController`, iOS-specific DI
+    - `src/commonTest/` — Shared unit tests
 - **`shared/ui-lib/`** — Shared Compose UI library (styles, reusable components, shaders, charts)
+- **`shared/app-di/`** — Koin root DI; produces `ComposeApp.framework` for iOS (exports
+  `:presentation`, `:data`, `:domain`)
 - **`build-logic/`** — Gradle convention plugins and build-related modules
     - `convention/` — Precompiled script plugins (`kmp-library-convention`, `cmp-ui-lib-convention`,
       `koin-convention`, `quality-convention`, `test-mocking-convention`)
     - `annotations/` — `:annotations` KMP module (part of the main build, physically co-located
       here). Contains `OpenForMokkery.kt` — the `@Retention(SOURCE)` annotation that marks classes
-      to be opened by the `allOpen` compiler plugin for Mokkery mocking. Consumed via
-      `compileOnly(project(":annotations"))` in `test-mocking-convention` to avoid duplicate-class
-      DEX conflicts at Android merge time.
-- **`composeApp/src/commonMain/`** — Shared business logic and UI (depends on `:ble`)
-- **`composeApp/src/androidMain/`** — Android-specific implementations
-- **`composeApp/src/iosMain/`** — iOS-specific implementations (Kotlin/Native)
-- **`composeApp/src/commonTest/`** — Shared unit tests
-- **`androidApp/`** — Android shell (MainActivity)
+      to be opened by the `allOpen` compiler plugin for Mokkery mocking. Exposed as
+      `api(project(":annotations"))` in `test-mocking-convention` so it is available on all
+      platforms including Kotlin/Native.
+- **`androidApp/`** — Android shell (MainActivity, depends on `:app-di`)
 - **`iosApp/`** — iOS shell (SwiftUI entry point, Live Activity widgets)
 
 ### Key Packages
@@ -77,31 +86,48 @@ Shared UI (Compose Multiplatform)
 | `ble/di/`              | Koin DI modules for BLE (expect/actual per platform)       |
 | `ble/utils/`           | BLE UUID constants, byte parsing, logging utilities        |
 
-#### `composeApp` module (commonMain)
+#### `:domain` module (commonMain)
 
-| Package       | Purpose                                                                      |
-|---------------|------------------------------------------------------------------------------|
-| `data/db/`    | Room database with heart rate and activity entities                          |
-| `data/repo/`  | Repository layer (HR activities, BLE state, tracking state)                  |
-| `data/store/` | DataStore-backed persistence for BLE and tracking state                      |
-| `tracking/`   | `ActivityTrackingManager`, `StopWatch`, `TrackingController` (expect/actual) |
-| `screen/`     | UI screens: `main/`, `activities/`, `record/`                                |
-| `view/`       | Reusable Compose components, charts, AGSL shaders                            |
-| `di/`         | Koin DI modules — most have platform-specific counterparts                   |
-| `export/`     | CSV data export (platform-specific implementations)                          |
+| Package          | Purpose                                                              |
+|------------------|----------------------------------------------------------------------|
+| `domain/model/`  | Domain models (DeviceModel, etc.)                                    |
+| `tracking/`      | `ActivityTrackingManager`, `StopWatch`, `TrackingController` interface |
+| `usecase/`       | Use cases (e.g. `ExportCsvUseCase`)                                  |
+| `data/repo/`     | Repository interfaces                                                |
+| `export/`        | `FileExporter` interface                                             |
+| `ext/`           | Extension functions and logging utilities                            |
+
+#### `:data` module (commonMain)
+
+| Package      | Purpose                                               |
+|--------------|-------------------------------------------------------|
+| `data/db/`   | Room database with heart rate and activity entities   |
+| `data/repo/` | Repository implementations                           |
+| `data/store/`| DataStore-backed persistence for BLE and tracking     |
+| `di/`        | `ExportModule` (expect/actual per platform)           |
+| `export/`    | `AndroidFileExporter`, `IosFileExporter`              |
+
+#### `:presentation` module (commonMain)
+
+| Package    | Purpose                                              |
+|------------|------------------------------------------------------|
+| `screen/`  | UI screens: `main/`, `activities/`, `record/`        |
+| `tracking/`| `AndroidTrackingController`, `IosTrackingController` |
+| `di/`      | Koin DI modules (platform-specific counterparts)     |
+| `ext/`     | Compose/UI extension functions                       |
 
 ### Platform Differences
 
 **Android** (`androidMain/`):
 
 - `BleTrackingService` — Foreground service for background tracking
-- `TrackingController` sends Intents to the service
+- `AndroidTrackingController` sends Intents to the service
 - `Notificator` manages persistent notification with RemoteViews
 
 **iOS** (`iosMain/` + `iosApp/`):
 
 - `LiveActivityManager` updates WidgetKit Live Activities during tracking
-- `TrackingController` directly calls `ActivityTrackingManager`
+- `IosTrackingController` directly calls `ActivityTrackingManager`
 - Swift bridge in `iosApp/Bridge/` connects Kotlin to Swift Live Activity APIs
 - Live Activity UI defined in Swift: `iosApp/HramLiveActivity/`
 
