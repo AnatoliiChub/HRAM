@@ -130,12 +130,9 @@ class RecordViewModel(
         val manufacturer = uiState.value.connectedDevice?.manufacturer
         val identifier = uiState.value.connectedDevice?.identifier
         _uiState.indications(state.bleNotification).also {
-            val device = if (manufacturer != null && identifier == state.device.identifier) {
-                DeviceModel(
-                    name = state.device.name,
-                    identifier = state.device.identifier,
-                    manufacturer = manufacturer
-                )
+            val id = state.device.identifier
+            val device = if (manufacturer != null && identifier == id) {
+                DeviceModel(name = state.device.name, identifier = id, manufacturer = manufacturer)
             } else {
                 state.device
             }
