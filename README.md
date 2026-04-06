@@ -243,7 +243,7 @@ flowchart TB
             Data[":data</br>Room · DataStore</br>Repository implementations"]
             BLE[":ble</br>Kable · scanning · connection · parsing"]
         end
-        PL ~~~ DL ~~~ BLE
+        PL ~~~ DL   
     end
 
     Android --> AppDI
