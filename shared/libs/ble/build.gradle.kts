@@ -1,7 +1,7 @@
 plugins {
-    id("kmp-library-convention")
-    id("quality-convention")
-    id("test-mocking-convention")
+    alias(libs.plugins.kmp.convention)
+    alias(libs.plugins.quality.convention)
+    alias(libs.plugins.test.mocking.convention)
     alias(libs.plugins.kotlinxSerialization)
 }
 

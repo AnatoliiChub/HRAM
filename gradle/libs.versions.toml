@@ -79,3 +79,12 @@ mokkery = { id = "dev.mokkery", version.ref = "mokkery" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "kotlin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+
+## Convention plugins (local, no version)
+kmp-convention = { id = "kmp-convention" }
+cmp-convention = { id = "cmp-convention" }
+koin-convention = { id = "koin-convention" }
+quality-convention = { id = "quality-convention" }
+test-mocking-convention = { id = "test-mocking-convention" }
+room-convention = { id = "room-convention" }
+

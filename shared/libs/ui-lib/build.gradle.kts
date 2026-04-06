@@ -1,7 +1,7 @@
 plugins {
-    id("kmp-library-convention")
-    id("cmp-ui-lib-convention")
-    id("quality-convention")
+    alias(libs.plugins.kmp.convention)
+    alias(libs.plugins.cmp.convention)
+    alias(libs.plugins.quality.convention)
 }
 
 extra["koverIncludes"] = listOf("com.achub.hram.view.**", "com.achub.hram.style.**")

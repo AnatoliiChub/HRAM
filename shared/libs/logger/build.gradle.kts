@@ -1,9 +1,9 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
-// `:logger` deliberately does NOT apply kmp-library-convention.
-// kmp-library-convention adds api(project(":logger")) to every KMP module,
-// so applying kmp-library-convention here would create a self-dependency cycle.
+// `:logger` deliberately does NOT apply kmp-convention.
+// kmp-convention adds api(project(":logger")) to every KMP module,
+// so applying kmp-convention here would create a self-dependency cycle.
 plugins {
     alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.kotlinMultiplatform)

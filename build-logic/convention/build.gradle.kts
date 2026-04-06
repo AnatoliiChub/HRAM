@@ -12,6 +12,7 @@ dependencies {
     implementation(libs.plugins.ksp.toProvider())
     implementation(libs.plugins.jetbrainsCompose.toProvider())
     implementation(libs.plugins.kotlinComposeCompiler.toProvider())
+    implementation(libs.plugins.androidx.room.toProvider())
 }
 
 private fun Provider<PluginDependency>.toProvider(): Provider<String> =

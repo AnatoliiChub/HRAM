@@ -182,8 +182,8 @@ The project is organized into modules under `shared/`, a shell per platform, and
 ```
 HRAM/
 ├── shared/
-│   ├── libs/
-│   │   ├── ble/       # Standalone BLE library (Koin-free)
+│   ├── libs/          # Reusable KMP libraries, in the future will be moved to artifactory
+│   │   ├── ble/       # Standalone BLE library based on Kable.(Koin-free)
 │   │   ├── ui-lib/    # Reusable Compose components, styles, shaders
 │   │   └── logger/    # Napier wrapper — Logger object shared across all modules
 │   ├── domain/        # Business logic, interfaces, use cases

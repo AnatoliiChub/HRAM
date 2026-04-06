@@ -1,8 +1,8 @@
 plugins {
-    id("kmp-library-convention")
-    id("koin-convention")
+    alias(libs.plugins.kmp.convention)
+    alias(libs.plugins.koin.convention)
+    alias(libs.plugins.room.convention)
     alias(libs.plugins.kotlinxSerialization)
-    alias(libs.plugins.androidx.room)
 }
 
 kotlin {
@@ -15,10 +15,6 @@ kotlin {
             api(project(":domain"))
             implementation(project(":ble"))
 
-            // Room
-            implementation(libs.androidx.room.runtime)
-            implementation(libs.androidx.sqlite.bundled)
-
             // DataStore
             implementation(libs.datastore)
             implementation(libs.datastore.preferences)
@@ -30,13 +26,4 @@ kotlin {
     }
 }
 
-dependencies {
-    add("kspAndroid", libs.androidx.room.compiler)
-    add("kspIosSimulatorArm64", libs.androidx.room.compiler)
-    add("kspIosArm64", libs.androidx.room.compiler)
-}
-
-room {
-    schemaDirectory("$projectDir/schemas")
-}
 

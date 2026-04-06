@@ -3,8 +3,8 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
 plugins {
-    id("kmp-library-convention")
-    id("koin-convention")
+    alias(libs.plugins.kmp.convention)
+    alias(libs.plugins.koin.convention)
 }
 
 kotlin {
