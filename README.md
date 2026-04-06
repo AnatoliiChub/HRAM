@@ -444,47 +444,53 @@ shared `ActivityTrackingManager` and reactive state repositories:
       push updates to **Live Activities**.
 
 ```mermaid
-
 flowchart TB
     %% Shared UI
-    subgraph Shared CMP ["Shared UI (CMP)"]
+    subgraph CMP ["Shared UI (CMP)"]
         direction TB
         UI[User Command]
-        subgraph VM[ViewModel]
-            TC_Shared[TrackingController]
-        end
+        VM[ViewModel]
+        TC_Shared[TrackingController]
 
-        VM --> TC_Shared
         UI --> VM
+        VM --> TC_Shared
     end
-      
+
     %% Background Mode
-    subgraph BG[Background Mode Implementation]
+    subgraph BG ["Background Mode Implementation"]
         direction LR
+
         %% Android Platform
         subgraph Android ["Android Platform"]
             TC_And[AndroidTrackingController]
             Service[BleTrackingService]
-              Notif[Notification <br> Manager]
-          
+            Notif[Notificator]
+
             Service -- "Updates RemoteViews" --> Notif
         end
 
         %% Shared KMP
-        subgraph Shared ["Shared Logic (KMP)"]
-            VM[ViewModel]
-            TC_Shared[TrackingController]
+        subgraph KMP ["Shared Logic (KMP)"]
             ATM[ActivityTrackingManager]
-            Repos[(State Repo)]
+            BCO[BleConnectionOrchestrator]
+            SR[SessionRecorder]
 
-            ATM -- "Update State" --> Repos
+            subgraph Storage ["State Repos"]
+                BleRepo[(BleStateRepo)]
+                TrackRepo[(TrackingStateRepo)]
+            end
+
+            ATM --> BCO
+            ATM --> SR
+            BCO -- "BLE state" --> BleRepo
+            SR -- "Tracking state" --> TrackRepo
         end
 
         %% iOS Platform
         subgraph iOS ["iOS Platform"]
-            LAM[LiveActivityManager]
-            LA[Native Live Activities <br> Swift Code]
             TC_iOS[IosTrackingController]
+            LAM[LiveActivityManager]
+            LA["Native Live Activities (Swift)"]
 
             TC_iOS -- "Controls" --> LAM
             LAM -- "Interop call" --> LA
@@ -494,11 +500,11 @@ flowchart TB
     %% Cross-layer connections
     TC_Shared -- "Implementation" --> TC_And
     TC_Shared -- "Implementation" --> TC_iOS
+    TC_And -. "Intents" .-> Service
     Service -- "Calls" --> ATM
     TC_iOS -- "Calls" --> ATM
-    Service -. "Listen" .-> Repos
-    TC_iOS -. "Listen" .-> Repos
-    TC_And -. "Intents (Start/Stop)" .-> Service
+    Service -. "Listen" .-> Storage
+    TC_iOS -. "Listen" .-> Storage
 ```
 
 ---
