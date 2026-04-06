@@ -16,8 +16,7 @@ import com.achub.hram.domain.model.HeartRateRecord
 import com.achub.hram.domain.model.ScanResultModel
 import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.createActivity
-import com.achub.hram.ext.logger
-import com.achub.hram.ext.loggerE
+import com.achub.hram.Logger
 import com.achub.hram.ext.tickerFlow
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
@@ -107,10 +106,10 @@ class HramActivityTrackingManager(
     override fun scan(duration: Duration) = cancelScanning.apply { tryEmit(false) }
         .let { deviceDataSource.scan(duration) }
         .onStart { emit(ScanResultModel.Initiated) }
-        .onStart { logger(TAG) { "Scan started for duration: $duration" } }
+        .onStart { Logger.D(TAG) { "Scan started for duration: $duration" } }
         .combine(scanningCancellationTracking()) { scanResult, _ -> scanResult }
         .onEach {
-            logger(TAG) { "Scan result: $it" }
+            Logger.D(TAG) { "Scan result: $it" }
             when (it) {
                 is ScanResultModel.Initiated -> updateBleState(BleState.Scanning.Started)
                 is ScanResultModel.Complete -> updateBleState(BleState.Scanning.Completed)
@@ -129,7 +128,7 @@ class HramActivityTrackingManager(
         .onEach { updateBleState(BleState.Connected(it)) }
         .flatMapLatest { listen() }
         .onEach { notification ->
-            logger(TAG) { "Ble notification received: $notification" }
+            Logger.D(TAG) { "Ble notification received: $notification" }
             val state = BleState.NotificationUpdate(notification, device)
             updateBleState(state)
         }
@@ -141,7 +140,7 @@ class HramActivityTrackingManager(
         .onStart { emit(BleNotificationModel.Empty) }
         .map { it.copy(elapsedTime = stopWatch.elapsedTime()) }
         .onEach { indication -> if (isTracking() && indication.isBleConnected) store(indication) }
-        .catch { loggerE(TAG) { "listen error : $it" } }
+        .catch { Logger.E(TAG) { "listen error : $it" } }
 
     override fun releaseState() {
         scope.launch { trackingStateRepo.release() }
@@ -188,7 +187,7 @@ class HramActivityTrackingManager(
     private suspend fun isTracking() = trackingStateRepo.get() == TrackingStateStage.ACTIVE_TRACKING_STATE
 
     private suspend fun onScanFailed(exception: Throwable) {
-        loggerE(TAG) { "Scan failed: $exception" }
+        Logger.E(TAG) { "Scan failed: $exception" }
         val error = platformStateHandler.mapScanError(exception)
             ?: when (exception) {
                 is DeviceUnavailableException -> ScanError.BLUETOOTH_OFF
@@ -198,7 +197,7 @@ class HramActivityTrackingManager(
     }
 
     private fun onConnectionFailed(exception: Throwable? = null) = scope.launch {
-        loggerE(TAG) { "Connection failed: $exception" }
+        Logger.E(TAG) { "Connection failed: $exception" }
         disconnect()
     }
 

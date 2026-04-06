@@ -37,4 +37,13 @@ kotlin {
         freeCompilerArgs.add("-Xcontext-parameters")
         freeCompilerArgs.add("-Xexpect-actual-classes")
     }
+
+    sourceSets {
+        commonMain {
+            dependencies {
+                // Logger (Napier wrapper) — available in every KMP module without explicit declaration
+                api(project(":logger"))
+            }
+        }
+    }
 }

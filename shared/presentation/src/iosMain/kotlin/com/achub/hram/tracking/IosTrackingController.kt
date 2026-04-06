@@ -7,7 +7,7 @@ import com.achub.hram.di.CoroutineModule.Companion.WORKER_DISPATCHER
 import com.achub.hram.domain.model.DeviceModel
 import com.achub.hram.domain.model.SCAN_DURATION_MS
 import com.achub.hram.ext.launchIn
-import com.achub.hram.ext.logger
+import com.achub.hram.Logger
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -37,48 +37,48 @@ class IosTrackingController(private val liveActivityManager: LiveActivityManager
     private var currentAction: ControllerAction? = null
 
     init {
-        logger(TAG) { "IosTrackingController initialized" }
+        Logger.D(TAG) { "IosTrackingController initialized" }
         liveActivityManager.startObserving(bleStateRepo.listen(), trackingStateRepo.listen())
     }
 
     override fun scan(id: String?) {
-        logger(TAG) { "Scan initiated" }
+        Logger.D(TAG) { "Scan initiated" }
         currentAction = ControllerAction.Scan
         performScan()
     }
 
     override fun connectDevice(device: DeviceModel) {
-        logger(TAG) { "Connect device: $device" }
+        Logger.D(TAG) { "Connect device: $device" }
         currentAction = ControllerAction.Connect
         performConnect(device)
     }
 
     override fun disconnectDevice() {
-        logger(TAG) { "Disconnect device" }
+        Logger.D(TAG) { "Disconnect device" }
         currentAction = ControllerAction.Disconnect
         tracker.disconnect()
     }
 
     override fun startTracking() {
-        logger(TAG) { "Start tracking" }
+        Logger.D(TAG) { "Start tracking" }
         currentAction = ControllerAction.StartTracking
         scope.launch { tracker.startTracking() }
     }
 
     override fun pauseTracking() {
-        logger(TAG) { "Pause tracking" }
+        Logger.D(TAG) { "Pause tracking" }
         currentAction = ControllerAction.PauseTracking
         scope.launch { tracker.pauseTracking() }
     }
 
     override fun finishTracking(name: String) {
-        logger(TAG) { "Finish tracking with name: $name" }
+        Logger.D(TAG) { "Finish tracking with name: $name" }
         currentAction = ControllerAction.StopTracking
         scope.launch { tracker.finishTracking(name) }
     }
 
     override fun cancelScanning() {
-        logger(TAG) { "Cancel scanning" }
+        Logger.D(TAG) { "Cancel scanning" }
         currentAction = ControllerAction.CancelScanning
         tracker.cancelScanning()
     }
@@ -102,7 +102,7 @@ class IosTrackingController(private val liveActivityManager: LiveActivityManager
     }
 
     override fun clear() {
-        logger(TAG) { "Cleaning up IosTrackingController" }
+        Logger.D(TAG) { "Cleaning up IosTrackingController" }
         liveActivityManager.cleanup()
         job.cancel()
         connectJob = null

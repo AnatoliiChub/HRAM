@@ -20,8 +20,6 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
             // Serialization (BleState, TrackingStateStage, domain models @Serializable)
             implementation(libs.kotlinx.serialization.json)
-
-            implementation(libs.logger)
         }
     }
 }

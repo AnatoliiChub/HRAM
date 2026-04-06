@@ -10,7 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.IntSize
-import io.github.aakira.napier.Napier
+import com.achub.hram.Logger
 
 private const val TAG = "LiquidEffect"
 
@@ -55,7 +55,7 @@ actual fun rememberLiquidRenderEffect(
 
             runtimeShader.setColorUniform("color", baseColor.toArgb())
         } catch (exception: Throwable) {
-                Napier.e(tag = TAG) { "Error setting shader uniforms: ${exception.localizedMessage}" }
+                Logger.E(TAG) { "Error setting shader uniforms: ${exception.localizedMessage}" }
         }
         RenderEffect.createRuntimeShaderEffect(runtimeShader, "content").asComposeRenderEffect()
     }

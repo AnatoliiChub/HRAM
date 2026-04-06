@@ -1,7 +1,7 @@
 package com.achub.hram.ble.core.connection
 
 import com.achub.hram.ble.BluetoothState
-import com.achub.hram.ble.utils.logger
+import com.achub.hram.Logger
 import com.juul.kable.ExperimentalApi
 import com.juul.kable.Peripheral
 import com.juul.kable.State
@@ -36,7 +36,7 @@ internal class HramConnectionTracker(
 
     @OptIn(ExperimentalApi::class, ExperimentalUuidApi::class, FlowPreview::class)
     override fun trackConnectionState(peripheral: Peripheral) = peripheral.state
-        .onEach { logger(TAG) { "${peripheral.name} device current connection state $it" } }
+        .onEach { Logger.D(TAG) { "${peripheral.name} device current connection state $it" } }
         .map { currentState -> CONNECTING_STATES.any { it == currentState }.not() && currentState !is State.Connected }
         .debounce(STATE_CHANGING_DEBOUNCE)
         .combine(isBluetoothOn) { isDisconnected, isBluetoothOn -> isDisconnected && isBluetoothOn }
@@ -44,5 +44,5 @@ internal class HramConnectionTracker(
         .onEach { isKeepConnection.trySend(true) }
 
     override fun observeDisconnection(): Flow<Boolean> = isKeepConnection.receiveAsFlow()
-        .onEach { logger(TAG) { "Keep connection emitted $it" } }
+        .onEach { Logger.D(TAG) { "Keep connection emitted $it" } }
 }

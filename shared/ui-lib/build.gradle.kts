@@ -18,7 +18,6 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(libs.kotlinx.datetime)
-            implementation(libs.logger)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

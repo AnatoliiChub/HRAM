@@ -2,7 +2,7 @@
 
 package com.achub.hram.ble
 
-import com.achub.hram.ble.utils.logger
+import com.achub.hram.Logger
 import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.onFailure
@@ -27,7 +27,7 @@ class BluetoothStateIos : BluetoothState {
         delegate = object : NSObject(), CBCentralManagerDelegateProtocol {
             override fun centralManagerDidUpdateState(central: CBCentralManager) {
                 trySendBlocking(central.state == CBManagerStatePoweredOn)
-                    .onFailure { logger(TAG) { "BluetoothState: failed: $it" } }
+                    .onFailure { Logger.D(TAG) { "BluetoothState: failed: $it" } }
             }
         }
         manager = CBCentralManager(delegate, null, options)

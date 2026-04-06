@@ -12,7 +12,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import androidx.core.content.ContextCompat
-import com.achub.hram.ble.utils.loggerE
+import com.achub.hram.Logger
 import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.onFailure
@@ -29,13 +29,13 @@ class BluetoothStateAndroid(context: Context) : BluetoothState {
             override fun onReceive(context: Context?, intent: Intent?) {
                 val isBluetoothOnState = STATE_ON == intent?.getIntExtra(EXTRA_STATE, STATE_OFF)
                 trySendBlocking(isBluetoothOnState)
-                    .onFailure { loggerE(TAG) { "BluetoothState: failed: $it" } }
+                    .onFailure { Logger.E(TAG) { "BluetoothState: failed: $it" } }
             }
         }
 
         val adapter = ContextCompat.getSystemService(context, BluetoothManager::class.java)?.adapter
         trySendBlocking(adapter?.state == STATE_ON)
-            .onFailure { loggerE(TAG) { "BluetoothState initial: failed: $it" } }
+            .onFailure { Logger.E(TAG) { "BluetoothState initial: failed: $it" } }
 
         context.registerReceiver(receiver, IntentFilter(ACTION_STATE_CHANGED))
 

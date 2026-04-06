@@ -4,7 +4,7 @@ import com.achub.hram.ble.BLE_SCAN_DURATION
 import com.achub.hram.ble.models.BleConnectionsException
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.PeripheralConvertor
-import com.achub.hram.ble.utils.logger
+import com.achub.hram.Logger
 import com.juul.kable.ExperimentalApi
 import com.juul.kable.Identifier
 import com.juul.kable.NotConnectedException
@@ -94,7 +94,7 @@ internal class HramBleConnectionManager(
     private suspend fun isReconnectionRequired(throwable: Throwable): Boolean {
         val isReconnectionRequired = ERROR_REQUIRED_RECONNECTION.any { throwable::class == it } ||
             (throwable is TimeoutCancellationException && wasConnected.load())
-        logger(TAG) { "try to reconnect: $isReconnectionRequired, because of $throwable" }
+        Logger.D(TAG) { "try to reconnect: $isReconnectionRequired, because of $throwable" }
         if (isReconnectionRequired) delay(RECONNECTION_DELAY_MS)
         return isReconnectionRequired
     }

@@ -71,9 +71,6 @@ kotlin {
 
             // Serialization (for BleState, TrackingStateStage @Serializable)
             implementation(libs.kotlinx.serialization.json)
-
-            // Logging
-            implementation(libs.logger)
         }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)

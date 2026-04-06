@@ -1,8 +1,7 @@
 package com.achub.hram.tracking
 
 import com.achub.hram.data.models.BleState
-import com.achub.hram.ext.logger
-import com.achub.hram.ext.loggerE
+import com.achub.hram.Logger
 import com.hram.bridge.LiveActivityBridgeImpl
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CoroutineScope
@@ -35,7 +34,7 @@ class HramLiveActivityManager : LiveActivityManager {
      */
     @OptIn(FlowPreview::class)
     override fun startObserving(bleStateFlow: Flow<BleState>, trackingStateFlow: Flow<TrackingStateStage>) {
-        logger(TAG) { "Starting Live Activity observation" }
+        Logger.D(TAG) { "Starting Live Activity observation" }
 
         observerJob?.cancel()
         bleStateFlow
@@ -50,14 +49,14 @@ class HramLiveActivityManager : LiveActivityManager {
     }
 
     override fun stopObserving() {
-        logger(TAG) { "Stopping Live Activity observation" }
+        Logger.D(TAG) { "Stopping Live Activity observation" }
         observerJob?.cancel()
         observerJob = null
         endActivity()
     }
 
     override fun cleanup() {
-        logger(TAG) { "Cleaning up LiveActivityManager" }
+        Logger.D(TAG) { "Cleaning up LiveActivityManager" }
         stopObserving()
         job.cancel()
     }
@@ -86,9 +85,9 @@ class HramLiveActivityManager : LiveActivityManager {
                 deviceName = deviceName,
                 elapsedTime = elapsedTime
             )
-            logger(TAG) { "Live Activity started with ID: $activityId" }
+            Logger.D(TAG) { "Live Activity started with ID: $activityId" }
         } catch (e: Exception) {
-            loggerE(TAG) { "Failed to start Live Activity: ${e.message}" }
+            Logger.E(TAG) { "Failed to start Live Activity: ${e.message}" }
         }
     }
 
@@ -228,7 +227,7 @@ class HramLiveActivityManager : LiveActivityManager {
                 elapsedTime = elapsedTime
             )
         } catch (e: Exception) {
-            loggerE(TAG) { "Failed to update Live Activity: ${e.message}" }
+            Logger.E(TAG) { "Failed to update Live Activity: ${e.message}" }
         }
     }
 

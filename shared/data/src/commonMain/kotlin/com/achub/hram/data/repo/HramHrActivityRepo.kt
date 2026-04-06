@@ -8,7 +8,7 @@ import com.achub.hram.domain.model.ActivityInfo
 import com.achub.hram.domain.model.ActivityRecord
 import com.achub.hram.domain.model.HeartRateRecord
 import com.achub.hram.domain.model.HrBucket
-import com.achub.hram.ext.logger
+import com.achub.hram.Logger
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -55,7 +55,7 @@ class HramHrActivityRepo(
                         minHr = aggregated.minOfOrNull { it.avgHr }?.toInt() ?: 0,
                     )
                 }.onEach {
-                    logger(TAG) { "ActivityInfo for ${it.name}: size=${it.buckets.size}" }
+                    Logger.D(TAG) { "ActivityInfo for ${it.name}: size=${it.buckets.size}" }
                 }
             } else {
                 emptyList()

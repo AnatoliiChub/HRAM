@@ -38,8 +38,6 @@ kotlin {
             api(project(":presentation"))
             // data — provides DataModule (includes BleDataModule transitively)
             api(project(":data"))
-            // Logging (for initKoin Napier setup)
-            implementation(libs.logger)
         }
     }
 }

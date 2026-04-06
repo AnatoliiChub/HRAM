@@ -1,7 +1,6 @@
 package com.achub.hram.ext
 
 import com.achub.hram.domain.model.ActivityRecord
-import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
@@ -15,14 +14,6 @@ import kotlinx.coroutines.launch
 import kotlin.time.Duration
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
-
-fun logger(tag: String?, message: () -> String) {
-    Napier.d { "[$tag] ${message()}" }
-}
-
-fun loggerE(tag: String?, message: () -> String) {
-    Napier.e { "[$tag] ${message()}" }
-}
 
 fun <T> Flow<T>.launchIn(scope: CoroutineScope) = scope.launch { collect() }
 

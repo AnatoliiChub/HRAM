@@ -12,7 +12,7 @@ import com.achub.hram.domain.model.DeviceModel
 import com.achub.hram.domain.model.SCAN_DURATION_MS
 import com.achub.hram.data.repo.state.TrackingStateRepo
 import com.achub.hram.di.CoroutineModule.Companion.WORKER_DISPATCHER
-import com.achub.hram.ext.logger
+import com.achub.hram.Logger
 import com.achub.hram.library.R
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -68,15 +68,15 @@ class BleTrackingService : Service(), KoinComponent {
         val notification: Notification = notificator.createNotification()
         ServiceCompat.startForeground(this, NOTIFICATION_ID, notification, FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE)
         trackBleState()
-        logger(TAG) { "Service created" }
+        Logger.D(TAG) { "Service created" }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        logger(TAG) { "onStartCommand with action: $intent $dispatcher" }
+        Logger.D(TAG) { "onStartCommand with action: $intent $dispatcher" }
         if (intent == null) return START_STICKY
         currentAction.set(Action.entries[intent.getIntExtra(ACTION, -1)].ordinal)
         val action = Action.entries[currentAction.get()]
-        logger(TAG) { "Processing action: $action" }
+        Logger.D(TAG) { "Processing action: $action" }
 
         when (action) {
             Action.CancelScanning -> tracker.cancelScanning()
@@ -95,7 +95,7 @@ class BleTrackingService : Service(), KoinComponent {
     }
 
     override fun onDestroy() {
-        logger(TAG) { "Service destroyed" }
+        Logger.D(TAG) { "Service destroyed" }
         job.cancel()
         scanJob = null
         connectJob = null

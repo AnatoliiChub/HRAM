@@ -29,9 +29,6 @@ kotlin {
             // Serialization + okio
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.okio)
-
-            // Logging
-            implementation(libs.logger)
         }
     }
 }

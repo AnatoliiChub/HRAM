@@ -7,8 +7,7 @@ import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.BleNotification
 import com.achub.hram.ble.models.HramBleDevice
 import com.achub.hram.ble.utils.cancelAfter
-import com.achub.hram.ble.utils.logger
-import com.achub.hram.ble.utils.loggerE
+import com.achub.hram.Logger
 import com.juul.kable.Peripheral
 import com.juul.kable.State
 import com.juul.kable.UnmetRequirementException
@@ -45,17 +44,17 @@ internal class HramHrDeviceRepo(
             .catch {
                 when (it) {
                     is kotlinx.coroutines.TimeoutCancellationException -> {
-                        logger(TAG) { "Scan completed after timeout of $duration" }
+                        Logger.D(TAG) { "Scan completed after timeout of $duration" }
                         emit(ScanResult.Complete)
                     }
 
                     is UnmetRequirementException -> {
-                        loggerE(TAG) { "BLE unavailable during scan: $it" }
+                        Logger.E(TAG) { "BLE unavailable during scan: $it" }
                         emit(ScanResult.Error(BleUnavailableException(cause = it)))
                     }
 
                     else -> {
-                        loggerE(TAG) { "Error while scanning for devices: $it" }
+                        Logger.E(TAG) { "Error while scanning for devices: $it" }
                         emit(ScanResult.Error(it))
                     }
                 }
@@ -68,14 +67,14 @@ internal class HramHrDeviceRepo(
             .filter { it.index == 0 }
             .map { ConnectionResult.Connected(it.value) as ConnectionResult }
             .catch { error ->
-                loggerE(TAG) { "Error while connecting to device: $error" }
+                Logger.E(TAG) { "Error while connecting to device: $error" }
                 emit(ConnectionResult.Error(error))
             }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun listen(): Flow<BleNotification> = bleConnectionManager.onConnected
         .flatMapLatest { device -> hrIndicationCombiner(device) }
-        .catch { loggerE(TAG) { "Error: $it" } }
+        .catch { Logger.E(TAG) { "Error: $it" } }
 
     override suspend fun disconnect() {
         bleConnectionManager.disconnect()
@@ -85,7 +84,7 @@ internal class HramHrDeviceRepo(
     private fun hrIndicationCombiner(device: Peripheral): Flow<BleNotification> = combine(
         bleDataRepo.observeHeartRate(device),
         bleDataRepo.observeBatteryLevel(device),
-        device.state.onEach { logger(TAG) { "Device state changed. $it " } }
+        device.state.onEach { Logger.D(TAG) { "Device state changed. $it " } }
     ) { hr, battery, state ->
         val isConnected = state is State.Connected
         if (isConnected) BleNotification(hr, battery, true) else BleNotification.Empty

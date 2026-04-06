@@ -18,7 +18,6 @@ kotlin {
         }
         commonMain.dependencies {
             implementation(libs.kable)
-            implementation(libs.logger)
             implementation(libs.kotlinx.serialization.json)
         }
         commonTest.dependencies {
