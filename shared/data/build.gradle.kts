@@ -12,8 +12,8 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            // Domain interfaces + models live in composeApp
-            api(project(":composeApp"))
+            // Domain interfaces + models
+            api(project(":domain"))
 
             // BLE — only data layer depends on BLE
             implementation(project(":ble"))

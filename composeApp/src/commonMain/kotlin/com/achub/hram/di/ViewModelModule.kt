@@ -1,5 +1,6 @@
 package com.achub.hram.di
 
+import com.achub.hram.ActivityNameErrorMapper
 import com.achub.hram.data.repo.HrActivityRepo
 import com.achub.hram.data.repo.state.BleStateRepo
 import com.achub.hram.data.repo.state.TrackingStateRepo
@@ -7,7 +8,6 @@ import com.achub.hram.screen.activities.ActivitiesViewModel
 import com.achub.hram.screen.record.RecordViewModel
 import com.achub.hram.tracking.TrackingController
 import com.achub.hram.usecase.ExportCsvUseCase
-import com.achub.hram.usecase.ActivityNameErrorMapper
 import dev.icerock.moko.permissions.PermissionsController
 import kotlinx.coroutines.CoroutineDispatcher
 import org.koin.android.annotation.KoinViewModel

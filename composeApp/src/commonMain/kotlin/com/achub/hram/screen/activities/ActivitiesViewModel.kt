@@ -8,7 +8,7 @@ import com.achub.hram.data.repo.HrActivityRepo
 import com.achub.hram.domain.model.ActivityInfo
 import com.achub.hram.ext.stateInExt
 import com.achub.hram.usecase.ExportCsvUseCase
-import com.achub.hram.usecase.ActivityNameErrorMapper
+import com.achub.hram.ActivityNameErrorMapper
 import com.achub.hram.view.cards.ActivityGraphInfo
 import com.achub.hram.view.cards.AvgHrBucketByActivity
 import kotlinx.coroutines.CoroutineDispatcher

@@ -1,9 +1,9 @@
 package com.achub.hram.di
 
+import com.achub.hram.ActivityNameErrorMapper
 import com.achub.hram.data.repo.HrActivityRepo
 import com.achub.hram.export.FileExporter
 import com.achub.hram.usecase.ExportCsvUseCase
-import com.achub.hram.usecase.ActivityNameErrorMapper
 import org.koin.core.annotation.Configuration
 import org.koin.core.annotation.Factory
 import org.koin.core.annotation.Module

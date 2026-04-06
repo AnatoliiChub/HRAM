@@ -1,7 +1,7 @@
 package com.achub.hram.utils
 
-import com.achub.hram.usecase.ActivityNameErrorMapper
-import com.achub.hram.usecase.MAX_NAME_LENGTH
+import com.achub.hram.ActivityNameErrorMapper
+import com.achub.hram.MAX_NAME_LENGTH
 import hram.composeapp.generated.resources.Res
 import hram.composeapp.generated.resources.activity_screen_name_validation_empty
 import hram.composeapp.generated.resources.activity_screen_name_validation_start_digit
