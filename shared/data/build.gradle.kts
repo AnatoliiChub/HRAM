@@ -12,10 +12,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            // Domain interfaces + models
             api(project(":domain"))
-
-            // BLE — only data layer depends on BLE
             implementation(project(":ble"))
 
             // Room

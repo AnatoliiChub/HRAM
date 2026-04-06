@@ -133,7 +133,7 @@ To build the complete iOS application, run both scripts in sequence:
 ## Testing
 
 Unit tests for the shared logic are located in `shared/presentation/src/commonTest` and
-`shared/ble/src/commonTest`.
+`shared/libs/ble/src/commonTest`.
 The project utilises the following testing libraries:
 
 - **`kotlin.test`**: For standard assertions.
@@ -182,11 +182,13 @@ The project is organized into modules under `shared/`, a shell per platform, and
 ```
 HRAM/
 ├── shared/
-│   ├── ble/           # Standalone BLE library (Koin-free)
+│   ├── libs/
+│   │   ├── ble/       # Standalone BLE library (Koin-free)
+│   │   ├── ui-lib/    # Reusable Compose components, styles, shaders
+│   │   └── logger/    # Napier wrapper — Logger object shared across all modules
 │   ├── domain/        # Business logic, interfaces, use cases
 │   ├── data/          # Room DB, DataStore, repositories, export
 │   ├── presentation/  # Compose screens, ViewModels, platform DI
-│   ├── ui-lib/        # Reusable Compose components, styles, shaders
 │   └── app-di/        # Koin root — produces ComposeApp.framework for iOS
 ├── androidApp/        # Android shell (MainActivity + HramApp)
 ├── iosApp/            # iOS shell (SwiftUI + Live Activity + Swift bridge)
@@ -211,7 +213,23 @@ Gradle convention plugins and the shared `:annotations` KMP module:
   Mokkery mocking. Exposed as `api` in `test-mocking-convention` so it is available on all
   platforms including Kotlin/Native.
 
-### `shared/ble/`
+### `shared/libs/`
+
+Library modules shared across feature modules. None of them apply `koin-convention`; they are
+pure KMP libraries consumed as dependencies.
+
+### `shared/libs/logger/`
+
+Thin Napier wrapper. All other modules use `Logger` instead of importing Napier directly.
+
+- `Logger.D(tag, message)` — debug log.
+- `Logger.E(tag, message)` — error log.
+- `Logger.init()` — attaches `DebugAntilog`; called once from `initKoin()` in `:app-di`.
+
+Automatically available in every KMP module via `api(project(":logger"))` in
+`kmp-library-convention` — no per-module declaration needed.
+
+### `shared/libs/ble/`
 
 Standalone BLE module. Koin-free — no DI wiring inside.
 
@@ -244,7 +262,7 @@ Business logic, interfaces, and shared models. No platform code.
 | `data/repo/`                       | Repository interfaces (`HrActivityRepo`, `BleStateRepo`, …)    |
 | `export/FileExporter`              | Platform interface for writing files to device storage          |
 | `di/`                              | `TrackingModule`, `CoroutineModule`, `Qualifiers`               |
-| `ext/DomainExtensions`             | Shared extension functions and Napier logging helpers           |
+| `ext/DomainExtensions`             | Shared extension functions (`now()`, time helpers)      |
 
 ### `shared/data/`
 
@@ -280,7 +298,7 @@ Shared Compose UI, ViewModels, and platform-specific tracking controllers.
 | `tracking/LiveActivityManager`       | iOS — pushes updates to WidgetKit Live Activities                 |
 | `di/`                                | `ViewModelModule`, `UtilsModule`, `TrackingPlatformModule` (expect/actual), `NotificationModule` (Android) |
 
-### `shared/ui-lib/`
+### `shared/libs/ui-lib/`
 
 Reusable Compose UI library — styles, components, shaders, charts.
 
@@ -331,7 +349,7 @@ iOS application shell.
 
 ### BLE
 
-- BLE Layer is implemented in the standalone `:ble` module (`shared/ble/`):
+- BLE Layer is implemented in the standalone `:ble` module (`shared/libs/ble/`):
     - The app communicates with BLE devices that implement the standard Heart Rate Service.
     - `BleDevice` model describing discovered devices; `identifier` field used for mac address (
       Android) or UUID (iOS).
@@ -521,7 +539,7 @@ info) to survive process death or navigation.
 
 ### UI \& screens
 
-Shared UI lives in the `:ui-lib` module (`shared/ui-lib/`) and app-specific screens in
+Shared UI lives in the `:ui-lib` module (`shared/libs/ui-lib/`) and app-specific screens in
 `:presentation` (`shared/presentation/src/commonMain/kotlin/com/achub/hram/screen/`):
 
 - **`:ui-lib`** — all reusable components, styles, shaders, charts, dialogs, sections, tabs.
@@ -659,7 +677,7 @@ layers:
 | **Persistence**          | Room (KMP), DataStore                                                 |
 | **Serialization**        | kotlinx-serialization, Okio                                           |
 | **BLE**                  | [Kable](https://github.com/JuulLabs/kable)                           |
-| **Logging**              | [Napier](https://github.com/AAkira/Napier)                           |
+| **Logging**              | [Napier](https://github.com/AAkira/Napier) (wrapped by `:logger`)    |
 | **Testing**              | kotlin.test, kotlinx-coroutines-test, [Mokkery](https://mokkery.dev/) |
 | **Code Coverage**        | [Kover](https://github.com/Kotlin/kotlinx-kover)                     |
 | **Static Analysis**      | [Detekt](https://detekt.dev/)                                         |

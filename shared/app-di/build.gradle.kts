@@ -34,9 +34,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            // composeApp (UI + domain) — provides all app-level Koin modules
             api(project(":presentation"))
-            // data — provides DataModule (includes BleDataModule transitively)
             api(project(":data"))
         }
     }

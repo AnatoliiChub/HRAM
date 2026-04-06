@@ -54,15 +54,11 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            // UI components
             implementation(project(":ui-lib"))
-
-            // Domain (business logic, interfaces, models)
             api(project(":domain"))
 
             // Lifecycle + ViewModel
             implementation(libs.koin.compose.viewmodel)
-
 
             // Permission
             implementation(libs.moko.compose)
