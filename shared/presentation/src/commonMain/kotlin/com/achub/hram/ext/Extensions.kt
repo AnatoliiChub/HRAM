@@ -49,8 +49,7 @@ suspend fun PermissionsController.requestBleBefore(
         action()
     } catch (ex: Exception) {
         Logger.e("PermissionsController") { "requestBlePermissionBeforeAction Error : $ex" }
-        val bleOff = (ex is DeniedException) && (ex.message == BLE_OFF_MESSAGE) || (ex is DeviceUnavailableException)
+        val bleOff = ((ex is DeniedException) && (ex.message == BLE_OFF_MESSAGE)) || (ex is DeviceUnavailableException)
         if (bleOff) return else onFailure()
     }
 }
-

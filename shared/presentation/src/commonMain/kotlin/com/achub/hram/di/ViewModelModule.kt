@@ -50,7 +50,7 @@ class ViewModelModule {
         @WorkerThread dispatcher: CoroutineDispatcher,
     ) = ActivitiesViewModel(
         observeActivities = observeActivities,
-        deleteActivities = deleteActivities,
+        deleteActivitiesUseCase = deleteActivities,
         renameActivity = renameActivity,
         activityNameErrorMapper = activityNameErrorMapper,
         exportCsvUseCase = exportCsvUseCase,

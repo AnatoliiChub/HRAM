@@ -3,9 +3,11 @@ package com.achub.hram.screen.record
 import com.achub.hram.model.BleNotificationModel
 import com.achub.hram.model.DeviceModel
 import com.achub.hram.model.SCAN_DURATION_MS
+import com.achub.hram.tracking.TrackingStateStage
+import com.achub.hram.tracking.TrackingStateStage.ACTIVE_TRACKING_STATE
+import com.achub.hram.tracking.TrackingStateStage.PAUSED_TRACKING_STATE
+import com.achub.hram.tracking.TrackingStateStage.TRACKING_INIT_STATE
 import com.achub.hram.view.section.RecordingState
-import com.achub.hram.view.section.RecordingState.Paused
-import com.achub.hram.view.section.RecordingState.Recording
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import org.jetbrains.compose.resources.StringResource
@@ -46,15 +48,10 @@ fun MutableStateFlow<RecordScreenState>.updateHrDeviceDialogIfExists(
     update { state -> state.copy(dialog = updatedDialog(it)) }
 }
 
-fun MutableStateFlow<RecordScreenState>.hrDeviceDialog(scanDuration: Duration) =
-    update {
-        it.copy(
-            dialog = RecordScreenDialog.ChooseHRDevice(
-                isLoading = true,
-                loadingDuration = scanDuration
-            )
-        )
-    }
+fun MutableStateFlow<RecordScreenState>.hrDeviceDialog(scanDuration: Duration) = update {
+    val dialog = RecordScreenDialog.ChooseHRDevice(isLoading = true, loadingDuration = scanDuration)
+    it.copy(dialog = dialog)
+}
 
 fun MutableStateFlow<RecordScreenState>.settingsDialog() =
     update { it.copy(dialog = RecordScreenDialog.OpenSettingsDialog) }
@@ -63,8 +60,10 @@ fun MutableStateFlow<RecordScreenState>.deviceConnectedDialog(bleDevice: DeviceM
     it.copy(connectedDevice = bleDevice, dialog = RecordScreenDialog.DeviceConnectedDialog(bleDevice))
 }
 
-fun MutableStateFlow<RecordScreenState>.toggleRecordingState() =
-    this.update { it.copy(recordingState = if (it.recordingState.isRecording()) Paused else Recording) }
+fun MutableStateFlow<RecordScreenState>.toggleRecordingState() = this.update {
+    val state = if (it.recordingState.isRecording()) RecordingState.Paused else RecordingState.Recording
+    it.copy(recordingState = state)
+}
 
 fun MutableStateFlow<RecordScreenState>.stop() = this.update { it.copy(recordingState = RecordingState.Init) }
 
@@ -74,7 +73,7 @@ fun MutableStateFlow<RecordScreenState>.requestBluetooth() =
 fun MutableStateFlow<RecordScreenState>.indications(bleNotification: BleNotificationModel) =
     this.update { it.copy(bleNotification = bleNotification) }
 
-fun MutableStateFlow<RecordScreenState>.connectingProgressDialog(device: DeviceModel) =
+fun MutableStateFlow<RecordScreenState>.connectingProgressDialog() =
     this.update {
         it.copy(
             dialog = RecordScreenDialog.ChooseHRDevice(
@@ -89,4 +88,10 @@ val MutableStateFlow<RecordScreenState>.isRecording: Boolean get() = value.recor
 
 fun MutableStateFlow<RecordScreenState>.clearRequestBluetooth() = this.value.requestBluetooth.also {
     if (it) this.update { state -> state.copy(requestBluetooth = false) }
+}
+
+fun TrackingStateStage.toRecordingState() = when (this) {
+    TRACKING_INIT_STATE -> RecordingState.Init
+    ACTIVE_TRACKING_STATE -> RecordingState.Recording
+    PAUSED_TRACKING_STATE -> RecordingState.Paused
 }

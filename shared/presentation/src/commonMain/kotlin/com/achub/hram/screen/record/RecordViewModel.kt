@@ -4,24 +4,19 @@ package com.achub.hram.screen.record
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.achub.hram.ActivityNameErrorMapper
 import com.achub.hram.data.models.BleState
 import com.achub.hram.data.models.ScanError
-import com.achub.hram.model.BleNotificationModel
-import com.achub.hram.model.DeviceModel
-import com.achub.hram.model.SCAN_DURATION_MS
 import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.launchIn
 import com.achub.hram.ext.requestBleBefore
 import com.achub.hram.ext.stateInExt
+import com.achub.hram.model.BleNotificationModel
+import com.achub.hram.model.DeviceModel
+import com.achub.hram.model.SCAN_DURATION_MS
 import com.achub.hram.tracking.TrackingController
-import com.achub.hram.tracking.TrackingStateStage
-import com.achub.hram.tracking.TrackingStateStage.ACTIVE_TRACKING_STATE
-import com.achub.hram.tracking.TrackingStateStage.PAUSED_TRACKING_STATE
-import com.achub.hram.tracking.TrackingStateStage.TRACKING_INIT_STATE
 import com.achub.hram.usecase.ObserveBleStateUseCase
 import com.achub.hram.usecase.ObserveTrackingStateUseCase
-import com.achub.hram.ActivityNameErrorMapper
-import com.achub.hram.view.section.RecordingState
 import dev.icerock.moko.permissions.PermissionsController
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
@@ -57,7 +52,7 @@ class RecordViewModel(
         observeBleState().onEach { state ->
             when (state) {
                 is BleState.Scanning -> handleScanning(state)
-                is BleState.Connecting -> _uiState.connectingProgressDialog(state.device)
+                is BleState.Connecting -> _uiState.connectingProgressDialog()
                 is BleState.Connected -> handleConnectedState(state)
                 is BleState.NotificationUpdate -> handleNotificationUpdate(state)
                 is BleState.Disconnected -> handleDisconnected()
@@ -157,10 +152,4 @@ class RecordViewModel(
     private fun handleDisconnected() {
         _uiState.update { it.copy(connectedDevice = null, bleNotification = BleNotificationModel.Empty) }
     }
-}
-
-fun TrackingStateStage.toRecordingState() = when (this) {
-    TRACKING_INIT_STATE -> RecordingState.Init
-    ACTIVE_TRACKING_STATE -> RecordingState.Recording
-    PAUSED_TRACKING_STATE -> RecordingState.Paused
 }
