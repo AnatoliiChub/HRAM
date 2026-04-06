@@ -2,17 +2,23 @@ package com.achub.hram.screen.activities
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.achub.hram.models.GraphLimitsUi
 import com.achub.hram.models.HighlightedItemUi
 import com.achub.hram.data.repo.HrActivityRepo
+import com.achub.hram.domain.model.ActivityInfo
 import com.achub.hram.ext.stateInExt
 import com.achub.hram.usecase.ExportCsvUseCase
 import com.achub.hram.usecase.ActivityNameErrorMapper
+import com.achub.hram.view.cards.ActivityGraphInfo
+import com.achub.hram.view.cards.AvgHrBucketByActivity
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+
+private const val MAX_HR_FACTOR = 1.2f
 
 class ActivitiesViewModel(
     val hrActivityRepo: HrActivityRepo,
@@ -26,8 +32,8 @@ class ActivitiesViewModel(
 
     init {
         viewModelScope.launch(dispatcher) {
-            hrActivityRepo.getActivitiesGraph()
-                .map { list -> list.filter { it.name.isNotEmpty() } }
+            hrActivityRepo.getActivities()
+                .map { list -> list.filter { it.name.isNotEmpty() }.map { it.toGraphInfo() } }
                 .collect { activities ->
                     _uiState.update { it.copy(activities = activities) }
                 }
@@ -100,3 +106,25 @@ class ActivitiesViewModel(
         }
     }
 }
+
+private fun ActivityInfo.toGraphInfo(): ActivityGraphInfo {
+    val uiBuckets = buckets.map { AvgHrBucketByActivity(it.bucketNumber, it.avgHr, it.elapsedTime) }
+    return ActivityGraphInfo(
+        id = id,
+        name = name,
+        startDate = startDate,
+        duration = duration,
+        buckets = uiBuckets,
+        totalRecords = totalRecords,
+        avgHr = avgHr,
+        maxHr = maxHr,
+        minHr = minHr,
+        limits = GraphLimitsUi(
+            minX = 0f,
+            maxX = uiBuckets.maxOfOrNull { it.elapsedTime }?.toFloat() ?: 1f,
+            minY = 0f,
+            maxY = (uiBuckets.maxOfOrNull { it.avgHr } ?: 1f) * MAX_HR_FACTOR,
+        ),
+    )
+}
+

@@ -1,7 +1,7 @@
 package com.achub.hram.ext
 
 import androidx.compose.runtime.Composable
-import com.achub.hram.data.db.entity.ActivityEntity
+import com.achub.hram.domain.model.ActivityRecord
 import com.achub.hram.ble.models.BleConnectionsException.BleUnavailableException
 import dev.icerock.moko.permissions.DeniedException
 import dev.icerock.moko.permissions.Permission
@@ -92,8 +92,8 @@ fun MutableList<Job>.cancelAndClear() {
 }
 
 @OptIn(ExperimentalUuidApi::class)
-fun createActivity(name: String, currentTime: Long): ActivityEntity {
-    val activity = ActivityEntity(
+fun createActivity(name: String, currentTime: Long): ActivityRecord {
+    val activity = ActivityRecord(
         Uuid.random().toString() + currentTime,
         name,
         0L,

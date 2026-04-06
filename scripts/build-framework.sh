@@ -17,11 +17,11 @@ echo "=========================================="
 if [[ "$SDK" == "iphonesimulator" ]]; then
     ARCH="iosSimulatorArm64"
     GRADLE_TASK="IosSimulatorArm64"
-    FRAMEWORK_PATH="composeApp/build/bin/iosSimulatorArm64/debugFramework"
+    FRAMEWORK_PATH="shared/app-di/build/bin/iosSimulatorArm64/debugFramework"
 elif [[ "$SDK" == "iphoneos" ]]; then
     ARCH="iosArm64"
     GRADLE_TASK="IosArm64"
-    FRAMEWORK_PATH="composeApp/build/bin/iosArm64/debugFramework"
+    FRAMEWORK_PATH="shared/app-di/build/bin/iosArm64/debugFramework"
 else
     echo "Error: Unknown SDK '$SDK'. Use 'iphonesimulator' or 'iphoneos'"
     exit 1
@@ -30,7 +30,7 @@ fi
 # Step 1: Build Compose framework
 echo ""
 echo "Step 1: Building Compose framework for ${ARCH}..."
-./gradlew :composeApp:linkDebugFramework${GRADLE_TASK} \
+./gradlew :app-di:linkDebugFramework${GRADLE_TASK} \
     --no-daemon \
     --stacktrace
 
@@ -43,7 +43,7 @@ SDK_NAME=$(xcodebuild -showsdks | grep -o "${SDK}[0-9.]*" | head -1)
 echo "Detected SDK name: $SDK_NAME"
 
 # Create the xcode-frameworks directory and copy the framework
-XCODE_FRAMEWORKS_DIR="composeApp/build/xcode-frameworks/${CONFIGURATION}/${SDK_NAME}"
+XCODE_FRAMEWORKS_DIR="shared/app-di/build/xcode-frameworks/${CONFIGURATION}/${SDK_NAME}"
 mkdir -p "$XCODE_FRAMEWORKS_DIR"
 cp -R "${FRAMEWORK_PATH}/ComposeApp.framework" "$XCODE_FRAMEWORKS_DIR/"
 echo "Framework copied to: $XCODE_FRAMEWORKS_DIR"

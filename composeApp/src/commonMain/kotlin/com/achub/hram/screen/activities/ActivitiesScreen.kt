@@ -48,7 +48,7 @@ fun ActivitiesScreen() {
                 .padding(Dimen8),
             verticalArrangement = Arrangement.spacedBy(Dimen8)
         ) {
-            items(items = state.activities, key = { }) { activityInfo ->
+            items(items = state.activities, key = { it.id }) { activityInfo ->
                 val id = activityInfo.id
                 if (activityInfo.buckets.isNotEmpty()) {
                     ActivityCard(

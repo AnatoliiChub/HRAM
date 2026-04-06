@@ -9,10 +9,14 @@ plugins {
     id("quality-convention")
     id("test-mocking-convention")
     alias(libs.plugins.kotlinxSerialization)
-    alias(libs.plugins.androidx.room)
 }
 
 extra["koverIncludes"] = listOf("com.achub.hram.utils.**")
+
+// composeApp is a domain/UI module, not the DI root — disable Koin config check
+ksp {
+    arg("KOIN_CONFIG_CHECK", "false")
+}
 
 kotlin {
     android {
@@ -29,20 +33,10 @@ kotlin {
         }
     }
 
-    val sharedName = "ComposeApp"
-
     listOf(
         iosArm64(),
         iosSimulatorArm64(),
     ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
-            baseName = sharedName
-            isStatic = true
-            compilerOptions {
-                freeCompilerArgs.add("-Xexpect-actual-classes")
-            }
-            linkerOpts.add("-lsqlite3")
-        }
         iosTarget.compilations.getByName("main") {
             cinterops.create("LiveActivitiBridge") {
                 definitionFile.set(
@@ -69,16 +63,8 @@ kotlin {
             implementation(libs.moko.main)
             implementation(libs.moko.ble)
 
-            // Data store
-            implementation(libs.datastore)
-            implementation(libs.datastore.preferences)
-            implementation(libs.androidx.room.runtime)
-            implementation(libs.androidx.sqlite.bundled)
-
-            // Serialization
+            // Serialization (for BleState, TrackingStateStage @Serializable)
             implementation(libs.kotlinx.serialization.json)
-            implementation(libs.okio)
-            implementation(libs.kotlinx.datetime)
 
             // Logging
             implementation(libs.logger)
@@ -93,28 +79,3 @@ kotlin {
     }
 }
 
-dependencies {
-    add("kspAndroid", libs.androidx.room.compiler)
-    add("kspIosSimulatorArm64", libs.androidx.room.compiler)
-    add("kspIosArm64", libs.androidx.room.compiler)
-}
-
-room {
-    schemaDirectory("$projectDir/schemas")
-}
-
-tasks {
-    configureEach {
-        if (this.name.contains("kspDebugKotlinAndroid")) {
-            this.dependsOn("generateResourceAccessorsForAndroidMain")
-            this.dependsOn("generateResourceAccessorsForAndroidDebug")
-            this.dependsOn("generateActualResourceCollectorsForAndroidMain")
-            this.dependsOn("generateComposeResClass")
-            this.dependsOn("generateExpectResourceCollectorsForCommonMain")
-            this.dependsOn("kspCommonMainKotlinMetadata")
-        }
-        if (this.name.contains("kspKotlinIos")) {
-            this.dependsOn("kspCommonMainKotlinMetadata")
-        }
-    }
-}

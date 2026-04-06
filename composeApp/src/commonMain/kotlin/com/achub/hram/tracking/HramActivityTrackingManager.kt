@@ -5,9 +5,9 @@ import com.achub.hram.ble.HrDeviceRepo
 import com.achub.hram.ble.ScanResult
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.BleNotification
-import com.achub.hram.data.db.entity.ACTIVE_ACTIVITY
-import com.achub.hram.data.db.entity.HeartRateBleEntity
 import com.achub.hram.data.models.BleState
+import com.achub.hram.domain.model.ACTIVE_ACTIVITY
+import com.achub.hram.domain.model.HeartRateRecord
 import com.achub.hram.data.models.ScanError
 import com.achub.hram.data.repo.HrActivityRepo
 import com.achub.hram.data.repo.state.BleStateRepo
@@ -169,7 +169,7 @@ class HramActivityTrackingManager(
         bleIndication.hrNotification?.let { hrNotification ->
             val isContactOn = if (hrNotification.isSensorContactSupported) hrNotification.isContactOn else true
             currentActId?.let {
-                val entity = HeartRateBleEntity(
+                val entity = HeartRateRecord(
                     activityId = it,
                     heartRate = hrNotification.hrBpm,
                     elapsedTime = bleIndication.elapsedTime,
