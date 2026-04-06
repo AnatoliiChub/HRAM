@@ -1,4 +1,4 @@
-package com.achub.hram.model
+package com.achub.hram.models
 
 const val ACTIVE_ACTIVITY = ""
 
@@ -8,4 +8,3 @@ data class ActivityRecord(
     val duration: Long,
     val startDate: Long,
 )
-

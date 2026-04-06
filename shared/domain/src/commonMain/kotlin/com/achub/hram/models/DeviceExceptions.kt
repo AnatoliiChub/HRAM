@@ -1,4 +1,4 @@
-package com.achub.hram.model
+package com.achub.hram.models
 
 /**
  * Thrown when the Bluetooth adapter is unavailable (powered off or not present).
@@ -10,4 +10,3 @@ class DeviceUnavailableException(message: String? = null) : Exception(message)
  * Duration for each BLE scan cycle, in milliseconds.
  */
 const val SCAN_DURATION_MS = 5000L
-

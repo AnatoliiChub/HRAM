@@ -1,4 +1,4 @@
-package com.achub.hram.tracking
+package com.achub.hram.tracking.stopwatch
 
 import kotlinx.coroutines.flow.Flow
 
@@ -13,4 +13,3 @@ interface StopWatch {
 
     fun elapsedTime(): Long
 }
-

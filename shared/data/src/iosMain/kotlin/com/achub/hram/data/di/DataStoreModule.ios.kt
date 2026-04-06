@@ -1,13 +1,13 @@
 package com.achub.hram.data.di
 
 import androidx.datastore.core.DataStore
-import com.achub.hram.data.models.BleState
 import com.achub.hram.data.store.BLE_STATE_FILE_NAME
 import com.achub.hram.data.store.BleStateSerializer
 import com.achub.hram.data.store.TRACKING_STATE_STAGE_FILE_NAME
 import com.achub.hram.data.store.TrackingStateStageSerializer
 import com.achub.hram.data.store.createOkioDataStore
 import com.achub.hram.di.CoroutineModule
+import com.achub.hram.models.BleState
 import com.achub.hram.tracking.TrackingStateStage
 import kotlinx.cinterop.ExperimentalForeignApi
 import org.koin.core.annotation.Configuration
@@ -63,4 +63,3 @@ actual class DataStoreModule actual constructor() {
         serializer = serializer
     )
 }
-

@@ -1,7 +1,5 @@
-package com.achub.hram.data.models
+package com.achub.hram.models
 
-import com.achub.hram.model.BleNotificationModel
-import com.achub.hram.model.DeviceModel
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -43,4 +41,3 @@ enum class ScanError {
 enum class ConnectionError {
     UNKNOWN,
 }
-

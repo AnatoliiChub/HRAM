@@ -1,6 +1,6 @@
 package com.achub.hram.tracking
 
-import com.achub.hram.data.models.ScanError
+import com.achub.hram.models.ScanError
 
 /**
  * Abstracts platform-specific knowledge of BLE error conditions.
@@ -13,4 +13,3 @@ interface BlePlatformStateHandler {
      */
     fun mapScanError(exception: Throwable): ScanError?
 }
-

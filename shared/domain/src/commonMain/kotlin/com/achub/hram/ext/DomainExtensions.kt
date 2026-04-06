@@ -1,6 +1,6 @@
 package com.achub.hram.ext
 
-import com.achub.hram.model.ActivityRecord
+import com.achub.hram.models.ActivityRecord
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
@@ -48,4 +48,3 @@ fun <T> Flow<T>.cancelAfter(duration: Duration) = this.combine(
         delay(duration.inWholeMilliseconds + 1)
     }.timeout(duration)
 ) { result, _ -> result }
-

@@ -2,13 +2,13 @@ package com.achub.hram.data.repo
 
 import com.achub.hram.ble.HrDeviceRepo
 import com.achub.hram.ble.models.BleConnectionsException.BleUnavailableException
-import com.achub.hram.data.mapper.toDomain
 import com.achub.hram.data.mapper.toBle
-import com.achub.hram.model.BleNotificationModel
-import com.achub.hram.model.ConnectionResultModel
-import com.achub.hram.model.DeviceModel
-import com.achub.hram.model.DeviceUnavailableException
-import com.achub.hram.model.ScanResultModel
+import com.achub.hram.data.mapper.toDomain
+import com.achub.hram.models.BleNotificationModel
+import com.achub.hram.models.ConnectionResultModel
+import com.achub.hram.models.DeviceModel
+import com.achub.hram.models.DeviceUnavailableException
+import com.achub.hram.models.ScanResultModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -22,7 +22,6 @@ import kotlin.time.Duration
 class HramDeviceDataSource(
     private val hrDeviceRepo: HrDeviceRepo,
 ) : DeviceDataSource {
-
     override fun scan(duration: Duration): Flow<ScanResultModel> =
         hrDeviceRepo.scan(duration)
             .map { it.toDomain() }
@@ -40,4 +39,3 @@ class HramDeviceDataSource(
 
     override suspend fun disconnect() = hrDeviceRepo.disconnect()
 }
-

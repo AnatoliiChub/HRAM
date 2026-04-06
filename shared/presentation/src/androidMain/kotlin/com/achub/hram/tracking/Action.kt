@@ -9,4 +9,3 @@ enum class Action {
     StopTracking,
     CancelScanning
 }
-

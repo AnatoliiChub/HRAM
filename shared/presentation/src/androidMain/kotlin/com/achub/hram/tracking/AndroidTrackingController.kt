@@ -2,7 +2,9 @@ package com.achub.hram.tracking
 
 import android.content.Context
 import android.content.Intent
-import com.achub.hram.model.DeviceModel
+import com.achub.hram.models.DeviceModel
+import com.achub.hram.tracking.notification.ACTION
+import com.achub.hram.tracking.notification.BleTrackingService
 
 class AndroidTrackingController(
     val context: Context,
@@ -74,4 +76,3 @@ class AndroidTrackingController(
         // No-op for Android
     }
 }
-

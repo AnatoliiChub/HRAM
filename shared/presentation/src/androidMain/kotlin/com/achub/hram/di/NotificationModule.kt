@@ -2,8 +2,8 @@ package com.achub.hram.di
 
 import android.app.NotificationManager
 import android.content.Context
-import com.achub.hram.tracking.HramNotificator
-import com.achub.hram.tracking.Notificator
+import com.achub.hram.tracking.notification.HramNotificator
+import com.achub.hram.tracking.notification.Notificator
 import org.koin.core.annotation.Configuration
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Single

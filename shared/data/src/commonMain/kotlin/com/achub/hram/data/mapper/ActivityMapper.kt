@@ -1,7 +1,7 @@
 package com.achub.hram.data.mapper
 
 import com.achub.hram.data.db.entity.ActivityEntity
-import com.achub.hram.model.ActivityRecord
+import com.achub.hram.models.ActivityRecord
 
 fun ActivityEntity.toDomain() = ActivityRecord(
     id = id,
@@ -16,4 +16,3 @@ fun ActivityRecord.toEntity() = ActivityEntity(
     duration = duration,
     startDate = startDate,
 )
-

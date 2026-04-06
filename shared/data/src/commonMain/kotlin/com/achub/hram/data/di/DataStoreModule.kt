@@ -1,10 +1,10 @@
 package com.achub.hram.data.di
 
 import androidx.datastore.core.DataStore
-import com.achub.hram.data.models.BleState
 import com.achub.hram.data.store.BleStateSerializer
 import com.achub.hram.data.store.TrackingStateStageSerializer
 import com.achub.hram.di.CoroutineModule
+import com.achub.hram.models.BleState
 import com.achub.hram.tracking.TrackingStateStage
 import org.koin.core.annotation.Configuration
 import org.koin.core.annotation.Module
@@ -29,4 +29,3 @@ expect class DataStoreModule() {
         serializer: TrackingStateStageSerializer
     ): DataStore<TrackingStateStage>
 }
-

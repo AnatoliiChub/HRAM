@@ -1,6 +1,6 @@
 package com.achub.hram.tracking
 
-import com.achub.hram.data.models.ScanError
+import com.achub.hram.models.ScanError
 import dev.icerock.moko.permissions.DeniedException
 
 /**

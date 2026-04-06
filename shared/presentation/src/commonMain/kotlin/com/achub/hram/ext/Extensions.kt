@@ -2,7 +2,7 @@ package com.achub.hram.ext
 
 import androidx.compose.runtime.Composable
 import com.achub.hram.Logger
-import com.achub.hram.model.DeviceUnavailableException
+import com.achub.hram.models.DeviceUnavailableException
 import dev.icerock.moko.permissions.DeniedException
 import dev.icerock.moko.permissions.Permission
 import dev.icerock.moko.permissions.PermissionsController

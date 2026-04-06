@@ -1,4 +1,4 @@
-package com.achub.hram.model
+package com.achub.hram.models
 
 data class HeartRateRecord(
     val activityId: String,
@@ -8,4 +8,3 @@ data class HeartRateRecord(
     val isContactOn: Boolean,
     val batteryLevel: Int,
 )
-

@@ -1,6 +1,7 @@
-package com.achub.hram.tracking
+package com.achub.hram.tracking.notification
 
-import com.achub.hram.data.models.BleState
+import com.achub.hram.models.BleState
+import com.achub.hram.tracking.TrackingStateStage
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 

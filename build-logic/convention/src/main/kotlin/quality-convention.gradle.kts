@@ -8,27 +8,32 @@ plugins {
 
 val catalog = versionCatalogs.named("libs")
 
-// Extension: set kover include patterns, e.g. `extra["koverIncludes"] = listOf("com.achub.hram.ble.**")` */
-extra["koverIncludes"] = emptyList<String>()
+// Extension: set kover include/exclude patterns, e.g.
+// `extra["koverIncludes"] = listOf("com.achub.hram.ble.**")`
+// `extra["koverExcludes"] = listOf("com.achub.hram.ble.BleFactory")`
 
+extra["koverExcludes"] = emptyList<String>()
 // --- Kover ---
 afterEvaluate {
     @Suppress("UNCHECKED_CAST")
-    val includesPatterns = extra["koverIncludes"] as List<String>
     kover {
         reports {
+            @Suppress("UNCHECKED_CAST")
+            val excludesPatterns = (extra["koverExcludes"] as? List<String>) ?: emptyList()
+            val includesPatterns = (extra["koverIncludes"] as? List<String>) ?: emptyList()
             filters {
                 includes {
                     includesPatterns.forEach { classes(it) }
                 }
                 excludes {
                     classes("*.models.*")
-                    classes("*Android*")
-                    classes("*Ios*")
+                    excludesPatterns.forEach { classes(it) }
                 }
+                // Project-wide sensible defaults
             }
         }
     }
+    // Project-specific excludes from build.gradle (e.g. to exclude factory utilities)
 }
 
 // --- Detekt ---
@@ -49,9 +54,6 @@ detekt {
 tasks.withType<Detekt>().configureEach {
     reports {
         html.required.set(true)
-        html.outputLocation.set(file("${projectDir.path}/build/reports/detekt.html"))
-        xml.required.set(false)
-        txt.required.set(false)
         sarif.required.set(false)
         md.required.set(false)
     }

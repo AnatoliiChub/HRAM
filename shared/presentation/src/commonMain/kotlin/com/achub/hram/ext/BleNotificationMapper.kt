@@ -1,10 +1,10 @@
 package com.achub.hram.ext
 
-import com.achub.hram.model.BleNotificationModel
-import com.achub.hram.model.DeviceModel
-import com.achub.hram.model.HrNotificationModel
-import com.achub.hram.models.DeviceUi
+import com.achub.hram.models.BleNotificationModel
 import com.achub.hram.models.BleNotificationUi
+import com.achub.hram.models.DeviceModel
+import com.achub.hram.models.DeviceUi
+import com.achub.hram.models.HrNotificationModel
 import com.achub.hram.models.HrNotificationUi
 
 fun DeviceModel.toDto() = DeviceUi(name = name, identifier = identifier, manufacturer = manufacturer)

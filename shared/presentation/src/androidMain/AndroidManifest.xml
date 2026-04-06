@@ -16,7 +16,7 @@
 
     <application>
         <service
-            android:name="com.achub.hram.tracking.BleTrackingService"
+            android:name="com.achub.hram.tracking.notification.BleTrackingService"
             android:exported="false"
             android:foregroundServiceType="connectedDevice" />
     </application>

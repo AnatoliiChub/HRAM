@@ -1,4 +1,4 @@
-package com.achub.hram.tracking
+package com.achub.hram.tracking.notification
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -8,12 +8,16 @@ import android.content.Intent
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
 import android.os.IBinder
 import androidx.core.app.ServiceCompat
-import com.achub.hram.model.DeviceModel
-import com.achub.hram.model.SCAN_DURATION_MS
+import com.achub.hram.Logger
 import com.achub.hram.data.repo.state.TrackingStateRepo
 import com.achub.hram.di.CoroutineModule.Companion.WORKER_DISPATCHER
-import com.achub.hram.Logger
 import com.achub.hram.library.R
+import com.achub.hram.models.DeviceModel
+import com.achub.hram.models.SCAN_DURATION_MS
+import com.achub.hram.tracking.Action
+import com.achub.hram.tracking.ActivityTrackingManager
+import com.achub.hram.tracking.NOTIFICATION_SAMPLE_MS
+import com.achub.hram.tracking.TrackingStateStage
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -37,7 +41,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import kotlin.time.Duration.Companion.milliseconds
 
 const val CHANNEL_ID = "BLE_TRACKING_CHANNEL_ID"
-const val ACTION = "com.achub.hram.tracking.BleTrackingService.ACTION"
+const val ACTION = "com.achub.hram.tracking.notification.BleTrackingService.ACTION"
 const val NOTIFICATION_ID = 1
 private const val TAG = "BleTrackingService"
 

@@ -1,14 +1,14 @@
 package com.achub.hram.data.repo
 
+import com.achub.hram.Logger
 import com.achub.hram.data.db.dao.ActivityDao
 import com.achub.hram.data.db.dao.HeartRateDao
 import com.achub.hram.data.mapper.toDomain
 import com.achub.hram.data.mapper.toEntity
-import com.achub.hram.model.ActivityInfo
-import com.achub.hram.model.ActivityRecord
-import com.achub.hram.model.HeartRateRecord
-import com.achub.hram.model.HrBucket
-import com.achub.hram.Logger
+import com.achub.hram.models.ActivityInfo
+import com.achub.hram.models.ActivityRecord
+import com.achub.hram.models.HeartRateRecord
+import com.achub.hram.models.HrBucket
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -22,7 +22,6 @@ class HramHrActivityRepo(
     @Provided val actDao: ActivityDao,
     @Provided val hrDao: HeartRateDao
 ) : HrActivityRepo {
-
     override suspend fun insert(item: HeartRateRecord) = hrDao.insert(item.toEntity())
 
     override suspend fun insert(item: ActivityRecord) = actDao.insert(item.toEntity())

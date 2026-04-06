@@ -1,7 +1,7 @@
 package com.achub.hram.data.repo.state
 
 import androidx.datastore.core.DataStore
-import com.achub.hram.data.models.BleState
+import com.achub.hram.models.BleState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
@@ -20,4 +20,3 @@ class HramBleStateRepo(val dataStore: DataStore<BleState>) : BleStateRepo {
         dataStore.updateData { BleState.Disconnected }
     }
 }
-

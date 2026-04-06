@@ -4,13 +4,13 @@ import com.achub.hram.ble.ConnectionResult
 import com.achub.hram.ble.ScanResult
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.BleNotification
-import com.achub.hram.ble.models.HramBleDevice
 import com.achub.hram.ble.models.HrNotification
-import com.achub.hram.model.BleNotificationModel
-import com.achub.hram.model.ConnectionResultModel
-import com.achub.hram.model.DeviceModel
-import com.achub.hram.model.HrNotificationModel
-import com.achub.hram.model.ScanResultModel
+import com.achub.hram.ble.models.HramBleDevice
+import com.achub.hram.models.BleNotificationModel
+import com.achub.hram.models.ConnectionResultModel
+import com.achub.hram.models.DeviceModel
+import com.achub.hram.models.HrNotificationModel
+import com.achub.hram.models.ScanResultModel
 
 // ── BleDevice ↔ DeviceModel ──────────────────────────────────────────────────
 
@@ -58,4 +58,3 @@ fun ConnectionResult.toDomain(): ConnectionResultModel = when (this) {
     is ConnectionResult.Connected -> ConnectionResultModel.Connected(device.toDomain())
     is ConnectionResult.Error -> ConnectionResultModel.Error(error)
 }
-

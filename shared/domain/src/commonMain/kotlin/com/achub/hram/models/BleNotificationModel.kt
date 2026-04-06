@@ -1,4 +1,4 @@
-package com.achub.hram.model
+package com.achub.hram.models
 
 import kotlinx.serialization.Serializable
 
@@ -15,4 +15,3 @@ data class BleNotificationModel(
 
     fun isEmpty() = this == Empty
 }
-

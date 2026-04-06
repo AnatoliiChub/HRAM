@@ -1,8 +1,8 @@
 package com.achub.hram.screen.record
 
-import com.achub.hram.model.BleNotificationModel
-import com.achub.hram.model.DeviceModel
-import com.achub.hram.model.SCAN_DURATION_MS
+import com.achub.hram.models.BleNotificationModel
+import com.achub.hram.models.DeviceModel
+import com.achub.hram.models.SCAN_DURATION_MS
 import com.achub.hram.tracking.TrackingStateStage
 import com.achub.hram.tracking.TrackingStateStage.ACTIVE_TRACKING_STATE
 import com.achub.hram.tracking.TrackingStateStage.PAUSED_TRACKING_STATE

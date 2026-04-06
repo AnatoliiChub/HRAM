@@ -1,4 +1,4 @@
-package com.achub.hram.model
+package com.achub.hram.models
 
 import kotlinx.serialization.Serializable
 
@@ -8,4 +8,3 @@ data class HrNotificationModel(
     val isSensorContactSupported: Boolean,
     val isContactOn: Boolean,
 )
-

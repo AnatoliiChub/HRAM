@@ -1,7 +1,8 @@
-package com.achub.hram.tracking
+package com.achub.hram.tracking.notification
 
 import android.app.Notification
-import com.achub.hram.data.models.BleState
+import com.achub.hram.models.BleState
+import com.achub.hram.tracking.TrackingStateStage
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
 interface Notificator {

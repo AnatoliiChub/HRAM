@@ -1,7 +1,7 @@
 package com.achub.hram.data.store
 
 import androidx.datastore.core.okio.OkioSerializer
-import com.achub.hram.data.models.BleState
+import com.achub.hram.models.BleState
 import kotlinx.serialization.json.Json
 import okio.BufferedSink
 import okio.BufferedSource
@@ -17,4 +17,3 @@ class BleStateSerializer(val json: Json) : OkioSerializer<BleState> {
         sink.use { it.writeUtf8(json.encodeToString(BleState.serializer(), t)) }
     }
 }
-

@@ -1,6 +1,6 @@
 package com.achub.hram
 
-import com.achub.hram.data.models.BleState
+import com.achub.hram.models.BleState
 import kotlinx.serialization.Serializable
 import org.koin.ext.getFullName
 

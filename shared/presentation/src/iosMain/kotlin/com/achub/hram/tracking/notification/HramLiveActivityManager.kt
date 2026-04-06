@@ -1,7 +1,9 @@
-package com.achub.hram.tracking
+package com.achub.hram.tracking.notification
 
-import com.achub.hram.data.models.BleState
 import com.achub.hram.Logger
+import com.achub.hram.models.BleState
+import com.achub.hram.tracking.NOTIFICATION_SAMPLE_MS
+import com.achub.hram.tracking.TrackingStateStage
 import com.hram.bridge.LiveActivityBridgeImpl
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CoroutineScope

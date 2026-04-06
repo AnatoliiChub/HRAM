@@ -1,4 +1,4 @@
-package com.achub.hram.tracking
+package com.achub.hram.tracking.stopwatch
 
 import com.achub.hram.ext.tickerFlow
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -55,4 +55,3 @@ class HramStopWatch : StopWatch {
         null -> 0
     }
 }
-

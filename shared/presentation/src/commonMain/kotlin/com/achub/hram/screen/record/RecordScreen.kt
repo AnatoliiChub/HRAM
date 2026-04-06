@@ -21,10 +21,10 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionOnScreen
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.achub.hram.model.DeviceModel
 import com.achub.hram.ext.permissionController
 import com.achub.hram.ext.requestBluetooth
 import com.achub.hram.ext.toDto
+import com.achub.hram.models.DeviceModel
 import com.achub.hram.style.Dimen16
 import com.achub.hram.style.Dimen24
 import com.achub.hram.style.Dimen32

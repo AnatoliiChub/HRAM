@@ -1,23 +1,24 @@
 package com.achub.hram.tracking
 
-import com.achub.hram.data.models.BleState
-import com.achub.hram.data.models.ScanError
+import com.achub.hram.Logger
 import com.achub.hram.data.repo.DeviceDataSource
 import com.achub.hram.data.repo.HrActivityRepo
 import com.achub.hram.data.repo.state.BleStateRepo
 import com.achub.hram.data.repo.state.TrackingStateRepo
 import com.achub.hram.di.WorkerThread
-import com.achub.hram.model.ACTIVE_ACTIVITY
-import com.achub.hram.model.BleNotificationModel
-import com.achub.hram.model.ConnectionResultModel
-import com.achub.hram.model.DeviceModel
-import com.achub.hram.model.DeviceUnavailableException
-import com.achub.hram.model.HeartRateRecord
-import com.achub.hram.model.ScanResultModel
 import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.createActivity
-import com.achub.hram.Logger
 import com.achub.hram.ext.tickerFlow
+import com.achub.hram.models.ACTIVE_ACTIVITY
+import com.achub.hram.models.BleNotificationModel
+import com.achub.hram.models.BleState
+import com.achub.hram.models.ConnectionResultModel
+import com.achub.hram.models.DeviceModel
+import com.achub.hram.models.DeviceUnavailableException
+import com.achub.hram.models.HeartRateRecord
+import com.achub.hram.models.ScanError
+import com.achub.hram.models.ScanResultModel
+import com.achub.hram.tracking.stopwatch.StopWatch
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -207,4 +208,3 @@ class HramActivityTrackingManager(
 }
 
 class ScanCancelledException : CancellationException("Scan cancelled by user")
-

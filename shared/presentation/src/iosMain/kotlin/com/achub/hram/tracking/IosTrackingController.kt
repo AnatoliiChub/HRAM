@@ -1,13 +1,14 @@
 package com.achub.hram.tracking
 
-import com.achub.hram.data.models.BleState
+import com.achub.hram.Logger
 import com.achub.hram.data.repo.state.BleStateRepo
 import com.achub.hram.data.repo.state.TrackingStateRepo
 import com.achub.hram.di.CoroutineModule.Companion.WORKER_DISPATCHER
-import com.achub.hram.model.DeviceModel
-import com.achub.hram.model.SCAN_DURATION_MS
 import com.achub.hram.ext.launchIn
-import com.achub.hram.Logger
+import com.achub.hram.models.BleState
+import com.achub.hram.models.DeviceModel
+import com.achub.hram.models.SCAN_DURATION_MS
+import com.achub.hram.tracking.notification.LiveActivityManager
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -120,7 +121,12 @@ class IosTrackingController(private val liveActivityManager: LiveActivityManager
     }
 
     private enum class ControllerAction {
-        Scan, Connect, Disconnect, StartTracking, PauseTracking, StopTracking, CancelScanning
+        Scan,
+        Connect,
+        Disconnect,
+        StartTracking,
+        PauseTracking,
+        StopTracking,
+        CancelScanning
     }
 }
-

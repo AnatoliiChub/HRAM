@@ -1,4 +1,4 @@
-package com.achub.hram.tracking
+package com.achub.hram.tracking.notification
 
 import android.app.Notification
 import android.app.NotificationManager
@@ -7,8 +7,9 @@ import android.view.View
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import com.achub.hram.data.models.BleState
 import com.achub.hram.library.R
+import com.achub.hram.models.BleState
+import com.achub.hram.tracking.TrackingStateStage
 import com.achub.hram.utils.formatElapsedTime
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 

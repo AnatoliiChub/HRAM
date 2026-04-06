@@ -1,6 +1,6 @@
 package com.achub.hram.screen.activities
 
-import com.achub.hram.model.ActivityInfo
+import com.achub.hram.models.ActivityInfo
 import com.achub.hram.models.GraphLimitsUi
 import com.achub.hram.models.HighlightedItemUi
 import com.achub.hram.view.cards.ActivityGraphInfo

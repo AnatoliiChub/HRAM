@@ -1,4 +1,4 @@
-package com.achub.hram.model
+package com.achub.hram.models
 
 data class ActivityInfo(
     val id: String,
@@ -11,4 +11,3 @@ data class ActivityInfo(
     val maxHr: Int,
     val minHr: Int,
 )
-
