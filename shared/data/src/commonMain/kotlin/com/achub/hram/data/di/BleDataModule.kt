@@ -9,8 +9,8 @@ import com.achub.hram.ble.core.connection.ConnectionTracker
 import com.achub.hram.ble.core.data.BleDataRepo
 import com.achub.hram.ble.core.data.BleParser
 import com.achub.hram.ble.models.PeripheralConvertor
-import com.achub.hram.data.repo.DeviceDataSource
-import com.achub.hram.data.repo.HramDeviceDataSource
+import com.achub.hram.data.BleDeviceRepository
+import com.achub.hram.data.repo.HramBleDeviceRepository
 import kotlinx.coroutines.CoroutineScope
 import org.koin.core.annotation.Configuration
 import org.koin.core.annotation.Factory
@@ -42,10 +42,10 @@ class BleDataModule {
     fun providePeripheralConvertor(): PeripheralConvertor = BleFactory.peripheralConvertor()
 
     /**
-     * [DeviceDataSource] wraps [HrDeviceRepo] and maps BLE ↔ domain types.
+     * [BleDeviceRepository] wraps [HrDeviceRepo] and maps BLE ↔ domain types.
      * The [CoroutineScope] is passed at the call-site (from HramActivityTrackingManager).
      */
-    @Factory(binds = [DeviceDataSource::class])
+    @Factory(binds = [BleDeviceRepository::class])
     fun provideDeviceDataSource(
         @InjectedParam scope: CoroutineScope,
         connectionTracker: ConnectionTracker,
@@ -53,7 +53,7 @@ class BleDataModule {
         bleScanner: BleScanner,
         bleConnector: BleConnector,
         peripheralConvertor: PeripheralConvertor,
-    ): DeviceDataSource {
+    ): BleDeviceRepository {
         val hrDeviceRepo: HrDeviceRepo =
             BleFactory.hrDeviceRepo(
                 scope,
@@ -63,6 +63,6 @@ class BleDataModule {
                 bleConnector,
                 peripheralConvertor
             )
-        return HramDeviceDataSource(hrDeviceRepo)
+        return HramBleDeviceRepository(hrDeviceRepo)
     }
 }

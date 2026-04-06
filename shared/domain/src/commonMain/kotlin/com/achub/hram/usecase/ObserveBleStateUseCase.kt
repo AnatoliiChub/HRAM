@@ -1,6 +1,6 @@
 package com.achub.hram.usecase
 
-import com.achub.hram.data.repo.state.BleStateRepo
+import com.achub.hram.data.state.BleStateRepo
 import com.achub.hram.models.BleState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onStart

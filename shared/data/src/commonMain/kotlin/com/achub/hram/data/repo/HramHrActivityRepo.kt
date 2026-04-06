@@ -1,6 +1,7 @@
 package com.achub.hram.data.repo
 
 import com.achub.hram.Logger
+import com.achub.hram.data.HrActivityRepo
 import com.achub.hram.data.db.dao.ActivityDao
 import com.achub.hram.data.db.dao.HeartRateDao
 import com.achub.hram.data.mapper.toDomain

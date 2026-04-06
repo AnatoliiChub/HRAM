@@ -1,8 +1,8 @@
 package com.achub.hram.tracking
 
 import com.achub.hram.Logger
-import com.achub.hram.data.repo.state.BleStateRepo
-import com.achub.hram.data.repo.state.TrackingStateRepo
+import com.achub.hram.data.state.BleStateRepo
+import com.achub.hram.data.state.TrackingStateRepo
 import com.achub.hram.di.CoroutineModule.Companion.WORKER_DISPATCHER
 import com.achub.hram.ext.launchIn
 import com.achub.hram.models.BleState

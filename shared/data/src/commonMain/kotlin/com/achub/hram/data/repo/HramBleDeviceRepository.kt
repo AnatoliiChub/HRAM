@@ -2,6 +2,7 @@ package com.achub.hram.data.repo
 
 import com.achub.hram.ble.HrDeviceRepo
 import com.achub.hram.ble.models.BleConnectionsException.BleUnavailableException
+import com.achub.hram.data.BleDeviceRepository
 import com.achub.hram.data.mapper.toBle
 import com.achub.hram.data.mapper.toDomain
 import com.achub.hram.models.BleNotificationModel
@@ -15,13 +16,13 @@ import kotlinx.coroutines.flow.map
 import kotlin.time.Duration
 
 /**
- * Data-layer implementation of [DeviceDataSource].
+ * Data-layer implementation of [com.achub.hram.data.BleDeviceRepository].
  * Wraps [HrDeviceRepo] (BLE) and translates between BLE types and domain types.
  * Only this class (and [BleDeviceMapper]) may import from `:ble`.
  */
-class HramDeviceDataSource(
+class HramBleDeviceRepository(
     private val hrDeviceRepo: HrDeviceRepo,
-) : DeviceDataSource {
+) : BleDeviceRepository {
     override fun scan(duration: Duration): Flow<ScanResultModel> =
         hrDeviceRepo.scan(duration)
             .map { it.toDomain() }

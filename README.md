@@ -252,17 +252,19 @@ Key classes:
 
 Business logic, interfaces, and shared models. No platform code.
 
-| Package / File                     | Purpose                                                         |
-|------------------------------------|-----------------------------------------------------------------|
-| `domain/model/`                    | Domain models (`DeviceModel`, `ActivityInfo`, `HrBucket`, …)   |
-| `tracking/ActivityTrackingManager` | Interface + `HramActivityTrackingManager` implementation        |
-| `tracking/StopWatch`               | Stopwatch abstraction for session time tracking                 |
-| `tracking/TrackingController`      | Interface dispatched to platform implementations                |
-| `usecase/ExportCsvUseCase`         | Fetches HR records and formats them as CSV                      |
-| `data/repo/`                       | Repository interfaces (`HrActivityRepo`, `BleStateRepo`, …)    |
-| `export/FileExporter`              | Platform interface for writing files to device storage          |
-| `di/`                              | `TrackingModule`, `CoroutineModule`, `Qualifiers`               |
-| `ext/DomainExtensions`             | Shared extension functions (`now()`, time helpers)      |
+| Package / File                       | Purpose                                                                    |
+|--------------------------------------|----------------------------------------------------------------------------|
+| `domain/model/`                      | Domain models (`DeviceModel`, `ActivityInfo`, `HrBucket`, …)               |
+| `tracking/ActivityTrackingManager`   | Interface + `HramActivityTrackingManager` — thin coordinator                |
+| `tracking/BleConnectionOrchestrator` | Interface + `HramBleConnectionOrchestrator` — BLE connect/scan/state       |
+| `tracking/SessionRecorder`           | Interface + `HramSessionRecorder` — session lifecycle, stopwatch, HR storage |
+| `tracking/StopWatch`                 | Stopwatch abstraction for session time tracking                             |
+| `tracking/TrackingController`        | Interface dispatched to platform implementations                            |
+| `usecase/ExportCsvUseCase`           | Fetches HR records and formats them as CSV                                  |
+| `data/repo/`                         | Repository interfaces (`HrActivityRepo`, `BleStateRepo`, …)                |
+| `export/FileExporter`                | Platform interface for writing files to device storage                      |
+| `di/`                                | `TrackingModule`, `CoroutineModule`, `Qualifiers`                           |
+| `ext/DomainExtensions`               | Shared extension functions (`now()`, time helpers)                          |
 
 ### `shared/data/`
 
@@ -399,18 +401,24 @@ flowchart TD
 
 ### Tracking
 
-Tracking is implemented in the `:domain` module (`shared/domain/`):
+Tracking is implemented in the `:domain` module (`shared/domain/`). `ActivityTrackingManager`
+is the public interface and `HramActivityTrackingManager` is a thin coordinator that delegates
+to two focused components:
 
-- `ActivityTrackingManager` \- interface for activity tracking.
-    - Start, pause, resume, stop tracking.
-    - Integration with BLE data streams and activity repository.
-    - Core stopwatch logic abstracted in `StopWatch`.
+- `BleConnectionOrchestrator` (`HramBleConnectionOrchestrator`) — owns BLE lifecycle: device
+  scanning, connection, reconnection, BLE state updates.
+- `SessionRecorder` (`HramSessionRecorder`) — owns session lifecycle: start/pause/finish,
+  stopwatch, heart rate record storage.
+- The coordinator wires them together: the raw BLE notification flow from the orchestrator is
+  enriched with elapsed time and gated through a 1-second ticker (active only while tracking),
+  then each notification is persisted via `SessionRecorder.record()`.
+- Core stopwatch logic is abstracted in `StopWatch`.
 
 **What works:**
 
 - Heart rate session lifecycle (start/pause/stop etc.).
 - Time tracking for each session.
-- Combined use of BLE data and stopwatch inside tracking manager.
+- BLE data and session persistence handled by separate, independently testable components.
 
 ---
 
@@ -639,7 +647,8 @@ Dependency injection is implemented using Koin with KSP annotations. Modules are
 layers:
 
 **`:domain`**
-- `TrackingModule.kt` — bindings for `ActivityTrackingManager` and `StopWatch`.
+- `TrackingModule.kt` — bindings for `ActivityTrackingManager`, `BleConnectionOrchestrator`,
+  `SessionRecorder`, and `StopWatch`.
 - `CoroutineModule.kt` — coroutine dispatcher bindings.
 
 **`:data`**

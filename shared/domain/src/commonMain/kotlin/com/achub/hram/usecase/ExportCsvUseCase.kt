@@ -1,6 +1,6 @@
 package com.achub.hram.usecase
 
-import com.achub.hram.data.repo.HrActivityRepo
+import com.achub.hram.data.HrActivityRepo
 import com.achub.hram.export.FileExporter
 
 class ExportCsvUseCase(

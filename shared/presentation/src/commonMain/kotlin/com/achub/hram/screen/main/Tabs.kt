@@ -7,12 +7,12 @@ import hram.composeapp.generated.resources.ic_record
 import hram.composeapp.generated.resources.main_tab_activity
 import hram.composeapp.generated.resources.main_tab_record
 
-class Activities : TabType {
+object Activities : TabType {
     override val icon = Res.drawable.ic_activities
     override val label = Res.string.main_tab_activity
 }
 
-class Record : TabType {
+object Record : TabType {
     override val icon = Res.drawable.ic_record
     override val label = Res.string.main_tab_record
 }

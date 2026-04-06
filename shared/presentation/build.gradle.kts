@@ -8,34 +8,23 @@ plugins {
     alias(libs.plugins.koin.convention)
     alias(libs.plugins.quality.convention)
     alias(libs.plugins.test.mocking.convention)
-    alias(libs.plugins.kotlinxSerialization)
 }
-
-extra["koverIncludes"] = listOf("com.achub.hram.utils.**")
 
 // Keep the generated resources package name stable (was composeApp, now presentation)
-compose.resources {
-    packageOfResClass = "hram.composeapp.generated.resources"
-}
+compose.resources { packageOfResClass = "hram.composeapp.generated.resources" }
 
 // presentation is not the DI root — disable Koin config check
-ksp {
-    arg("KOIN_CONFIG_CHECK", "false")
-}
+ksp { arg("KOIN_CONFIG_CHECK", "false") }
 
 kotlin {
     android {
         namespace = "com.achub.hram.library"
 
         packaging {
-            resources {
-                excludes += "/META-INF/{AL2.0,LGPL2.1}"
-            }
+            resources { excludes += "/META-INF/{AL2.0,LGPL2.1}" }
         }
 
-        androidResources {
-            enable = true
-        }
+        androidResources { enable = true }
     }
 
     listOf(
@@ -56,17 +45,12 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":ui-lib"))
             api(project(":domain"))
-
-            // Lifecycle + ViewModel
             implementation(libs.koin.compose.viewmodel)
 
             // Permission
             implementation(libs.moko.compose)
             implementation(libs.moko.main)
             implementation(libs.moko.ble)
-
-            // Serialization (for BleState, TrackingStateStage @Serializable)
-            implementation(libs.kotlinx.serialization.json)
         }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
@@ -77,4 +61,3 @@ kotlin {
         }
     }
 }
-

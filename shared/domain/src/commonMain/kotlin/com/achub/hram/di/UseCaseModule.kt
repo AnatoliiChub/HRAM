@@ -1,8 +1,8 @@
 package com.achub.hram.di
 
-import com.achub.hram.data.repo.HrActivityRepo
-import com.achub.hram.data.repo.state.BleStateRepo
-import com.achub.hram.data.repo.state.TrackingStateRepo
+import com.achub.hram.data.HrActivityRepo
+import com.achub.hram.data.state.BleStateRepo
+import com.achub.hram.data.state.TrackingStateRepo
 import com.achub.hram.export.FileExporter
 import com.achub.hram.usecase.DeleteActivitiesUseCase
 import com.achub.hram.usecase.ExportCsvUseCase

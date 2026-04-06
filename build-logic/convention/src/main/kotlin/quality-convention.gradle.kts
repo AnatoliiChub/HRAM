@@ -13,6 +13,7 @@ val catalog = versionCatalogs.named("libs")
 // `extra["koverExcludes"] = listOf("com.achub.hram.ble.BleFactory")`
 
 extra["koverExcludes"] = emptyList<String>()
+extra["koverIncludes"] = emptyList<String>()
 // --- Kover ---
 afterEvaluate {
     @Suppress("UNCHECKED_CAST")

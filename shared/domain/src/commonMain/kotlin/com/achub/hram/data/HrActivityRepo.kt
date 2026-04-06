@@ -1,4 +1,4 @@
-package com.achub.hram.data.repo
+package com.achub.hram.data
 
 import com.achub.hram.models.ActivityInfo
 import com.achub.hram.models.ActivityRecord

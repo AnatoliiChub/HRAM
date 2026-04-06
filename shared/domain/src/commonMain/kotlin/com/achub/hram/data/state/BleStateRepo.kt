@@ -1,4 +1,4 @@
-package com.achub.hram.data.repo.state
+package com.achub.hram.data.state
 
 import com.achub.hram.models.BleState
 

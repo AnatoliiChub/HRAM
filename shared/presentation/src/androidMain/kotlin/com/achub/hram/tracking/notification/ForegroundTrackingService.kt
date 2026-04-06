@@ -9,7 +9,7 @@ import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
 import android.os.IBinder
 import androidx.core.app.ServiceCompat
 import com.achub.hram.Logger
-import com.achub.hram.data.repo.state.TrackingStateRepo
+import com.achub.hram.data.state.TrackingStateRepo
 import com.achub.hram.di.CoroutineModule.Companion.WORKER_DISPATCHER
 import com.achub.hram.library.R
 import com.achub.hram.models.DeviceModel

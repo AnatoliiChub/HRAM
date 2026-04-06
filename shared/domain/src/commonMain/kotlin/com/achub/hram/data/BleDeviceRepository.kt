@@ -1,4 +1,4 @@
-package com.achub.hram.data.repo
+package com.achub.hram.data
 
 import com.achub.hram.models.BleNotificationModel
 import com.achub.hram.models.ConnectionResultModel
@@ -11,7 +11,7 @@ import kotlin.time.Duration
  * Domain-facing abstraction for BLE device operations.
  * Implemented in the data layer; domain never imports BLE types directly.
  */
-interface DeviceDataSource {
+interface BleDeviceRepository {
     fun scan(duration: Duration): Flow<ScanResultModel>
 
     fun connect(device: DeviceModel): Flow<ConnectionResultModel>
