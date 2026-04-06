@@ -373,21 +373,21 @@ Data layer — Room database, DataStore, repository implementations, and CSV exp
 Shared Compose UI, ViewModels, and platform-specific tracking controllers.
 
 - `src/commonMain/` — Screens, ViewModels, DI modules.
-- `src/androidMain/` — `AndroidTrackingController`, `BleTrackingService`, `Notificator`, Android DI.
+- `src/androidMain/` — `AndroidTrackingController`, `TrackingForegroundService`, `Notificator`, Android DI.
 - `src/iosMain/` — `IosTrackingController`, `LiveActivityManager`, `BleStateType`, iOS DI.
 - `src/commonTest/` — Shared unit tests.
 
-| Package / File                       | Purpose                                                           |
-|--------------------------------------|-------------------------------------------------------------------|
-| `screen/main/`                       | Main screen, bottom tab navigation                                       |
-| `screen/activities/`                 | Activities list screen + ViewModel                                       |
-| `screen/record/`                     | Live recording screen + ViewModel                                        |
-| `tracking/TrackingController`        | Platform-agnostic interface for all tracking commands                    |
-| `tracking/AndroidTrackingController` | Sends Intents to `BleTrackingService`                                    |
-| `tracking/IosTrackingController`     | Calls `ActivityTrackingManager` and `LiveActivityManager` directly       |
-| `tracking/BleTrackingService`        | Android foreground service for background BLE tracking            |
-| `tracking/Notificator`               | Android persistent notification with `RemoteViews`                |
-| `tracking/LiveActivityManager`       | iOS — pushes updates to WidgetKit Live Activities                 |
+| Package / File                       | Purpose                                                                                                    |
+|--------------------------------------|------------------------------------------------------------------------------------------------------------|
+| `screen/main/`                       | Main screen, bottom tab navigation                                                                         |
+| `screen/activities/`                 | Activities list screen + ViewModel                                                                         |
+| `screen/record/`                     | Live recording screen + ViewModel                                                                          |
+| `tracking/TrackingController`        | Platform-agnostic interface for all tracking commands                                                      |
+| `tracking/AndroidTrackingController` | Sends Intents to `TrackingForegroundService`                                                               |
+| `tracking/IosTrackingController`     | Calls `ActivityTrackingManager` and `LiveActivityManager` directly                                         |
+| `tracking/TrackingForegroundService`        | Android foreground service for background tracking and notifications                                       |
+| `tracking/Notificator`               | Android persistent notification with `RemoteViews`                                                         |
+| `tracking/LiveActivityManager`       | iOS — pushes updates to WidgetKit Live Activities                                                          |
 | `di/`                                | `ViewModelModule`, `UtilsModule`, `TrackingPlatformModule` (expect/actual), `NotificationModule` (Android) |
 
 ### `shared/libs/ui-lib/`
@@ -522,7 +522,7 @@ a unified interface but has platform-specific implementations in `:presentation`
 shared `ActivityTrackingManager` and reactive state repositories:
 
 1. **Android**:
-    - Uses a **Foreground Service** (`BleTrackingService`) to keep the app alive.
+    - Uses a **Foreground Service** (`TrackingForegroundService`) to keep the app alive.
     - `AndroidTrackingController` sends Intents to the service.
     - The Service delegates work to `ActivityTrackingManager` and observes shared state repositories
       to update **Notifications** (remote views).
@@ -553,7 +553,7 @@ flowchart TB
         %% Android Platform
         subgraph Android ["Android Platform"]
             TC_And[AndroidTrackingController]
-            Service[BleTrackingService]
+            Service[TrackingForegroundService]
             Notif[Notificator]
 
             Service -- "Updates RemoteViews" --> Notif

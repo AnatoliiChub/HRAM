@@ -9,7 +9,6 @@ import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
 import android.os.IBinder
 import androidx.core.app.ServiceCompat
 import com.achub.hram.Logger
-import com.achub.hram.usecase.ObserveTrackingStateUseCase
 import com.achub.hram.di.CoroutineModule.Companion.WORKER_DISPATCHER
 import com.achub.hram.library.R
 import com.achub.hram.models.DeviceModel
@@ -18,6 +17,7 @@ import com.achub.hram.tracking.Action
 import com.achub.hram.tracking.ActivityTrackingManager
 import com.achub.hram.tracking.NOTIFICATION_SAMPLE_MS
 import com.achub.hram.tracking.TrackingStateStage
+import com.achub.hram.usecase.ObserveTrackingStateUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -41,11 +41,11 @@ import java.util.concurrent.atomic.AtomicInteger
 import kotlin.time.Duration.Companion.milliseconds
 
 const val CHANNEL_ID = "BLE_TRACKING_CHANNEL_ID"
-const val ACTION = "com.achub.hram.tracking.notification.BleTrackingService.ACTION"
+const val ACTION = "com.achub.hram.tracking.notification.TrackingForegroundService.ACTION"
 const val NOTIFICATION_ID = 1
-private const val TAG = "BleTrackingService"
+private const val TAG = "TrackingForegroundService"
 
-class BleTrackingService : Service(), KoinComponent {
+class TrackingForegroundService : Service(), KoinComponent {
     companion object {
         const val EXTRA_DEVICE_ID = "device_id"
         const val EXTRA_DEVICE_NAME = "device_name"
