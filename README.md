@@ -174,6 +174,98 @@ For compatibility, devices must implement the standard Heart Rate Service (UUID:
 
 ---
 
+## Clean Architecture
+
+HRAM follows Clean Architecture with three concentric layers. The core rule is that **dependencies
+always point inward** — Presentation and Data both depend on Domain; Domain depends on neither.
+
+### Layers
+
+**Domain** (`:domain`) — the stable core. Pure Kotlin, zero framework or platform dependencies.
+Owns all business logic:
+
+- `ActivityTrackingManager`, `BleConnectionOrchestrator`, `SessionRecorder` — tracking orchestration.
+- Use cases (`ExportCsvUseCase`, `ObserveBleStateUseCase`, …) — single-responsibility operations
+  consumed by ViewModels.
+- Repository interfaces (`HrActivityRepo`, `BleStateRepo`, `TrackingStateRepo`, `BleDeviceRepository`)
+  — contracts that Data must satisfy, keeping Domain ignorant of persistence details.
+- Domain models — plain data classes shared by all layers.
+
+**Data** (`:data`, `:ble`) — implements the domain contracts:
+
+- Room database + DAOs back `HrActivityRepo`.
+- DataStore backs `BleStateRepo` and `TrackingStateRepo`; both are `@Serializable` so state
+  survives process death.
+- `HramBleDeviceRepository` wraps `:ble` and maps BLE types to domain models — the only place BLE
+  types cross the boundary. `:ble` itself is Koin-free and framework-agnostic.
+
+**Presentation** (`:presentation`) — drives the UI and platform-specific background execution:
+
+- ViewModels talk exclusively to `TrackingController` and use cases — never to data implementations.
+- `AndroidTrackingController` dispatches Intents to `BleTrackingService` (foreground service).
+- `IosTrackingController` calls `ActivityTrackingManager` directly and drives Live Activities.
+
+### Advantages
+
+- **Testability** — domain logic is pure Kotlin; unit tests run without Android or iOS runtime.
+- **True code sharing** — ViewModels, use cases, and the entire tracking stack run identically on
+  both platforms; only background execution and notification APIs differ.
+- **Replaceability** — swap Room for another database, or Kable for another BLE library, without
+  touching domain or presentation.
+- **BLE isolation** — `:ble` is a standalone library; `BleDeviceRepository` is the single crossing
+  point, so BLE model changes never ripple beyond `:data`.
+- **Reactive state** — DataStore-backed state repos survive process death and are observed by both
+  platform notification systems (Android Notifications, iOS Live Activities) without coupling them
+  to the tracking logic.
+
+### Module dependency diagram
+
+```mermaid
+flowchart TB
+    subgraph Apps ["Platform Apps"]
+        direction LR
+        Android["androidApp"]
+        iOS["iosApp"]
+    end
+
+    AppDI[":app-di · Koin root / iOS framework"]
+
+    subgraph Layers [" "]
+        direction LR
+        subgraph PL ["Presentation Layer"]
+            direction TB
+            Presentation[":presentation</br> ViewModels  Screens</br>Android & iOS controllers"]
+            UILib[":ui-lib</br>Compose components · charts · shaders"]
+        end
+        subgraph DL ["Domain Layer"]
+            Domain[":domain</br>Business logic · Use Cases</br>Repository interfaces"]
+        end
+        subgraph DAL ["Data Layer"]
+            direction TB
+            Data[":data</br>Room · DataStore</br>Repository implementations"]
+            BLE[":ble</br>Kable · scanning · connection · parsing"]
+        end
+        PL ~~~ DL ~~~ BLE
+    end
+
+    Logger[":logger · Napier wrapper"]
+
+    Android --> AppDI
+    iOS --> AppDI
+    AppDI --> Presentation
+    AppDI --> Data
+    AppDI --> Domain
+    Presentation --> Domain
+    Presentation --> UILib
+    Data --> Domain
+    Data --> BLE
+    Domain --> Logger
+    UILib --> Logger
+    BLE --> Logger
+```
+
+---
+
 ## Project structure
 
 The project is organized into modules under `shared/`, a shell per platform, and a
