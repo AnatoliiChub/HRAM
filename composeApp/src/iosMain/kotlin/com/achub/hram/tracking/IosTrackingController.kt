@@ -22,9 +22,9 @@ import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import kotlin.time.Duration.Companion.milliseconds
 
-private const val TAG = "TrackingController"
+private const val TAG = "IosTrackingController"
 
-actual class TrackingController(private val liveActivityManager: LiveActivityManager) : KoinComponent {
+class IosTrackingController(private val liveActivityManager: LiveActivityManager) : TrackingController, KoinComponent {
     private val tracker: ActivityTrackingManager by inject()
     private val dispatcher: CoroutineDispatcher by inject(qualifier = named(WORKER_DISPATCHER))
     private val trackingStateRepo: TrackingStateRepo by inject()
@@ -34,55 +34,52 @@ actual class TrackingController(private val liveActivityManager: LiveActivityMan
     private val scope = CoroutineScope(Dispatchers.Main + job)
     private var scanJob: Job? = null
     private var connectJob: Job? = null
-    private var currentAction: Action? = null
-
-    // Live Activity Manager for iOS
+    private var currentAction: ControllerAction? = null
 
     init {
-        logger(TAG) { "TrackingController initialized" }
-        // Start observing BLE state for Live Activities
+        logger(TAG) { "IosTrackingController initialized" }
         liveActivityManager.startObserving(bleStateRepo.listen(), trackingStateRepo.listen())
     }
 
-    actual fun scan(id: String?) {
+    override fun scan(id: String?) {
         logger(TAG) { "Scan initiated" }
-        currentAction = Action.Scan
+        currentAction = ControllerAction.Scan
         performScan()
     }
 
-    actual fun connectDevice(device: DeviceModel) {
+    override fun connectDevice(device: DeviceModel) {
         logger(TAG) { "Connect device: $device" }
-        currentAction = Action.Connect
+        currentAction = ControllerAction.Connect
         performConnect(device)
     }
 
-    actual fun disconnectDevice() {
+    override fun disconnectDevice() {
         logger(TAG) { "Disconnect device" }
-        currentAction = Action.Disconnect
+        currentAction = ControllerAction.Disconnect
         tracker.disconnect()
     }
 
-    actual fun startTracking() {
+    override fun startTracking() {
         logger(TAG) { "Start tracking" }
-        currentAction = Action.StartTracking
+        currentAction = ControllerAction.StartTracking
         scope.launch { tracker.startTracking() }
     }
 
-    actual fun pauseTracking() {
+    override fun pauseTracking() {
         logger(TAG) { "Pause tracking" }
-        currentAction = Action.PauseTracking
+        currentAction = ControllerAction.PauseTracking
         scope.launch { tracker.pauseTracking() }
     }
 
-    actual fun finishTracking(name: String) {
+    override fun finishTracking(name: String) {
         logger(TAG) { "Finish tracking with name: $name" }
-        currentAction = Action.StopTracking
+        currentAction = ControllerAction.StopTracking
         scope.launch { tracker.finishTracking(name) }
     }
 
-    actual fun cancelScanning() {
+    override fun cancelScanning() {
         logger(TAG) { "Cancel scanning" }
-        currentAction = Action.CancelScanning
+        currentAction = ControllerAction.CancelScanning
         tracker.cancelScanning()
     }
 
@@ -90,7 +87,7 @@ actual class TrackingController(private val liveActivityManager: LiveActivityMan
     private fun performScan() {
         scanJob?.cancel()
         tracker.scan(SCAN_DURATION_MS.milliseconds)
-            .filter { currentAction == Action.Scan }
+            .filter { currentAction == ControllerAction.Scan }
             .flowOn(dispatcher)
             .launchIn(scope)
             .let { scanJob = it }
@@ -104,25 +101,15 @@ actual class TrackingController(private val liveActivityManager: LiveActivityMan
             .let { connectJob = it }
     }
 
-    actual fun clear() {
-        logger(TAG) { "Cleaning up TrackingController" }
+    override fun clear() {
+        logger(TAG) { "Cleaning up IosTrackingController" }
         liveActivityManager.cleanup()
         job.cancel()
         connectJob = null
         scanJob = null
     }
 
-    private enum class Action {
-        Scan,
-        Connect,
-        Disconnect,
-        StartTracking,
-        PauseTracking,
-        StopTracking,
-        CancelScanning
-    }
-
-    actual fun onAppForeground() {
+    override fun onAppForeground() {
         scope.launch {
             val bleState = bleStateRepo.get()
             if (bleState != BleState.Disconnected) {
@@ -131,4 +118,9 @@ actual class TrackingController(private val liveActivityManager: LiveActivityMan
             }
         }
     }
+
+    private enum class ControllerAction {
+        Scan, Connect, Disconnect, StartTracking, PauseTracking, StopTracking, CancelScanning
+    }
 }
+

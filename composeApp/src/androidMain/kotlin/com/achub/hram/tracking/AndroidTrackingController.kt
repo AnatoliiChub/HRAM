@@ -4,10 +4,10 @@ import android.content.Context
 import android.content.Intent
 import com.achub.hram.domain.model.DeviceModel
 
-actual class TrackingController(
+class AndroidTrackingController(
     val context: Context,
-) {
-    actual fun scan(id: String?) {
+) : TrackingController {
+    override fun scan(id: String?) {
         context.startForegroundService(
             Intent(context, BleTrackingService::class.java).apply {
                 putExtra(ACTION, Action.Scan.ordinal)
@@ -15,7 +15,7 @@ actual class TrackingController(
         )
     }
 
-    actual fun connectDevice(device: DeviceModel) {
+    override fun connectDevice(device: DeviceModel) {
         context.startForegroundService(
             Intent(context, BleTrackingService::class.java).apply {
                 putExtra(ACTION, Action.Connect.ordinal)
@@ -25,7 +25,7 @@ actual class TrackingController(
         )
     }
 
-    actual fun disconnectDevice() {
+    override fun disconnectDevice() {
         context.startForegroundService(
             Intent(context, BleTrackingService::class.java).apply {
                 putExtra(ACTION, Action.Disconnect.ordinal)
@@ -33,7 +33,7 @@ actual class TrackingController(
         )
     }
 
-    actual fun startTracking() {
+    override fun startTracking() {
         context.startForegroundService(
             Intent(context, BleTrackingService::class.java).apply {
                 putExtra(ACTION, Action.StartTracking.ordinal)
@@ -41,7 +41,7 @@ actual class TrackingController(
         )
     }
 
-    actual fun pauseTracking() {
+    override fun pauseTracking() {
         context.startForegroundService(
             Intent(context, BleTrackingService::class.java).apply {
                 putExtra(ACTION, Action.PauseTracking.ordinal)
@@ -49,7 +49,7 @@ actual class TrackingController(
         )
     }
 
-    actual fun finishTracking(name: String) {
+    override fun finishTracking(name: String) {
         context.startForegroundService(
             Intent(context, BleTrackingService::class.java).apply {
                 putExtra(ACTION, Action.StopTracking.ordinal)
@@ -58,7 +58,7 @@ actual class TrackingController(
         )
     }
 
-    actual fun cancelScanning() {
+    override fun cancelScanning() {
         context.startForegroundService(
             Intent(context, BleTrackingService::class.java).apply {
                 putExtra(ACTION, Action.CancelScanning.ordinal)
@@ -66,11 +66,12 @@ actual class TrackingController(
         )
     }
 
-    actual fun clear() {
+    override fun clear() {
         // No-op for Android
     }
 
-    actual fun onAppForeground() {
+    override fun onAppForeground() {
         // No-op for Android
     }
 }
+

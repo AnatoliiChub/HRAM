@@ -1,5 +1,6 @@
 package com.achub.hram.di
 
+import com.achub.hram.tracking.AndroidTrackingController
 import com.achub.hram.tracking.TrackingController
 import org.koin.core.annotation.Configuration
 import org.koin.core.annotation.Module
@@ -10,5 +11,5 @@ import org.koin.core.scope.Scope
 @Configuration
 actual class TrackingPlatformModule actual constructor() {
     @Single
-    actual fun provideTrackingController(scope: Scope): TrackingController = TrackingController(scope.get())
+    actual fun provideTrackingController(scope: Scope): TrackingController = AndroidTrackingController(scope.get())
 }
