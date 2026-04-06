@@ -1,6 +1,6 @@
 package com.achub.hram.tracking
 
-import com.achub.hram.domain.model.DeviceModel
+import com.achub.hram.model.DeviceModel
 
 interface TrackingController {
     fun scan(id: String? = null)

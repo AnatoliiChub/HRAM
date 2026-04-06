@@ -4,11 +4,11 @@ import com.achub.hram.ble.HrDeviceRepo
 import com.achub.hram.ble.models.BleConnectionsException.BleUnavailableException
 import com.achub.hram.data.mapper.toDomain
 import com.achub.hram.data.mapper.toBle
-import com.achub.hram.domain.model.BleNotificationModel
-import com.achub.hram.domain.model.ConnectionResultModel
-import com.achub.hram.domain.model.DeviceModel
-import com.achub.hram.domain.model.DeviceUnavailableException
-import com.achub.hram.domain.model.ScanResultModel
+import com.achub.hram.model.BleNotificationModel
+import com.achub.hram.model.ConnectionResultModel
+import com.achub.hram.model.DeviceModel
+import com.achub.hram.model.DeviceUnavailableException
+import com.achub.hram.model.ScanResultModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map

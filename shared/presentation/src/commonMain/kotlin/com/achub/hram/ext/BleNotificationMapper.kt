@@ -1,8 +1,8 @@
 package com.achub.hram.ext
 
-import com.achub.hram.domain.model.BleNotificationModel
-import com.achub.hram.domain.model.DeviceModel
-import com.achub.hram.domain.model.HrNotificationModel
+import com.achub.hram.model.BleNotificationModel
+import com.achub.hram.model.DeviceModel
+import com.achub.hram.model.HrNotificationModel
 import com.achub.hram.models.DeviceUi
 import com.achub.hram.models.BleNotificationUi
 import com.achub.hram.models.HrNotificationUi

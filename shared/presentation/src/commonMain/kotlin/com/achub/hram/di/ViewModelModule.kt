@@ -1,13 +1,15 @@
 package com.achub.hram.di
 
 import com.achub.hram.ActivityNameErrorMapper
-import com.achub.hram.data.repo.HrActivityRepo
-import com.achub.hram.data.repo.state.BleStateRepo
-import com.achub.hram.data.repo.state.TrackingStateRepo
 import com.achub.hram.screen.activities.ActivitiesViewModel
 import com.achub.hram.screen.record.RecordViewModel
 import com.achub.hram.tracking.TrackingController
+import com.achub.hram.usecase.DeleteActivitiesUseCase
 import com.achub.hram.usecase.ExportCsvUseCase
+import com.achub.hram.usecase.ObserveActivitiesUseCase
+import com.achub.hram.usecase.ObserveBleStateUseCase
+import com.achub.hram.usecase.ObserveTrackingStateUseCase
+import com.achub.hram.usecase.RenameActivityUseCase
 import dev.icerock.moko.permissions.PermissionsController
 import kotlinx.coroutines.CoroutineDispatcher
 import org.koin.android.annotation.KoinViewModel
@@ -24,25 +26,34 @@ class ViewModelModule {
     fun recordViewModel(
         activityNameErrorMapper: ActivityNameErrorMapper,
         trackingController: TrackingController,
-        bleStateRepo: BleStateRepo,
-        trackingStateRepo: TrackingStateRepo,
+        observeBleState: ObserveBleStateUseCase,
+        observeTrackingState: ObserveTrackingStateUseCase,
         @InjectedParam permissionsController: PermissionsController,
         @WorkerThread dispatcher: CoroutineDispatcher,
     ) = RecordViewModel(
         activityNameErrorMapper = activityNameErrorMapper,
         permissionController = permissionsController,
         dispatcher = dispatcher,
-        bleStateRepo = bleStateRepo,
-        trackingStateRepo = trackingStateRepo,
+        observeBleState = observeBleState,
+        observeTrackingState = observeTrackingState,
         trackingController = trackingController,
     )
 
     @Factory
     @KoinViewModel
     fun activitiesViewModel(
-        hrActivityRepo: HrActivityRepo,
+        observeActivities: ObserveActivitiesUseCase,
+        deleteActivities: DeleteActivitiesUseCase,
+        renameActivity: RenameActivityUseCase,
         activityNameErrorMapper: ActivityNameErrorMapper,
         exportCsvUseCase: ExportCsvUseCase,
         @WorkerThread dispatcher: CoroutineDispatcher,
-    ) = ActivitiesViewModel(hrActivityRepo, activityNameErrorMapper, exportCsvUseCase, dispatcher)
+    ) = ActivitiesViewModel(
+        observeActivities = observeActivities,
+        deleteActivities = deleteActivities,
+        renameActivity = renameActivity,
+        activityNameErrorMapper = activityNameErrorMapper,
+        exportCsvUseCase = exportCsvUseCase,
+        dispatcher = dispatcher,
+    )
 }

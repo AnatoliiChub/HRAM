@@ -6,11 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.achub.hram.data.models.BleState
 import com.achub.hram.data.models.ScanError
-import com.achub.hram.data.repo.state.BleStateRepo
-import com.achub.hram.data.repo.state.TrackingStateRepo
-import com.achub.hram.domain.model.BleNotificationModel
-import com.achub.hram.domain.model.DeviceModel
-import com.achub.hram.domain.model.SCAN_DURATION_MS
+import com.achub.hram.model.BleNotificationModel
+import com.achub.hram.model.DeviceModel
+import com.achub.hram.model.SCAN_DURATION_MS
 import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.launchIn
 import com.achub.hram.ext.requestBleBefore
@@ -20,6 +18,8 @@ import com.achub.hram.tracking.TrackingStateStage
 import com.achub.hram.tracking.TrackingStateStage.ACTIVE_TRACKING_STATE
 import com.achub.hram.tracking.TrackingStateStage.PAUSED_TRACKING_STATE
 import com.achub.hram.tracking.TrackingStateStage.TRACKING_INIT_STATE
+import com.achub.hram.usecase.ObserveBleStateUseCase
+import com.achub.hram.usecase.ObserveTrackingStateUseCase
 import com.achub.hram.ActivityNameErrorMapper
 import com.achub.hram.view.section.RecordingState
 import dev.icerock.moko.permissions.PermissionsController
@@ -28,7 +28,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.InjectedParam
@@ -41,8 +40,8 @@ class RecordViewModel(
     val activityNameErrorMapper: ActivityNameErrorMapper,
     val dispatcher: CoroutineDispatcher,
     val trackingController: TrackingController,
-    val bleStateRepo: BleStateRepo,
-    val trackingStateRepo: TrackingStateRepo,
+    val observeBleState: ObserveBleStateUseCase,
+    val observeTrackingState: ObserveTrackingStateUseCase,
     @InjectedParam val permissionController: PermissionsController,
 ) : ViewModel(), KoinComponent {
     private val _uiState = MutableStateFlow(RecordScreenState())
@@ -51,10 +50,11 @@ class RecordViewModel(
     private val scanDuration = SCAN_DURATION_MS.milliseconds
 
     init {
-        trackingStateRepo.listen().onEach { state ->
+        observeTrackingState().onEach { state ->
             _uiState.update { it.copy(recordingState = state.toRecordingState()) }
         }.flowOn(dispatcher).launchIn(viewModelScope).let { jobs.add(it) }
-        bleStateRepo.listen().onStart { bleStateRepo.release() }.onEach { state ->
+
+        observeBleState().onEach { state ->
             when (state) {
                 is BleState.Scanning -> handleScanning(state)
                 is BleState.Connecting -> _uiState.connectingProgressDialog(state.device)

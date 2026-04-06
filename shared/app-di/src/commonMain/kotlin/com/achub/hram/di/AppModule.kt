@@ -7,6 +7,7 @@ import org.koin.core.annotation.KoinApplication
     modules = [
         ViewModelModule::class,
         TrackingModule::class,
+        UseCaseModule::class,
         TrackingPlatformModule::class,
         DataModule::class,
         UtilsModule::class,

@@ -1,9 +1,9 @@
 package com.achub.hram.tracking
 
 import com.achub.hram.data.models.BleState
-import com.achub.hram.domain.model.BleNotificationModel
-import com.achub.hram.domain.model.DeviceModel
-import com.achub.hram.domain.model.ScanResultModel
+import com.achub.hram.model.BleNotificationModel
+import com.achub.hram.model.DeviceModel
+import com.achub.hram.model.ScanResultModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration

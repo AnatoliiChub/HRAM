@@ -1,4 +1,4 @@
-package com.achub.hram.domain.model
+package com.achub.hram.model
 
 /**
  * Thrown when the Bluetooth adapter is unavailable (powered off or not present).

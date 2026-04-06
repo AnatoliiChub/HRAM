@@ -2,13 +2,15 @@ package com.achub.hram.screen.activities
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.achub.hram.ActivityNameErrorMapper
+import com.achub.hram.ext.stateInExt
+import com.achub.hram.model.ActivityInfo
 import com.achub.hram.models.GraphLimitsUi
 import com.achub.hram.models.HighlightedItemUi
-import com.achub.hram.data.repo.HrActivityRepo
-import com.achub.hram.domain.model.ActivityInfo
-import com.achub.hram.ext.stateInExt
+import com.achub.hram.usecase.DeleteActivitiesUseCase
 import com.achub.hram.usecase.ExportCsvUseCase
-import com.achub.hram.ActivityNameErrorMapper
+import com.achub.hram.usecase.ObserveActivitiesUseCase
+import com.achub.hram.usecase.RenameActivityUseCase
 import com.achub.hram.view.cards.ActivityGraphInfo
 import com.achub.hram.view.cards.AvgHrBucketByActivity
 import kotlinx.coroutines.CoroutineDispatcher
@@ -21,7 +23,9 @@ import kotlinx.coroutines.launch
 private const val MAX_HR_FACTOR = 1.2f
 
 class ActivitiesViewModel(
-    val hrActivityRepo: HrActivityRepo,
+    val observeActivities: ObserveActivitiesUseCase,
+    val deleteActivities: DeleteActivitiesUseCase,
+    val renameActivity: RenameActivityUseCase,
     val activityNameErrorMapper: ActivityNameErrorMapper,
     val exportCsvUseCase: ExportCsvUseCase,
     val dispatcher: CoroutineDispatcher,
@@ -32,8 +36,8 @@ class ActivitiesViewModel(
 
     init {
         viewModelScope.launch(dispatcher) {
-            hrActivityRepo.getActivities()
-                .map { list -> list.filter { it.name.isNotEmpty() }.map { it.toGraphInfo() } }
+            observeActivities()
+                .map { list -> list.map { it.toGraphInfo() } }
                 .collect { activities ->
                     _uiState.update { it.copy(activities = activities) }
                 }
@@ -61,7 +65,7 @@ class ActivitiesViewModel(
 
     fun deleteActivities(selectedActivitiesId: Set<String>) {
         viewModelScope.launch(dispatcher) {
-            hrActivityRepo.deleteActivitiesById(selectedActivitiesId)
+            deleteActivities(selectedActivitiesId)
             _uiState.update { state ->
                 state.copy(selectedActivitiesId = state.selectedActivitiesId - selectedActivitiesId)
             }
@@ -100,7 +104,7 @@ class ActivitiesViewModel(
         if (selectedIds.size != 1) return
         val activityId = selectedIds.first()
         viewModelScope.launch(dispatcher) {
-            hrActivityRepo.updateById(activityId, currentDialog.activityName)
+            renameActivity(activityId, currentDialog.activityName)
             dismissDialog()
             _uiState.update { it.copy(selectedActivitiesId = emptySet()) }
         }
@@ -127,4 +131,3 @@ private fun ActivityInfo.toGraphInfo(): ActivityGraphInfo {
         ),
     )
 }
-

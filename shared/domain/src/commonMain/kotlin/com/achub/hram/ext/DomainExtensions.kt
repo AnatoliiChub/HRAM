@@ -1,6 +1,6 @@
 package com.achub.hram.ext
 
-import com.achub.hram.domain.model.ActivityRecord
+import com.achub.hram.model.ActivityRecord
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job

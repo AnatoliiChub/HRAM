@@ -1,4 +1,4 @@
-package com.achub.hram.domain.model
+package com.achub.hram.model
 
 data class ActivityInfo(
     val id: String,

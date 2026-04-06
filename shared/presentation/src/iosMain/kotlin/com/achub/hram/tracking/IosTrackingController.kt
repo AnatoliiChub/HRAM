@@ -4,8 +4,8 @@ import com.achub.hram.data.models.BleState
 import com.achub.hram.data.repo.state.BleStateRepo
 import com.achub.hram.data.repo.state.TrackingStateRepo
 import com.achub.hram.di.CoroutineModule.Companion.WORKER_DISPATCHER
-import com.achub.hram.domain.model.DeviceModel
-import com.achub.hram.domain.model.SCAN_DURATION_MS
+import com.achub.hram.model.DeviceModel
+import com.achub.hram.model.SCAN_DURATION_MS
 import com.achub.hram.ext.launchIn
 import com.achub.hram.Logger
 import kotlinx.coroutines.CoroutineDispatcher

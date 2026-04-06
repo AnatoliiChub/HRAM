@@ -1,8 +1,8 @@
 package com.achub.hram.data.repo
 
-import com.achub.hram.domain.model.ActivityInfo
-import com.achub.hram.domain.model.ActivityRecord
-import com.achub.hram.domain.model.HeartRateRecord
+import com.achub.hram.model.ActivityInfo
+import com.achub.hram.model.ActivityRecord
+import com.achub.hram.model.HeartRateRecord
 import kotlinx.coroutines.flow.Flow
 
 interface HrActivityRepo {

@@ -6,11 +6,11 @@ import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.BleNotification
 import com.achub.hram.ble.models.HramBleDevice
 import com.achub.hram.ble.models.HrNotification
-import com.achub.hram.domain.model.BleNotificationModel
-import com.achub.hram.domain.model.ConnectionResultModel
-import com.achub.hram.domain.model.DeviceModel
-import com.achub.hram.domain.model.HrNotificationModel
-import com.achub.hram.domain.model.ScanResultModel
+import com.achub.hram.model.BleNotificationModel
+import com.achub.hram.model.ConnectionResultModel
+import com.achub.hram.model.DeviceModel
+import com.achub.hram.model.HrNotificationModel
+import com.achub.hram.model.ScanResultModel
 
 // ── BleDevice ↔ DeviceModel ──────────────────────────────────────────────────
 

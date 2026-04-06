@@ -2,7 +2,7 @@ package com.achub.hram.tracking
 
 import android.content.Context
 import android.content.Intent
-import com.achub.hram.domain.model.DeviceModel
+import com.achub.hram.model.DeviceModel
 
 class AndroidTrackingController(
     val context: Context,

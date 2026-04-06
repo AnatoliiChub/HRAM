@@ -1,4 +1,4 @@
-package com.achub.hram.domain.model
+package com.achub.hram.model
 
 const val ACTIVE_ACTIVITY = ""
 

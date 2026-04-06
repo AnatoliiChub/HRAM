@@ -1,8 +1,8 @@
 package com.achub.hram.screen.record
 
-import com.achub.hram.domain.model.BleNotificationModel
-import com.achub.hram.domain.model.DeviceModel
-import com.achub.hram.domain.model.SCAN_DURATION_MS
+import com.achub.hram.model.BleNotificationModel
+import com.achub.hram.model.DeviceModel
+import com.achub.hram.model.SCAN_DURATION_MS
 import com.achub.hram.view.section.RecordingState
 import com.achub.hram.view.section.RecordingState.Paused
 import com.achub.hram.view.section.RecordingState.Recording

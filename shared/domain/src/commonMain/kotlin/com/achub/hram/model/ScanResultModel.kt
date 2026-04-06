@@ -1,4 +1,4 @@
-package com.achub.hram.domain.model
+package com.achub.hram.model
 
 sealed interface ScanResultModel {
     data class ScanUpdate(val device: DeviceModel) : ScanResultModel

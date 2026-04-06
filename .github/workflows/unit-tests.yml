@@ -48,7 +48,7 @@ jobs:
         id: kover
         uses: mi-kas/kover-report@v1.9
         with:
-          path: ${{ github.workspace }}/shared/ble/build/reports/kover/report.xml
+          path: ${{ github.workspace }}/shared/libs/ble/build/reports/kover/report.xml
           title: Code Coverage for BLE package
           update-comment: true
           min-coverage-overall: 80

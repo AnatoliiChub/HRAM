@@ -4,10 +4,10 @@ import com.achub.hram.data.db.dao.ActivityDao
 import com.achub.hram.data.db.dao.HeartRateDao
 import com.achub.hram.data.mapper.toDomain
 import com.achub.hram.data.mapper.toEntity
-import com.achub.hram.domain.model.ActivityInfo
-import com.achub.hram.domain.model.ActivityRecord
-import com.achub.hram.domain.model.HeartRateRecord
-import com.achub.hram.domain.model.HrBucket
+import com.achub.hram.model.ActivityInfo
+import com.achub.hram.model.ActivityRecord
+import com.achub.hram.model.HeartRateRecord
+import com.achub.hram.model.HrBucket
 import com.achub.hram.Logger
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow

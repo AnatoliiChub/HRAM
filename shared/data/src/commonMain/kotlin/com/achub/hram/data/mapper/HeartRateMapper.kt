@@ -1,7 +1,7 @@
 package com.achub.hram.data.mapper
 
 import com.achub.hram.data.db.entity.HeartRateBleEntity
-import com.achub.hram.domain.model.HeartRateRecord
+import com.achub.hram.model.HeartRateRecord
 
 fun HeartRateBleEntity.toDomain() = HeartRateRecord(
     activityId = activityId,

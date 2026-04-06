@@ -1,7 +1,7 @@
 package com.achub.hram.data.models
 
-import com.achub.hram.domain.model.BleNotificationModel
-import com.achub.hram.domain.model.DeviceModel
+import com.achub.hram.model.BleNotificationModel
+import com.achub.hram.model.DeviceModel
 import kotlinx.serialization.Serializable
 
 @Serializable
