@@ -312,8 +312,8 @@ pure KMP libraries consumed as dependencies.
 
 Thin Napier wrapper. All other modules use `Logger` instead of importing Napier directly.
 
-- `Logger.D(tag, message)` — debug log.
-- `Logger.E(tag, message)` — error log.
+- `Logger.d(tag) { message }` — debug log.
+- `Logger.e(tag) { message }` — error log.
 - `Logger.init()` — attaches `DebugAntilog`; called once from `initKoin()` in `:app-di`.
 
 Automatically available in every KMP module via `api(project(":logger"))` in
@@ -345,16 +345,15 @@ Business logic, interfaces, and shared models. No platform code.
 | Package / File                       | Purpose                                                                    |
 |--------------------------------------|----------------------------------------------------------------------------|
 | `domain/model/`                      | Domain models (`DeviceModel`, `ActivityInfo`, `HrBucket`, …)               |
-| `tracking/ActivityTrackingManager`   | Interface + `HramActivityTrackingManager` — thin coordinator                |
-| `tracking/BleConnectionOrchestrator` | Interface + `HramBleConnectionOrchestrator` — BLE connect/scan/state       |
-| `tracking/SessionRecorder`           | Interface + `HramSessionRecorder` — session lifecycle, stopwatch, HR storage |
-| `tracking/StopWatch`                 | Stopwatch abstraction for session time tracking                             |
-| `tracking/TrackingController`        | Interface dispatched to platform implementations                            |
-| `usecase/ExportCsvUseCase`           | Fetches HR records and formats them as CSV                                  |
-| `data/repo/`                         | Repository interfaces (`HrActivityRepo`, `BleStateRepo`, …)                |
-| `export/FileExporter`                | Platform interface for writing files to device storage                      |
-| `di/`                                | `TrackingModule`, `CoroutineModule`, `Qualifiers`                           |
-| `ext/DomainExtensions`               | Shared extension functions (`now()`, time helpers)                          |
+| `tracking/ActivityTrackingManager`      | Interface + `HramActivityTrackingManager` — thin coordinator                |
+| `tracking/BleConnectionOrchestrator`   | Interface + `HramBleConnectionOrchestrator` — BLE connect/scan/state       |
+| `tracking/SessionRecorder`             | Interface + `HramSessionRecorder` — session lifecycle, stopwatch, HR storage |
+| `tracking/stopwatch/StopWatch`         | Stopwatch abstraction for session time tracking                             |
+| `usecase/ExportCsvUseCase`             | Fetches HR records and formats them as CSV                                  |
+| `data/repo/`                           | Repository interfaces (`HrActivityRepo`, `BleStateRepo`, …)                |
+| `export/FileExporter`                  | Platform interface for writing files to device storage                      |
+| `di/`                                  | `TrackingModule`, `UseCaseModule`, `CoroutineModule`, `Qualifiers`          |
+| `ext/DomainExtensions`                 | Shared extension functions (`now()`, time helpers)                          |
 
 ### `shared/data/`
 
@@ -380,11 +379,12 @@ Shared Compose UI, ViewModels, and platform-specific tracking controllers.
 
 | Package / File                       | Purpose                                                           |
 |--------------------------------------|-------------------------------------------------------------------|
-| `screen/main/`                       | Main screen, bottom tab navigation                                |
-| `screen/activities/`                 | Activities list screen + ViewModel                                |
-| `screen/record/`                     | Live recording screen + ViewModel                                 |
-| `tracking/AndroidTrackingController` | Sends Intents to `BleTrackingService`                             |
-| `tracking/IosTrackingController`     | Calls `ActivityTrackingManager` and `LiveActivityManager` directly |
+| `screen/main/`                       | Main screen, bottom tab navigation                                       |
+| `screen/activities/`                 | Activities list screen + ViewModel                                       |
+| `screen/record/`                     | Live recording screen + ViewModel                                        |
+| `tracking/TrackingController`        | Platform-agnostic interface for all tracking commands                    |
+| `tracking/AndroidTrackingController` | Sends Intents to `BleTrackingService`                                    |
+| `tracking/IosTrackingController`     | Calls `ActivityTrackingManager` and `LiveActivityManager` directly       |
 | `tracking/BleTrackingService`        | Android foreground service for background BLE tracking            |
 | `tracking/Notificator`               | Android persistent notification with `RemoteViews`                |
 | `tracking/LiveActivityManager`       | iOS — pushes updates to WidgetKit Live Activities                 |
@@ -517,7 +517,7 @@ to two focused components:
 **Implementation Details:**
 
 Background execution is nuanced per platform. `TrackingController` is the central entry point,
-defined as an interface in `:domain` (`shared/domain/tracking/TrackingController.kt`). It provides
+defined as an interface in `:presentation` (`shared/presentation/src/commonMain/kotlin/com/achub/hram/tracking/TrackingController.kt`). It provides
 a unified interface but has platform-specific implementations in `:presentation` that leverage the
 shared `ActivityTrackingManager` and reactive state repositories:
 
@@ -748,7 +748,7 @@ layers:
 - `CoroutineModule.kt` — coroutine dispatcher bindings.
 
 **`:data`**
-- `BleDataModule.kt` — `HrDeviceRepo` and BLE data bindings.
+- `BleDataModule.kt` — `BleDeviceRepository` and BLE infrastructure bindings (scanner, connector, parser).
 - `BleModule.kt` (expect/actual) — platform-specific BLE scanner/connector setup.
 - `DatabaseModule.kt` (expect/actual) — Room database setup.
 - `DataModule.kt` — repository bindings.
