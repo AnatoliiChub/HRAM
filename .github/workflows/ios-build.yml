@@ -26,7 +26,7 @@ jobs:
         run: ./scripts/build-framework.sh iphonesimulator Debug
 
       - name: Build Xcode project
-        run: ./scripts/build-xcode.sh iphonesimulator Debug "iPhone 16e"
+        run: ./scripts/build-xcode.sh iphonesimulator Debug "iPhone 17"
 
       - name: Upload iOS debug app
         if: always()

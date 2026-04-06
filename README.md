@@ -100,12 +100,12 @@ Builds the iOS Xcode project.
 
 - `SDK` (default: `iphonesimulator`): Target SDK - `iphonesimulator` or `iphoneos`
 - `CONFIGURATION` (default: `Debug`): Build configuration
-- `SIMULATOR_NAME` (default: `iPhone 16e`): Simulator device name (only used for iphonesimulator)
+- `SIMULATOR_NAME` (default: `iPhone 17`): Simulator device name (only used for iphonesimulator)
 
 **Examples:**
 
 ```bash
-./scripts/build-xcode.sh iphonesimulator Debug "iPhone 16e"
+./scripts/build-xcode.sh iphonesimulator Debug "iPhone 17"
 ./scripts/build-xcode.sh iphoneos Debug
 ./scripts/build-xcode.sh  # Uses defaults
 ```
@@ -125,7 +125,7 @@ To build the complete iOS application, run both scripts in sequence:
 ./scripts/build-framework.sh iphonesimulator Debug
 
 # Build the Xcode project
-./scripts/build-xcode.sh iphonesimulator Debug "iPhone 16e"
+./scripts/build-xcode.sh iphonesimulator Debug "iPhone 17"
 ```
 
 ---
