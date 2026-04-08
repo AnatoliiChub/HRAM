@@ -32,9 +32,10 @@ dependencyResolutionManagement {
     }
 }
 
-include(":presentation", ":androidApp", ":ble", ":ui-lib", ":annotations", ":logger", ":data", ":domain", ":app-di")
+include(":presentation", ":androidApp", ":desktopApp", ":ble", ":ui-lib", ":annotations", ":logger", ":data", ":domain", ":app-di")
 project(":logger").projectDir = file("shared/libs/logger")
 project(":presentation").projectDir = file("shared/presentation")
+project(":desktopApp").projectDir = file("desktopApp")
 project(":ble").projectDir = file("shared/libs/ble")
 project(":ui-lib").projectDir = file("shared/libs/ui-lib")
 project(":annotations").projectDir = file("shared/libs/annotations")

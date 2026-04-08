@@ -45,8 +45,10 @@ detekt {
     source.setFrom(
         files(
             "src/commonMain/kotlin",
+            "src/mobileMain/kotlin",
             "src/androidMain/kotlin",
-            "src/iosMain/kotlin"
+            "src/iosMain/kotlin",
+            "src/jvmMain/kotlin"
         )
     )
     config.setFrom(files("$rootDir/detekt/detekt.yml"))

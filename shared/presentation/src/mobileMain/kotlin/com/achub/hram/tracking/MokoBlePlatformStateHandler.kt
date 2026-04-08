@@ -4,9 +4,9 @@ import com.achub.hram.models.ScanError
 import dev.icerock.moko.permissions.DeniedException
 
 /**
- * moko-permissions-aware implementation of [BlePlatformStateHandler].
+ * moko-permissions-aware [BlePlatformStateHandler] shared by Android and iOS.
  * Recognises [DeniedException] with the "Bluetooth is powered off" message that moko
- * raises on both platforms when the system Bluetooth adapter is disabled.
+ * raises when the system Bluetooth adapter is disabled.
  */
 class MokoBlePlatformStateHandler : BlePlatformStateHandler {
     override fun mapScanError(exception: Throwable): ScanError? = when {
@@ -16,3 +16,4 @@ class MokoBlePlatformStateHandler : BlePlatformStateHandler {
         else -> null
     }
 }
+

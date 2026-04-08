@@ -20,6 +20,7 @@ dependencies {
     add("kspAndroid", roomCompiler)
     add("kspIosSimulatorArm64", roomCompiler)
     add("kspIosArm64", roomCompiler)
+    add("kspJvm", roomCompiler)
 }
 
 room {

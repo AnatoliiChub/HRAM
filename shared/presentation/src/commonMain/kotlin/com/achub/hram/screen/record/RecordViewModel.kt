@@ -5,9 +5,9 @@ package com.achub.hram.screen.record
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.achub.hram.ActivityNameErrorMapper
+import com.achub.hram.ext.BlePermissionController
 import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.launchIn
-import com.achub.hram.ext.requestBleBefore
 import com.achub.hram.ext.stateInExt
 import com.achub.hram.models.BleNotificationModel
 import com.achub.hram.models.BleState
@@ -17,7 +17,6 @@ import com.achub.hram.models.ScanError
 import com.achub.hram.tracking.TrackingController
 import com.achub.hram.usecase.ObserveBleStateUseCase
 import com.achub.hram.usecase.ObserveTrackingStateUseCase
-import dev.icerock.moko.permissions.PermissionsController
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,7 +36,7 @@ class RecordViewModel(
     val trackingController: TrackingController,
     val observeBleState: ObserveBleStateUseCase,
     val observeTrackingState: ObserveTrackingStateUseCase,
-    @InjectedParam val permissionController: PermissionsController,
+    @InjectedParam val permissionController: BlePermissionController,
 ) : ViewModel(), KoinComponent {
     private val _uiState = MutableStateFlow(RecordScreenState())
     val uiState = _uiState.stateInExt(initialValue = RecordScreenState())
@@ -93,9 +92,7 @@ class RecordViewModel(
 
     fun requestScanning() = viewModelScope.launch(dispatcher) {
         permissionController.requestBleBefore(action = ::scan, onFailure = _uiState::settingsDialog)
-    }
-
-    fun onHrDeviceSelected(device: DeviceModel) = trackingController.connectDevice(device)
+    }    fun onHrDeviceSelected(device: DeviceModel) = trackingController.connectDevice(device)
 
     override fun onCleared() {
         super.onCleared()

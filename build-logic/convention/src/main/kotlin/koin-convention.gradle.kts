@@ -40,6 +40,7 @@ dependencies {
     add("kspAndroid", koinKspCompiler)
     add("kspIosArm64", koinKspCompiler)
     add("kspIosSimulatorArm64", koinKspCompiler)
+    add("kspJvm", koinKspCompiler)
 }
 
 // --- KSP: Koin args ---

@@ -28,6 +28,8 @@ kotlin {
         withHostTest {}
     }
 
+    jvm()
+
     listOf(
         iosArm64(),
         iosSimulatorArm64(),
