@@ -1,0 +1,202 @@
+package com.achub.hram.screen.record
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.isSpecified
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionOnScreen
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.achub.hram.ext.permissionController
+import com.achub.hram.ext.requestBluetooth
+import com.achub.hram.ext.toDto
+import com.achub.hram.models.DeviceModel
+import com.achub.hram.style.Dimen16
+import com.achub.hram.style.Dimen24
+import com.achub.hram.style.Dimen32
+import com.achub.hram.view.dialogs.InfoDialog
+import com.achub.hram.view.dialogs.NameActivityDialog
+import com.achub.hram.view.dialogs.choosedevice.HrConnectDialog
+import com.achub.hram.view.section.DeviceSection
+import com.achub.hram.view.section.RecordSection
+import com.achub.hram.view.section.TrackingIndicationsSection
+import com.achub.hram.view.shader.ProperLiquidWaveEffect
+import hram.composeapp.generated.resources.Res
+import hram.composeapp.generated.resources.dialog_device_connected_message
+import hram.composeapp.generated.resources.dialog_device_connected_title
+import hram.composeapp.generated.resources.dialog_device_connection_failed_message
+import hram.composeapp.generated.resources.dialog_device_connection_failed_title
+import hram.composeapp.generated.resources.dialog_name_activity_message
+import hram.composeapp.generated.resources.dialog_name_activity_title
+import hram.composeapp.generated.resources.dialog_open_setting_button_text
+import hram.composeapp.generated.resources.dialog_open_setting_message
+import hram.composeapp.generated.resources.dialog_open_setting_title
+import kotlinx.coroutines.delay
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
+
+const val DOUBLE_HAPTIC_INTERVAL = 150L
+private const val COLUMN_SPACER_WEIGHT = 0.5f
+
+@Composable
+fun RecordScreen() {
+    val controller = permissionController()
+    val viewModel = koinViewModel<RecordViewModel>(parameters = { parametersOf(controller) })
+    val state = viewModel.uiState.collectAsStateWithLifecycle().value
+    with(viewModel) {
+        if (state.requestBluetooth) {
+            requestBluetooth()
+            clearRequestBluetooth()
+        }
+        val indications = state.bleNotification.toDto()
+        var heartGlobalCenter by remember { mutableStateOf(Offset.Unspecified) }
+        var boxGlobalPosition by remember { mutableStateOf(Offset.Zero) }
+
+        val device = state.connectedDevice?.toDto()
+        Box(Modifier.fillMaxSize().onGloballyPositioned { boxGlobalPosition = it.positionOnScreen() }) {
+            val hrNotification = indications.hrNotification
+            ProperLiquidWaveEffect(
+                center = heartIconCenter(heartGlobalCenter, boxGlobalPosition),
+                apply = hrNotification?.hrBpm != null && hrNotification.isContactOn,
+                minRadius = Dimen24
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(Dimen16),
+                    horizontalAlignment = CenterHorizontally
+                ) {
+                    Spacer(Modifier.weight(COLUMN_SPACER_WEIGHT))
+                    TrackingIndicationsSection(indications, heartPosUpdated = { heartGlobalCenter = it })
+                    Spacer(Modifier.size(Dimen32))
+                    DeviceSection(device, onConnectClick = { requestScanning() }, onDisconnectClick = { disconnect() })
+                    Spacer(Modifier.weight(COLUMN_SPACER_WEIGHT))
+                    RecordSection(
+                        recordingState = state.recordingState,
+                        onPlay = ::toggleRecording,
+                        onStop = ::showNameActivityDialog,
+                        isRecordingEnabled = state.isRecordingEnabled
+                    )
+                }
+            }
+        }
+        Dialogs(
+            state,
+            onDeviceSelected = ::onHrDeviceSelected,
+            onRequestScanning = ::requestScanning,
+            onDismissDialog = ::dismissDialog,
+            onCancelScanning = ::cancelScanning,
+            openSettings = ::openSettings,
+            onActivityNameChanged = ::onActivityNameChanged,
+            onActivityNameConfirmed = ::stopRecording,
+        )
+    }
+}
+
+@Composable
+private fun Dialogs(
+    state: RecordScreenState,
+    onDeviceSelected: (DeviceModel) -> Unit,
+    onRequestScanning: () -> Unit,
+    onDismissDialog: () -> Unit,
+    onCancelScanning: () -> Unit,
+    openSettings: () -> Unit,
+    onActivityNameChanged: (String) -> Unit,
+    onActivityNameConfirmed: (String) -> Unit
+) {
+    when (val dialog = state.dialog) {
+        is RecordScreenDialog.ChooseHRDevice -> {
+            HrConnectDialog(
+                isLoading = dialog.isLoading,
+                devices = dialog.scannedDevices.map { it.toDto() },
+                isDeviceConfirmed = dialog.isDeviceConfirmed,
+                loadingDuration = dialog.loadingDuration,
+                onConfirmClick = { deviceDto ->
+                    dialog.scannedDevices.find { it.identifier == deviceDto.identifier }
+                        ?.let { onDeviceSelected(it) }
+                },
+                onRefresh = onRequestScanning,
+                onDismissRequest = {
+                    onDismissDialog()
+                    onCancelScanning()
+                },
+            )
+        }
+
+        is RecordScreenDialog.DeviceConnectedDialog -> {
+            InfoDialog(
+                title = Res.string.dialog_device_connected_title,
+                message = stringResource(
+                    Res.string.dialog_device_connected_message,
+                    dialog.bleDevice.name,
+                    dialog.bleDevice.manufacturer.orEmpty()
+                ),
+                onDismiss = onDismissDialog
+            )
+            val haptic = LocalHapticFeedback.current
+            LaunchedEffect(dialog) {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                delay(DOUBLE_HAPTIC_INTERVAL)
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            }
+        }
+
+        is RecordScreenDialog.OpenSettingsDialog -> {
+            InfoDialog(
+                title = Res.string.dialog_open_setting_title,
+                message = stringResource(Res.string.dialog_open_setting_message),
+                buttonText = Res.string.dialog_open_setting_button_text,
+                onDismiss = onDismissDialog,
+                onButtonClick = {
+                    openSettings()
+                    onDismissDialog()
+                }
+            )
+        }
+
+        is RecordScreenDialog.NameActivity -> {
+            NameActivityDialog(
+                title = Res.string.dialog_name_activity_title,
+                message = Res.string.dialog_name_activity_message,
+                name = dialog.activityName,
+                error = dialog.error,
+                onNameChanged = onActivityNameChanged,
+                onDismiss = onDismissDialog,
+                onButtonClick = onActivityNameConfirmed
+            )
+        }
+
+        is RecordScreenDialog.ConnectionErrorDialog -> {
+            InfoDialog(
+                title = Res.string.dialog_device_connection_failed_title,
+                message = stringResource(Res.string.dialog_device_connection_failed_message),
+                onDismiss = onDismissDialog,
+                onButtonClick = onDismissDialog,
+            )
+        }
+
+        else -> {}
+    }
+}
+
+private fun heartIconCenter(
+    heartGlobalCenter: Offset,
+    boxGlobalPosition: Offset
+): Offset = if (heartGlobalCenter.isSpecified) {
+    heartGlobalCenter - boxGlobalPosition
+} else {
+    Offset.Unspecified
+}

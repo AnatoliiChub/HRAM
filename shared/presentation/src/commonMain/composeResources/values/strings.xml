@@ -1,0 +1,37 @@
+<resources>
+    <!-- Main Screen -->
+    <string name="main_tab_record">Record</string>
+    <string name="main_tab_activity">Activities</string>
+    <!-- Record Screen - Dialogs -->
+    <string name="dialog_device_connected_title">Device Connected</string>
+    <string name="dialog_device_connected_message">%1$s from %2$s successfully connected</string>
+
+    <string name="dialog_device_connection_failed_title">Connection Failed</string>
+    <string name="dialog_device_connection_failed_message">Connection failed. Please try again.</string>
+
+    <string name="dialog_open_setting_title">Permission required</string>
+    <string name="dialog_open_setting_message">It looks like you denied the BLE permission. Please allow it for the app in system settings.</string>
+    <string name="dialog_open_setting_button_text">Open Settings</string>
+
+    <string name="dialog_name_activity_title">Name your activity</string>
+    <string name="dialog_name_activity_message">Please enter a name for your activity before saving.</string>
+
+    <!-- Activities Screen - Dialogs -->
+    <string name="dialog_rename_activity_title">Rename your activity</string>
+    <string name="dialog_rename_activity_message">Please enter a new name before saving.</string>
+
+    <string name="dialog_activity_deletion_title">Confirm Activity Deletion</string>
+    <string name="dialog_activity_deletion_message">Are you sure you want to delete the selected %1$s?</string>
+    <string name="dialog_activity_deletion_button_text">Confirm</string>
+
+    <string name="text_activity">activity</string>
+    <string name="text_activities">activities</string>
+
+    <!-- Activity Name Validation -->
+    <string name="activity_screen_name_validation_empty">Activity name cannot be empty</string>
+    <string name="activity_screen_name_validation_start_digit">Activity name cannot start with a number</string>
+    <string name="activity_screen_name_validation_too_short">Activity name is too short</string>
+    <string name="activity_screen_name_validation_too_long">Activity name is too long</string>
+
+</resources>
+

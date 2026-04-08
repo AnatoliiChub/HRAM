@@ -5,8 +5,8 @@
 //  Live Activity and Dynamic Island implementation for heart rate monitoring
 //
 
-import SwiftUI
 import ActivityKit
+import SwiftUI
 import WidgetKit
 
 // MARK: - Constants

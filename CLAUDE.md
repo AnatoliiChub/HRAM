@@ -1,0 +1,159 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this
+repository.
+
+## Project Overview
+
+HRAM is a Kotlin Multiplatform (KMP) heart rate monitoring app using Compose Multiplatform for
+shared UI across Android and iOS. It connects to BLE heart rate monitors, tracks activity sessions,
+and displays live metrics.
+
+## Build Commands
+
+```bash
+# Android
+./gradlew :androidApp:assembleDebug
+./gradlew :androidApp:installDebug
+
+# iOS framework (called by Xcode build phase)
+./scripts/build-framework.sh [SDK] [CONFIGURATION]
+./scripts/build-xcode.sh [SDK] [CONFIGURATION] [SIMULATOR_NAME]
+
+# Tests
+./gradlew testDebugUnitTest
+./gradlew :ble:testAndroidHostTest --tests "com.achub.hram.ble.core.connection.HramConnectionTrackerTest"
+
+# Code quality
+./gradlew detekt
+./gradlew koverHtmlReport   # Coverage report (80% minimum enforced)
+```
+
+## Architecture
+
+### Layer Overview
+
+```
+Shared UI (Compose Multiplatform)
+    → ViewModel (commonMain)
+    → TrackingController (interface in :domain, platform impl in :presentation)
+         → Android: Intent → BleTrackingService (Foreground Service)
+         → iOS: ActivityTrackingManager + LiveActivityManager
+    → ActivityTrackingManager ← BLE (Kable) + Room Database
+```
+
+### Source Set Organization
+
+- **`shared/ble/`** — Standalone BLE module (scanning, connection, data parsing, models, DI)
+    - `src/commonMain/` — Shared BLE interfaces and implementations
+    - `src/androidMain/` — Android Bluetooth state observer
+    - `src/iosMain/` — iOS CoreBluetooth state observer
+    - `src/commonTest/` — BLE unit tests
+- **`shared/domain/`** — Business logic, interfaces, use cases, and shared models
+    - `TrackingController` interface, `ActivityTrackingManager`, `StopWatch`, use cases,
+      repository interfaces, `FileExporter` interface, extension utilities
+- **`shared/data/`** — Data layer: Room database, DataStore, repositories, and export
+    - Room entities + DAOs, repository implementations, `ExportModule` (expect/actual),
+      `AndroidFileExporter`, `IosFileExporter`
+- **`shared/presentation/`** — Shared Compose UI (depends on `:domain`, `:data`, `:ble`)
+    - `src/commonMain/` — ViewModels, UI screens, DI modules
+    - `src/androidMain/` — `AndroidTrackingController`, Android-specific DI
+    - `src/iosMain/` — `IosTrackingController`, iOS-specific DI
+    - `src/commonTest/` — Shared unit tests
+- **`shared/ui-lib/`** — Shared Compose UI library (styles, reusable components, shaders, charts)
+- **`shared/app-di/`** — Koin root DI; produces `ComposeApp.framework` for iOS (exports
+  `:presentation`, `:data`, `:domain`)
+- **`build-logic/`** — Gradle convention plugins and build-related modules
+    - `convention/` — Precompiled script plugins (`kmp-library-convention`, `cmp-ui-lib-convention`,
+      `koin-convention`, `quality-convention`, `test-mocking-convention`)
+    - `annotations/` — `:annotations` KMP module (part of the main build, physically co-located
+      here). Contains `OpenForMokkery.kt` — the `@Retention(SOURCE)` annotation that marks classes
+      to be opened by the `allOpen` compiler plugin for Mokkery mocking. Exposed as
+      `api(project(":annotations"))` in `test-mocking-convention` so it is available on all
+      platforms including Kotlin/Native.
+- **`androidApp/`** — Android shell (MainActivity, depends on `:app-di`)
+- **`iosApp/`** — iOS shell (SwiftUI entry point, Live Activity widgets)
+
+### Key Packages
+
+#### `:ble` module
+
+| Package                | Purpose                                                    |
+|------------------------|------------------------------------------------------------|
+| `ble/core/connection/` | BLE scanning, connection, reconnect retry (max 3 attempts) |
+| `ble/core/data/`       | BLE characteristic parsing, HR + battery streams           |
+| `ble/models/`          | BLE device, notification, and exception models             |
+| `ble/di/`              | Koin DI modules for BLE (expect/actual per platform)       |
+| `ble/utils/`           | BLE UUID constants, byte parsing, logging utilities        |
+
+#### `:domain` module (commonMain)
+
+| Package          | Purpose                                                              |
+|------------------|----------------------------------------------------------------------|
+| `domain/model/`  | Domain models (DeviceModel, etc.)                                    |
+| `tracking/`      | `ActivityTrackingManager`, `StopWatch`, `TrackingController` interface |
+| `usecase/`       | Use cases (e.g. `ExportCsvUseCase`)                                  |
+| `data/repo/`     | Repository interfaces                                                |
+| `export/`        | `FileExporter` interface                                             |
+| `ext/`           | Extension functions and logging utilities                            |
+
+#### `:data` module (commonMain)
+
+| Package      | Purpose                                               |
+|--------------|-------------------------------------------------------|
+| `data/db/`   | Room database with heart rate and activity entities   |
+| `data/repo/` | Repository implementations                           |
+| `data/store/`| DataStore-backed persistence for BLE and tracking     |
+| `di/`        | `ExportModule` (expect/actual per platform)           |
+| `export/`    | `AndroidFileExporter`, `IosFileExporter`              |
+
+#### `:presentation` module (commonMain)
+
+| Package    | Purpose                                              |
+|------------|------------------------------------------------------|
+| `screen/`  | UI screens: `main/`, `activities/`, `record/`        |
+| `tracking/`| `AndroidTrackingController`, `IosTrackingController` |
+| `di/`      | Koin DI modules (platform-specific counterparts)     |
+| `ext/`     | Compose/UI extension functions                       |
+
+### Platform Differences
+
+**Android** (`androidMain/`):
+
+- `BleTrackingService` — Foreground service for background tracking
+- `AndroidTrackingController` sends Intents to the service
+- `Notificator` manages persistent notification with RemoteViews
+
+**iOS** (`iosMain/` + `iosApp/`):
+
+- `LiveActivityManager` updates WidgetKit Live Activities during tracking
+- `IosTrackingController` directly calls `ActivityTrackingManager`
+- Swift bridge in `iosApp/Bridge/` connects Kotlin to Swift Live Activity APIs
+- Live Activity UI defined in Swift: `iosApp/HramLiveActivity/`
+
+### Dependency Injection
+
+Koin with KSP annotations. Each platform has companion DI modules for database, DataStore, BLE,
+tracking, and export. Entry point: `di/Koin.kt`.
+
+### BLE Device Identifier Note
+
+`BleDevice.identifier` is a MAC address on Android but a CoreBluetooth UUID on iOS.
+
+## Tech Stack
+
+- Kotlin 2.3.20, Compose Multiplatform 1.10.3
+- BLE: Kable v0.42.0
+- Database: Room KMP v2.8.4
+- DI: Koin v4.2.0 + Annotations + KSP
+- Persistence: DataStore v1.2.1
+- Testing: `kotlin.test` + Mokkery (mocking) + Kover (coverage)
+- Static analysis: Detekt v1.23.8
+- Logging: Napier v2.7.1
+
+## Prerequisites
+
+- macOS (required for iOS builds)
+- JDK 17+
+- Android Studio 2025.2.2 RC2+
+- Xcode 26+

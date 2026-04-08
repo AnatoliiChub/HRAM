@@ -20,8 +20,10 @@ public struct HRActivityAttributes: ActivityAttributes {
         public var iconName: String
         public var elapsedTimeString: String
 
-        public init(heartRate: Int, isConnected: Bool, isContactOn: Bool, bleState: String,
-                    isTrackingActive: Bool, batteryLevel: Int, deviceName: String, iconName: String, elapsedTimeString: String) {
+        public init(
+            heartRate: Int, isConnected: Bool, isContactOn: Bool, bleState: String,
+            isTrackingActive: Bool, batteryLevel: Int, deviceName: String, iconName: String, elapsedTimeString: String
+        ) {
             self.heartRate = heartRate
             self.isConnected = isConnected
             self.isContactOn = isContactOn

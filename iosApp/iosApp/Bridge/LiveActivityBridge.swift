@@ -1,7 +1,6 @@
-import Foundation
 import ActivityKit
-
 import ComposeApp
+import Foundation
 
 @_cdecl("startLiveActivity")
 public func startLiveActivity(
@@ -94,7 +93,7 @@ public class LiveActivityBridgeImpl: NSObject {
 
         // Parse bleState string to BleStateType enum
         let bleStateType = BleStateType.from(state: bleState)
-        let elapsedTimeString = DateUtilsKt.formatElapsedTime(timeInMs: elapsedTime)
+        let elapsedTimeString = DateUtils.shared.formatElapsedTime(timeInMs: elapsedTime)
 
         let attributes = HRActivityAttributes()
         let contentState = HRActivityAttributes.ContentState(
@@ -156,19 +155,20 @@ public class LiveActivityBridgeImpl: NSObject {
 
         // Parse bleState string to BleStateType enum
         let bleStateType = BleStateType.from(state: bleState)
-        let elapsedTimeString = DateUtilsKt.formatElapsedTime(timeInMs: elapsedTime)
+        let elapsedTimeString = DateUtils.shared.formatElapsedTime(timeInMs: elapsedTime)
 
-        let content = ActivityContent(state: HRActivityAttributes.ContentState(
-            heartRate: heartRate,
-            isConnected: isConnected,
-            isContactOn: isContactOn,
-            bleState: bleStateType.displayText(deviceName: deviceName, connectionLost: !isConnected, isContactOn: isContactOn),
-            isTrackingActive: isTrackingActive,
-            batteryLevel: batteryLevel,
-            deviceName: deviceName,
-            iconName: iconName(bleState: bleStateType, isConnected: isConnected, isContactOn: isContactOn),
-            elapsedTimeString: elapsedTimeString
-        ), staleDate: nil)
+        let content = ActivityContent(
+            state: HRActivityAttributes.ContentState(
+                heartRate: heartRate,
+                isConnected: isConnected,
+                isContactOn: isContactOn,
+                bleState: bleStateType.displayText(deviceName: deviceName, connectionLost: !isConnected, isContactOn: isContactOn),
+                isTrackingActive: isTrackingActive,
+                batteryLevel: batteryLevel,
+                deviceName: deviceName,
+                iconName: iconName(bleState: bleStateType, isConnected: isConnected, isContactOn: isContactOn),
+                elapsedTimeString: elapsedTimeString
+            ), staleDate: nil)
 
         Task {
             await activity.update(content)
@@ -201,8 +201,8 @@ func iconName(bleState: BleStateType, isConnected: Bool, isContactOn: Bool) -> S
     }
 }
 
-public extension BleStateType {
-    func displayText(deviceName: String = "", connectionLost: Bool, isContactOn: Bool) -> String {
+extension BleStateType {
+    public func displayText(deviceName: String = "", connectionLost: Bool, isContactOn: Bool) -> String {
         switch self {
         case .scanningStarted:
             return String(localized: "ble.scanning_started", defaultValue: "Scanning...")
@@ -223,9 +223,9 @@ public extension BleStateType {
                 return String(localized: .connectingToDevice(device: deviceName))
             }
         case .connected, .notificationUpdate:
-            return if (connectionLost) {
+            return if connectionLost {
                 String(localized: "ble.connection.lost", defaultValue: "Connection Lost")
-            } else if (!isContactOn) {
+            } else if !isContactOn {
                 String(localized: "ble.contact.off", defaultValue: "Contact off")
             } else {
                 String(localized: "ble.connected", defaultValue: "Connected")

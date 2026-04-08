@@ -5,7 +5,7 @@ set -e  # Exit on error
 # Default values
 SDK="${1:-iphonesimulator}"
 CONFIGURATION="${2:-Debug}"
-SIMULATOR_NAME="${3:-iPhone 16e}"
+SIMULATOR_NAME="${3:-iPhone 17}"
 
 echo "=========================================="
 echo "Building iOS Xcode Project"

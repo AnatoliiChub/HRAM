@@ -14,4 +14,5 @@ plugins {
     alias(libs.plugins.mokkery) apply false
     alias(libs.plugins.kover) apply false
     alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.kotlin.allopen) apply false
 }

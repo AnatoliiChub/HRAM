@@ -1,0 +1,63 @@
+<resources>
+    <!-- Activity Screen (shared with composeApp) -->
+    <string name="seconds_unit">s</string>
+    <string name="activity_validation_empty">Activity name cannot be empty</string>
+
+    <!-- Chart bubble -->
+    <string name="chart_bubble_bpm">%1$s BPM</string>
+
+    <!-- Record Screen -->
+    <string name="hr_checkbox_label">Heart Rate tracking</string>
+    <string name="connected_device_label">Device: %1$s</string>
+    <string name="heart_indication_stub">--</string>
+    <string name="heart_indication_bpm">%1$s BPM</string>
+    <string name="heart_indication_no_connection">Not connected</string>
+    <string name="heart_indication_contact_off">Contact Off</string>
+    <string name="heart_indication_battery_level"> %1$s %</string>
+    <string name="choose_at_least_one_option">Choose at least one tracking option</string>
+    <string name="connect_device">Connect device</string>
+    <string name="disconnect_device">Disconnect device</string>
+    <string name="device_from">%1$s from %2$s</string>
+
+    <!-- Dialogs -->
+    <string name="dialog_choose_hr_device_connecting">Connecting...</string>
+    <string name="dialog_choose_hr_device_scanning">Scanning...</string>
+    <string name="dialog_choose_hr_device_connect_device">Connect Device</string>
+    <string name="dialog_choose_hr_device_no_device_found">No Devices Found</string>
+    <string name="dialog_choose_hr_device_retry">Retry</string>
+    <string name="dialog_choose_hr_device_connect">Connect</string>
+
+    <string name="dialog_choose_hr_device_scanning_message">Scanning for devices...</string>
+    <string name="dialog_choose_hr_device_no_device_message">No devices found. Please try again.</string>
+    <string name="dialog_choose_hr_device_select_device_message">Select your heart rate device from the list or scan again.</string>
+
+    <string name="dialog_info_ok">OK</string>
+
+    <string name="dialog_name_activity_title">Name your activity</string>
+    <string name="dialog_name_activity_message">Please enter a name for your activity before saving.</string>
+
+    <!-- Activity Card -->
+    <string name="activity_screen_unnamed_act">Untitled Activity</string>
+    <string name="activity_screen_created_at">Created on %1$s</string>
+    <string name="activity_screen_elapsed_time">Elapsed time: %1$s</string>
+    <string name="activity_screen_seconds_unit">s</string>
+    <string name="activity_screen_avg_hr">Avg Heart Rate:</string>
+    <string name="activity_screen_max_hr">Max Heart Rate:</string>
+    <string name="activity_screen_min_hr">Min Heart Rate:</string>
+    <string name="activity_screen_heart_indication_bpm">%1$s BPM</string>
+
+    <string-array name="month_names">
+        <item>Jan</item>
+        <item>Feb</item>
+        <item>Mar</item>
+        <item>Apr</item>
+        <item>May</item>
+        <item>Jun</item>
+        <item>Jul</item>
+        <item>Aug</item>
+        <item>Sep</item>
+        <item>Oct</item>
+        <item>Nov</item>
+        <item>Dec</item>
+    </string-array>
+</resources>

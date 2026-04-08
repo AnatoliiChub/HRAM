@@ -20,10 +20,10 @@ datastore = "1.2.1"
 kotlinx-datetime = "0.7.1"
 room = "2.8.4"
 sqlite = "2.6.2"
-ui-tooling = "1.10.5"
+ui-tooling = "1.10.6"
 detekt = "1.23.8"
 mokkery = "3.3.0"
-kover = "0.9.7"
+kover = "0.9.8"
 coreKtx = "1.18.0"
 kotlinx-serialization = "1.10.0"
 okio = "3.17.0"
@@ -36,6 +36,7 @@ androidx-lifecycle-viewmodelCompose = { module = "org.jetbrains.androidx.lifecyc
 androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesTest" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 logger = { module = "io.github.aakira:napier", version.ref = "logger" }
 kable = { module = "com.juul.kable:kable-core", version.ref = "kable" }
@@ -78,3 +79,12 @@ mokkery = { id = "dev.mokkery", version.ref = "mokkery" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "kotlin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+
+## Convention plugins (local, no version)
+kmp-convention = { id = "kmp-convention" }
+cmp-convention = { id = "cmp-convention" }
+koin-convention = { id = "koin-convention" }
+quality-convention = { id = "quality-convention" }
+test-mocking-convention = { id = "test-mocking-convention" }
+room-convention = { id = "room-convention" }
+
