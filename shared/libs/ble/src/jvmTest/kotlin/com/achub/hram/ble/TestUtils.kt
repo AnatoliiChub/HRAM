@@ -10,7 +10,8 @@ actual fun identifier(id: String): Identifier {
     return if (isMacOs) {
         "00000000-0000-4000-8000-$hex".toIdentifier()
     } else {
-        // Linux:
-        hex.chunked(2).joinToString(":").toIdentifier()
+        // Linux: btleplug uses bluez_async::DeviceId which serializes as a D-Bus object path JSON
+        val mac = hex.chunked(2).joinToString("_") { it.uppercase() }
+        """{"object_path":"/org/bluez/hci0/dev_$mac"}""".toIdentifier()
     }
 }
