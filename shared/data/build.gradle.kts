@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.koin.convention)
     alias(libs.plugins.room.convention)
     alias(libs.plugins.kotlinxSerialization)
+    alias(libs.plugins.quality.convention)
 }
 
 kotlin {

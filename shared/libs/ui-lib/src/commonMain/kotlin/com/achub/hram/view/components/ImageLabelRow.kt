@@ -20,6 +20,7 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
 private const val IMAGE_PADDING_DIVISOR = 10
+private const val IMAGE_ALPHA = 0.7f
 
 @Composable
 fun ImageLabelRow(
@@ -42,7 +43,7 @@ fun IndicationImage(
     drawable: DrawableResource,
 ) {
     Image(
-        modifier = modifier.size(imageSize).padding(imageSize / IMAGE_PADDING_DIVISOR).alpha(0.7f),
+        modifier = modifier.size(imageSize).padding(imageSize / IMAGE_PADDING_DIVISOR).alpha(IMAGE_ALPHA),
         painter = painterResource(drawable),
         contentDescription = null
     )

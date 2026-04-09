@@ -11,6 +11,8 @@ import org.jetbrains.skia.ImageFilter
 import org.jetbrains.skia.RuntimeEffect
 import org.jetbrains.skia.RuntimeShaderBuilder
 
+private const val NORMALIZED_CENTER = 0.5f
+
 /**
  * Desktop (JVM/Skiko) implementation — mirrors the iOS/Skia implementation.
  * Compose Desktop uses Skiko which exposes the same Skia API as the iOS target.
@@ -37,8 +39,8 @@ actual fun rememberLiquidRenderEffect(
         builder.uniform("density", density)
         builder.uniform("minRadius", minRadius)
 
-        val originX = if (center != Offset.Unspecified && resX > 0f) center.x / resX else 0.5f
-        val originY = if (center != Offset.Unspecified && resY > 0f) center.y / resY else 0.5f
+        val originX = if (center != Offset.Unspecified && resX > 0f) center.x / resX else NORMALIZED_CENTER
+        val originY = if (center != Offset.Unspecified && resY > 0f) center.y / resY else NORMALIZED_CENTER
         builder.uniform("origin", originX, originY)
         builder.uniform("color", baseColor.red, baseColor.green, baseColor.blue, baseColor.alpha)
 

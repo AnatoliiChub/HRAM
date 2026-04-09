@@ -11,6 +11,8 @@ import org.jetbrains.skia.ImageFilter
 import org.jetbrains.skia.RuntimeEffect
 import org.jetbrains.skia.RuntimeShaderBuilder
 
+private const val NORMALIZED_CENTER = NORMALIZED_CENTER
+
 @Composable
 actual fun rememberLiquidRenderEffect(
     shaderSrc: String,
@@ -37,19 +39,19 @@ actual fun rememberLiquidRenderEffect(
             if (resX > 0f) {
                 center.x / resX
             } else {
-                0.5f
+                NORMALIZED_CENTER
             }
         } else {
-            0.5f
+            NORMALIZED_CENTER
         }
         val originY = if (center != Offset.Unspecified) {
             if (resY > 0f) {
                 center.y / resY
             } else {
-                0.5f
+                NORMALIZED_CENTER
             }
         } else {
-            0.5f
+            NORMALIZED_CENTER
         }
         builder.uniform("origin", originX, originY)
 
