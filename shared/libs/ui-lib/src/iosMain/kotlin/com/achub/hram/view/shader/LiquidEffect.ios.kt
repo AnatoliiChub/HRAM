@@ -11,7 +11,7 @@ import org.jetbrains.skia.ImageFilter
 import org.jetbrains.skia.RuntimeEffect
 import org.jetbrains.skia.RuntimeShaderBuilder
 
-private const val NORMALIZED_CENTER = NORMALIZED_CENTER
+private const val NORMALIZED_CENTER = 0.5f
 
 @Composable
 actual fun rememberLiquidRenderEffect(
