@@ -22,6 +22,9 @@ kotlin {
             implementation(libs.kable)
             implementation(libs.kotlinx.serialization.json)
         }
+        jvmMain.dependencies {
+            implementation(libs.jna)
+        }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
             implementation(libs.kotlinx.coroutines.test)

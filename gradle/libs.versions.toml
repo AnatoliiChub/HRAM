@@ -27,6 +27,7 @@ kover = "0.9.8"
 coreKtx = "1.18.0"
 kotlinx-serialization = "1.10.0"
 okio = "3.17.0"
+jna = "5.18.1"
 
 [libraries]
 components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "composeMultiplatform" }
@@ -61,6 +62,7 @@ androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", vers
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
+jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 
 ## Test libraries
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
