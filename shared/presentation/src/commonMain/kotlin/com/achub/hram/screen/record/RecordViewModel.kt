@@ -92,7 +92,9 @@ class RecordViewModel(
 
     fun requestScanning() = viewModelScope.launch(dispatcher) {
         permissionController.requestBleBefore(action = ::scan, onFailure = _uiState::settingsDialog)
-    }    fun onHrDeviceSelected(device: DeviceModel) = trackingController.connectDevice(device)
+    }
+
+    fun onHrDeviceSelected(device: DeviceModel) = trackingController.connectDevice(device)
 
     override fun onCleared() {
         super.onCleared()
