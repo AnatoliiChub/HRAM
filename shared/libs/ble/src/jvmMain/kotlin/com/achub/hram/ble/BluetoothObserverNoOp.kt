@@ -5,8 +5,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class BluetoothObserverNoOp : BluetoothObserver {
-    override fun init() = Unit
-
     override fun observeBleState(): Flow<Boolean> = flow {
         emit(true)
         awaitCancellation()

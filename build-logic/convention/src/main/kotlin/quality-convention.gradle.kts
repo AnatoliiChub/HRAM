@@ -28,6 +28,7 @@ afterEvaluate {
                 }
                 excludes {
                     classes("*.models.*")
+                    annotatedBy("com.achub.hram.NoCoverage")
                     excludesPatterns.forEach { classes(it) }
                 }
                 // Project-wide sensible defaults

@@ -5,9 +5,5 @@ package com.achub.hram.ble
 import kotlinx.coroutines.flow.Flow
 
 class BluetoothStateJvm(private val observer: BluetoothObserver) : BluetoothState {
-    init {
-        observer.init()
-    }
-
     override val isBluetoothOn: Flow<Boolean> = observer.observeBleState()
 }
