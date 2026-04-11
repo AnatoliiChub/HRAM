@@ -1,6 +1,11 @@
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
+
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+
 plugins {
     alias(libs.plugins.kmp.convention)
     alias(libs.plugins.cmp.convention)
+    alias(libs.plugins.jvm.convention)
     alias(libs.plugins.quality.convention)
 }
 

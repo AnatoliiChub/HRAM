@@ -5,6 +5,7 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 plugins {
     alias(libs.plugins.kmp.convention)
     alias(libs.plugins.cmp.convention)
+    alias(libs.plugins.jvm.convention)
     alias(libs.plugins.koin.convention)
     alias(libs.plugins.quality.convention)
     alias(libs.plugins.test.mocking.convention)
@@ -17,19 +18,6 @@ compose.resources { packageOfResClass = "hram.composeapp.generated.resources" }
 ksp { arg("KOIN_CONFIG_CHECK", "false") }
 
 kotlin {
-    // Register "mobileMain" as a proper intermediate source set covering Android + iOS.
-    // The IDE reads this template to understand source-set scopes — this is what silences
-    // the "conflicting overloads" false-positive on actual fun permissionController().
-    applyDefaultHierarchyTemplate {
-        common {
-            group("mobile") { // → creates mobileMain wired to androidMain + iosMain
-                withAndroidTarget()
-                withIos()
-            }
-            withJvm() // jvmMain sits directly under common (no intermediate group)
-        }
-    }
-
     android {
         namespace = "com.achub.hram.library"
 
@@ -55,13 +43,7 @@ kotlin {
     }
 
     sourceSets {
-        // applyDefaultHierarchyTemplate wires leaf targets → mobileMain for platform
-        // compilations, but the metadata compilation tasks (compileAndroidMain,
-        // compileIosMainKotlinMetadata) also need explicit dependsOn to see mobileMain symbols.
         val mobileMain by getting
-        androidMain.get().dependsOn(mobileMain)
-        iosMain.get().dependsOn(mobileMain)
-
         mobileMain.dependencies {
             implementation(libs.moko.compose)
             implementation(libs.moko.main)
@@ -82,4 +64,3 @@ kotlin {
         }
     }
 }
-
