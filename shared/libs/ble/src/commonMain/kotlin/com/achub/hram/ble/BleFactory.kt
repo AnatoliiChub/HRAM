@@ -5,7 +5,6 @@ import com.achub.hram.ble.core.connection.BleScanner
 import com.achub.hram.ble.core.connection.ConnectionTracker
 import com.achub.hram.ble.core.connection.HramBleConnectionManager
 import com.achub.hram.ble.core.connection.HramBleConnector
-import com.achub.hram.ble.core.connection.HramBleScanner
 import com.achub.hram.ble.core.connection.HramConnectionTracker
 import com.achub.hram.ble.core.data.BleDataRepo
 import com.achub.hram.ble.core.data.BleParser
@@ -23,7 +22,7 @@ import kotlinx.coroutines.CoroutineScope
  * only here, not in consuming modules.
  */
 object BleFactory {
-    fun scanner(): BleScanner = HramBleScanner()
+    fun scanner(): BleScanner = createBleScanner()
 
     fun connector(): BleConnector = HramBleConnector()
 
@@ -54,3 +53,5 @@ object BleFactory {
         ),
     )
 }
+
+internal expect fun createBleScanner(): BleScanner

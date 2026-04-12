@@ -60,8 +60,7 @@ fun RecordScreen() {
     val state = viewModel.uiState.collectAsStateWithLifecycle().value
     with(viewModel) {
         if (state.requestBluetooth) {
-            requestBluetooth()
-            clearRequestBluetooth()
+            requestBluetooth(onRequested = { clearRequestBluetooth() })
         }
         val indications = state.bleNotification.toDto()
         var heartGlobalCenter by remember { mutableStateOf(Offset.Unspecified) }

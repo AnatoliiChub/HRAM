@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 
 @Suppress(names = ["ComposableNaming"])
 @Composable
-actual fun requestBluetooth() {
+actual fun requestBluetooth(onRequested: () -> Unit) {
+    onRequested()
     // Not required — iOS shows the Bluetooth permission dialog automatically.
 }

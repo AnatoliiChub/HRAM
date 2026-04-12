@@ -57,6 +57,11 @@ internal class HramHrDeviceRepo(
                         emit(ScanResult.Error(BleUnavailableException(cause = it), type))
                     }
 
+                    is BleUnavailableException -> {
+                        Logger.e(TAG) { "BLE unavailable during scan: $it" }
+                        emit(ScanResult.Error(it, ScanErrorType.BLUETOOTH_OFF))
+                    }
+
                     else -> {
                         Logger.e(TAG) { "Error while scanning for devices: $it" }
                         emit(ScanResult.Error(it))
