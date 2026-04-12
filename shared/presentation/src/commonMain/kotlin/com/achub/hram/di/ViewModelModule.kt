@@ -1,6 +1,7 @@
 package com.achub.hram.di
 
 import com.achub.hram.ActivityNameErrorMapper
+import com.achub.hram.ext.BlePermissionController
 import com.achub.hram.screen.activities.ActivitiesViewModel
 import com.achub.hram.screen.record.RecordViewModel
 import com.achub.hram.tracking.TrackingController
@@ -10,7 +11,6 @@ import com.achub.hram.usecase.ObserveActivitiesUseCase
 import com.achub.hram.usecase.ObserveBleStateUseCase
 import com.achub.hram.usecase.ObserveTrackingStateUseCase
 import com.achub.hram.usecase.RenameActivityUseCase
-import dev.icerock.moko.permissions.PermissionsController
 import kotlinx.coroutines.CoroutineDispatcher
 import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.Configuration
@@ -28,7 +28,7 @@ class ViewModelModule {
         trackingController: TrackingController,
         observeBleState: ObserveBleStateUseCase,
         observeTrackingState: ObserveTrackingStateUseCase,
-        @InjectedParam permissionsController: PermissionsController,
+        @InjectedParam permissionsController: BlePermissionController,
         @WorkerThread dispatcher: CoroutineDispatcher,
     ) = RecordViewModel(
         activityNameErrorMapper = activityNameErrorMapper,

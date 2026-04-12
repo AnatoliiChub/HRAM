@@ -5,6 +5,7 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 plugins {
     alias(libs.plugins.kmp.convention)
     alias(libs.plugins.cmp.convention)
+    alias(libs.plugins.jvm.convention)
     alias(libs.plugins.koin.convention)
     alias(libs.plugins.quality.convention)
     alias(libs.plugins.test.mocking.convention)
@@ -42,15 +43,17 @@ kotlin {
     }
 
     sourceSets {
+        val mobileMain by getting
+        mobileMain.dependencies {
+            implementation(libs.moko.compose)
+            implementation(libs.moko.main)
+            implementation(libs.moko.ble)
+        }
+
         commonMain.dependencies {
             implementation(project(":ui-lib"))
             api(project(":domain"))
             implementation(libs.koin.compose.viewmodel)
-
-            // Permission
-            implementation(libs.moko.compose)
-            implementation(libs.moko.main)
-            implementation(libs.moko.ble)
         }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)

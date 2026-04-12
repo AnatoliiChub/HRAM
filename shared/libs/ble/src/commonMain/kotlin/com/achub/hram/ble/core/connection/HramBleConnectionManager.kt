@@ -1,10 +1,10 @@
 package com.achub.hram.ble.core.connection
 
+import com.achub.hram.Logger
 import com.achub.hram.ble.BLE_SCAN_DURATION
 import com.achub.hram.ble.models.BleConnectionsException
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.PeripheralConvertor
-import com.achub.hram.Logger
 import com.juul.kable.ExperimentalApi
 import com.juul.kable.Identifier
 import com.juul.kable.NotConnectedException
@@ -65,14 +65,13 @@ internal class HramBleConnectionManager(
     )
     override fun connectToDevice(identifier: Identifier): Flow<BleDevice> =
         connectionTracker.observeDisconnection()
-            .onStart { wasConnected.store(false) }
             .onStart { emit(true) } // for initial connect
             .onEach { stopConnectionTracking() }
             .onEach { connector.disconnect() }
             .map { scanner.scan(identifier, BLE_SCAN_DURATION.milliseconds) }
             .map(connector::connect)
-            .onEach { wasConnected.store(true) }
             .onEach(::startConnectionTracking)
+            .onEach { wasConnected.store(true) }
             .map(peripheralConverter::convert)
             .retry(RECONNECTION_RETRY_ATTEMPTS, ::isReconnectionRequired)
 
@@ -94,7 +93,10 @@ internal class HramBleConnectionManager(
     private suspend fun isReconnectionRequired(throwable: Throwable): Boolean {
         val isReconnectionRequired = ERROR_REQUIRED_RECONNECTION.any { throwable::class == it } ||
             (throwable is TimeoutCancellationException && wasConnected.load())
-        Logger.d(TAG) { "try to reconnect: $isReconnectionRequired, because of $throwable" }
+        Logger.d(TAG) {
+            "try to reconnect: $isReconnectionRequired," +
+                " because of $throwable, wasConnected: ${wasConnected.load()}"
+        }
         if (isReconnectionRequired) delay(RECONNECTION_DELAY_MS)
         return isReconnectionRequired
     }

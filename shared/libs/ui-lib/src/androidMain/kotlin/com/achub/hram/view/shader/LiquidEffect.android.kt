@@ -55,7 +55,7 @@ actual fun rememberLiquidRenderEffect(
 
             runtimeShader.setColorUniform("color", baseColor.toArgb())
         } catch (exception: Throwable) {
-                Logger.e(TAG) { "Error setting shader uniforms: ${exception.localizedMessage}" }
+            Logger.e(TAG) { "Error setting shader uniforms: ${exception.localizedMessage}" }
         }
         RenderEffect.createRuntimeShaderEffect(runtimeShader, "content").asComposeRenderEffect()
     }

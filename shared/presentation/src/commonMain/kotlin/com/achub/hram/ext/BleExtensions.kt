@@ -4,4 +4,7 @@ import androidx.compose.runtime.Composable
 
 @Suppress("ComposableNaming")
 @Composable
-expect fun requestBluetooth()
+expect fun requestBluetooth(onRequested: () -> Unit = {})
+
+@Composable
+expect fun permissionController(): BlePermissionController

@@ -27,6 +27,7 @@ kover = "0.9.8"
 coreKtx = "1.18.0"
 kotlinx-serialization = "1.10.0"
 okio = "3.17.0"
+jna = "5.18.1"
 
 [libraries]
 components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "composeMultiplatform" }
@@ -38,6 +39,7 @@ koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesTest" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
+kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinxCoroutinesTest" }
 logger = { module = "io.github.aakira:napier", version.ref = "logger" }
 kable = { module = "com.juul.kable:kable-core", version.ref = "kable" }
 material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "material3" }
@@ -60,6 +62,7 @@ androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", vers
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
+jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 
 ## Test libraries
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -83,8 +86,8 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 ## Convention plugins (local, no version)
 kmp-convention = { id = "kmp-convention" }
 cmp-convention = { id = "cmp-convention" }
+jvm-convention = { id = "jvm-convention" }
 koin-convention = { id = "koin-convention" }
 quality-convention = { id = "quality-convention" }
 test-mocking-convention = { id = "test-mocking-convention" }
 room-convention = { id = "room-convention" }
-

@@ -1,6 +1,7 @@
 package com.achub.hram.data.mapper
 
 import com.achub.hram.ble.ConnectionResult
+import com.achub.hram.ble.ScanErrorType
 import com.achub.hram.ble.ScanResult
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.BleNotification
@@ -9,6 +10,7 @@ import com.achub.hram.ble.models.HramBleDevice
 import com.achub.hram.models.BleNotificationModel
 import com.achub.hram.models.ConnectionResultModel
 import com.achub.hram.models.DeviceModel
+import com.achub.hram.models.DeviceUnavailableException
 import com.achub.hram.models.HrNotificationModel
 import com.achub.hram.models.ScanResultModel
 
@@ -47,8 +49,14 @@ fun BleNotification.toDomain() = BleNotificationModel(
 
 fun ScanResult.toDomain(): ScanResultModel = when (this) {
     is ScanResult.ScanUpdate -> ScanResultModel.ScanUpdate(device.toDomain())
-    is ScanResult.Error -> ScanResultModel.Error(error)
+
+    is ScanResult.Error -> {
+        val scanError = if (type == ScanErrorType.BLUETOOTH_OFF) DeviceUnavailableException() else error
+        ScanResultModel.Error(scanError)
+    }
+
     ScanResult.Complete -> ScanResultModel.Complete
+
     ScanResult.Initiated -> ScanResultModel.Initiated
 }
 

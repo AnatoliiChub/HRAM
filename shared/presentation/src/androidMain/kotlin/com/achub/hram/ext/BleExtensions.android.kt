@@ -10,7 +10,8 @@ private const val ENABLE_BLE_REQUEST_CODE = 19999
 
 @SuppressLint("MissingPermission", "ComposableNaming")
 @Composable
-actual fun requestBluetooth() {
+actual fun requestBluetooth(onRequested: () -> Unit) {
+    onRequested()
     val intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
     LocalActivity.current?.startActivityForResult(intent, ENABLE_BLE_REQUEST_CODE)
 }

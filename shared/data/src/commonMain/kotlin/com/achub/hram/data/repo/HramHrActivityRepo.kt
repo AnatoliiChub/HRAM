@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.flowOf
 import org.koin.core.annotation.Provided
 
 private const val TAG = "HramHrActivityRepo"
+private const val MILLIS_IN_SECOND = 1000
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HramHrActivityRepo(
@@ -42,7 +43,7 @@ class HramHrActivityRepo(
                 activities.map { activity ->
                     val all = hrDao.getAllForActivity(activity.id)
                     val aggregated = hrDao.getAggregatedHeartRateForActivity(activity.id, activity.duration)
-                        .map { bucket -> HrBucket(bucket.bucketNumber, bucket.avgHr, bucket.elapsedTime / 1000) }
+                        .map { bucket -> HrBucket(bucket.bucketNumber, bucket.avgHr, bucket.elapsedTime / MILLIS_IN_SECOND) }
                     ActivityInfo(
                         id = activity.id,
                         name = activity.name,

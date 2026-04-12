@@ -1,41 +1,23 @@
 package com.achub.hram.utils
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
 
+/**
+ * Platform-specific function to check if the app is in the background.
+ * - Android & iOS: Returns true when app is in background (based on lifecycle events)
+ * - Desktop/JVM: Always returns false
+ */
 @Composable
-fun isAppInBackground(): Boolean {
-    var isAppInBackground by remember { mutableStateOf(true) }
-    appStateChanged { isAppInBackground = it.isBackground() }
-    return isAppInBackground
-}
+expect fun isAppInBackground(): Boolean
 
+/**
+ * Platform-specific callback for app state changes.
+ * - Android & iOS: Observes lifecycle events and calls the callback
+ * - Desktop/JVM: No-op (not applicable on these platforms)
+ */
 @Suppress("ComposableNaming")
 @Composable
-fun appStateChanged(onChanged: (state: AppState) -> Unit) {
-    val lifecycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(lifecycleOwner) {
-        val lifecycle = lifecycleOwner.lifecycle
-        val observer = LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_PAUSE -> onChanged(AppState.BACKGROUND)
-                Lifecycle.Event.ON_RESUME -> onChanged(AppState.FOREGROUND)
-                else -> {}
-            }
-        }
-        lifecycle.addObserver(observer)
-        onDispose {
-            lifecycle.removeObserver(observer)
-        }
-    }
-}
+expect fun appStateChanged(onChanged: (state: AppState) -> Unit)
 
 enum class AppState {
     FOREGROUND,

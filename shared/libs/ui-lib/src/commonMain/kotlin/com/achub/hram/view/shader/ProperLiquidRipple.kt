@@ -25,6 +25,8 @@ import com.achub.hram.view.shader
  *  if center is Offset.Unspecified, no ripple is drawn
  *  else a ripple is drawn originating from the specified center point
  */
+private const val RIPPLE_DURATION_MS = 1500
+
 fun Modifier.liquidRipple(
     center: Offset = Offset.Unspecified,
     baseColor: Color = DarkRed,
@@ -37,12 +39,10 @@ fun Modifier.liquidRipple(
 
     // One-shot normalized animated time [0f..1f] triggered when `center` changes to a valid value
     val progress = remember { Animatable(0f) }
-    // internal duration for the ripple (ms) — kept inside the implementation
-    val internalDuration = 1500
     LaunchedEffect(center) {
         if (center != Offset.Unspecified) {
             progress.snapTo(0f)
-            progress.animateTo(1f, animationSpec = tween(durationMillis = internalDuration, easing = LinearEasing))
+            progress.animateTo(1f, animationSpec = tween(durationMillis = RIPPLE_DURATION_MS, easing = LinearEasing))
             // after animation finishes, reset to 0 so it can replay on next tap
             progress.snapTo(0f)
         } else {

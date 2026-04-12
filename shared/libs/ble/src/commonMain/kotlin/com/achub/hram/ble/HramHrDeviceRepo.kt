@@ -11,6 +11,7 @@ import com.achub.hram.ble.utils.cancelAfter
 import com.juul.kable.Peripheral
 import com.juul.kable.State
 import com.juul.kable.UnmetRequirementException
+import com.juul.kable.UnmetRequirementReason
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
@@ -48,7 +49,17 @@ internal class HramHrDeviceRepo(
 
                     is UnmetRequirementException -> {
                         Logger.e(TAG) { "BLE unavailable during scan: $it" }
-                        emit(ScanResult.Error(BleUnavailableException(cause = it)))
+                        val type = if (it.reason == UnmetRequirementReason.BluetoothDisabled) {
+                            ScanErrorType.BLUETOOTH_OFF
+                        } else {
+                            ScanErrorType.UNKNOWN
+                        }
+                        emit(ScanResult.Error(BleUnavailableException(cause = it), type))
+                    }
+
+                    is BleUnavailableException -> {
+                        Logger.e(TAG) { "BLE unavailable during scan: $it" }
+                        emit(ScanResult.Error(it, ScanErrorType.BLUETOOTH_OFF))
                     }
 
                     else -> {

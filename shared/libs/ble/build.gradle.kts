@@ -2,12 +2,17 @@ plugins {
     alias(libs.plugins.kmp.convention)
     alias(libs.plugins.test.mocking.convention)
     alias(libs.plugins.quality.convention)
+    alias(libs.plugins.jvm.convention)
     alias(libs.plugins.kotlinxSerialization)
 }
 
 extra["koverIncludes"] = listOf("com.achub.hram.ble.**")
 // Exclude utility factory classes from coverage (they are thin wiring code)
-extra["koverExcludes"] = listOf("com.achub.hram.ble.BleFactory")
+extra["koverExcludes"] = listOf(
+    "com.achub.hram.ble.BleFactory**",
+    "**Android**",
+    "**Ios**"
+)
 
 kotlin {
     android {
@@ -21,6 +26,9 @@ kotlin {
         commonMain.dependencies {
             implementation(libs.kable)
             implementation(libs.kotlinx.serialization.json)
+        }
+        jvmMain.dependencies {
+            implementation(libs.jna)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

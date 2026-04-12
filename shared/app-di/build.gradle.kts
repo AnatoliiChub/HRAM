@@ -5,6 +5,7 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 plugins {
     alias(libs.plugins.kmp.convention)
     alias(libs.plugins.koin.convention)
+    alias(libs.plugins.quality.convention)
 }
 
 kotlin {

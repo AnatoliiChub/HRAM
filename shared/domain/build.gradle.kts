@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.kmp.convention)
     alias(libs.plugins.koin.convention)
     alias(libs.plugins.kotlinxSerialization)
+    alias(libs.plugins.quality.convention)
 }
 
 // domain is not the DI root — not all dependencies are defined here

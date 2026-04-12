@@ -8,7 +8,7 @@ import kotlin.time.Duration
 sealed interface ScanResult {
     data class ScanUpdate(val device: BleDevice) : ScanResult
 
-    data class Error(val error: Throwable) : ScanResult
+    data class Error(val error: Throwable, val type: ScanErrorType = ScanErrorType.UNKNOWN) : ScanResult
 
     data object Complete : ScanResult
 
@@ -41,4 +41,9 @@ interface HrDeviceRepo {
      * Disconnects from the currently connected device
      */
     suspend fun disconnect()
+}
+
+enum class ScanErrorType {
+    BLUETOOTH_OFF,
+    UNKNOWN
 }

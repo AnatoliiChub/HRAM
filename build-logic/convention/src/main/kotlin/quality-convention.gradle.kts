@@ -28,6 +28,7 @@ afterEvaluate {
                 }
                 excludes {
                     classes("*.models.*")
+                    annotatedBy("com.achub.hram.NoCoverage")
                     excludesPatterns.forEach { classes(it) }
                 }
                 // Project-wide sensible defaults
@@ -45,8 +46,10 @@ detekt {
     source.setFrom(
         files(
             "src/commonMain/kotlin",
+            "src/mobileMain/kotlin",
             "src/androidMain/kotlin",
-            "src/iosMain/kotlin"
+            "src/iosMain/kotlin",
+            "src/jvmMain/kotlin"
         )
     )
     config.setFrom(files("$rootDir/detekt/detekt.yml"))
