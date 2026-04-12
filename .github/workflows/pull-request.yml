@@ -37,10 +37,16 @@ jobs:
     needs: [ detekt ]
     uses: ./.github/workflows/ios-build.yml
 
+  # macOS DMG build
+  mac-build:
+    name: macOS Build
+    needs: [ detekt ]
+    uses: ./.github/workflows/mac-build.yml
+
   # Summary comment on PR
   summary:
     name: Post PR Summary
-    needs: [ detekt, unit-tests, android-build, ios-build ]
+    needs: [ detekt, unit-tests, android-build, ios-build, mac-build ]
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -63,6 +69,7 @@ jobs:
             | 🧪 Unit Tests & Coverage | ${{ needs.unit-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} | [View Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.unit-tests.outputs.artifact-id }}) |
             | 🤖 Android Debug Build | ${{ needs.android-build.result == 'success' && '✅ Passed' || '❌ Failed' }} | [Download APK](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.android-build.outputs.artifact-id }}) |
             | 🍎 iOS Debug Build | ${{ needs.ios-build.result == 'success' && '✅ Passed' || '❌ Failed' }} | [Download App](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.ios-build.outputs.artifact-id }}) |
+            | 🖥️ macOS DMG | ${{ needs.mac-build.result == 'success' && '✅ Passed' || '❌ Failed' }} | [Download DMG](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.mac-build.outputs.artifact-id }}) |
             
             ---
             *Workflow run: [#${{ github.run_number }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})*
