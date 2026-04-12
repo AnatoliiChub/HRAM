@@ -41,7 +41,7 @@ class BluetoothObserverMacTest {
 
         val observer = BluetoothObserverMac(bridge = bridge)
 
-        val job = observer.observeBleState().first() // trigger setup, will suspend until initial emit consumed
+        observer.observeBleState().first()
 
         // Verify that class_addMethod and objc_registerClassPair were called (registration path)
         verify { bridge.invokePointer("class_addMethod", any()) }
