@@ -26,10 +26,13 @@ compose.desktop {
         mainClass = "com.achub.hram.MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            targetFormats(TargetFormat.Dmg)
             packageName = "HRAM"
             packageVersion = "1.0.0"
             description = "Heart Rate Activity Monitoring"
+            macOS {
+                iconFile.set(project.file("icons/hram.icns"))
+            }
         }
     }
 }
