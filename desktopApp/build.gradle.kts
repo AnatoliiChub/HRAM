@@ -32,6 +32,11 @@ compose.desktop {
             description = "Heart Rate Activity Monitoring"
             macOS {
                 iconFile.set(project.file("icons/hram.icns"))
+                bundleID = "com.achub.hram"
+                entitlementsFile.set(project.file("macos/entitlements.plist"))
+                infoPlist {
+                    extraKeysRawXml = project.file("macos/info-plist-extra.xml").readText()
+                }
             }
         }
     }
