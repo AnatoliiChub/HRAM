@@ -35,6 +35,7 @@ internal class DesktopBleScanner(
         if (!isBluetoothOn()) flow { throw BleUnavailableException() } else delegate.scan()
 
     private fun isBluetoothOn(): Boolean {
+        // TODO SHOULD BE IMPLEMENTED FOR WINDOWS AND LINUX AS WELL
         val controller = bridge.invokePointer(
             "objc_msgSend",
             arrayOf(

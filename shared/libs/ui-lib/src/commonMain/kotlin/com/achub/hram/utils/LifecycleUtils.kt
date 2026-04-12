@@ -4,16 +4,16 @@ import androidx.compose.runtime.Composable
 
 /**
  * Platform-specific function to check if the app is in the background.
- * - Android: Returns true when app is in background (based on lifecycle events)
- * - Desktop/JVM & iOS: Always returns false
+ * - Android & iOS: Returns true when app is in background (based on lifecycle events)
+ * - Desktop/JVM: Always returns false
  */
 @Composable
 expect fun isAppInBackground(): Boolean
 
 /**
  * Platform-specific callback for app state changes.
- * - Android: Observes lifecycle events and calls the callback
- * - Desktop/JVM & iOS: No-op (not applicable on these platforms)
+ * - Android & iOS: Observes lifecycle events and calls the callback
+ * - Desktop/JVM: No-op (not applicable on these platforms)
  */
 @Suppress("ComposableNaming")
 @Composable

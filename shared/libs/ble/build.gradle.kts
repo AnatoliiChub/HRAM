@@ -9,7 +9,7 @@ plugins {
 extra["koverIncludes"] = listOf("com.achub.hram.ble.**")
 // Exclude utility factory classes from coverage (they are thin wiring code)
 extra["koverExcludes"] = listOf(
-    "com.achub.hram.ble.BleFactory",
+    "com.achub.hram.ble.BleFactory**",
     "**Android**",
     "**Ios**"
 )
