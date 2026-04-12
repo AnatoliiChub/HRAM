@@ -24,7 +24,7 @@ jobs:
 
       - name: Package macOS DMG
         run: |
-          ./gradlew :desktopApp:packageDmg \
+          ./gradlew clean :desktopApp:packageDmg \
             --no-daemon \
             --stacktrace
 
