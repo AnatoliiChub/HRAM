@@ -306,10 +306,12 @@ HRAM/
 
 ### `build-logic/`
 
-Gradle convention plugins (precompiled script plugins in `convention/`):
+Houses all precompiled Gradle convention plugins. Each plugin encapsulates a cross-cutting build concern — compiler options, Compose setup, Koin/KSP wiring, Detekt/Kover quality gates, or Mokkery mocking support — so individual module `build.gradle.kts` files stay lean. Plugins are opt-in: modules declare only the conventions they need.
 
-- `kmp-library-convention` — Base KMP multiplatform library setup (Android + iOS + JVM targets).
-- `cmp-ui-lib-convention` — Extends `kmp-library-convention` with Compose Multiplatform plugins
+Plugins in `convention/`:
+
+- `kmp-convention` — Base KMP multiplatform library setup (Android + iOS + JVM targets).
+- `cmp-convention` — Extends `kmp-convention` with Compose Multiplatform plugins
   and common Compose dependencies; used by `:ui-lib` and `:presentation`.
 - `jvm-convention` — Adds the `mobileMain` intermediate source set (Android + iOS) to any module
   that also has a JVM target. Applied to `:ble`, `:ui-lib`, and `:presentation`. Code in
@@ -317,6 +319,7 @@ Gradle convention plugins (precompiled script plugins in `convention/`):
 - `koin-convention` — Koin DI + KSP wiring.
 - `quality-convention` — Detekt + Kover. Applied to all library modules. Uses
   `@NoCoverage` to exclude platform-bridge classes from coverage reports.
+- `room-convention` — Room KMP + KSP wiring. Applied to `:data` for database code generation.
 - `test-mocking-convention` — Mokkery + `allOpen`. Opt-in for modules that use mocks in tests.
   Registers `@OpenForMokkery` with the `allOpen` compiler plugin — no per-module configuration
   needed.
@@ -346,122 +349,27 @@ Thin Napier wrapper. All other modules use `Logger` instead of importing Napier 
 - `Logger.init()` — attaches `DebugAntilog`; called once from `initKoin()` in `:app-di`.
 
 Automatically available in every KMP module via `api(project(":logger"))` in
-`kmp-library-convention` — no per-module declaration needed.
+`kmp-convention` — no per-module declaration needed.
 
 ### `shared/libs/ble/`
 
-Standalone BLE module. Koin-free — no DI wiring inside.
-
-Source sets:
-
-- `src/commonMain/` — Shared BLE interfaces and implementations.
-- `src/mobileMain/` — Shared Android + iOS.
-- `src/androidMain/` — Android Bluetooth state observer (`BluetoothStateAndroid`).
-- `src/iosMain/` — iOS CoreBluetooth state observer (`BluetoothStateIos`).
-- `src/jvmMain/` — Desktop BLE infrastructure: `DesktopBleScanner` (pre-checks Bluetooth via
-  IOBluetooth before scanning), `BluetoothObserverMac` / `BluetoothObserverNoOp`,
-  `ObjcBridge` / `RealObjcBridge` (JNA bridge for IOBluetooth calls).
-- `src/commonTest/` — BLE unit tests.
-
-Key classes:
-
-| Class / Interface        | Purpose                                                              |
-|--------------------------|----------------------------------------------------------------------|
-| `BleConnectionManager`   | Bluetooth state, scanning, connect/disconnect/reconnect lifecycle    |
-| `BleDataRepo`            | Characteristic data streams (heart rate, battery)                   |
-| `HrDeviceRepo`           | High-level facade over `BleConnectionManager` + `BleDataRepo`       |
-| `BleDevice`              | Discovered device — `identifier` is MAC on Android, UUID on iOS     |
-| `BleNotification`        | Encapsulates `HrNotification`, battery level, and connection status |
-| `DesktopBleScanner`      | JVM decorator — throws `UnmetRequirementException(BluetoothDisabled)` if BT is off |
-| `BluetoothObserverMac`   | JVM — polls IOBluetooth power state via JNA on macOS                |
+Standalone BLE module built on Kable, providing scanning, connection lifecycle management, reconnection retry logic, and Heart Rate Service characteristic parsing. It is completely Koin-free; `:data` consumes it through `HramBleDeviceRepository`, which is the single crossing point where BLE types are mapped to domain models.
 
 ### `shared/domain/`
 
-Business logic, interfaces, and shared models. No platform code.
-
-| Package / File                       | Purpose                                                                    |
-|--------------------------------------|----------------------------------------------------------------------------|
-| `domain/model/`                      | Domain models (`DeviceModel`, `ActivityInfo`, `HrBucket`, …)               |
-| `tracking/ActivityTrackingManager`      | Interface + `HramActivityTrackingManager` — thin coordinator                |
-| `tracking/BleConnectionOrchestrator`   | Interface + `HramBleConnectionOrchestrator` — BLE connect/scan/state       |
-| `tracking/SessionRecorder`             | Interface + `HramSessionRecorder` — session lifecycle, stopwatch, HR storage |
-| `tracking/stopwatch/StopWatch`         | Stopwatch abstraction for session time tracking                             |
-| `usecase/ExportCsvUseCase`             | Fetches HR records and formats them as CSV                                  |
-| `data/repo/`                           | Repository interfaces (`HrActivityRepo`, `BleStateRepo`, …)                |
-| `export/FileExporter`                  | Platform interface for writing files to device storage                      |
-| `di/`                                  | `TrackingModule`, `UseCaseModule`, `CoroutineModule`, `Qualifiers`          |
-| `ext/DomainExtensions`                 | Shared extension functions (`now()`, time helpers)                          |
+The stable core of the architecture — pure Kotlin with zero framework or platform dependencies. Owns all business logic: `ActivityTrackingManager`, `BleConnectionOrchestrator`, `SessionRecorder`, use cases, and repository interfaces that the Data layer must satisfy.
 
 ### `shared/data/`
 
-Data layer — Room database, DataStore, repository implementations, and CSV export.
-
-| Package / File               | Purpose                                                                      |
-|------------------------------|------------------------------------------------------------------------------|
-| `data/db/`                   | `HramDatabase`, `ActivityEntity`, `HeartRateBleEntity`, DAOs                 |
-| `data/repo/`                 | `HramHrActivityRepo`, `HramBleStateRepo`, `HramTrackingStateRepo`            |
-| `data/store/`                | DataStore serializers (`BleStateSerializer`, `TrackingStateStageSerializer`) |
-| `data/mapper/`               | Mappers between entities and domain models                                   |
-| `export/`                    | `AndroidFileExporter`, `IosFileExporter`, `DesktopFileExporter`              |
-| `di/` (commonMain)           | `BleDataModule`, `DataModule`, `SerializerModule`                            |
-| `di/` (expect/actual)        | `BleModule`, `DatabaseModule`, `DataStoreModule`, `ExportModule` — per-platform setup |
-| `di/jvmMain/`                | `BleModule.jvm`, `DatabaseModule.jvm`, `DataStoreModule.jvm`                |
+Data layer implementing all domain repository interfaces using Room for heart rate and activity persistence, DataStore for BLE and tracking state, and platform-specific `FileExporter` implementations for CSV export. State repositories are `@Serializable` so they survive process death and are observed by both platform notification systems.
 
 ### `shared/presentation/`
 
-Shared Compose UI, ViewModels, and platform-specific tracking controllers.
-
-- `src/commonMain/` — Screens, ViewModels, DI modules.
-- `src/mobileMain/` — Shared Android + iOS logic (e.g. `BleExtensions.mobile.kt`).
-- `src/androidMain/` — `AndroidTrackingController`, `TrackingForegroundService`, `Notificator`, Android DI.
-- `src/iosMain/` — `IosTrackingController`, `LiveActivityManager`, `BleStateType`, iOS DI.
-- `src/jvmMain/` — `DesktopTrackingController`, desktop DI, `BleExtensions.jvm.kt`.
-- `src/commonTest/` — Shared unit tests.
-
-| Package / File                        | Purpose                                                                                                    |
-|---------------------------------------|------------------------------------------------------------------------------------------------------------|
-| `screen/main/`                        | Main screen, bottom tab navigation                                                                         |
-| `screen/activities/`                  | Activities list screen + ViewModel                                                                         |
-| `screen/record/`                      | Live recording screen + ViewModel                                                                          |
-| `tracking/TrackingController`         | Platform-agnostic interface for all tracking commands                                                      |
-| `tracking/AndroidTrackingController`  | Sends Intents to `TrackingForegroundService`                                                               |
-| `tracking/IosTrackingController`      | Calls `ActivityTrackingManager` and `LiveActivityManager` directly                                         |
-| `tracking/DesktopTrackingController`  | Delegates directly to `ActivityTrackingManager` — no foreground service or Live Activities                 |
-| `tracking/TrackingForegroundService`  | Android foreground service for background tracking and notifications                                       |
-| `tracking/Notificator`                | Android persistent notification with `RemoteViews`                                                         |
-| `tracking/LiveActivityManager`        | iOS — pushes updates to WidgetKit Live Activities                                                          |
-| `di/`                                 | `ViewModelModule`, `UtilsModule`, `TrackingPlatformModule` (expect/actual), `NotificationModule` (Android) |
+Shared Compose UI screens (Main, Activities, Record), ViewModels, and platform-specific tracking controllers. `commonMain` contains all screens and ViewModels; platform source sets hold the `TrackingController` implementations — Android uses a Foreground Service with persistent notifications, iOS delegates to `ActivityTrackingManager` and pushes Live Activity updates, Desktop runs everything in-process.
 
 ### `shared/libs/ui-lib/`
 
-Reusable Compose UI library — styles, components, shaders, charts.
-
-Source sets:
-
-- `src/commonMain/` — All shared UI components, styles, resources.
-- `src/mobileMain/` — `LifecycleUtils` actual for Android + iOS (lifecycle-aware implementation).
-- `src/androidMain/` — Android-specific overrides.
-- `src/iosMain/` — iOS-specific overrides.
-- `src/jvmMain/` — `LifecycleUtils` actual for Desktop (always returns `false` / no-op; desktop
-  apps do not have a background state concept).
-
-Key packages:
-
-- `style/` — Colors, dimensions, text styles.
-- `models/` — UI-layer DTOs (`BleNotificationUi`, `DeviceUi`, `HrNotificationUi`,
-  `GraphLimitsUi`, `HighlightedItemUi`).
-- `view/cards/` — Activity card, graph info, aggregated HR bucket components.
-- `view/chart/` — Chart components for visualising HR/metrics.
-- `view/components/` — Buttons, text fields, progress indicators, heart animation, floating
-  toolbar, custom ripple, dialog primitives.
-- `view/dialogs/` — Info, name-activity, and BLE device chooser dialogs.
-- `view/indications/` — Heart indication row, warning labels.
-- `view/section/` — Record, device, and tracking indication sections.
-- `view/shader/` — AGSL-based Liquid Ripple and Liquid Wave effects (expect/actual).
-- `view/tabs/` — Bottom navigation bar with liquid ripple tab indicator.
-- `ext/` — Time and view extension functions.
-- `utils/` — Date utilities, lifecycle helpers.
-- `composeResources/` — All string resources (EN/UK), drawables, AGSL shader files.
+Reusable Compose UI library providing shared styles, components, shaders, and charts consumed across all screens. Includes custom AGSL-based visual effects (Liquid Ripple, Liquid Wave), a bottom navigation bar, heart rate chart components, dialogs, and all string resources with English and Ukrainian localisation.
 
 ### `shared/app-di/`
 
@@ -480,7 +388,7 @@ Android application shell. Depends on `:app-di`.
 
 ### `iosApp/`
 
-iOS application shell.
+iOS application shell built with SwiftUI that hosts the Compose Multiplatform UI and wires Kotlin to native iOS APIs. Provides the C-interop bridge connecting Kotlin tracking calls to Swift Live Activity APIs, and implements the Live Activity and Dynamic Island UI using WidgetKit.
 
 - `iosApp/` — SwiftUI entry point (`iOSApp.swift`, `ContentView.swift`).
 - `Bridge/LiveActivityBridge.swift` — C-interop bridge: Kotlin calls `startLiveActivity` /
@@ -735,7 +643,7 @@ Shared UI lives in the `:ui-lib` module (`shared/libs/ui-lib/`) and app-specific
     - `view/dialogs/` — Info, name-activity, and BLE device chooser dialogs.
     - `view/indications/` — Heart indication row, warning labels.
     - `view/section/` — Record, device, and tracking indication sections.
-    - `view/shader/` — AGSL-based Liquid Ripple and Liquid Wave effects (expect/actual).
+    - `view/shader/` — AGSL-based shader effects: Liquid Ripple, Liquid Wave, Gooey, and Metaball (expect/actual).
     - `view/tabs/` — Bottom navigation bar with liquid ripple tab indicator.
     - `ext/` — Time and view extension functions.
     - `utils/` — Date utilities, lifecycle helpers.
@@ -829,6 +737,7 @@ layers:
 **`:domain`**
 - `TrackingModule.kt` — bindings for `ActivityTrackingManager`, `BleConnectionOrchestrator`,
   `SessionRecorder`, and `StopWatch`.
+- `UseCaseModule.kt` — use case bindings.
 - `CoroutineModule.kt` — coroutine dispatcher bindings.
 
 **`:data`**
