@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.achub.hram.ext.getPlatform
 import com.achub.hram.style.Dimen16
 import com.achub.hram.style.Dimen8
 import com.achub.hram.view.cards.ActivityCard
@@ -101,7 +102,7 @@ fun BoxScope.Toolbar(
     onExport: () -> Unit = {}
 ) {
     FloatingToolbar(
-        modifier = Modifier.align(Alignment.BottomEnd)
+        modifier = Modifier.align(if (getPlatform().isDesktop()) Alignment.TopStart else Alignment.BottomEnd)
             .padding(Dimen16),
         selected = selectedIds
     ) { opt ->

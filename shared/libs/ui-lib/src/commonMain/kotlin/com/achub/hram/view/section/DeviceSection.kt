@@ -7,10 +7,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign.Companion.Center
 import com.achub.hram.models.DeviceUi
+import com.achub.hram.style.Dimen16
 import com.achub.hram.style.Dimen32
 import com.achub.hram.style.Dimen48
-import com.achub.hram.style.Dimen8
 import com.achub.hram.style.LabelMediumBold
 import com.achub.hram.style.LabelSmall
 import com.achub.hram.style.Red
@@ -38,15 +39,15 @@ fun DeviceSection(device: DeviceUi?, onConnectClick: () -> Unit, onDisconnectCli
         }
     } else {
         Text(
-            modifier = Modifier.padding(Dimen32),
+            modifier = Modifier.padding(horizontal = Dimen32),
             text = stringResource(
                 Res.string.device_from,
                 device.name,
                 device.manufacturer ?: ""
             ),
-            style = LabelMediumBold.copy(color = White.copy(alpha = 0.7f))
+            style = LabelMediumBold.copy(color = White.copy(alpha = 0.7f), textAlign = Center)
         )
-        Spacer(Modifier.size(Dimen8))
+        Spacer(Modifier.size(Dimen16))
         HrButton(
             modifier = Modifier.height(Dimen48),
             onClick = onDisconnectClick,

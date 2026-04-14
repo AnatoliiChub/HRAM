@@ -18,6 +18,8 @@ val Red = Color.Red
 val DarkRedShadow = Color(0xFF6B0000)
 val DarkRed = Color(0xFF4B0000)
 val Red20 = Color.Red.copy(alpha = 0.2f)
+
+val Red2 = Color(0xFFAA0000)
 val LightRed = Color(0xFFFF8F8F)
 val GradientRed = Color(0xFFE60000)
 val GradientLightRed = Color(0xFFFF4D4D)

@@ -1,0 +1,51 @@
+// Analytically-computed two-circle metaball field.
+//
+// For each fragment the standard metaball potential is evaluated:
+//   f(p) = r² / |p - c1|²  +  r² / |p - c2|²
+//
+// Pixels where f ≥ 1.0 are "inside" the merged blob; all others are
+// fully transparent.  Because we never blur anything we can overlay icons
+// on top in a separate layer and they stay perfectly sharp.
+//
+// Compatible with both AGSL (Android 13 / API 33+)
+//                   and SkSL  (Skia — iOS & Desktop).
+
+uniform shader content;      // bound by RenderEffect machinery; not sampled here
+
+uniform float2 resolution;   // composable size in px (width, height)
+uniform float2 center1;      // blob 1 centre in px, y-axis points down
+uniform float2 center2;      // blob 2 centre in px, y-axis points down
+uniform float  radius;       // blob radius in px  (iso-surface at r when isolated)
+
+uniform half4 topColor;      // gradient colour at the top of the container
+uniform half4 bottomColor;   // gradient colour at the bottom of the container
+uniform half4 borderColor;   // stroke colour around the metaball boundary
+
+half4 main(float2 coord) {
+    float r2   = radius * radius;
+    float2 d1  = coord - center1;
+    float2 d2  = coord - center2;
+
+    // Metaball potential field — threshold at 1.0
+    float f = r2 / max(dot(d1, d1), 0.001)
+            + r2 / max(dot(d2, d2), 0.001);
+
+    // White border ring: fades in from the outer edge, peaks just before the fill,
+    // then fades out as the fill covers it.  The visible ring sits just outside
+    // and at the transition zone of the filled shape.
+    float borderAlpha = smoothstep(0.72, 0.95, f) * (1.0 - smoothstep(0.95, 1.05, f));
+
+    // Gradient fill for the interior — starts slightly inset so the white ring
+    // is visible as a distinct stroke at the boundary.
+    float fillAlpha = smoothstep(0.90, 1.05, f);
+    float t = clamp(coord.y / max(resolution.y, 1.0), 0.0, 1.0);
+    half4 fillColor = mix(topColor, bottomColor, half(t));
+
+    // Composite: border underneath, gradient fill on top.
+    // Premultiplied form: rgb = colour.rgb * alpha (both terms must satisfy rgb ≤ alpha).
+    half ba = half(borderAlpha);
+    half4 border = half4(borderColor.rgb * ba, ba); // premultiplied borderColor
+    half4 fill   = fillColor * half(fillAlpha);     // premultiplied gradient
+    return fill + border * (1.0 - half(fillAlpha));
+}
+

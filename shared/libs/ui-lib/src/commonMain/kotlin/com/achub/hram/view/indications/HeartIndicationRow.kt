@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
@@ -15,12 +16,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionOnScreen
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.achub.hram.models.BleNotificationUi
 import com.achub.hram.models.HrNotificationUi
-import com.achub.hram.style.Dimen132
 import com.achub.hram.style.Dimen32
 import com.achub.hram.style.HeadingMediumBold
 import com.achub.hram.style.LabelMedium
@@ -29,14 +31,14 @@ import com.achub.hram.style.White
 import com.achub.hram.view.components.HeartBeatingAnimView
 import hram.ui_lib.generated.resources.Res
 import hram.ui_lib.generated.resources.heart3d
-import hram.ui_lib.generated.resources.ic_battery_full
-import hram.ui_lib.generated.resources.ic_heart_contact_off
-import hram.ui_lib.generated.resources.ic_heart_disconnected
 import hram.ui_lib.generated.resources.heart_indication_battery_level
 import hram.ui_lib.generated.resources.heart_indication_bpm
 import hram.ui_lib.generated.resources.heart_indication_contact_off
 import hram.ui_lib.generated.resources.heart_indication_no_connection
 import hram.ui_lib.generated.resources.heart_indication_stub
+import hram.ui_lib.generated.resources.ic_battery_full
+import hram.ui_lib.generated.resources.ic_heart_contact_off
+import hram.ui_lib.generated.resources.ic_heart_disconnected
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
@@ -85,9 +87,18 @@ fun HeartIndicationRow(
             },
             heartIcon,
         )
+        val maxHeartLabel = stringResource(Res.string.heart_indication_bpm, 555)
+        val textMeasurer = rememberTextMeasurer()
+        val maxHeartLabelWidthPx = remember {
+            textMeasurer.measure(
+                text = maxHeartLabel,
+                style = HeadingMediumBold
+            ).size.width
+        }
+        val maxHeartLabelWidth = with(LocalDensity.current) { maxHeartLabelWidthPx.toDp() }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                modifier = Modifier.align(Alignment.CenterHorizontally).widthIn(min = Dimen132),
+                modifier = Modifier.align(Alignment.CenterHorizontally).widthIn(min = maxHeartLabelWidth),
                 text = hrLabel,
                 textAlign = TextAlign.Center,
                 style = HeadingMediumBold
