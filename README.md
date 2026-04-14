@@ -6,14 +6,14 @@
 |---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
 | <img src="https://github.com/user-attachments/assets/709f2167-d628-40b2-8fa4-10ae4b441762" width="280"> | <img src="https://github.com/user-attachments/assets/d3aa997d-3564-459d-894f-01eb95cb3550" width="280"> |
 
-HRAM is a Kotlin Multiplatform app for heart rate \& activity tracking with BLE heart rate
+HRAM is a Kotlin Multiplatform app for heart rate activity tracking with BLE heart rate
 monitors.  
 It uses Compose Multiplatform for shared UI, Kotlin Multiplatform for shared logic, Koin for DI, and
 an SQL database for storing heart rate activities. Runs on **Android**, **iOS**, and **macOS Desktop**.
 
 Tested with a Decathlon HRM Belt as an example device.
 
-Status: **Work in progress / Prototype**
+Status: **Work in progress**
 
 ## ⚠️ **Disclaimer:**
 
@@ -152,8 +152,12 @@ are used.
 
 ## Testing
 
-Unit tests for the shared logic are located in `shared/presentation/src/commonTest` and
-`shared/libs/ble/src/commonTest`.
+Unit tests for the shared logic are located in:
+
+- `shared/presentation/src/commonTest` — presentation layer tests (e.g. `ActivityNameErrorMapperTest`).
+- `shared/libs/ble/src/commonTest` — BLE module unit tests (scanner, connector, connection manager, data repo, parser, device repo).
+- `shared/libs/ble/src/jvmTest` — Desktop-specific BLE state observer tests (`BluetoothObserverMacTest`, `BluetoothObserverNoOpTest`).
+
 The project utilises the following testing libraries:
 
 - **`kotlin.test`**: For standard assertions.
@@ -403,6 +407,8 @@ macOS / JVM application shell. Depends on `:app-di`.
 - `Main.kt` — `main()` entry point: sets the macOS Dock icon via `java.awt.Taskbar`, initialises
   Koin, and launches the Compose Desktop `Window` (minimum size 800 × 600).
 - `icons/hram.icns` — App icon used for the Dock (runtime) and the packaged `.app` / DMG bundle.
+- `macos/entitlements.plist` and `macos/info-plist-extra.xml` — macOS Bluetooth entitlements and
+  extra `Info.plist` keys injected into the packaged `.app` bundle.
 - Build task `packageDmg` produces a distributable macOS disk image.
 
 ---
