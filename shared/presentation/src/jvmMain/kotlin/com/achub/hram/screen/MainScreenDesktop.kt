@@ -14,12 +14,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -56,8 +59,15 @@ fun MainScreenDesktop() {
                 .windowInsetsPadding(WindowInsets.safeDrawing)
                 .fillMaxSize()
         ) {
-            ActivitiesScreen()
-            RecordScreen(modifier = Modifier.align(Alignment.BottomCenter))
+            var hasActivities by remember { mutableStateOf(false) }
+            val verticalBias by animateFloatAsState(
+                targetValue = if (hasActivities) 1f else 0f,
+                animationSpec = tween(durationMillis = 600),
+                label = "recordScreenAlignment"
+            )
+
+            ActivitiesScreen({ hasActivities = it })
+            RecordScreen(modifier = Modifier.align(BiasAlignment(0f, verticalBias)))
         }
     }
 }

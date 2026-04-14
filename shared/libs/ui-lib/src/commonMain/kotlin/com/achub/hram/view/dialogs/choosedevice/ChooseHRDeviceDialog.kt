@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -136,18 +137,20 @@ private fun DeviceList(devices: List<DeviceUi>, selected: DeviceUi?, onClick: (D
 @Composable
 @Preview
 fun ChooseHRDeviceDialogPreview() {
-    Box(modifier = Modifier.padding().fillMaxWidth()) {
-        HrConnectDialog(
-            onConfirmClick = {},
-            onDismissRequest = {},
-            onRefresh = {},
-            isLoading = true,
-            devices = listOf(
-                DeviceUi("Hrm1", "00:11:22:33:44:55"),
-                DeviceUi("Hrm2", "66:77:88:99:AA:BB"),
-                DeviceUi("Hrm3", "CC:DD:EE:FF:00:11"),
-            ),
-            loadingDuration = 5.seconds
-        )
+    Scaffold {
+        Box(modifier = Modifier.padding().fillMaxWidth()) {
+            HrConnectDialog(
+                onConfirmClick = {},
+                onDismissRequest = {},
+                onRefresh = {},
+                isLoading = true,
+                devices = listOf(
+                    DeviceUi("Hrm1", "00:11:22:33:44:55"),
+                    DeviceUi("Hrm2", "66:77:88:99:AA:BB"),
+                    DeviceUi("Hrm3", "CC:DD:EE:FF:00:11"),
+                ),
+                loadingDuration = 5.seconds
+            )
+        }
     }
 }
