@@ -106,7 +106,7 @@ fun RecordSection(
         // Transparent clickable Boxes inside the container act as hit-test targets for
         // each button; touch handling is unaffected by the renderEffect.
         MetaballContainer(
-            modifier = Modifier.width(totalWidth).height(Dimen64),
+            modifier = Modifier.width(totalWidth).height(btnWidth),
             center1 = center1,
             center2 = center2,
             radius = btnRadiusPx,

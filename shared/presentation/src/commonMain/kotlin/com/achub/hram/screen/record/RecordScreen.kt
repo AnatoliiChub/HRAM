@@ -52,10 +52,10 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
-const val DOUBLE_HAPTIC_INTERVAL = 150L
-const val COLUMN_SPACER_WEIGHT = 0.5f
-const val COLUMN_MIDDLE_SPACER_WEIGHT = 0.33f
-const val COLUMN_BOTTOM_SPACER_WEIGHT = 0.17f
+private const val DOUBLE_HAPTIC_INTERVAL = 150L
+private const val COLUMN_SPACER_WEIGHT = 0.5f
+private const val COLUMN_MIDDLE_SPACER_WEIGHT = 0.33f
+private const val COLUMN_BOTTOM_SPACER_WEIGHT = 0.17f
 
 @Composable
 fun RecordScreen() {

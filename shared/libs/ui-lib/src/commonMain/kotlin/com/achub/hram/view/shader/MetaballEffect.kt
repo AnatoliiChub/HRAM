@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.IntSize
  * @param radius     Blob radius in **pixels** — the iso-surface for an isolated circle.
  * @param topColor   Gradient colour at `y = 0` (top of the composable).
  * @param bottomColor Gradient colour at `y = resolution.height`.
+ * @param borderColor Colour used for the metaball border/outline.
  * @param resolution Composable size in pixels — used to normalise the gradient.
  */
 @Composable
