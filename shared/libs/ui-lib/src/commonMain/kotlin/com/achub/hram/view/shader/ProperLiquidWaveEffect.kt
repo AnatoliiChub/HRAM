@@ -23,8 +23,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.achub.hram.style.DarkRed
-import com.achub.hram.view.shader
 import com.achub.hram.utils.isAppInBackground
+import com.achub.hram.view.shader
 
 @Composable
 fun ProperLiquidWaveEffect(

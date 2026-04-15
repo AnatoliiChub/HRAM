@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -20,6 +21,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionOnScreen
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.achub.hram.ext.permissionController
 import com.achub.hram.ext.requestBluetooth
@@ -50,8 +52,10 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
-const val DOUBLE_HAPTIC_INTERVAL = 150L
+private const val DOUBLE_HAPTIC_INTERVAL = 150L
 private const val COLUMN_SPACER_WEIGHT = 0.5f
+private const val COLUMN_MIDDLE_SPACER_WEIGHT = 0.33f
+private const val COLUMN_BOTTOM_SPACER_WEIGHT = 0.17f
 
 @Composable
 fun RecordScreen() {
@@ -82,13 +86,14 @@ fun RecordScreen() {
                     TrackingIndicationsSection(indications, heartPosUpdated = { heartGlobalCenter = it })
                     Spacer(Modifier.size(Dimen32))
                     DeviceSection(device, onConnectClick = { requestScanning() }, onDisconnectClick = { disconnect() })
-                    Spacer(Modifier.weight(COLUMN_SPACER_WEIGHT))
+                    Spacer(Modifier.weight(COLUMN_MIDDLE_SPACER_WEIGHT))
                     RecordSection(
                         recordingState = state.recordingState,
                         onPlay = ::toggleRecording,
                         onStop = ::showNameActivityDialog,
                         isRecordingEnabled = state.isRecordingEnabled
                     )
+                    Spacer(Modifier.weight(COLUMN_BOTTOM_SPACER_WEIGHT))
                 }
             }
         }
@@ -106,7 +111,7 @@ fun RecordScreen() {
 }
 
 @Composable
-private fun Dialogs(
+fun Dialogs(
     state: RecordScreenState,
     onDeviceSelected: (DeviceModel) -> Unit,
     onRequestScanning: () -> Unit,
@@ -191,11 +196,17 @@ private fun Dialogs(
     }
 }
 
-private fun heartIconCenter(
+fun heartIconCenter(
     heartGlobalCenter: Offset,
     boxGlobalPosition: Offset
 ): Offset = if (heartGlobalCenter.isSpecified) {
     heartGlobalCenter - boxGlobalPosition
 } else {
     Offset.Unspecified
+}
+
+@Preview
+@Composable
+fun RecordScreenPreview() {
+    Text("Record Screen")
 }

@@ -66,7 +66,7 @@ class RecordViewModel(
 
     fun stopRecording(name: String?) = _uiState.stop().also {
         trackingController.finishTracking(name ?: "Temporary name")
-        _uiState.update { it.copy(dialog = null, connectedDevice = null) }
+        _uiState.update { it.copy(dialog = null) }
     }
 
     fun showNameActivityDialog() =

@@ -4,6 +4,9 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
 plugins {
     alias(libs.plugins.kmp.convention)
+    alias(libs.plugins.cmp.convention)
+    alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.kotlinComposeCompiler)
     alias(libs.plugins.koin.convention)
     alias(libs.plugins.quality.convention)
 }

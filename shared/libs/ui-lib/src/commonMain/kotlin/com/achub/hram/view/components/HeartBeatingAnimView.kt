@@ -13,10 +13,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.tooling.preview.Preview
-import com.achub.hram.style.Dimen76
+import com.achub.hram.style.Dimen64
+import com.achub.hram.utils.isAppInBackground
 import hram.ui_lib.generated.resources.Res
 import hram.ui_lib.generated.resources.ic_heart
-import com.achub.hram.utils.isAppInBackground
 import org.jetbrains.compose.resources.DrawableResource
 
 private const val MIN_HEART_SCALE = 0.75f
@@ -57,7 +57,7 @@ fun HeartBeatingAnimView(
 
     IndicationImage(
         modifier = modifier.scale(if (isBeating) animatedScale else DEFAULT_HEART_SCALE),
-        imageSize = Dimen76,
+        imageSize = Dimen64,
         drawable = icon,
     )
 }

@@ -7,15 +7,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.achub.hram.ext.getPlatform
 import com.achub.hram.style.Dimen16
 import com.achub.hram.style.Dimen8
 import com.achub.hram.view.cards.ActivityCard
@@ -35,18 +37,23 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun ActivitiesScreen() {
+fun ActivitiesScreen(onListUpdated: (Boolean) -> Unit = {}) {
     val viewModel = koinViewModel<ActivitiesViewModel>()
     val state = viewModel.uiState.collectAsStateWithLifecycle().value
     val haptic = LocalHapticFeedback.current
     val selectedIds = state.selectedActivitiesId
+    val isDesktop = getPlatform().isDesktop()
+    LaunchedEffect(state.activities) {
+        onListUpdated(state.activities.isNotEmpty())
+    }
     Box(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(
+        LazyVerticalGrid(
+            columns = if (isDesktop) GridCells.Fixed(2) else GridCells.Fixed(1),
             modifier = Modifier
                 .fillMaxSize()
-                .align(Center)
                 .padding(Dimen8),
-            verticalArrangement = Arrangement.spacedBy(Dimen8)
+            verticalArrangement = Arrangement.spacedBy(Dimen8),
+            horizontalArrangement = Arrangement.spacedBy(Dimen8)
         ) {
             items(items = state.activities, key = { it.id }) { activityInfo ->
                 val id = activityInfo.id
@@ -101,7 +108,7 @@ fun BoxScope.Toolbar(
     onExport: () -> Unit = {}
 ) {
     FloatingToolbar(
-        modifier = Modifier.align(Alignment.BottomEnd)
+        modifier = Modifier.align(if (getPlatform().isDesktop()) Alignment.TopStart else Alignment.BottomEnd)
             .padding(Dimen16),
         selected = selectedIds
     ) { opt ->
