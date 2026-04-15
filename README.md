@@ -2,9 +2,28 @@
 
 ### Kotlin Multiplatform project targeting Android, iOS & Desktop (macOS)
 
-| **Android**                                                                                             | **iOS**                                                                                                 |
-|---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
-| <img src="https://github.com/user-attachments/assets/709f2167-d628-40b2-8fa4-10ae4b441762" width="280"> | <img src="https://github.com/user-attachments/assets/d3aa997d-3564-459d-894f-01eb95cb3550" width="280"> |
+<table>
+  <tr>
+    <th align="center">Android</th>
+    <th align="center">iOS</th>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/8d4d2538-bb67-404c-b998-f97c72d3403b" width="271">
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/b7bec722-0915-4ef3-908f-7e48d4e412d1" width="271">
+    </td>
+  </tr>
+  <tr>
+    <th colspan="2" align="center">Desktop Mac</th>
+  </tr>
+  <tr>
+    <td colspan="2" align="center">
+      <img src="https://github.com/user-attachments/assets/aa07c116-6641-418f-a01d-978778614257" width="521">
+    </td>
+  </tr>
+</table>
 
 HRAM is a Kotlin Multiplatform app for heart rate activity tracking with BLE heart rate
 monitors.  
@@ -676,6 +695,10 @@ Shared UI lives in the `:ui-lib` module (`shared/libs/ui-lib/`) and app-specific
 | iOS                                                                                                     | Android                                                                                                 |
 |---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
 | <img src="https://github.com/user-attachments/assets/53cc386f-1df6-4a5b-a33a-8d037f99a0b9" width="280"> | <img src="https://github.com/user-attachments/assets/54656da8-e7d9-45fb-abee-d476a6dc480b" width="280"> |
+
+**Desktop Mac - Single screen**
+
+<img width="1032" height="781" alt="Screenshot 2026-04-15 at 20 44 18" src="https://github.com/user-attachments/assets/6057f090-0687-46ca-ab3e-7d978d79c9a8" />
 
 #### Notifications / Live Activities
 
