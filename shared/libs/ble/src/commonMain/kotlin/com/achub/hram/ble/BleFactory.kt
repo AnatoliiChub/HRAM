@@ -1,5 +1,6 @@
 package com.achub.hram.ble
 
+import com.achub.hram.ble.core.connection.AdvertisementCache
 import com.achub.hram.ble.core.connection.BleConnector
 import com.achub.hram.ble.core.connection.BleScanner
 import com.achub.hram.ble.core.connection.ConnectionTracker
@@ -50,6 +51,7 @@ object BleFactory {
             connector = bleConnector,
             peripheralConverter = peripheralConvertor,
             scope = scope,
+            advertisementCache = AdvertisementCache(),
         ),
     )
 }

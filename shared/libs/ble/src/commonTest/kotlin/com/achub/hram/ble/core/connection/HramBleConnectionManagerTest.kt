@@ -1,5 +1,6 @@
 package com.achub.hram.ble.core.connection
 
+import com.achub.hram.ble.ADVERTISEMENT_CACHE_TTL_MS
 import com.achub.hram.ble.identifier
 import com.achub.hram.ble.models.BleConnectionsException
 import com.achub.hram.ble.models.BleDevice
@@ -39,6 +40,8 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TestTimeSource
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HramBleConnectionManagerTest {
@@ -78,6 +81,7 @@ class HramBleConnectionManagerTest {
         every { bleDeviceMock.provideIdentifier() } returns identifier
         everySuspend { connectorMock.connect(advertisementMock) } returns peripheralMock
         every { trackerMock.observeDisconnection() } returns disconnectionFlow.filter { it }
+        every { advertisementMock.identifier } returns identifier
     }
 
     @Test
@@ -214,6 +218,59 @@ class HramBleConnectionManagerTest {
             peripheralConverter = peripheralConvertorMock,
             scope = this,
         ).apply { resetCalls(connectorMock) }
+    }
+
+    private fun TestScope.createManager(cache: AdvertisementCache): HramBleConnectionManager {
+        return HramBleConnectionManager(
+            connectionTracker = trackerMock,
+            scanner = scannerMock,
+            connector = connectorMock,
+            peripheralConverter = peripheralConvertorMock,
+            scope = this,
+            advertisementCache = cache,
+        ).apply { resetCalls(connectorMock) }
+    }
+
+    @OptIn(ExperimentalApi::class)
+    @Test
+    fun `connectToDevice - uses cached advertisement when scan was recent`() = runTest {
+        val cache = AdvertisementCache()
+        val manager = createManager(cache)
+
+        // Populate cache via scanHrDevices()
+        every { scannerMock.scan() } returns flowOf(advertisementMock)
+        manager.scanHrDevices().collect {}
+
+        // connectToDevice should reuse the cache and NOT call scanner.scan(identifier, duration)
+        val job = manager.connectToDevice(identifier).onEach { collectedDevices.add(it) }.launchIn(this)
+        advanceUntilIdle()
+
+        assertEquals(1, collectedDevices.size)
+        verifySuspend(VerifyMode.exactly(0)) { scannerMock.scan(identifier, any()) }
+        job.cancel()
+    }
+
+    @OptIn(ExperimentalApi::class)
+    @Test
+    fun `connectToDevice - falls back to scan when cache is expired`() = runTest {
+        val clock = TestTimeSource()
+        val cache = AdvertisementCache(clock)
+        val manager = createManager(cache)
+
+        // Populate cache via scanHrDevices()
+        every { scannerMock.scan() } returns flowOf(advertisementMock)
+        manager.scanHrDevices().collect {}
+
+        // Advance time past TTL
+        clock += (ADVERTISEMENT_CACHE_TTL_MS + 1).milliseconds
+
+        everySuspend { scannerMock.scan(identifier, any()) } returns advertisementMock
+        val job = manager.connectToDevice(identifier).onEach { collectedDevices.add(it) }.launchIn(this)
+        advanceUntilIdle()
+
+        assertEquals(1, collectedDevices.size)
+        verifySuspend(VerifyMode.exactly(1)) { scannerMock.scan(identifier, any()) }
+        job.cancel()
     }
 
     @OptIn(ExperimentalApi::class)
