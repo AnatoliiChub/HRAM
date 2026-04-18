@@ -19,6 +19,5 @@ val Dimen76 = 76.dp
 val Dimen96 = 96.dp
 val Dimen120 = 120.dp
 val Dimen128 = 128.dp
-val Dimen132 = 124.dp
 val Dimen216 = 216.dp
 val Dimen320 = 320.dp

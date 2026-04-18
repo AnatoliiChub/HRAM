@@ -10,5 +10,5 @@ const val BLE_SCAN_DURATION = 5000L
  * Cached entries are reused in [connectToDevice] to avoid triggering a new BLE scan
  * immediately after [scanHrDevices] has already found the device.
  */
-const val ADVERTISEMENT_CACHE_TTL_MS = 20_000L
+const val ADVERTISEMENT_CACHE_TTL_MS = 5_000L
 

@@ -5,6 +5,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -19,6 +20,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.achub.hram.ext.getPlatform
 import com.achub.hram.style.Dimen16
+import com.achub.hram.style.Dimen216
 import com.achub.hram.style.Dimen8
 import com.achub.hram.view.cards.ActivityCard
 import com.achub.hram.view.components.ActivityOptions
@@ -52,6 +54,7 @@ fun ActivitiesScreen(onListUpdated: (Boolean) -> Unit = {}) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(Dimen8),
+            contentPadding = if (isDesktop) PaddingValues(bottom = Dimen216) else PaddingValues(),
             verticalArrangement = Arrangement.spacedBy(Dimen8),
             horizontalArrangement = Arrangement.spacedBy(Dimen8)
         ) {
