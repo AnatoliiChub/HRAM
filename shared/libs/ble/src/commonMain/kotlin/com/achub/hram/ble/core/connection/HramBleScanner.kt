@@ -14,14 +14,12 @@ import kotlin.uuid.ExperimentalUuidApi
 
 @OptIn(ExperimentalUuidApi::class)
 internal class HramBleScanner(
-    val scanner: Scanner<Advertisement> = Scanner { filters { match { services = listOf(HR_SERVICE_UUID) } } }
+    val scanner: Scanner<Advertisement> = Scanner { filters { match { services = listOf(HR_SERVICE_UUID) } } },
 ) : BleScanner {
     @OptIn(ExperimentalUuidApi::class, FlowPreview::class)
     override suspend fun scan(identifier: Identifier, duration: Duration) =
         scan().filter { it.identifier == identifier }.timeout(duration).first()
 
     @OptIn(ExperimentalUuidApi::class)
-    override fun scan(): Flow<Advertisement> {
-        return scanner.advertisements
-    }
+    override fun scan(): Flow<Advertisement> = scanner.advertisements
 }

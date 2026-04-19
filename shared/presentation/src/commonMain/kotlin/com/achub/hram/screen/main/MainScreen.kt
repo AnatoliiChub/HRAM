@@ -18,7 +18,7 @@ import com.achub.hram.screen.record.RecordScreen
 import com.achub.hram.style.Black
 import com.achub.hram.view.tabs.ProperLiquidBottomBar
 
-private val tabs = listOf(Activities, Record)
+private val tabs = listOf(Record, Activities)
 
 @Composable
 fun MainScreen() {

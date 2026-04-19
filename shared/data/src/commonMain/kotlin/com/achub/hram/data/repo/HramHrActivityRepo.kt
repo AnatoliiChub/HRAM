@@ -1,6 +1,5 @@
 package com.achub.hram.data.repo
 
-import com.achub.hram.Logger
 import com.achub.hram.data.HrActivityRepo
 import com.achub.hram.data.db.dao.ActivityDao
 import com.achub.hram.data.db.dao.HeartRateDao
@@ -12,11 +11,9 @@ import com.achub.hram.models.HeartRateRecord
 import com.achub.hram.models.HrBucket
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.Provided
 
-private const val TAG = "HramHrActivityRepo"
 private const val MILLIS_IN_SECOND = 1000
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -37,31 +34,31 @@ class HramHrActivityRepo(
     override suspend fun getActivity(id: String): ActivityRecord? =
         actDao.getActivity(id)?.toDomain()
 
-    override fun getActivities(): Flow<List<ActivityInfo>> = actDao.getAll().flatMapLatest { activities ->
-        flowOf(
-            if (activities.isNotEmpty()) {
-                activities.map { activity ->
-                    val all = hrDao.getAllForActivity(activity.id)
-                    val aggregated = hrDao.getAggregatedHeartRateForActivity(activity.id, activity.duration)
-                        .map { bucket -> HrBucket(bucket.bucketNumber, bucket.avgHr, bucket.elapsedTime / MILLIS_IN_SECOND) }
-                    ActivityInfo(
-                        id = activity.id,
-                        name = activity.name,
-                        startDate = activity.startDate,
-                        duration = activity.duration / 1000L,
-                        buckets = aggregated,
-                        totalRecords = all.count { it.activityId == activity.id },
-                        avgHr = if (aggregated.isNotEmpty()) aggregated.map { it.avgHr }.average().toInt() else 0,
-                        maxHr = aggregated.maxOfOrNull { it.avgHr }?.toInt() ?: 0,
-                        minHr = aggregated.minOfOrNull { it.avgHr }?.toInt() ?: 0,
-                    )
-                }.onEach {
-                    Logger.d(TAG) { "ActivityInfo for ${it.name}: size=${it.buckets.size}" }
-                }
-            } else {
-                emptyList()
+    override fun getActivities(): Flow<List<ActivityInfo>> = actDao.getAll().map { activities ->
+        if (activities.isEmpty()) return@map emptyList()
+
+        val counts = hrDao.getActivityCounts()
+        val buckets = hrDao.getAllAggregatedHeartRates()
+
+        val countsMap = counts.associate { it.activityId to it.totalRecords }
+        val bucketsMap = buckets.groupBy { it.activityId }
+
+        activities.map { activity ->
+            val aggregated = (bucketsMap[activity.id] ?: emptyList()).map { bucket ->
+                HrBucket(bucket.bucketNumber, bucket.avgHr, bucket.elapsedTime / MILLIS_IN_SECOND)
             }
-        )
+            ActivityInfo(
+                id = activity.id,
+                name = activity.name,
+                startDate = activity.startDate,
+                duration = activity.duration / 1000L,
+                buckets = aggregated,
+                totalRecords = countsMap[activity.id] ?: 0,
+                avgHr = if (aggregated.isNotEmpty()) aggregated.map { it.avgHr }.average().toInt() else 0,
+                maxHr = aggregated.maxOfOrNull { it.avgHr }?.toInt() ?: 0,
+                minHr = aggregated.minOfOrNull { it.avgHr }?.toInt() ?: 0,
+            )
+        }
     }
 
     override suspend fun getHeartRatesForActivity(activityId: String): List<HeartRateRecord> =

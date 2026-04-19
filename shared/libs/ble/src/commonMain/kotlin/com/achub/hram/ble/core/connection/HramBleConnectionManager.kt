@@ -5,6 +5,7 @@ import com.achub.hram.ble.BLE_SCAN_DURATION
 import com.achub.hram.ble.models.BleConnectionsException
 import com.achub.hram.ble.models.BleDevice
 import com.achub.hram.ble.models.PeripheralConvertor
+import com.juul.kable.Advertisement
 import com.juul.kable.ExperimentalApi
 import com.juul.kable.Identifier
 import com.juul.kable.NotConnectedException
@@ -46,11 +47,15 @@ internal class HramBleConnectionManager(
     val connector: BleConnector,
     val peripheralConverter: PeripheralConvertor,
     val scope: CoroutineScope,
+    val advertisementCache: AdvertisementCache = AdvertisementCache(),
 ) : BleConnectionManager {
     @OptIn(ExperimentalApi::class)
     override val onConnected = connector.connected.filterNotNull()
 
+    @OptIn(ExperimentalUuidApi::class)
     override fun scanHrDevices() = scanner.scan()
+        .onStart { advertisementCache.clear() }
+        .onEach { advertisement -> advertisementCache.put(advertisement) }
 
     private var connectionTrackerJob: Job? = null
 
@@ -68,12 +73,23 @@ internal class HramBleConnectionManager(
             .onStart { emit(true) } // for initial connect
             .onEach { stopConnectionTracking() }
             .onEach { connector.disconnect() }
-            .map { scanner.scan(identifier, BLE_SCAN_DURATION.milliseconds) }
+            .map { resolveAdvertisement(identifier) }
             .map(connector::connect)
             .onEach(::startConnectionTracking)
             .onEach { wasConnected.store(true) }
             .map(peripheralConverter::convert)
             .retry(RECONNECTION_RETRY_ATTEMPTS, ::isReconnectionRequired)
+
+    @OptIn(ExperimentalUuidApi::class)
+    private suspend fun resolveAdvertisement(identifier: Identifier): Advertisement {
+        val cached = advertisementCache.get(identifier)
+        if (cached != null) {
+            Logger.d(TAG) { "Using cached advertisement for $identifier" }
+            return cached
+        }
+        Logger.d(TAG) { "No valid cache for $identifier, starting BLE scan" }
+        return scanner.scan(identifier, BLE_SCAN_DURATION.milliseconds)
+    }
 
     override suspend fun disconnect() {
         stopConnectionTracking()
