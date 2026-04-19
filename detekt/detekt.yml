@@ -67,6 +67,13 @@ style:
   UnusedPrivateMember:
     active: true
     ignoreAnnotated: [ 'Preview' ]
+  UnusedPrivateClass:
+    active: true
+  UnusedPrivateProperty:
+    active: true
+  UnusedParameter:
+    active: true
+    ignoreOverridden: true
   UnusedImports:
     active: true
   WildcardImport:
