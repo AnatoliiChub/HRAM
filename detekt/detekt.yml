@@ -2,7 +2,7 @@ config:
   validation: false
 
 build:
-  maxIssues: 5
+  maxIssues: 0
   weights:
     complexity: 2
     LongParameterList: 1

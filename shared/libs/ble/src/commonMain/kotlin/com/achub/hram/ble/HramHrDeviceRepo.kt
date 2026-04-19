@@ -41,6 +41,7 @@ internal class HramHrDeviceRepo(
             .distinctUntilChanged()
             .map { device -> ScanResult.ScanUpdate(device) as ScanResult }
             .catch {
+                val a = 556
                 when (it) {
                     is kotlinx.coroutines.TimeoutCancellationException -> {
                         Logger.d(TAG) { "Scan completed after timeout of $duration" }

@@ -60,7 +60,7 @@ class HramHrDeviceRepoTest {
 
     @Test
     fun failedtest() {
-        assertEquals(1, 2)
+        assertEquals(1, 334)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
