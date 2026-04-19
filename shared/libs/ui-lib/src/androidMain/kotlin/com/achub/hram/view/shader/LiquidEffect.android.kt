@@ -54,7 +54,7 @@ actual fun rememberLiquidRenderEffect(
             runtimeShader.setFloatUniform("origin", floatArrayOf(ox, oy))
 
             runtimeShader.setColorUniform("color", baseColor.toArgb())
-        } catch (exception: Throwable) {
+        } catch (exception: IllegalArgumentException) {
             Logger.e(TAG) { "Error setting shader uniforms: ${exception.localizedMessage}" }
         }
         RenderEffect.createRuntimeShaderEffect(runtimeShader, "content").asComposeRenderEffect()
