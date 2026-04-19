@@ -12,14 +12,35 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Initial comment to PR
+  init-summary:
+    name: Initialize PR Summary
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Post initial summary comment
+        uses: mshick/add-pr-comment@v2
+        with:
+          message-id: pr-summary
+          message: |
+            ## 🚀 Pull Request Job Started
+            
+            Pre-merge checks are currently in progress. Please wait for the results...
+            
+            ---
+            *Workflow run: [#${{ github.run_number }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})*
+
   # Static code analysis
   detekt:
     name: Static Code Analysis
+    needs: [ init-summary ]
     uses: ./.github/workflows/detekt-analysis.yml
 
   # Unit tests and coverage
   unit-tests:
     name: Unit Tests & Coverage
+    needs: [ init-summary ]
     uses: ./.github/workflows/unit-tests.yml
     permissions:
       contents: read
@@ -28,19 +49,19 @@ jobs:
   # Android debug build
   android-build:
     name: Android Build
-    needs: [ detekt ]
+    needs: [ detekt, unit-tests ]
     uses: ./.github/workflows/android-build.yml
 
   # iOS debug build
   ios-build:
     name: iOS Build
-    needs: [ detekt ]
+    needs: [ detekt, unit-tests ]
     uses: ./.github/workflows/ios-build.yml
 
   # macOS DMG build
   mac-build:
     name: macOS Build
-    needs: [ detekt ]
+    needs: [ detekt, unit-tests ]
     uses: ./.github/workflows/mac-build.yml
 
   # Summary comment on PR
@@ -56,6 +77,7 @@ jobs:
       - name: Generate PR summary comment
         uses: mshick/add-pr-comment@v2
         with:
+          message-id: pr-summary
           message: |
             ## 🚀 Pull Request Build Summary
             
@@ -67,9 +89,9 @@ jobs:
             |-------|--------|----------|
             | 🔍 Detekt Analysis | ${{ needs.detekt.result == 'success' && '✅ Passed' || '❌ Failed' }} | [View Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.detekt.outputs.artifact-id }}) |
             | 🧪 Unit Tests & Coverage | ${{ needs.unit-tests.result == 'success' && '✅ Passed' || '❌ Failed' }} | [View Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.unit-tests.outputs.artifact-id }}) |
-            | 🤖 Android Debug Build | ${{ needs.android-build.result == 'success' && '✅ Passed' || '❌ Failed' }} | [Download APK](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.android-build.outputs.artifact-id }}) |
-            | 🍎 iOS Debug Build | ${{ needs.ios-build.result == 'success' && '✅ Passed' || '❌ Failed' }} | [Download App](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.ios-build.outputs.artifact-id }}) |
-            | 🖥️ macOS DMG | ${{ needs.mac-build.result == 'success' && '✅ Passed' || '❌ Failed' }} | [Download DMG](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.mac-build.outputs.artifact-id }}) |
+            | 🤖 Android Debug Build | ${{ needs.android-build.result == 'success' && '✅ Passed' || (needs.android-build.result == 'skipped' && '⏭️ Skipped' || '❌ Failed') }} | [Download APK](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.android-build.outputs.artifact-id }}) |
+            | 🍎 iOS Debug Build | ${{ needs.ios-build.result == 'success' && '✅ Passed' || (needs.ios-build.result == 'skipped' && '⏭️ Skipped' || '❌ Failed') }} | [Download App](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.ios-build.outputs.artifact-id }}) |
+            | 🖥️ macOS DMG | ${{ needs.mac-build.result == 'success' && '✅ Passed' || (needs.mac-build.result == 'skipped' && '⏭️ Skipped' || '❌ Failed') }} | [Download DMG](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.mac-build.outputs.artifact-id }}) |
             
             ---
             *Workflow run: [#${{ github.run_number }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})*
