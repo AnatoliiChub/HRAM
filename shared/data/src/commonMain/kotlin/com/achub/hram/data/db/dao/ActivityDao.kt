@@ -29,6 +29,9 @@ interface ActivityDao {
     @Query("SELECT * FROM ActivityEntity WHERE duration > 0 ORDER BY startDate DESC")
     fun getAll(): Flow<List<ActivityEntity>>
 
+    @Query("SELECT * FROM ActivityEntity WHERE duration > 0 ORDER BY startDate DESC LIMIT :limit")
+    fun getLimited(limit: Int): Flow<List<ActivityEntity>>
+
     @Transaction
     @Query("SELECT * FROM ActivityEntity WHERE id = :id LIMIT 1")
     fun getActivityWithHeartRates(id: String): Flow<ActivityWithHeartRates?>

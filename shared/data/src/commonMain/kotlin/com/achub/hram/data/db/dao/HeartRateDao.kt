@@ -13,28 +13,14 @@ interface HeartRateDao {
     @Insert(onConflict = REPLACE)
     suspend fun insert(item: HeartRateBleEntity)
 
+    @Insert(onConflict = REPLACE)
+    suspend fun insertAll(items: List<HeartRateBleEntity>)
+
     @Query("SELECT * FROM HeartRateBleEntity")
     fun getAll(): Flow<List<HeartRateBleEntity>>
 
     @Query("SELECT * FROM HeartRateBleEntity WHERE activityId = :activityId ORDER BY elapsedTime ASC")
     suspend fun getAllForActivity(activityId: String): List<HeartRateBleEntity>
-
-    @Query(
-        """
-    SELECT 
-        CAST((elapsedTime * 100.0) / (:activityDuration) AS INT) AS bucketNumber,
-        AVG(hr.heartRate) AS avgHr,
-        MIN(hr.elapsedTime) AS elapsedTime
-    FROM HeartRateBleEntity hr
-    WHERE hr.activityId = :activityId
-    GROUP BY bucketNumber
-    ORDER BY bucketNumber
-"""
-    )
-    suspend fun getAggregatedHeartRateForActivity(
-        activityId: String,
-        activityDuration: Long
-    ): List<HrBucketEntity>
 
     @Query(
         """
@@ -63,6 +49,3 @@ data class ActivityCount(
     val activityId: String,
     val totalRecords: Int,
 )
-
-
-

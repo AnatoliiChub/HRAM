@@ -11,8 +11,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -45,12 +48,28 @@ fun ActivitiesScreen(onListUpdated: (Boolean) -> Unit = {}) {
     val haptic = LocalHapticFeedback.current
     val selectedIds = state.selectedActivitiesId
     val isDesktop = getPlatform().isDesktop()
+
+    val gridState = rememberLazyGridState()
+    val loadMore = remember {
+        derivedStateOf {
+            val layoutInfo = gridState.layoutInfo
+            val totalItemsNumber = layoutInfo.totalItemsCount
+            val lastVisibleItemIndex = (layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0) + 1
+            lastVisibleItemIndex > (totalItemsNumber - 2) && totalItemsNumber > 0
+        }
+    }
+
+    LaunchedEffect(loadMore.value) {
+        if (loadMore.value) viewModel.loadMore()
+    }
+
     LaunchedEffect(state.activities) {
         onListUpdated(state.activities.isNotEmpty())
     }
     Box(modifier = Modifier.fillMaxSize()) {
         LazyVerticalGrid(
             columns = if (isDesktop) GridCells.Fixed(2) else GridCells.Fixed(1),
+            state = gridState,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(Dimen8),
