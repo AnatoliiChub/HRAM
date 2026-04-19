@@ -7,11 +7,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material3.CircularWavyProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -24,7 +29,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.achub.hram.ext.getPlatform
 import com.achub.hram.style.Dimen16
 import com.achub.hram.style.Dimen216
+import com.achub.hram.style.Dimen48
 import com.achub.hram.style.Dimen8
+import com.achub.hram.style.Red
 import com.achub.hram.view.cards.ActivityCard
 import com.achub.hram.view.components.ActivityOptions
 import com.achub.hram.view.components.FloatingToolbar
@@ -41,6 +48,7 @@ import hram.composeapp.generated.resources.text_activity
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ActivitiesScreen(onListUpdated: (Boolean) -> Unit = {}) {
     val viewModel = koinViewModel<ActivitiesViewModel>()
@@ -66,6 +74,7 @@ fun ActivitiesScreen(onListUpdated: (Boolean) -> Unit = {}) {
     LaunchedEffect(state.activities) {
         onListUpdated(state.activities.isNotEmpty())
     }
+
     Box(modifier = Modifier.fillMaxSize()) {
         LazyVerticalGrid(
             columns = if (isDesktop) GridCells.Fixed(2) else GridCells.Fixed(1),
@@ -99,6 +108,14 @@ fun ActivitiesScreen(onListUpdated: (Boolean) -> Unit = {}) {
                         highLighted = state.highlightedItem,
                         onHighlighted = { viewModel.onHighlighted(it) }
                     )
+                }
+            }
+
+            if (state.isLoading) {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        CircularWavyProgressIndicator(modifier = Modifier.size(Dimen48), trackColor = Red, color = Red)
+                    }
                 }
             }
         }

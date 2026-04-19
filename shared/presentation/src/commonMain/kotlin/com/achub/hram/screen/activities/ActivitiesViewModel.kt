@@ -39,9 +39,12 @@ class ActivitiesViewModel(
     private val limit = MutableStateFlow(PAGE_SIZE)
 
     init {
-        limit.flatMapLatest { observeActivities(it) }
+        limit.onEach { _uiState.update { it.copy(isLoading = true) } }
+            .flatMapLatest { observeActivities(it) }
             .map { list -> list.map { it.toGraphInfo() } }
-            .onEach { activities -> _uiState.update { it.copy(activities = activities) } }
+            .onEach { activities ->
+                _uiState.update { it.copy(activities = activities, isLoading = false) }
+            }
             .flowOn(dispatcher)
             .launchIn(viewModelScope)
     }

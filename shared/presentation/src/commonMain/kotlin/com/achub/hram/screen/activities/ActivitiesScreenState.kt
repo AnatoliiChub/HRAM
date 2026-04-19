@@ -11,7 +11,8 @@ data class ActivitiesUiState(
     val activities: List<ActivityGraphInfo> = emptyList(),
     val highlightedItem: HighlightedItemUi? = null,
     val selectedActivitiesId: Set<String> = emptySet(),
-    val dialog: ActivitiesScreenDialog? = null
+    val dialog: ActivitiesScreenDialog? = null,
+    val isLoading: Boolean = false
 ) {
     val isSelectionMode: Boolean
         get() = selectedActivitiesId.isNotEmpty()
