@@ -42,6 +42,8 @@ import hram.ui_lib.generated.resources.ic_heart_disconnected
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
+private const val MAX_BPM_STUB = 555
+
 @Composable
 fun HeartIndicationRow(
     bleNotification: BleNotificationUi,
@@ -87,7 +89,7 @@ fun HeartIndicationRow(
             },
             heartIcon,
         )
-        val maxHeartLabel = stringResource(Res.string.heart_indication_bpm, 555)
+        val maxHeartLabel = stringResource(Res.string.heart_indication_bpm, MAX_BPM_STUB)
         val textMeasurer = rememberTextMeasurer()
         val maxHeartLabelWidthPx = remember {
             textMeasurer.measure(

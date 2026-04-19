@@ -14,6 +14,7 @@ import kotlin.time.Duration
 import kotlin.uuid.ExperimentalUuidApi
 
 private const val POWER_STATE_ON = 1
+private const val BYTE_MASK = 0xFF
 
 /**
  * JVM/Desktop wrapper around [HramBleScanner] that checks IOBluetooth power state before
@@ -47,6 +48,6 @@ internal class DesktopBleScanner(
             "objc_msgSend",
             arrayOf(controller, bridge.getSel("powerState"))
         )
-        return (powerState and 0xFF) == POWER_STATE_ON
+        return (powerState and BYTE_MASK) == POWER_STATE_ON
     }
 }
