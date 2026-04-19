@@ -58,11 +58,6 @@ class HramHrDeviceRepoTest {
         every { bleDeviceMock.provideIdentifier() } returns IDENTIFIER
     }
 
-    @Test
-    fun failedtest() {
-        assertEquals(1, 334)
-    }
-
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `connect to device`() = runTest {
