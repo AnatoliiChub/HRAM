@@ -36,7 +36,7 @@ jobs:
         id: artifact-upload-step
         with:
           name: detekt-report
-          path: '**/build/reports/detekt.html'
+          path: '**/build/reports/detekt/detekt.html'
           if-no-files-found: warn
           retention-days: 7
 
