@@ -21,6 +21,10 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
             // Serialization (BleState, TrackingStateStage, domain models @Serializable)
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.kotlinx.datetime)
+        }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
         }
     }
 }

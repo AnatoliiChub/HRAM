@@ -1,5 +1,6 @@
 package com.achub.hram.view.cards
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -16,22 +18,26 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import com.achub.hram.models.GraphLimitsUi
-import com.achub.hram.models.HighlightedItemUi
 import com.achub.hram.ext.dateFormat
 import com.achub.hram.ext.formatTime
 import com.achub.hram.ext.fromEpochSeconds
+import com.achub.hram.models.GraphLimitsUi
+import com.achub.hram.models.HighlightedItemUi
 import com.achub.hram.style.DarkGray
 import com.achub.hram.style.Dimen12
 import com.achub.hram.style.Dimen16
 import com.achub.hram.style.Dimen2
+import com.achub.hram.style.Dimen24
 import com.achub.hram.style.Dimen32
 import com.achub.hram.style.Dimen320
 import com.achub.hram.style.Dimen8
@@ -39,20 +45,25 @@ import com.achub.hram.style.Gray40
 import com.achub.hram.style.LabelBigBold
 import com.achub.hram.style.LabelMedium
 import com.achub.hram.style.LabelMediumBold
+import com.achub.hram.style.White
 import com.achub.hram.style.White80
 import com.achub.hram.view.chart.AreaChart
 import com.achub.hram.view.chart.ChartBubble
 import com.achub.hram.view.chart.ChartData
 import com.achub.hram.view.chart.defaultChartStyle
+import com.achub.hram.view.dialogs.InfoDialog
 import hram.ui_lib.generated.resources.Res
 import hram.ui_lib.generated.resources.activity_screen_avg_hr
 import hram.ui_lib.generated.resources.activity_screen_created_at
 import hram.ui_lib.generated.resources.activity_screen_elapsed_time
 import hram.ui_lib.generated.resources.activity_screen_heart_indication_bpm
+import hram.ui_lib.generated.resources.activity_screen_kcal_burnt
+import hram.ui_lib.generated.resources.activity_screen_kcal_info
 import hram.ui_lib.generated.resources.activity_screen_max_hr
 import hram.ui_lib.generated.resources.activity_screen_min_hr
 import hram.ui_lib.generated.resources.activity_screen_seconds_unit
 import hram.ui_lib.generated.resources.activity_screen_unnamed_act
+import hram.ui_lib.generated.resources.ic_info
 import hram.ui_lib.generated.resources.ic_not_selected
 import hram.ui_lib.generated.resources.ic_selected
 import hram.ui_lib.generated.resources.month_names
@@ -61,6 +72,7 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringArrayResource
 import org.jetbrains.compose.resources.stringResource
+import kotlin.math.roundToInt
 
 @Composable
 fun ActivityCard(
@@ -82,6 +94,8 @@ fun ActivityCard(
         dateFormat(MonthNames(monthNames))
             .format(activityInfo.startDate.fromEpochSeconds())
     }
+
+    var showKcalInfo by remember { mutableStateOf(false) }
 
     Card(
         modifier = modifier
@@ -121,7 +135,8 @@ fun ActivityCard(
             HeartRateLabel(Res.string.activity_screen_max_hr, activityInfo.maxHr)
             Spacer(Modifier.height(Dimen8))
             HeartRateLabel(Res.string.activity_screen_min_hr, activityInfo.minHr)
-            Spacer(Modifier.height(Dimen32))
+            KcalBurntRow(activityInfo.kcalBurnt, onInfoClick = { showKcalInfo = true })
+            Spacer(Modifier.height(Dimen16))
             AreaChart(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -133,6 +148,40 @@ fun ActivityCard(
             ) { xLabel, yLabel -> ChartBubble(xLabel, yLabel) }
         }
     }
+
+    if (showKcalInfo) {
+        InfoDialog(
+            title = Res.string.activity_screen_kcal_burnt,
+            message = stringResource(Res.string.activity_screen_kcal_info),
+            onDismiss = { showKcalInfo = false },
+            onButtonClick = { showKcalInfo = false }
+        )
+    }
+}
+
+@Composable
+private fun KcalBurntRow(kcal: Double, onInfoClick: () -> Unit) = Row(
+    verticalAlignment = Alignment.CenterVertically
+) {
+    Row(
+        modifier = Modifier.clickable(onClick = onInfoClick)
+            .padding(top = Dimen8, bottom = Dimen8, end = Dimen16),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = stringResource(Res.string.activity_screen_kcal_burnt), style = LabelMedium)
+        Spacer(Modifier.width(Dimen8))
+        Icon(
+            painter = painterResource(Res.drawable.ic_info),
+            contentDescription = null,
+            modifier = Modifier.size(Dimen24),
+            tint = White
+        )
+    }
+    Spacer(Modifier.weight(1f))
+    Text(
+        text = kcal.roundToInt().toString(),
+        style = LabelMediumBold
+    )
 }
 
 @Composable

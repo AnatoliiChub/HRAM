@@ -38,6 +38,7 @@ fun ActivityInfo.toGraphInfo(): ActivityGraphInfo {
         avgHr = avgHr,
         maxHr = maxHr,
         minHr = minHr,
+        kcalBurnt = kcalBurnt,
         limits = GraphLimitsUi(
             minX = 0f,
             maxX = uiBuckets.maxOfOrNull { it.elapsedTime }?.toFloat() ?: 1f,

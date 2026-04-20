@@ -35,6 +35,10 @@
     <string name="text_activity">activity</string>
     <string name="text_activities">activities</string>
 
+    <!-- Activity Card -->
+    <string name="activity_card_kcal_burnt">Kcal burnt</string>
+    <string name="activity_card_kcal_info">Your burnt calories are currently being estimated using default values. For an accurate calculation, please set your age, weight, height, and sex in your User Profile Settings.</string>
+
     <!-- Activity Name Validation -->
     <string name="activity_screen_name_validation_empty">Activity name cannot be empty</string>
     <string name="activity_screen_name_validation_start_digit">Activity name cannot start with a number</string>

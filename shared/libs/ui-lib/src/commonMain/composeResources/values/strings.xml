@@ -44,6 +44,8 @@
     <string name="activity_screen_avg_hr">Avg Heart Rate:</string>
     <string name="activity_screen_max_hr">Max Heart Rate:</string>
     <string name="activity_screen_min_hr">Min Heart Rate:</string>
+    <string name="activity_screen_kcal_burnt">Kcal burnt</string>
+    <string name="activity_screen_kcal_info">Your burnt calories are currently being estimated using default values. For an accurate calculation, please set your age, weight, height, and sex in your User Profile Settings.</string>
     <string name="activity_screen_heart_indication_bpm">%1$s BPM</string>
 
     <string-array name="month_names">
