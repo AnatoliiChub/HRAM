@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.achub.hram.screen.settings.profile.UserProfileScreen
 import com.achub.hram.style.Black
 import com.achub.hram.style.Dimen16
 import com.achub.hram.style.HeadingMediumBold
@@ -79,7 +80,11 @@ fun SettingsScreen() {
                     SettingsSubScreen(
                         titleRes = state.titleRes,
                         onBack = { currentNav = SettingsNav.Root }
-                    )
+                    ) {
+                        if (state.titleRes == Res.string.settings_item_user_profile) {
+                            UserProfileScreen()
+                        }
+                    }
                 }
             }
         }
@@ -134,7 +139,8 @@ private fun SettingsRoot(onNavigate: (SettingsNav) -> Unit) {
 @Composable
 private fun SettingsSubScreen(
     titleRes: StringResource,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    content: @Composable () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         Row(
@@ -156,5 +162,6 @@ private fun SettingsSubScreen(
                 modifier = Modifier.padding(start = Dimen16)
             )
         }
+        content()
     }
 }

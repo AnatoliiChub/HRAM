@@ -7,11 +7,14 @@ import com.achub.hram.data.db.dao.ActivityDao
 import com.achub.hram.data.db.dao.HeartRateDao
 import com.achub.hram.data.repo.HramHrActivityRepo
 import com.achub.hram.data.repo.state.HramBleStateRepo
+import com.achub.hram.data.repo.state.HramSettingsStateRepo
 import com.achub.hram.data.repo.state.HramTrackingStateRepo
 import com.achub.hram.data.state.BleStateRepo
+import com.achub.hram.data.state.SettingsStateRepo
 import com.achub.hram.data.state.TrackingStateRepo
 import com.achub.hram.di.WorkerThread
 import com.achub.hram.models.BleState
+import com.achub.hram.models.UserSettings
 import com.achub.hram.tracking.TrackingStateStage
 import kotlinx.coroutines.CoroutineDispatcher
 import org.koin.core.annotation.Configuration
@@ -48,4 +51,9 @@ class DataModule {
     fun provideTrackingStateStageRepo(
         @Named(TRACKING_STATE_QUALIFIER) datastore: DataStore<TrackingStateStage>
     ): TrackingStateRepo = HramTrackingStateRepo(datastore)
+
+    @Single
+    fun provideSettingsStateRepo(
+        @Named(USER_SETTINGS_QUALIFIER) datastore: DataStore<UserSettings>
+    ): SettingsStateRepo = HramSettingsStateRepo(datastore)
 }

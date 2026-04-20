@@ -23,4 +23,5 @@ fun <T> createOkioDataStore(
 
 internal const val BLE_STATE_FILE_NAME = "hram.ble_state.json"
 internal const val TRACKING_STATE_STAGE_FILE_NAME = "hram.tracking_state_stage.json"
+internal const val USER_SETTINGS_FILE_NAME = "hram.user_settings.json"
 

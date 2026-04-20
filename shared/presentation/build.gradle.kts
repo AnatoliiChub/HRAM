@@ -54,6 +54,7 @@ kotlin {
             implementation(project(":ui-lib"))
             api(project(":domain"))
             implementation(libs.koin.compose.viewmodel)
+            implementation(libs.kotlinx.datetime)
         }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)

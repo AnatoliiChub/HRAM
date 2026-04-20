@@ -5,9 +5,12 @@ import com.achub.hram.data.store.BLE_STATE_FILE_NAME
 import com.achub.hram.data.store.BleStateSerializer
 import com.achub.hram.data.store.TRACKING_STATE_STAGE_FILE_NAME
 import com.achub.hram.data.store.TrackingStateStageSerializer
+import com.achub.hram.data.store.USER_SETTINGS_FILE_NAME
+import com.achub.hram.data.store.UserSettingsSerializer
 import com.achub.hram.data.store.createOkioDataStore
 import com.achub.hram.di.CoroutineModule
 import com.achub.hram.models.BleState
+import com.achub.hram.models.UserSettings
 import com.achub.hram.tracking.TrackingStateStage
 import kotlinx.cinterop.ExperimentalForeignApi
 import org.koin.core.annotation.Configuration
@@ -59,6 +62,25 @@ actual class DataStoreModule actual constructor() {
                 error = null,
             )
             requireNotNull(documentDirectory).path + "/$TRACKING_STATE_STAGE_FILE_NAME"
+        },
+        serializer = serializer
+    )
+    @OptIn(ExperimentalForeignApi::class, ExperimentalForeignApi::class)
+    @Single
+    @Named(USER_SETTINGS_QUALIFIER)
+    actual fun provideUserSettingsDataStore(
+        scope: Scope,
+        serializer: UserSettingsSerializer
+    ): DataStore<UserSettings> = createOkioDataStore(
+        produceFilePath = {
+            val documentDirectory: NSURL? = NSFileManager.defaultManager.URLForDirectory(
+                directory = NSDocumentDirectory,
+                inDomain = NSUserDomainMask,
+                appropriateForURL = null,
+                create = false,
+                error = null,
+            )
+            requireNotNull(documentDirectory).path + "/$USER_SETTINGS_FILE_NAME"
         },
         serializer = serializer
     )
