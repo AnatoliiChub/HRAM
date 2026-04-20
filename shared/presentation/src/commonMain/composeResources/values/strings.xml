@@ -2,6 +2,7 @@
     <!-- Main Screen -->
     <string name="main_tab_record">Record</string>
     <string name="main_tab_activity">Activities</string>
+    <string name="main_tab_settings">Settings</string>
     <!-- Record Screen - Dialogs -->
     <string name="dialog_device_connected_title">Device Connected</string>
     <string name="dialog_device_connected_message">%1$s from %2$s successfully connected</string>

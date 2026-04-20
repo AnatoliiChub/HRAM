@@ -15,10 +15,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.achub.hram.screen.activities.ActivitiesScreen
 import com.achub.hram.screen.record.RecordScreen
+import com.achub.hram.screen.settings.SettingsScreen
 import com.achub.hram.style.Black
 import com.achub.hram.view.tabs.ProperLiquidBottomBar
 
-private val tabs = listOf(Record, Activities)
+private val tabs = listOf(Record, Activities, Settings)
 
 @Composable
 fun MainScreen() {
@@ -38,6 +39,7 @@ fun MainScreen() {
                 when (tabs[index]) {
                     is Activities -> ActivitiesScreen()
                     is Record -> RecordScreen()
+                    is Settings -> SettingsScreen()
                 }
             }
             ProperLiquidBottomBar(tabs, pagerState.currentPage, pagerState::animateScrollToPage)
