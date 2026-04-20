@@ -1,17 +1,24 @@
 package com.achub.hram.data.repo
 
+import com.achub.hram.MOCK_ACTIVITIES
 import com.achub.hram.data.HrActivityRepo
 import com.achub.hram.data.db.dao.ActivityDao
 import com.achub.hram.data.db.dao.HeartRateDao
+import com.achub.hram.data.debug.MockDataGenerator
 import com.achub.hram.data.mapper.toDomain
 import com.achub.hram.data.mapper.toEntity
+import com.achub.hram.di.WorkerThread
 import com.achub.hram.models.ActivityInfo
 import com.achub.hram.models.ActivityRecord
 import com.achub.hram.models.HeartRateRecord
 import com.achub.hram.models.HrBucket
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import org.koin.core.annotation.Provided
 
 private const val MILLIS_IN_SECOND = 1000
@@ -19,8 +26,18 @@ private const val MILLIS_IN_SECOND = 1000
 @OptIn(ExperimentalCoroutinesApi::class)
 class HramHrActivityRepo(
     @Provided val actDao: ActivityDao,
-    @Provided val hrDao: HeartRateDao
+    @Provided val hrDao: HeartRateDao,
+    @param:WorkerThread private val dispatcher: CoroutineDispatcher
 ) : HrActivityRepo {
+    private val scope = CoroutineScope(dispatcher + SupervisorJob())
+
+    init {
+        if (MOCK_ACTIVITIES) {
+            scope.launch {
+                MockDataGenerator(actDao, hrDao).generateIfNeeded()
+            }
+        }
+    }
     override suspend fun insert(item: HeartRateRecord) = hrDao.insert(item.toEntity())
 
     override suspend fun insert(item: ActivityRecord) = actDao.insert(item.toEntity())
@@ -34,8 +51,12 @@ class HramHrActivityRepo(
     override suspend fun getActivity(id: String): ActivityRecord? =
         actDao.getActivity(id)?.toDomain()
 
-    override fun getActivities(): Flow<List<ActivityInfo>> = actDao.getAll().map { activities ->
-        if (activities.isEmpty()) return@map emptyList()
+    override fun getActivities(limit: Int): Flow<List<ActivityInfo>> = actDao.getLimited(limit).map { activities ->
+        mapToActivityInfo(activities)
+    }
+
+    private suspend fun mapToActivityInfo(activities: List<com.achub.hram.data.db.entity.ActivityEntity>): List<ActivityInfo> {
+        if (activities.isEmpty()) return emptyList()
 
         val counts = hrDao.getActivityCounts()
         val buckets = hrDao.getAllAggregatedHeartRates()
@@ -43,7 +64,7 @@ class HramHrActivityRepo(
         val countsMap = counts.associate { it.activityId to it.totalRecords }
         val bucketsMap = buckets.groupBy { it.activityId }
 
-        activities.map { activity ->
+        return activities.map { activity ->
             val aggregated = (bucketsMap[activity.id] ?: emptyList()).map { bucket ->
                 HrBucket(bucket.bucketNumber, bucket.avgHr, bucket.elapsedTime / MILLIS_IN_SECOND)
             }

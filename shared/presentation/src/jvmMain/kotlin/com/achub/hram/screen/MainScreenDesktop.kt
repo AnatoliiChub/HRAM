@@ -1,5 +1,7 @@
 package com.achub.hram.screen
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,8 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,6 +50,17 @@ import com.achub.hram.view.shader.ProperLiquidWaveEffect
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
+private const val GRADIENT_START_STOP = 0.0f
+private const val GRADIENT_MIDDLE_STOP = 0.38f
+private const val GRADIENT_END_STOP = 1.0f
+
+private const val WEIGHT_START_SPACER = 2f
+private const val WEIGHT_SECTION = 6f
+private const val WEIGHT_INTERNAL_SPACER = 0.5f
+private const val WEIGHT_END_SPACER = 1f
+
+private const val RECORD_SCREEN_ANIM_DURATION = 600
+
 @Composable
 fun MainScreenDesktop() {
     MaterialTheme {
@@ -62,7 +73,7 @@ fun MainScreenDesktop() {
             var hasActivities by remember { mutableStateOf(false) }
             val verticalBias by animateFloatAsState(
                 targetValue = if (hasActivities) 1f else 0f,
-                animationSpec = tween(durationMillis = 600),
+                animationSpec = tween(durationMillis = RECORD_SCREEN_ANIM_DURATION),
                 label = "recordScreenAlignment"
             )
 
@@ -102,9 +113,9 @@ fun RecordScreen(modifier: Modifier = Modifier) {
                     modifier = Modifier.fillMaxWidth().background(
                         Brush.verticalGradient(
                             colorStops = arrayOf(
-                                0.0f to Color.Transparent,
-                                0.38f to Black,
-                                1.0f to Black,
+                                GRADIENT_START_STOP to Color.Transparent,
+                                GRADIENT_MIDDLE_STOP to Black,
+                                GRADIENT_END_STOP to Black,
                             )
                         )
                     )
@@ -115,20 +126,20 @@ fun RecordScreen(modifier: Modifier = Modifier) {
                             .padding(top = Dimen96, bottom = Dimen8),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Spacer(Modifier.weight(2f))
-                        Box(Modifier.weight(6f)) {
+                        Spacer(Modifier.weight(WEIGHT_START_SPACER))
+                        Box(Modifier.weight(WEIGHT_SECTION)) {
                             TrackingIndicationsSection(indications, heartPosUpdated = { heartGlobalCenter = it })
                         }
-                        Spacer(Modifier.weight(0.5f))
-                        Column(Modifier.weight(6f), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Spacer(Modifier.weight(WEIGHT_INTERNAL_SPACER))
+                        Column(Modifier.weight(WEIGHT_SECTION), horizontalAlignment = Alignment.CenterHorizontally) {
                             DeviceSection(
                                 device,
                                 onConnectClick = { requestScanning() },
                                 onDisconnectClick = { disconnect() },
                             )
                         }
-                        Spacer(Modifier.weight(0.5f))
-                        Box(Modifier.weight(6f), contentAlignment = Alignment.Center) {
+                        Spacer(Modifier.weight(WEIGHT_INTERNAL_SPACER))
+                        Box(Modifier.weight(WEIGHT_SECTION), contentAlignment = Alignment.Center) {
                             RecordSection(
                                 modifier = Modifier.padding(0.dp),
                                 recordingState = state.recordingState,
@@ -137,7 +148,7 @@ fun RecordScreen(modifier: Modifier = Modifier) {
                                 isRecordingEnabled = state.isRecordingEnabled
                             )
                         }
-                        Spacer(Modifier.weight(1f))
+                        Spacer(Modifier.weight(WEIGHT_END_SPACER))
                     }
                 }
             }

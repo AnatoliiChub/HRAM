@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionOnScreen
@@ -39,85 +40,129 @@ import hram.ui_lib.generated.resources.heart_indication_stub
 import hram.ui_lib.generated.resources.ic_battery_full
 import hram.ui_lib.generated.resources.ic_heart_contact_off
 import hram.ui_lib.generated.resources.ic_heart_disconnected
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
+private const val MAX_BPM_STUB = 555
+private const val LETTER_SPACING_REDUCTION = -1.2
+
+private data class HeartIndicationState(
+    val hrValueStub: Boolean,
+    val hrLabel: String,
+    val secondaryLabel: String,
+    val heartIcon: DrawableResource,
+    val isContactOn: Boolean
+)
+
 @Composable
-fun HeartIndicationRow(
-    bleNotification: BleNotificationUi,
-    heartPosUpdated: (Offset) -> Unit
-) {
-    val isEmpty = bleNotification.isEmpty()
+private fun calculateHeartIndicationState(bleNotification: BleNotificationUi): HeartIndicationState {
     val hrIndication = bleNotification.hrNotification
-    val hrBpm = hrIndication?.hrBpm ?: "--"
     val isSensorContactSupported = hrIndication?.isSensorContactSupported == true
     val isContactOn = hrIndication?.isContactOn == true
-    val batteryLevel = bleNotification.batteryLevel
     val noBle = bleNotification.isBleConnected.not()
-    val isContactOff = isSensorContactSupported && isContactOn.not()
-    val hrValueStub = isEmpty || noBle || isContactOff || hrIndication == null
+    val isContactOff = isSensorContactSupported && !isContactOn
+    val hrValueStub = bleNotification.isEmpty() || noBle || isContactOff || hrIndication == null
+
     val hrLabel = if (hrValueStub) {
         stringResource(Res.string.heart_indication_stub)
     } else {
-        stringResource(Res.string.heart_indication_bpm, hrBpm)
+        stringResource(Res.string.heart_indication_bpm, hrIndication.hrBpm)
     }
 
     val secondaryLabel = when {
         noBle -> stringResource(Res.string.heart_indication_no_connection)
         isContactOff -> stringResource(Res.string.heart_indication_contact_off)
-        else -> stringResource(Res.string.heart_indication_battery_level, batteryLevel)
+        else -> stringResource(Res.string.heart_indication_battery_level, bleNotification.batteryLevel)
     }
-    val secondaryLabelColor = if (isEmpty) Red else White
 
     val heartIcon = when {
         noBle -> Res.drawable.ic_heart_disconnected
         isContactOff -> Res.drawable.ic_heart_contact_off
         else -> Res.drawable.heart3d
     }
+
+    return HeartIndicationState(hrValueStub, hrLabel, secondaryLabel, heartIcon, isContactOn)
+}
+
+@Composable
+fun HeartIndicationRow(
+    bleNotification: BleNotificationUi,
+    heartPosUpdated: (Offset) -> Unit
+) {
+    val state = calculateHeartIndicationState(bleNotification)
+
     Row(verticalAlignment = CenterVertically) {
-        HeartBeatingAnimView(
-            hrValueStub.not(),
-            Modifier.onGloballyPositioned {
-                val position = it.positionOnScreen()
-                val center = Offset(
-                    x = position.x + it.size.width / 2f,
-                    y = position.y + it.size.height / 2f
-                )
-                heartPosUpdated(center)
-            },
-            heartIcon,
-        )
-        val maxHeartLabel = stringResource(Res.string.heart_indication_bpm, 555)
-        val textMeasurer = rememberTextMeasurer()
-        val maxHeartLabelWidthPx = remember {
-            textMeasurer.measure(
-                text = maxHeartLabel,
-                style = HeadingMediumBold
-            ).size.width
-        }
-        val maxHeartLabelWidth = with(LocalDensity.current) { maxHeartLabelWidthPx.toDp() }
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                modifier = Modifier.align(Alignment.CenterHorizontally).widthIn(min = maxHeartLabelWidth),
-                text = hrLabel,
-                textAlign = TextAlign.Center,
-                style = HeadingMediumBold
+        HeartIcon(state.hrValueStub, state.heartIcon, heartPosUpdated)
+        HeartDataColumn(state.hrLabel, state.secondaryLabel, bleNotification, state.isContactOn)
+    }
+}
+
+@Composable
+private fun HeartIcon(
+    hrValueStub: Boolean,
+    heartIcon: DrawableResource,
+    heartPosUpdated: (Offset) -> Unit
+) {
+    HeartBeatingAnimView(
+        isBeating = !hrValueStub,
+        modifier = Modifier.onGloballyPositioned {
+            val position = it.positionOnScreen()
+            val center = Offset(
+                x = position.x + it.size.width / 2f,
+                y = position.y + it.size.height / 2f
             )
-            Row(verticalAlignment = CenterVertically) {
-                AnimatedVisibility(bleNotification.isBleConnected && isContactOn) {
-                    Image(
-                        modifier = Modifier.size(Dimen32),
-                        imageVector = vectorResource(Res.drawable.ic_battery_full),
-                        colorFilter = ColorFilter.tint(White),
-                        contentDescription = null
-                    )
-                }
-                Text(
-                    text = secondaryLabel,
-                    style = LabelMedium.copy(color = secondaryLabelColor, letterSpacing = (-1.2).sp)
-                )
-            }
+            heartPosUpdated(center)
+        },
+        icon = heartIcon,
+    )
+}
+
+@Composable
+private fun HeartDataColumn(
+    hrLabel: String,
+    secondaryLabel: String,
+    bleNotification: BleNotificationUi,
+    isContactOn: Boolean
+) {
+    val secondaryLabelColor = if (bleNotification.isEmpty()) Red else White
+    val maxHeartLabel = stringResource(Res.string.heart_indication_bpm, MAX_BPM_STUB)
+    val textMeasurer = rememberTextMeasurer()
+    val maxWidthPx = remember {
+        textMeasurer.measure(maxHeartLabel, HeadingMediumBold).size.width
+    }
+    val maxWidth = with(LocalDensity.current) { maxWidthPx.toDp() }
+
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            modifier = Modifier.align(Alignment.CenterHorizontally).widthIn(min = maxWidth),
+            text = hrLabel,
+            textAlign = TextAlign.Center,
+            style = HeadingMediumBold
+        )
+        SecondaryLabelRow(secondaryLabel, secondaryLabelColor, bleNotification.isBleConnected && isContactOn)
+    }
+}
+
+@Composable
+private fun SecondaryLabelRow(
+    text: String,
+    color: Color,
+    showBatteryIcon: Boolean
+) {
+    Row(verticalAlignment = CenterVertically) {
+        AnimatedVisibility(showBatteryIcon) {
+            Image(
+                modifier = Modifier.size(Dimen32),
+                imageVector = vectorResource(Res.drawable.ic_battery_full),
+                colorFilter = ColorFilter.tint(White),
+                contentDescription = null
+            )
         }
+        Text(
+            text = text,
+            style = LabelMedium.copy(color = color, letterSpacing = LETTER_SPACING_REDUCTION.sp)
+        )
     }
 }
 

@@ -1,4 +1,4 @@
-@file:Suppress("detekt:NoUnusedImports") // https://github.com/detekt/detekt/issues/8140
+@file:Suppress("detekt:UnusedImports") // https://github.com/detekt/detekt/issues/8140
 
 package com.achub.hram.ext
 

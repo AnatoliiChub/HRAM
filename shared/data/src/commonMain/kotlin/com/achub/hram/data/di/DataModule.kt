@@ -1,17 +1,19 @@
 package com.achub.hram.data.di
 
 import androidx.datastore.core.DataStore
+import com.achub.hram.data.HrActivityRepo
 import com.achub.hram.data.db.HramDatabase
 import com.achub.hram.data.db.dao.ActivityDao
 import com.achub.hram.data.db.dao.HeartRateDao
-import com.achub.hram.data.HrActivityRepo
 import com.achub.hram.data.repo.HramHrActivityRepo
-import com.achub.hram.data.state.BleStateRepo
 import com.achub.hram.data.repo.state.HramBleStateRepo
 import com.achub.hram.data.repo.state.HramTrackingStateRepo
+import com.achub.hram.data.state.BleStateRepo
 import com.achub.hram.data.state.TrackingStateRepo
+import com.achub.hram.di.WorkerThread
 import com.achub.hram.models.BleState
 import com.achub.hram.tracking.TrackingStateStage
+import kotlinx.coroutines.CoroutineDispatcher
 import org.koin.core.annotation.Configuration
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Named
@@ -30,8 +32,12 @@ class DataModule {
         database.getActivityDao()
 
     @Single
-    fun provideHrActivityRepo(actDao: ActivityDao, hrDao: HeartRateDao): HrActivityRepo =
-        HramHrActivityRepo(actDao, hrDao)
+    fun provideHrActivityRepo(
+        actDao: ActivityDao,
+        hrDao: HeartRateDao,
+        @WorkerThread dispatcher: CoroutineDispatcher
+    ): HrActivityRepo =
+        HramHrActivityRepo(actDao, hrDao, dispatcher)
 
     @Single
     fun provideBleStateRepo(

@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.callbackFlow
 
 private const val TAG = "BluetoothObserverMac"
 private const val POWER_STATE_ON = 1
+private const val BYTE_MASK = 0xFF
 
 /**
  * BluetoothObserverMac now depends on an ObjcBridge. By default, it uses RealObjcBridge(), so
@@ -30,7 +31,7 @@ class BluetoothObserverMac(
     private fun objcNsString(value: String): Pointer = bridge.nsString(value)
 
     private fun readPowerState(controller: Pointer, powerStateSelector: Pointer): Boolean {
-        return (bridge.invokeInt("objc_msgSend", arrayOf(controller, powerStateSelector)) and 0xFF) == POWER_STATE_ON
+        return (bridge.invokeInt("objc_msgSend", arrayOf(controller, powerStateSelector)) and BYTE_MASK) == POWER_STATE_ON
     }
 
     // Allocates and registers a temporary Objective-C observer class and returns its Pointer

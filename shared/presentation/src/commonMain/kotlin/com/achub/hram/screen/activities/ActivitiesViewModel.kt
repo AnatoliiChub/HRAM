@@ -11,14 +11,19 @@ import com.achub.hram.usecase.ExportCsvUseCase
 import com.achub.hram.usecase.ObserveActivitiesUseCase
 import com.achub.hram.usecase.RenameActivityUseCase
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+private const val PAGE_SIZE = 7
+
+@OptIn(ExperimentalCoroutinesApi::class)
 class ActivitiesViewModel(
     val observeActivities: ObserveActivitiesUseCase,
     val deleteActivitiesUseCase: DeleteActivitiesUseCase,
@@ -31,12 +36,21 @@ class ActivitiesViewModel(
 
     val uiState: StateFlow<ActivitiesUiState> = _uiState.stateInExt(initialValue = ActivitiesUiState(emptyList()))
 
+    private val limit = MutableStateFlow(PAGE_SIZE)
+
     init {
-        observeActivities()
+        limit.onEach { _uiState.update { it.copy(isLoading = true) } }
+            .flatMapLatest { observeActivities(it) }
             .map { list -> list.map { it.toGraphInfo() } }
-            .onEach { activities -> _uiState.update { it.copy(activities = activities) } }
+            .onEach { activities ->
+                _uiState.update { it.copy(activities = activities, isLoading = false) }
+            }
             .flowOn(dispatcher)
             .launchIn(viewModelScope)
+    }
+
+    fun loadMore() {
+        limit.update { it + PAGE_SIZE }
     }
 
     fun onHighlighted(highlightedItem: HighlightedItemUi?) =

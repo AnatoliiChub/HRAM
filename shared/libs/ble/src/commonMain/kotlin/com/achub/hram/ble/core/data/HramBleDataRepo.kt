@@ -13,8 +13,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlin.uuid.ExperimentalUuidApi
 
-private const val TAG = "HramBleDataRepo"
-
 @OptIn(ExperimentalUuidApi::class)
 val HR_CHAR = characteristicOf(HR_SERVICE_UUID, HR_MEASUREMENT_CHAR_UUID)
 

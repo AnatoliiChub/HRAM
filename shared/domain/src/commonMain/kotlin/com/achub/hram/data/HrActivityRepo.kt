@@ -16,7 +16,7 @@ interface HrActivityRepo {
 
     suspend fun getActivity(id: String): ActivityRecord?
 
-    fun getActivities(): Flow<List<ActivityInfo>>
+    fun getActivities(limit: Int): Flow<List<ActivityInfo>>
 
     suspend fun getHeartRatesForActivity(activityId: String): List<HeartRateRecord>
 
