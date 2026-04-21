@@ -44,6 +44,8 @@
     <string name="activity_screen_avg_hr">Ср. пульс:</string>
     <string name="activity_screen_max_hr">Макс. пульс:</string>
     <string name="activity_screen_min_hr">Мін. пульс:</string>
+    <string name="activity_screen_kcal_burnt">Спалено ккал</string>
+    <string name="activity_screen_kcal_info">Наразі спалені калорії оцінюються за стандартними показниками. Для точного розрахунку вкажіть ваш вік, вагу, зріст та стать у Налаштуваннях профілю користувача.</string>
     <string name="activity_screen_heart_indication_bpm">%1$s уд/хв</string>
 
     <string-array name="month_names">

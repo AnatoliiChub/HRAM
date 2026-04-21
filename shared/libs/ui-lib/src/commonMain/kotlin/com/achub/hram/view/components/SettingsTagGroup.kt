@@ -33,7 +33,7 @@ fun <T> SettingsTagGroup(
     options: List<T>,
     selectedOption: T,
     onOptionSelected: (T) -> Unit,
-    optionLabel: (T) -> String,
+    optionLabel: @Composable (T) -> String,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.fillMaxWidth()) {

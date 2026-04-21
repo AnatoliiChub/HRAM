@@ -12,8 +12,17 @@ import com.achub.hram.models.BiologicalSex
 import com.achub.hram.style.Dimen16
 import com.achub.hram.view.components.SettingsRangePicker
 import com.achub.hram.view.components.SettingsTagGroup
+import hram.composeapp.generated.resources.Res
+import hram.composeapp.generated.resources.sex_female
+import hram.composeapp.generated.resources.sex_male
+import hram.composeapp.generated.resources.sex_other
+import hram.composeapp.generated.resources.user_profile_biological_sex
+import hram.composeapp.generated.resources.user_profile_birth_year
+import hram.composeapp.generated.resources.user_profile_height
+import hram.composeapp.generated.resources.user_profile_weight
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.roundToInt
 import kotlin.time.Clock
@@ -37,29 +46,37 @@ fun UserProfileScreen() {
         verticalArrangement = Arrangement.spacedBy(Dimen16)
     ) {
         SettingsTagGroup(
-            label = "Biological Sex",
+            label = stringResource(Res.string.user_profile_biological_sex),
             options = BiologicalSex.entries,
             selectedOption = state.settings.biologicalSex,
             onOptionSelected = { viewModel.updateSex(it) },
-            optionLabel = { it.name }
+            optionLabel = { sex ->
+                stringResource(
+                    when (sex) {
+                        BiologicalSex.Male -> Res.string.sex_male
+                        BiologicalSex.Female -> Res.string.sex_female
+                        BiologicalSex.Other -> Res.string.sex_other
+                    }
+                )
+            }
         )
 
         SettingsRangePicker(
-            label = "Birth Year: ${state.settings.birthYear}",
+            label = stringResource(Res.string.user_profile_birth_year, state.settings.birthYear.toString()),
             value = state.settings.birthYear.toFloat(),
             range = MIN_BIRTH_YEAR..currentYear,
             onValueChange = { viewModel.updateBirthYear(it.roundToInt()) }
         )
 
         SettingsRangePicker(
-            label = "Weight: ${state.settings.weightKg.roundToInt()} kg",
+            label = stringResource(Res.string.user_profile_weight, state.settings.weightKg.roundToInt().toString()),
             value = state.settings.weightKg,
             range = MIN_WEIGHT..MAX_WEIGHT,
             onValueChange = { viewModel.updateWeight(it) }
         )
 
         SettingsRangePicker(
-            label = "Height: ${state.settings.heightCm} cm",
+            label = stringResource(Res.string.user_profile_height, state.settings.heightCm.toString()),
             value = state.settings.heightCm.toFloat(),
             range = MIN_HEIGHT..MAX_HEIGHT,
             onValueChange = { viewModel.updateHeight(it.roundToInt()) }

@@ -45,5 +45,14 @@
     <string name="activity_screen_name_validation_too_short">Activity name is too short</string>
     <string name="activity_screen_name_validation_too_long">Activity name is too long</string>
 
+    <!-- User Profile Settings -->
+    <string name="user_profile_biological_sex">Biological Sex</string>
+    <string name="user_profile_birth_year">Birth Year: %1$s</string>
+    <string name="user_profile_weight">Weight: %1$s kg</string>
+    <string name="user_profile_height">Height: %1$s cm</string>
+    <string name="sex_male">Male</string>
+    <string name="sex_female">Female</string>
+    <string name="sex_other">Other</string>
+
 </resources>
 

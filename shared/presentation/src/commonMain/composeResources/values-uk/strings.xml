@@ -2,6 +2,15 @@
     <!-- Main Screen -->
     <string name="main_tab_record">Запис</string>
     <string name="main_tab_activity">Активності</string>
+    <string name="main_tab_settings">Налаштування</string>
+
+    <!-- Settings Menu Items -->
+    <string name="settings_item_user_profile">Профіль користувача</string>
+    <string name="settings_item_preferences_display">Налаштування та вигляд</string>
+    <string name="settings_item_session_settings">Налаштування сесії</string>
+    <string name="settings_item_data_storage">Дані, сховище та інтеграції</string>
+    <string name="settings_item_about">Про додаток</string>
+
     <!-- Record Screen - Dialogs -->
     <string name="dialog_device_connected_title">Пристрій підключено</string>
     <string name="dialog_device_connected_message">%1$s (%2$s) успішно підключено</string>
@@ -27,10 +36,24 @@
     <string name="text_activity">активність</string>
     <string name="text_activities">активності</string>
 
+    <!-- Activity Card -->
+    <string name="activity_card_kcal_burnt">Спалено ккал</string>
+    <string name="activity_card_kcal_info">Наразі спалені калорії оцінюються за стандартними показниками. Для точного розрахунку вкажіть ваш вік, вагу, зріст та стать у Налаштуваннях профілю користувача.</string>
+
     <!-- Activity Name Validation -->
     <string name="activity_screen_name_validation_empty">Назва активності не може бути порожньою</string>
     <string name="activity_screen_name_validation_start_digit">Назва активності не може починатися з цифри</string>
     <string name="activity_screen_name_validation_too_short">Назва активності занадто коротка</string>
     <string name="activity_screen_name_validation_too_long">Назва активності занадто довга</string>
+
+    <!-- User Profile Settings -->
+    <string name="user_profile_biological_sex">Біологічна стать</string>
+    <string name="user_profile_birth_year">Рік народження: %1$s</string>
+    <string name="user_profile_weight">Вага: %1$s кг</string>
+    <string name="user_profile_height">Зріст: %1$s см</string>
+    <string name="sex_male">Чол</string>
+    <string name="sex_female">Жін</string>
+    <string name="sex_other">Інше</string>
+
 </resources>
 
