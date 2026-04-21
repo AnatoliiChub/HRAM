@@ -15,11 +15,19 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
@@ -29,7 +37,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionOnScreen
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.achub.hram.ext.permissionController
@@ -39,14 +49,21 @@ import com.achub.hram.screen.activities.ActivitiesScreen
 import com.achub.hram.screen.record.Dialogs
 import com.achub.hram.screen.record.RecordViewModel
 import com.achub.hram.screen.record.heartIconCenter
+import com.achub.hram.screen.settings.SettingsScreen
 import com.achub.hram.style.Black
+import com.achub.hram.style.Dimen16
 import com.achub.hram.style.Dimen24
 import com.achub.hram.style.Dimen8
 import com.achub.hram.style.Dimen96
+import com.achub.hram.style.White
 import com.achub.hram.view.section.DeviceSection
 import com.achub.hram.view.section.RecordSection
 import com.achub.hram.view.section.TrackingIndicationsSection
 import com.achub.hram.view.shader.ProperLiquidWaveEffect
+import hram.composeapp.generated.resources.Res
+import hram.composeapp.generated.resources.ic_settings
+import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -64,21 +81,53 @@ private const val RECORD_SCREEN_ANIM_DURATION = 600
 @Composable
 fun MainScreenDesktop() {
     MaterialTheme {
-        Box(
-            modifier = Modifier
-                .background(color = Black)
-                .windowInsetsPadding(WindowInsets.safeDrawing)
-                .fillMaxSize()
-        ) {
-            var hasActivities by remember { mutableStateOf(false) }
-            val verticalBias by animateFloatAsState(
-                targetValue = if (hasActivities) 1f else 0f,
-                animationSpec = tween(durationMillis = RECORD_SCREEN_ANIM_DURATION),
-                label = "recordScreenAlignment"
-            )
+        val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+        val scope = rememberCoroutineScope()
 
-            ActivitiesScreen({ hasActivities = it })
-            RecordScreen(modifier = Modifier.align(BiasAlignment(0f, verticalBias)))
+        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+            ModalNavigationDrawer(
+                drawerState = drawerState,
+                drawerContent = {
+                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                        ModalDrawerSheet(
+                            modifier = Modifier.background(Black),
+                            drawerContainerColor = Black
+                        ) {
+                            SettingsScreen()
+                        }
+                    }
+                }
+            ) {
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                    Box(
+                        modifier = Modifier
+                            .background(color = Black)
+                            .windowInsetsPadding(WindowInsets.safeDrawing)
+                            .fillMaxSize()
+                    ) {
+                        var hasActivities by remember { mutableStateOf(false) }
+                        val verticalBias by animateFloatAsState(
+                            targetValue = if (hasActivities) 1f else 0f,
+                            animationSpec = tween(durationMillis = RECORD_SCREEN_ANIM_DURATION),
+                            label = "recordScreenAlignment"
+                        )
+
+                        ActivitiesScreen({ hasActivities = it })
+                        RecordScreen(modifier = Modifier.align(BiasAlignment(0f, verticalBias)))
+
+                        IconButton(
+                            onClick = { scope.launch { drawerState.open() } },
+                            modifier = Modifier.align(Alignment.TopEnd).padding(Dimen16)
+                        ) {
+                            Icon(
+                                painter = painterResource(Res.drawable.ic_settings),
+                                contentDescription = "Settings",
+                                tint = White
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }

@@ -4,8 +4,10 @@ import com.achub.hram.view.tabs.TabType
 import hram.composeapp.generated.resources.Res
 import hram.composeapp.generated.resources.ic_activities
 import hram.composeapp.generated.resources.ic_record
+import hram.composeapp.generated.resources.ic_settings
 import hram.composeapp.generated.resources.main_tab_activity
 import hram.composeapp.generated.resources.main_tab_record
+import hram.composeapp.generated.resources.main_tab_settings
 
 object Activities : TabType {
     override val icon = Res.drawable.ic_activities
@@ -17,3 +19,7 @@ object Record : TabType {
     override val label = Res.string.main_tab_record
 }
 
+object Settings : TabType {
+    override val icon = Res.drawable.ic_settings
+    override val label = Res.string.main_tab_settings
+}

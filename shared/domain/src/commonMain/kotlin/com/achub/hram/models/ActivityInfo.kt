@@ -10,4 +10,5 @@ data class ActivityInfo(
     val avgHr: Int,
     val maxHr: Int,
     val minHr: Int,
+    val kcalBurnt: Double = 0.0,
 )

@@ -2,6 +2,14 @@
     <!-- Main Screen -->
     <string name="main_tab_record">Record</string>
     <string name="main_tab_activity">Activities</string>
+    <string name="main_tab_settings">Settings</string>
+
+    <!-- Settings Menu Items -->
+    <string name="settings_item_user_profile">User Profile</string>
+    <string name="settings_item_preferences_display">Preferences &amp; Display</string>
+    <string name="settings_item_session_settings">Session Settings</string>
+    <string name="settings_item_data_storage">Data, Storage &amp; Integrations</string>
+    <string name="settings_item_about">About</string>
     <!-- Record Screen - Dialogs -->
     <string name="dialog_device_connected_title">Device Connected</string>
     <string name="dialog_device_connected_message">%1$s from %2$s successfully connected</string>
@@ -27,11 +35,24 @@
     <string name="text_activity">activity</string>
     <string name="text_activities">activities</string>
 
+    <!-- Activity Card -->
+    <string name="activity_card_kcal_burnt">Kcal burnt</string>
+    <string name="activity_card_kcal_info">Your burnt calories are currently being estimated using default values. For an accurate calculation, please set your age, weight, height, and sex in your User Profile Settings.</string>
+
     <!-- Activity Name Validation -->
     <string name="activity_screen_name_validation_empty">Activity name cannot be empty</string>
     <string name="activity_screen_name_validation_start_digit">Activity name cannot start with a number</string>
     <string name="activity_screen_name_validation_too_short">Activity name is too short</string>
     <string name="activity_screen_name_validation_too_long">Activity name is too long</string>
+
+    <!-- User Profile Settings -->
+    <string name="user_profile_biological_sex">Biological Sex</string>
+    <string name="user_profile_birth_year">Birth Year: %1$s</string>
+    <string name="user_profile_weight">Weight: %1$s kg</string>
+    <string name="user_profile_height">Height: %1$s cm</string>
+    <string name="sex_male">Male</string>
+    <string name="sex_female">Female</string>
+    <string name="sex_other">Other</string>
 
 </resources>
 

@@ -2,8 +2,10 @@ package com.achub.hram.di
 
 import com.achub.hram.data.HrActivityRepo
 import com.achub.hram.data.state.BleStateRepo
+import com.achub.hram.data.state.SettingsStateRepo
 import com.achub.hram.data.state.TrackingStateRepo
 import com.achub.hram.export.FileExporter
+import com.achub.hram.usecase.CalculateCaloriesUseCase
 import com.achub.hram.usecase.DeleteActivitiesUseCase
 import com.achub.hram.usecase.ExportCsvUseCase
 import com.achub.hram.usecase.ObserveActivitiesUseCase
@@ -24,7 +26,14 @@ class UseCaseModule {
     fun observeBleState(repo: BleStateRepo) = ObserveBleStateUseCase(repo)
 
     @Factory
-    fun observeActivities(repo: HrActivityRepo) = ObserveActivitiesUseCase(repo)
+    fun calculateCalories() = CalculateCaloriesUseCase()
+
+    @Factory
+    fun observeActivities(
+        repo: HrActivityRepo,
+        settingsRepo: SettingsStateRepo,
+        calculateCaloriesUseCase: CalculateCaloriesUseCase
+    ) = ObserveActivitiesUseCase(repo, settingsRepo, calculateCaloriesUseCase)
 
     @Factory
     fun deleteActivities(repo: HrActivityRepo) = DeleteActivitiesUseCase(repo)

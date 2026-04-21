@@ -4,6 +4,7 @@ import com.achub.hram.ActivityNameErrorMapper
 import com.achub.hram.ext.BlePermissionController
 import com.achub.hram.screen.activities.ActivitiesViewModel
 import com.achub.hram.screen.record.RecordViewModel
+import com.achub.hram.screen.settings.profile.UserProfileViewModel
 import com.achub.hram.tracking.TrackingController
 import com.achub.hram.usecase.DeleteActivitiesUseCase
 import com.achub.hram.usecase.ExportCsvUseCase
@@ -56,4 +57,10 @@ class ViewModelModule {
         exportCsvUseCase = exportCsvUseCase,
         dispatcher = dispatcher,
     )
+
+    @Factory
+    @KoinViewModel
+    fun userProfileViewModel(
+        settingsRepo: com.achub.hram.data.state.SettingsStateRepo
+    ) = UserProfileViewModel(settingsRepo)
 }

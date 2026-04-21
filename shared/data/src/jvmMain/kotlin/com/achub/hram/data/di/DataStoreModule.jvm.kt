@@ -5,9 +5,12 @@ import com.achub.hram.data.store.BLE_STATE_FILE_NAME
 import com.achub.hram.data.store.BleStateSerializer
 import com.achub.hram.data.store.TRACKING_STATE_STAGE_FILE_NAME
 import com.achub.hram.data.store.TrackingStateStageSerializer
+import com.achub.hram.data.store.USER_SETTINGS_FILE_NAME
+import com.achub.hram.data.store.UserSettingsSerializer
 import com.achub.hram.data.store.createOkioDataStore
 import com.achub.hram.di.CoroutineModule
 import com.achub.hram.models.BleState
+import com.achub.hram.models.UserSettings
 import com.achub.hram.tracking.TrackingStateStage
 import org.koin.core.annotation.Configuration
 import org.koin.core.annotation.Module
@@ -36,6 +39,16 @@ actual class DataStoreModule actual constructor() {
         serializer: TrackingStateStageSerializer,
     ): DataStore<TrackingStateStage> = createOkioDataStore(
         produceFilePath = { dataStorePath(TRACKING_STATE_STAGE_FILE_NAME) },
+        serializer = serializer,
+    )
+
+    @Single
+    @Named(USER_SETTINGS_QUALIFIER)
+    actual fun provideUserSettingsDataStore(
+        scope: Scope,
+        serializer: UserSettingsSerializer,
+    ): DataStore<UserSettings> = createOkioDataStore(
+        produceFilePath = { dataStorePath(USER_SETTINGS_FILE_NAME) },
         serializer = serializer,
     )
 
