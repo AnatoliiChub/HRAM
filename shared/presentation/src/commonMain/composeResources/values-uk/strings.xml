@@ -55,5 +55,10 @@
     <string name="sex_female">Жін</string>
     <string name="sex_other">Інше</string>
 
+    <!-- Theme Settings -->
+    <string name="theme_system">Системна</string>
+    <string name="theme_dark">Темна</string>
+    <string name="theme_light">Світла</string>
+
 </resources>
 

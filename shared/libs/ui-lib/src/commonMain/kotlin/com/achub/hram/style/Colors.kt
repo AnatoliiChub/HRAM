@@ -14,6 +14,10 @@ val White80 = Color(0XC8DEE2E6)
 val White10 = Color(0X1aDEE2E6)
 val White30 = Color(0X4aDEE2E6)
 
+val OffWhite = Color(0xFFF1F3F5)
+val LightGray = Color(0xFFE9ECEF)
+val DarkText = Color(0xFF343A40)
+
 val Red = Color.Red
 val DarkRedShadow = Color(0xFF6B0000)
 val DarkRed = Color(0xFF4B0000)

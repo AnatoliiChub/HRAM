@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -23,14 +24,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.achub.hram.style.DarkGray
-import com.achub.hram.style.DarkRed
 import com.achub.hram.style.Dimen16
 import com.achub.hram.style.Dimen2
 import com.achub.hram.style.Dimen216
 import com.achub.hram.style.Dimen64
-import com.achub.hram.style.Red2
-import com.achub.hram.style.White
 import com.achub.hram.view.shader.MetaballContainer
 import hram.ui_lib.generated.resources.Res
 import hram.ui_lib.generated.resources.ic_pause
@@ -60,6 +57,8 @@ fun RecordSection(
     val gap: Dp = Dimen64
     val btnWidth: Dp = (totalWidth - gap) / 2
 
+    val colorScheme = MaterialTheme.colorScheme
+
     // Plain Box with explicit dimensions — BoxWithConstraints (SubcomposeLayout) cannot
     // answer intrinsic-height queries and crashes on Desktop when a parent needs them.
     Box(modifier = modifier.width(totalWidth).height(btnWidth)) {
@@ -77,18 +76,9 @@ fun RecordSection(
             label = "stopX",
         )
 
-        // Drive stop icon alpha from the physical button separation rather than from
-        // isPaused directly.  This prevents the icon from appearing before the buttons
-        // have moved far enough apart and eliminates the brief overlap of both icons.
-        //
-        // Fade range: from Dimen64 (buttons just stop overlapping) to btnWidth + gap
-        // (fully split).  Spreading across the full remaining travel makes the opacity
-        // change feel gradual rather than sudden.
         val stopIconAlpha = ((stopX - playX - Dimen64) / (btnWidth + gap - Dimen64))
             .coerceIn(0f, 1f)
 
-        // Convert animated button positions from Dp to pixels for the shader.
-        // center = top-left offset + half button size (both axes).
         val btnRadiusPx = with(density) { (btnWidth / 2).toPx() }
         val center1 = Offset(
             x = with(density) { (stopX + btnWidth / 2).toPx() },
@@ -99,22 +89,16 @@ fun RecordSection(
             y = btnRadiusPx,
         )
 
-        // Layer 1 – MetaballContainer draws the two-circle merged shape via an AGSL/SkSL
-        // shader on a transparent background.  No blur is applied anywhere, so icons
-        // placed in Layer 2 above this layer remain perfectly sharp.
-        //
-        // Transparent clickable Boxes inside the container act as hit-test targets for
-        // each button; touch handling is unaffected by the renderEffect.
         MetaballContainer(
             modifier = Modifier.width(totalWidth).height(btnWidth),
             center1 = center1,
             center2 = center2,
             radius = btnRadiusPx,
-            borderColor = if (isRecordingEnabled) White else DarkGray,
-            topColor = if (isRecordingEnabled) Red2 else DarkRed,
-            bottomColor = if (isRecordingEnabled) DarkRed else DarkRed,
+            borderColor = if (isRecordingEnabled) colorScheme.onBackground else colorScheme.onSurfaceVariant,
+            topColor = if (isRecordingEnabled) colorScheme.primary else colorScheme.secondary,
+            bottomColor = if (isRecordingEnabled) colorScheme.secondary else colorScheme.secondary,
         ) {
-            // Stop button hit area (drawn first so play wins when blobs overlap).
+            // Stop button hit area
             Box(
                 modifier = Modifier
                     .absoluteOffset(x = stopX)
@@ -139,20 +123,17 @@ fun RecordSection(
             )
         }
 
-        // Layer 2 – Icons rendered outside the MetaballContainer so they are never
-        // affected by the renderEffect.  Plain Box / Icon composables do not consume
-        // touch events, so taps fall through to the hit areas in Layer 1.
         Box(
             modifier = Modifier.absoluteOffset(x = stopX).size(btnWidth),
             contentAlignment = Alignment.Center,
         ) {
-            ButtonIcon(Res.drawable.ic_stop, White, stopIconAlpha)
+            ButtonIcon(Res.drawable.ic_stop, colorScheme.onPrimary, stopIconAlpha)
         }
         Box(
             modifier = Modifier.absoluteOffset(x = playX).size(btnWidth),
             contentAlignment = Alignment.Center,
         ) {
-            ButtonIcon(playIcon, if (isRecordingEnabled) White else DarkGray)
+            ButtonIcon(playIcon, if (isRecordingEnabled) colorScheme.onPrimary else colorScheme.onSurfaceVariant)
         }
     }
 }
@@ -183,27 +164,5 @@ private fun RecordSectionRecordingPreview() {
         onPlay = {},
         onStop = {},
         isRecordingEnabled = true,
-    )
-}
-
-@Preview
-@Composable
-private fun RecordSectionPausedPreview() {
-    RecordSection(
-        recordingState = RecordingState.Paused,
-        onPlay = {},
-        onStop = {},
-        isRecordingEnabled = true,
-    )
-}
-
-@Preview
-@Composable
-private fun RecordSectionInitPreview() {
-    RecordSection(
-        recordingState = RecordingState.Init,
-        onPlay = {},
-        onStop = {},
-        isRecordingEnabled = false,
     )
 }

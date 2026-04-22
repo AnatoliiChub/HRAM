@@ -20,6 +20,7 @@ data class RecordScreenState(
     val recordingState: RecordingState = RecordingState.Init,
     val requestBluetooth: Boolean = false,
     val dialog: RecordScreenDialog? = null,
+    val kcalBurnt: Double = 0.0,
 ) {
     val isRecordingEnabled: Boolean
         get() = connectedDevice != null || recordingState != RecordingState.Init

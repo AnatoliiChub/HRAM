@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LinearWavyProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -22,7 +23,6 @@ import com.achub.hram.style.Dimen24
 import com.achub.hram.style.Dimen48
 import com.achub.hram.style.Dimen8
 import com.achub.hram.style.DimenZero
-import com.achub.hram.style.Red
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -57,7 +57,7 @@ fun HRProgress(isLoading: Boolean, cycleDuration: Duration, height: Dp = Dimen48
     LinearWavyProgressIndicator(
         modifier = Modifier.fillMaxWidth().height(height).alpha(alpha.value),
         trackColor = Transparent,
-        color = Red,
+        color = MaterialTheme.colorScheme.primary,
         gapSize = Dimen8,
         stopSize = DimenZero,
         wavelength = Dimen24,

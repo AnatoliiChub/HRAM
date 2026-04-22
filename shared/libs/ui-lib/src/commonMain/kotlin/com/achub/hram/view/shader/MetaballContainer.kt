@@ -41,7 +41,7 @@ fun MetaballContainer(
     radius: Float,
     topColor: Color,
     bottomColor: Color,
-    borderColor: Color = Color.White,
+    borderColor: Color,
     content: @Composable BoxScope.() -> Unit = {},
 ) {
     var size by remember { mutableStateOf(IntSize.Zero) }

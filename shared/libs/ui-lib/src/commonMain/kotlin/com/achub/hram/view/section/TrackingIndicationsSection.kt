@@ -3,6 +3,7 @@ package com.achub.hram.view.section
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
@@ -23,7 +24,8 @@ fun TrackingIndicationsSection(bleNotification: BleNotificationUi, heartPosUpdat
         Text(
             modifier = Modifier.align(CenterHorizontally),
             text = formatElapsedTime(bleNotification.elapsedTime),
-            style = Heading3
+            style = Heading3,
+            color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(modifier = Modifier.height(Dimen16))
     }

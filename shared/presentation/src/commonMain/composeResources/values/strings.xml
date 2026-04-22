@@ -54,5 +54,10 @@
     <string name="sex_female">Female</string>
     <string name="sex_other">Other</string>
 
+    <!-- Theme Settings -->
+    <string name="theme_system">System</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_light">Light</string>
+
 </resources>
 

@@ -1,5 +1,6 @@
 package com.achub.hram.screen.settings.profile
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -42,6 +43,7 @@ fun UserProfileScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(androidx.compose.material3.MaterialTheme.colorScheme.background)
             .padding(Dimen16),
         verticalArrangement = Arrangement.spacedBy(Dimen16)
     ) {
