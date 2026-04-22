@@ -57,7 +57,7 @@ fun HRProgress(isLoading: Boolean, cycleDuration: Duration, height: Dp = Dimen48
     LinearWavyProgressIndicator(
         modifier = Modifier.fillMaxWidth().height(height).alpha(alpha.value),
         trackColor = Transparent,
-        color = MaterialTheme.colorScheme.primary,
+        color = MaterialTheme.colorScheme.secondary,
         gapSize = Dimen8,
         stopSize = DimenZero,
         wavelength = Dimen24,

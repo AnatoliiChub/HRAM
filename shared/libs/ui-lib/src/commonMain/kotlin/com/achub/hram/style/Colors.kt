@@ -2,7 +2,6 @@ package com.achub.hram.style
 
 import androidx.compose.ui.graphics.Color
 
-val Gray = Color.Gray
 val Dark = Color(0xFF1f1f1f)
 
 val Black = Color(0xFF0E1111)

@@ -24,7 +24,7 @@ fun DialogButton(text: String, enabled: Boolean = true, onClick: () -> Unit) {
         Text(
             modifier = Modifier.padding(horizontal = Dimen24, vertical = Dimen12),
             text = text,
-            style = LabelMedium.copy(color = colorScheme.primary, fontWeight = W600),
+            style = LabelMedium.copy(color = colorScheme.secondary, fontWeight = W600),
         )
     }
 }

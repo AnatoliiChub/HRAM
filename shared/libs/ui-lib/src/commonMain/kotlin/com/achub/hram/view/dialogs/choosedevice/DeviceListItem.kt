@@ -23,7 +23,7 @@ fun DeviceListItem(
     onSelected: (DeviceUi) -> Unit
 ) {
     val colorScheme = MaterialTheme.colorScheme
-    val color = if (isSelected) colorScheme.primary else colorScheme.onBackground
+    val color = if (isSelected) colorScheme.secondary else colorScheme.onBackground
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(Dimen4))

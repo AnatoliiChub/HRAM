@@ -89,14 +89,17 @@ fun RecordSection(
             y = btnRadiusPx,
         )
 
+        val light = if (isRecordingEnabled) colorScheme.primary else colorScheme.secondary
+        val dark = if (isRecordingEnabled) colorScheme.secondary else colorScheme.secondary
+
         MetaballContainer(
             modifier = Modifier.width(totalWidth).height(btnWidth),
             center1 = center1,
             center2 = center2,
             radius = btnRadiusPx,
             borderColor = if (isRecordingEnabled) colorScheme.onBackground else colorScheme.onSurfaceVariant,
-            topColor = if (isRecordingEnabled) colorScheme.primary else colorScheme.secondary,
-            bottomColor = if (isRecordingEnabled) colorScheme.secondary else colorScheme.secondary,
+            topColor = dark,
+            bottomColor = light,
         ) {
             // Stop button hit area
             Box(
