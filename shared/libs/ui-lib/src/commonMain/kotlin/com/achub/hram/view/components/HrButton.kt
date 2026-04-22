@@ -11,8 +11,10 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,15 +33,12 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.achub.hram.EventsCutter
 import com.achub.hram.get
-import com.achub.hram.style.Black
-import com.achub.hram.style.DarkGray
 import com.achub.hram.style.Dimen1
 import com.achub.hram.style.Dimen16
 import com.achub.hram.style.Dimen2
 import com.achub.hram.style.Dimen3
 import com.achub.hram.style.Dimen8
-import com.achub.hram.style.White
-import com.achub.hram.style.White10
+import com.achub.hram.style.HramTheme
 import com.achub.hram.style.hrButtonDarkRedDropShadowColor
 import com.achub.hram.style.hrButtonRedDropShadowColor
 import kotlinx.coroutines.FlowPreview
@@ -50,7 +49,6 @@ import kotlin.time.ExperimentalTime
 
 const val PRESS_ANIMATION_DURATION = 70L
 const val PRESS_BUTTON_DEBOUNCE_DURATION = 250L
-val rippleColor = Black
 
 // extracted magic numbers
 private const val PRESSED_CONTENT_ALPHA = 0.4f
@@ -79,6 +77,7 @@ fun HrButton(
     enabled: Boolean = true,
     content: @Composable BoxScope.(contentAlpha: Float) -> Unit
 ) {
+    val colorScheme = MaterialTheme.colorScheme
     val eventsCutter = remember { EventsCutter.get(PRESS_BUTTON_DEBOUNCE_DURATION) }
     val interactionSource = remember { MutableInteractionSource() }
     var clicked by remember { mutableStateOf(false) }
@@ -109,7 +108,8 @@ fun HrButton(
     val shadowAlpha by transition.animateFloat(label = "shadowAlpha", transitionSpec = {
         buttonPressAnimation()
     }) { pressedState -> if (pressedState) PRESSED_SHADOW_ALPHA else DEFAULT_SHADOW_ALPHA }
-    val backgroundColor = if (enabled) DarkGray else White10
+
+    val backgroundColor = if (enabled) colorScheme.surface else colorScheme.onSurface.copy(alpha = 0.1f)
     val shape = RoundedCornerShape(Dimen16)
 
     Box(
@@ -134,7 +134,7 @@ fun HrButton(
         )
             // note that the background needs to be defined before defining the inner shadow
             .background(
-                color = Black,
+                color = colorScheme.background,
                 shape = shape
             ),
         contentAlignment = Center
@@ -145,7 +145,7 @@ fun HrButton(
                     enabled = enabled,
                     interactionSource = interactionSource,
                     indication = customRipple(
-                        color = rippleColor,
+                        color = colorScheme.onSurface,
                         bounded = true,
                     )
                 ) {
@@ -153,13 +153,13 @@ fun HrButton(
                         clicked = true
                         onClick()
                     }
-                }.border(Dimen2, DarkGray, shape)
+                }.border(Dimen2, colorScheme.surface, shape)
                 .background(color = backgroundColor, shape = shape)
                 .innerShadow(
                     shape = shape,
                     block = {
                         radius = INNER_SHADOW_RADIUS
-                        color = Black
+                        color = colorScheme.background
                     },
                 ),
             contentAlignment = Center
@@ -170,13 +170,28 @@ fun HrButton(
 @Preview
 @Composable
 private fun HrButtonPreview() {
-    Box(Modifier.padding(16.dp)) {
-        HrButton(onClick = {}) { contentAlpha ->
-            Text(
-                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
-                text = "HR Button",
-                color = White.copy(alpha = contentAlpha)
-            )
+    Column {
+        HramTheme(darkTheme = false) {
+            Box(Modifier.background(MaterialTheme.colorScheme.background).padding(16.dp)) {
+                HrButton(onClick = {}) { contentAlpha ->
+                    Text(
+                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
+                        text = "Light Theme",
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = contentAlpha)
+                    )
+                }
+            }
+        }
+        HramTheme(darkTheme = true) {
+            Box(Modifier.background(MaterialTheme.colorScheme.background).padding(16.dp)) {
+                HrButton(onClick = {}) { contentAlpha ->
+                    Text(
+                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
+                        text = "Dark Theme",
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = contentAlpha)
+                    )
+                }
+            }
         }
     }
 }

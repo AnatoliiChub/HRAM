@@ -21,11 +21,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.achub.hram.screen.settings.display.DisplaySettingsScreen
 import com.achub.hram.screen.settings.profile.UserProfileScreen
-import com.achub.hram.style.Black
 import com.achub.hram.style.Dimen16
 import com.achub.hram.style.HeadingMediumBold
-import com.achub.hram.style.White
 import com.achub.hram.view.components.SettingsMenuItem
 import hram.composeapp.generated.resources.Res
 import hram.composeapp.generated.resources.ic_arrow_back
@@ -58,7 +57,7 @@ fun SettingsScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Black)
+            .background(androidx.compose.material3.MaterialTheme.colorScheme.background)
     ) {
         AnimatedContent(
             targetState = currentNav,
@@ -81,8 +80,9 @@ fun SettingsScreen() {
                         titleRes = state.titleRes,
                         onBack = { currentNav = SettingsNav.Root }
                     ) {
-                        if (state.titleRes == Res.string.settings_item_user_profile) {
-                            UserProfileScreen()
+                        when (state.titleRes) {
+                            Res.string.settings_item_user_profile -> UserProfileScreen()
+                            Res.string.settings_item_preferences_display -> DisplaySettingsScreen()
                         }
                     }
                 }
@@ -99,7 +99,7 @@ private fun SettingsRoot(onNavigate: (SettingsNav) -> Unit) {
     ) {
         Text(
             text = stringResource(Res.string.main_tab_settings),
-            style = HeadingMediumBold.copy(color = White),
+            style = HeadingMediumBold.copy(color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground),
             modifier = Modifier.padding(Dimen16)
         )
 
@@ -153,12 +153,12 @@ private fun SettingsSubScreen(
                 Icon(
                     painter = painterResource(Res.drawable.ic_arrow_back),
                     contentDescription = "Back",
-                    tint = White
+                    tint = androidx.compose.material3.MaterialTheme.colorScheme.onBackground
                 )
             }
             Text(
                 text = stringResource(titleRes),
-                style = HeadingMediumBold.copy(color = White),
+                style = HeadingMediumBold.copy(color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground),
                 modifier = Modifier.padding(start = Dimen16)
             )
         }

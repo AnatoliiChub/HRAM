@@ -8,18 +8,24 @@ import com.achub.hram.ActivityNameErrorMapper
 import com.achub.hram.ext.BlePermissionController
 import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.launchIn
-import com.achub.hram.ext.stateInExt
 import com.achub.hram.models.BleNotificationModel
 import com.achub.hram.models.BleState
 import com.achub.hram.models.DeviceModel
+import com.achub.hram.models.HrBucket
 import com.achub.hram.models.SCAN_DURATION_MS
 import com.achub.hram.models.ScanError
+import com.achub.hram.models.UserSettings
 import com.achub.hram.tracking.TrackingController
+import com.achub.hram.usecase.CalculateCaloriesUseCase
 import com.achub.hram.usecase.ObserveBleStateUseCase
 import com.achub.hram.usecase.ObserveTrackingStateUseCase
+import com.achub.hram.usecase.ObserveUserSettingsUseCase
+import com.achub.hram.view.section.RecordingState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -36,16 +42,30 @@ class RecordViewModel(
     val trackingController: TrackingController,
     val observeBleState: ObserveBleStateUseCase,
     val observeTrackingState: ObserveTrackingStateUseCase,
+    val observeUserSettings: ObserveUserSettingsUseCase,
+    val calculateCalories: CalculateCaloriesUseCase,
     @InjectedParam val permissionController: BlePermissionController,
 ) : ViewModel(), KoinComponent {
     private val _uiState = MutableStateFlow(RecordScreenState())
-    val uiState = _uiState.stateInExt(initialValue = RecordScreenState())
+    val uiState: StateFlow<RecordScreenState> = _uiState.asStateFlow()
     private var jobs = mutableListOf<Job>()
     private val scanDuration = SCAN_DURATION_MS.milliseconds
 
+    private var userSettings: UserSettings = UserSettings.Default
+    private val currentBuckets = mutableListOf<HrBucket>()
+
     init {
+        observeUserSettings().onEach {
+            userSettings = it
+        }.flowOn(dispatcher).launchIn(viewModelScope).let { jobs.add(it) }
+
         observeTrackingState().onEach { state ->
-            _uiState.update { it.copy(recordingState = state.toRecordingState()) }
+            val recordingState = state.toRecordingState()
+            if (recordingState == RecordingState.Init) {
+                currentBuckets.clear()
+                _uiState.update { it.copy(kcalBurnt = 0.0) }
+            }
+            _uiState.update { it.copy(recordingState = recordingState) }
         }.flowOn(dispatcher).launchIn(viewModelScope).let { jobs.add(it) }
 
         observeBleState().onEach { state ->
@@ -66,7 +86,8 @@ class RecordViewModel(
 
     fun stopRecording(name: String?) = _uiState.stop().also {
         trackingController.finishTracking(name ?: "Temporary name")
-        _uiState.update { it.copy(dialog = null) }
+        _uiState.update { it.copy(dialog = null, kcalBurnt = 0.0) }
+        currentBuckets.clear()
     }
 
     fun showNameActivityDialog() =
@@ -136,6 +157,15 @@ class RecordViewModel(
                 state.device
             }
             if (state.bleNotification.isBleConnected) _uiState.update { it.copy(connectedDevice = device) }
+        }
+
+        if (uiState.value.recordingState == RecordingState.Recording) {
+            state.bleNotification.hrNotification?.let { hr ->
+                // Approximate calorie burn increment
+                val bucket = HrBucket(1, hr.hrBpm.toFloat(), 1)
+                val kcal = calculateCalories(userSettings, listOf(bucket), 1)
+                _uiState.update { it.copy(kcalBurnt = it.kcalBurnt + kcal) }
+            }
         }
     }
 

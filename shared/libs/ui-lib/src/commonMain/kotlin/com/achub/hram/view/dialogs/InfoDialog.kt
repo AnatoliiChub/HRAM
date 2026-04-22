@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,7 +17,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.achub.hram.style.Dimen24
 import com.achub.hram.style.LabelMedium
-import com.achub.hram.style.White
 import com.achub.hram.view.components.dialog.DialogButton
 import com.achub.hram.view.components.dialog.DialogElevatedCard
 import com.achub.hram.view.components.dialog.DialogTitle
@@ -34,12 +34,18 @@ fun InfoDialog(
     onDismiss: () -> Unit,
     onButtonClick: () -> Unit = { onDismiss() }
 ) {
+    val colorScheme = MaterialTheme.colorScheme
     BasicAlertDialog(onDismissRequest = onDismiss) {
         DialogElevatedCard {
             Column(modifier = Modifier.padding(Dimen24).fillMaxWidth(), horizontalAlignment = CenterHorizontally) {
                 DialogTitle(title = title)
                 Spacer(Modifier.height(Dimen24))
-                Text(text = message, color = White, style = LabelMedium, textAlign = TextAlign.Center)
+                Text(
+                    text = message,
+                    color = colorScheme.onSurface.copy(alpha = 0.8f),
+                    style = LabelMedium,
+                    textAlign = TextAlign.Center
+                )
                 Spacer(Modifier.height(Dimen24))
                 DialogButton(text = stringResource(buttonText), onClick = onButtonClick)
             }

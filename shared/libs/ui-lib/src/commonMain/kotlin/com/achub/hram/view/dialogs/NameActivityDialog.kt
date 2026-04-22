@@ -18,7 +18,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.DialogProperties
 import com.achub.hram.style.Dimen24
 import com.achub.hram.style.LabelMedium
-import com.achub.hram.style.White
 import com.achub.hram.view.components.HramTextField
 import com.achub.hram.view.components.dialog.DialogButton
 import com.achub.hram.view.components.dialog.DialogElevatedCard
@@ -56,10 +55,16 @@ fun NameActivityDialog(
         }
     ) {
         DialogElevatedCard {
+            val colorScheme = MaterialTheme.colorScheme
             Column(modifier = Modifier.padding(Dimen24), horizontalAlignment = CenterHorizontally) {
                 DialogTitle(title = title)
                 Spacer(Modifier.height(Dimen24))
-                Text(text = stringResource(message), color = White, style = LabelMedium, textAlign = TextAlign.Center)
+                Text(
+                    text = stringResource(message),
+                    color = colorScheme.onSurface.copy(alpha = 0.8f),
+                    style = LabelMedium,
+                    textAlign = TextAlign.Center
+                )
                 Spacer(Modifier.height(Dimen24))
                 HramTextField(
                     modifier = Modifier.fillMaxWidth(),
@@ -67,13 +72,13 @@ fun NameActivityDialog(
                     onValueChange = { onNameChanged(it) },
                     singleLine = true,
                     isError = error != null,
-                    textStyle = LabelMedium.copy(color = White),
+                    textStyle = LabelMedium.copy(color = colorScheme.onBackground),
                     supportingText = {
                         error?.let {
                             Text(
                                 modifier = Modifier.fillMaxWidth(),
                                 text = stringResource(error),
-                                color = MaterialTheme.colorScheme.error
+                                color = colorScheme.error
                             )
                         }
                     },

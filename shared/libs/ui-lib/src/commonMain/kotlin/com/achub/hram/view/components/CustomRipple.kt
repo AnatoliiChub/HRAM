@@ -15,7 +15,7 @@ import androidx.compose.ui.node.DelegatingNode
 import androidx.compose.ui.node.currentValueOf
 import androidx.compose.ui.unit.Dp
 
-private const val RIPPLE_ALPHA = 0.45f
+private const val RIPPLE_ALPHA = 0.15f
 
 @Stable
 fun customRipple(

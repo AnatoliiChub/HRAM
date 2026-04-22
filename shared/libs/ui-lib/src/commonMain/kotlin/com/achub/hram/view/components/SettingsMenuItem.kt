@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,7 +17,6 @@ import androidx.compose.ui.graphics.Color
 import com.achub.hram.style.Dimen16
 import com.achub.hram.style.Dimen24
 import com.achub.hram.style.LabelLarge
-import com.achub.hram.style.White
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
@@ -27,9 +27,9 @@ fun SettingsMenuItem(
     trailingIcon: DrawableResource,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    iconTint: Color = White,
-    textColor: Color = White,
-    trailingIconTint: Color = White.copy(alpha = 0.6f)
+    iconTint: Color = MaterialTheme.colorScheme.onBackground,
+    textColor: Color = MaterialTheme.colorScheme.onBackground,
+    trailingIconTint: Color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
 ) {
     Row(
         modifier = modifier

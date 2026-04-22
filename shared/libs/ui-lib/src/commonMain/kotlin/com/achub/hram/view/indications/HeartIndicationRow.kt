@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -28,7 +29,6 @@ import com.achub.hram.style.Dimen32
 import com.achub.hram.style.HeadingMediumBold
 import com.achub.hram.style.LabelMedium
 import com.achub.hram.style.Red
-import com.achub.hram.style.White
 import com.achub.hram.view.components.HeartBeatingAnimView
 import hram.ui_lib.generated.resources.Res
 import hram.ui_lib.generated.resources.heart3d
@@ -125,7 +125,8 @@ private fun HeartDataColumn(
     bleNotification: BleNotificationUi,
     isContactOn: Boolean
 ) {
-    val secondaryLabelColor = if (bleNotification.isEmpty()) Red else White
+    val onBackground = MaterialTheme.colorScheme.onBackground
+    val secondaryLabelColor = if (bleNotification.isEmpty()) Red else onBackground
     val maxHeartLabel = stringResource(Res.string.heart_indication_bpm, MAX_BPM_STUB)
     val textMeasurer = rememberTextMeasurer()
     val maxWidthPx = remember {
@@ -138,7 +139,8 @@ private fun HeartDataColumn(
             modifier = Modifier.align(Alignment.CenterHorizontally).widthIn(min = maxWidth),
             text = hrLabel,
             textAlign = TextAlign.Center,
-            style = HeadingMediumBold
+            style = HeadingMediumBold,
+            color = onBackground
         )
         SecondaryLabelRow(secondaryLabel, secondaryLabelColor, bleNotification.isBleConnected && isContactOn)
     }
@@ -155,7 +157,7 @@ private fun SecondaryLabelRow(
             Image(
                 modifier = Modifier.size(Dimen32),
                 imageVector = vectorResource(Res.drawable.ic_battery_full),
-                colorFilter = ColorFilter.tint(White),
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground),
                 contentDescription = null
             )
         }

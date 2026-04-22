@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,13 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.achub.hram.style.Black
 import com.achub.hram.style.Dimen12
 import com.achub.hram.style.Dimen16
 import com.achub.hram.style.Dimen4
 import com.achub.hram.style.Dimen8
 import com.achub.hram.style.LabelMedium
-import com.achub.hram.style.White
 
 @Composable
 fun <T> SettingsTagGroup(
@@ -37,7 +36,7 @@ fun <T> SettingsTagGroup(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
-        Text(text = label, style = LabelMedium, color = White)
+        Text(text = label, style = LabelMedium, color = MaterialTheme.colorScheme.onBackground)
         Spacer(Modifier.height(Dimen12))
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -63,9 +62,9 @@ private fun TagItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val backgroundColor = if (isSelected) White else Color.Transparent
-    val textColor = if (isSelected) Black else White
-    val borderColor = if (isSelected) White else White.copy(alpha = 0.3f)
+    val backgroundColor = if (isSelected) MaterialTheme.colorScheme.onBackground else Color.Transparent
+    val textColor = if (isSelected) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.onBackground
+    val borderColor = if (isSelected) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
 
     Box(
         modifier = modifier

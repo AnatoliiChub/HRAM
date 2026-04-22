@@ -7,6 +7,7 @@ val Dimen1 = 1.dp
 val Dimen2 = 2.dp
 val Dimen3 = 3.dp
 val Dimen4 = 4.dp
+val Dimen6 = 6.dp
 val Dimen8 = 8.dp
 val Dimen12 = 12.dp
 val Dimen16 = 16.dp

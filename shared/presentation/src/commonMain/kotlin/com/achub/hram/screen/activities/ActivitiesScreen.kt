@@ -31,7 +31,6 @@ import com.achub.hram.style.Dimen16
 import com.achub.hram.style.Dimen216
 import com.achub.hram.style.Dimen48
 import com.achub.hram.style.Dimen8
-import com.achub.hram.style.Red
 import com.achub.hram.view.cards.ActivityCard
 import com.achub.hram.view.components.ActivityOptions
 import com.achub.hram.view.components.FloatingToolbar
@@ -114,7 +113,11 @@ fun ActivitiesScreen(onListUpdated: (Boolean) -> Unit = {}) {
             if (state.isLoading) {
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        CircularWavyProgressIndicator(modifier = Modifier.size(Dimen48), trackColor = Red, color = Red)
+                        CircularWavyProgressIndicator(
+                            modifier = Modifier.size(Dimen48),
+                            trackColor = androidx.compose.material3.MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                            color = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                        )
                     }
                 }
             }

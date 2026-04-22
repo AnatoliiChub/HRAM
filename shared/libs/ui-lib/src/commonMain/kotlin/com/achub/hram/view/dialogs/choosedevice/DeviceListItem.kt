@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -13,8 +14,6 @@ import com.achub.hram.models.DeviceUi
 import com.achub.hram.style.Dimen4
 import com.achub.hram.style.LabelMediumBold
 import com.achub.hram.style.LabelSmall
-import com.achub.hram.style.Red
-import com.achub.hram.style.White
 
 @Composable
 fun DeviceListItem(
@@ -23,7 +22,8 @@ fun DeviceListItem(
     device: DeviceUi,
     onSelected: (DeviceUi) -> Unit
 ) {
-    val color = if (isSelected) Red else White
+    val colorScheme = MaterialTheme.colorScheme
+    val color = if (isSelected) colorScheme.secondary else colorScheme.onBackground
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(Dimen4))

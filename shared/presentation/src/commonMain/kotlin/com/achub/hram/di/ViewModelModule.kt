@@ -3,7 +3,9 @@ package com.achub.hram.di
 import com.achub.hram.ActivityNameErrorMapper
 import com.achub.hram.ext.BlePermissionController
 import com.achub.hram.screen.activities.ActivitiesViewModel
+import com.achub.hram.screen.main.MainViewModel
 import com.achub.hram.screen.record.RecordViewModel
+import com.achub.hram.screen.settings.display.DisplaySettingsViewModel
 import com.achub.hram.screen.settings.profile.UserProfileViewModel
 import com.achub.hram.tracking.TrackingController
 import com.achub.hram.usecase.DeleteActivitiesUseCase
@@ -29,6 +31,8 @@ class ViewModelModule {
         trackingController: TrackingController,
         observeBleState: ObserveBleStateUseCase,
         observeTrackingState: ObserveTrackingStateUseCase,
+        observeUserSettings: com.achub.hram.usecase.ObserveUserSettingsUseCase,
+        calculateCalories: com.achub.hram.usecase.CalculateCaloriesUseCase,
         @InjectedParam permissionsController: BlePermissionController,
         @WorkerThread dispatcher: CoroutineDispatcher,
     ) = RecordViewModel(
@@ -37,6 +41,8 @@ class ViewModelModule {
         dispatcher = dispatcher,
         observeBleState = observeBleState,
         observeTrackingState = observeTrackingState,
+        observeUserSettings = observeUserSettings,
+        calculateCalories = calculateCalories,
         trackingController = trackingController,
     )
 
@@ -63,4 +69,16 @@ class ViewModelModule {
     fun userProfileViewModel(
         settingsRepo: com.achub.hram.data.state.SettingsStateRepo
     ) = UserProfileViewModel(settingsRepo)
+
+    @Factory
+    @KoinViewModel
+    fun displaySettingsViewModel(
+        settingsRepo: com.achub.hram.data.state.SettingsStateRepo
+    ) = DisplaySettingsViewModel(settingsRepo)
+
+    @Factory
+    @KoinViewModel
+    fun mainViewModel(
+        observeUserSettings: com.achub.hram.usecase.ObserveUserSettingsUseCase
+    ) = MainViewModel(observeUserSettings)
 }

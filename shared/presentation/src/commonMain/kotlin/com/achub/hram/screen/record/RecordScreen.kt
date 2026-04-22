@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -76,7 +77,8 @@ fun RecordScreen() {
             ProperLiquidWaveEffect(
                 center = heartIconCenter(heartGlobalCenter, boxGlobalPosition),
                 apply = hrNotification?.hrBpm != null && hrNotification.isContactOn,
-                minRadius = Dimen24
+                minRadius = Dimen24,
+                baseColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
             ) {
                 Column(
                     modifier = Modifier.fillMaxSize().padding(Dimen16),

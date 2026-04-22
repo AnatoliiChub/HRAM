@@ -3,6 +3,7 @@ package com.achub.hram.view.components
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -17,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
-import com.achub.hram.style.DarkRedShadow
 import com.achub.hram.style.hramTextFieldColors
 import kotlinx.coroutines.delay
 
@@ -41,9 +41,10 @@ fun HramTextField(
         delay(TEXT_DEBOUNCE_TIME)
         onValueChange(text)
     }
+    val selectionHandleColor = MaterialTheme.colorScheme.primary
     val customTextSelectionColors = TextSelectionColors(
-        handleColor = DarkRedShadow,
-        backgroundColor = DarkRedShadow.copy(alpha = 0.4f)
+        handleColor = selectionHandleColor,
+        backgroundColor = selectionHandleColor.copy(alpha = 0.4f)
     )
     CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
         TextField(
@@ -52,7 +53,7 @@ fun HramTextField(
             onValueChange = { text = it },
             singleLine = singleLine,
             isError = isError,
-            textStyle = textStyle,
+            textStyle = textStyle.copy(color = MaterialTheme.colorScheme.onBackground),
             enabled = enabled,
             readOnly = readOnly,
             shape = shape,
