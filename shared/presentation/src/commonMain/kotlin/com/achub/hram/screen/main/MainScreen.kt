@@ -6,7 +6,8 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -43,13 +44,21 @@ fun MainScreen() {
         Column(
             modifier = Modifier
                 .background(color = MaterialTheme.colorScheme.background)
-                .windowInsetsPadding(WindowInsets.safeDrawing)
                 .fillMaxSize()
         ) {
             HorizontalPager(
                 state = pagerState,
                 userScrollEnabled = false,
-                modifier = Modifier.fillMaxWidth().weight(1f)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .then(
+                        if (tabs[pagerState.currentPage] is Activities) {
+                            Modifier
+                        } else {
+                            Modifier.windowInsetsPadding(WindowInsets.statusBars)
+                        }
+                    )
             ) { index ->
                 when (tabs[index]) {
                     is Activities -> ActivitiesScreen()
@@ -57,7 +66,9 @@ fun MainScreen() {
                     is Settings -> SettingsScreen()
                 }
             }
-            ProperLiquidBottomBar(tabs, pagerState.currentPage, pagerState::animateScrollToPage)
+            Column(modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars)) {
+                ProperLiquidBottomBar(tabs, pagerState.currentPage, pagerState::animateScrollToPage)
+            }
         }
     }
 }
