@@ -18,7 +18,7 @@ private val DarkColorScheme = darkColorScheme(
     onSurface = White,
     error = LightRed,
     onError = Color.Black,
-    onSurfaceVariant = DarkText.copy(alpha = 0.7f)
+    onSurfaceVariant = DarkSecondaryText
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -33,7 +33,7 @@ private val LightColorScheme = lightColorScheme(
     error = Red2,
     onError = Color.White,
     surfaceVariant = LightGray,
-    onSurfaceVariant = DarkText.copy(alpha = 0.7f)
+    onSurfaceVariant = SecondaryText
 )
 
 @Composable

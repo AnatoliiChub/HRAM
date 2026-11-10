@@ -37,7 +37,7 @@
 
     <!-- Activity Card -->
     <string name="activity_card_kcal_burnt">Kcal burnt</string>
-    <string name="activity_card_kcal_info">Your burnt calories are currently being estimated using default values. For an accurate calculation, please set your age, weight, height, and sex in your User Profile Settings.</string>
+    <string name="activity_card_kcal_info">Your calorie estimate uses default values when profile details are missing. Update your age, weight, height, and biological sex in Profile Settings for a more accurate estimate.</string>
 
     <!-- Activity Name Validation -->
     <string name="activity_screen_name_validation_empty">Activity name cannot be empty</string>
@@ -60,4 +60,3 @@
     <string name="theme_light">Light</string>
 
 </resources>
-

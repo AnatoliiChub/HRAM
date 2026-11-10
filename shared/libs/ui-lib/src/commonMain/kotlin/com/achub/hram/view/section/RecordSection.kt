@@ -97,7 +97,11 @@ fun RecordSection(
             center1 = center1,
             center2 = center2,
             radius = btnRadiusPx,
-            borderColor = if (isRecordingEnabled) colorScheme.onBackground else colorScheme.onSurfaceVariant,
+            borderColor = if (isRecordingEnabled) {
+                colorScheme.primary.copy(alpha = 0.18f)
+            } else {
+                colorScheme.onSurfaceVariant
+            },
             topColor = dark,
             bottomColor = light,
         ) {

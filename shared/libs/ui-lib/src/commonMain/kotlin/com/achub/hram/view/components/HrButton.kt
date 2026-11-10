@@ -75,6 +75,7 @@ fun HrButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     enabled: Boolean = true,
+    isOutlined: Boolean = false,
     content: @Composable BoxScope.(contentAlpha: Float) -> Unit
 ) {
     val colorScheme = MaterialTheme.colorScheme
@@ -112,7 +113,9 @@ fun HrButton(
     val backgroundColor = if (enabled) colorScheme.surface else colorScheme.onSurface.copy(alpha = 0.1f)
     val shape = RoundedCornerShape(Dimen16)
 
-    Box(
+    val outerModifier = if (isOutlined) {
+        Modifier.background(colorScheme.background, shape)
+    } else {
         Modifier.dropShadow(
             shape = shape,
             shadow = Shadow(
@@ -131,12 +134,11 @@ fun HrButton(
                 offset = SECOND_SHADOW_OFFSET,
                 alpha = if (!enabled) DISABLED_SHADOW_ALPHA else shadowAlpha
             )
-        )
-            // note that the background needs to be defined before defining the inner shadow
-            .background(
-                color = colorScheme.background,
-                shape = shape
-            ),
+        ).background(colorScheme.background, shape)
+    }
+
+    Box(
+        outerModifier,
         contentAlignment = Center
     ) {
         Box(
@@ -153,15 +155,19 @@ fun HrButton(
                         clicked = true
                         onClick()
                     }
-                }.border(Dimen2, colorScheme.surface, shape)
+                }.border(
+                    if (isOutlined) Dimen1 else Dimen2,
+                    if (isOutlined) colorScheme.outlineVariant else colorScheme.surface,
+                    shape
+                )
                 .background(color = backgroundColor, shape = shape)
-                .innerShadow(
+                .then(if (isOutlined) Modifier else Modifier.innerShadow(
                     shape = shape,
                     block = {
                         radius = INNER_SHADOW_RADIUS
                         color = colorScheme.background
                     },
-                ),
+                )),
             contentAlignment = Center
         ) { content(if (!enabled) DISABLED_CONTENT_ALPHA else buttonContentAlpha) }
     }

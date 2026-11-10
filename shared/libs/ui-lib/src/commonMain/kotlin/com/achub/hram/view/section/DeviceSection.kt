@@ -20,7 +20,7 @@ import com.achub.hram.style.Dimen16
 import com.achub.hram.style.Dimen32
 import com.achub.hram.style.Dimen48
 import com.achub.hram.style.HramTheme
-import com.achub.hram.style.LabelMediumBold
+import com.achub.hram.style.LabelMedium
 import com.achub.hram.style.LabelSmall
 import com.achub.hram.view.components.HrButton
 import hram.ui_lib.generated.resources.Res
@@ -52,13 +52,14 @@ fun DeviceSection(device: DeviceUi?, onConnectClick: () -> Unit, onDisconnectCli
                 device.name,
                 device.manufacturer ?: ""
             ),
-            style = LabelMediumBold.copy(color = colorScheme.onBackground.copy(alpha = 0.7f), textAlign = Center)
+            style = LabelMedium.copy(color = colorScheme.onSurfaceVariant, textAlign = Center)
         )
         Spacer(Modifier.size(Dimen16))
         HrButton(
             modifier = Modifier.height(Dimen48),
             onClick = onDisconnectClick,
             enabled = true,
+            isOutlined = true,
         ) {
             Text(
                 modifier = Modifier.padding(horizontal = Dimen32),

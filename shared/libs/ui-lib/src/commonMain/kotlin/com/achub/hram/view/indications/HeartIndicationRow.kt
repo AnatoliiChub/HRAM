@@ -4,8 +4,10 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,7 +27,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.achub.hram.models.BleNotificationUi
 import com.achub.hram.models.HrNotificationUi
-import com.achub.hram.style.Dimen32
+import com.achub.hram.style.Dimen24
+import com.achub.hram.style.Dimen4
 import com.achub.hram.style.HeadingMediumBold
 import com.achub.hram.style.LabelMedium
 import com.achub.hram.style.Red
@@ -155,11 +158,12 @@ private fun SecondaryLabelRow(
     Row(verticalAlignment = CenterVertically) {
         AnimatedVisibility(showBatteryIcon) {
             Image(
-                modifier = Modifier.size(Dimen32),
+                modifier = Modifier.size(Dimen24),
                 imageVector = vectorResource(Res.drawable.ic_battery_full),
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground),
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant),
                 contentDescription = null
             )
+            Spacer(Modifier.width(Dimen4))
         }
         Text(
             text = text,

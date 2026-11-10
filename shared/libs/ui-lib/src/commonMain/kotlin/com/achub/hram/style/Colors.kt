@@ -11,6 +11,8 @@ val White = Color(0XFFDEE2E6)
 val OffWhite = Color(0xFFF1F3F5)
 val LightGray = Color(0xFFE9ECEF)
 val DarkText = Color(0xFF343A40)
+val SecondaryText = Color(0xFF5F6B7A)
+val DarkSecondaryText = Color(0xFFADB5BD)
 
 val Red = Color.Red
 val DarkRed = Color(0xFF4B0000)
@@ -23,4 +25,3 @@ val GradientLightRed = Color(0xFFFF4D4D)
 
 val hrButtonRedDropShadowColor = Color(0x80FF0000)
 val hrButtonDarkRedDropShadowColor = Color(0xCCFF0000)
-

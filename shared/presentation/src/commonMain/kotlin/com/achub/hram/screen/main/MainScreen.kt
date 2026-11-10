@@ -36,6 +36,8 @@ fun MainScreen() {
         com.achub.hram.models.AppTheme.Light -> false
     }
 
+    ApplyStatusBarStyle(darkTheme)
+
     HramTheme(darkTheme = darkTheme) {
         val pagerState = rememberPagerState(initialPage = 0, pageCount = { tabs.size })
         Column(
