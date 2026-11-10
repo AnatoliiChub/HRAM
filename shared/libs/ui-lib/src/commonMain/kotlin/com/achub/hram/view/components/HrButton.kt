@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.draw.innerShadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
@@ -113,32 +114,8 @@ fun HrButton(
     val backgroundColor = if (enabled) colorScheme.surface else colorScheme.onSurface.copy(alpha = 0.1f)
     val shape = RoundedCornerShape(Dimen16)
 
-    val outerModifier = if (isOutlined) {
-        Modifier.background(colorScheme.background, shape)
-    } else {
-        Modifier.dropShadow(
-            shape = shape,
-            shadow = Shadow(
-                radius = Dimen8,
-                spread = Dimen1,
-                color = hrButtonRedDropShadowColor,
-                offset = TOP_SHADOW_OFFSET,
-                alpha = if (!enabled) DISABLED_SHADOW_ALPHA else shadowAlpha
-            )
-        ).dropShadow(
-            shape = shape,
-            shadow = Shadow(
-                radius = Dimen8,
-                spread = Dimen1,
-                color = hrButtonDarkRedDropShadowColor,
-                offset = SECOND_SHADOW_OFFSET,
-                alpha = if (!enabled) DISABLED_SHADOW_ALPHA else shadowAlpha
-            )
-        ).background(colorScheme.background, shape)
-    }
-
     Box(
-        outerModifier,
+        Modifier.buttonOuterModifier(shape, colorScheme.background, isOutlined, enabled, shadowAlpha),
         contentAlignment = Center
     ) {
         Box(
@@ -161,16 +138,56 @@ fun HrButton(
                     shape
                 )
                 .background(color = backgroundColor, shape = shape)
-                .then(if (isOutlined) Modifier else Modifier.innerShadow(
-                    shape = shape,
-                    block = {
-                        radius = INNER_SHADOW_RADIUS
-                        color = colorScheme.background
-                    },
-                )),
+                .then(
+                    if (isOutlined) {
+                        Modifier
+                    } else {
+                        Modifier.innerShadow(
+                            shape = shape,
+                            block = {
+                                radius = INNER_SHADOW_RADIUS
+                                color = colorScheme.background
+                            },
+                        )
+                    }
+                ),
             contentAlignment = Center
         ) { content(if (!enabled) DISABLED_CONTENT_ALPHA else buttonContentAlpha) }
     }
+}
+
+private fun Modifier.buttonOuterModifier(
+    shape: RoundedCornerShape,
+    background: Color,
+    isOutlined: Boolean,
+    enabled: Boolean,
+    shadowAlpha: Float
+): Modifier {
+    val shadowModifier = if (isOutlined) {
+        this
+    } else {
+        val alpha = if (enabled) shadowAlpha else DISABLED_SHADOW_ALPHA
+        dropShadow(
+            shape = shape,
+            shadow = Shadow(
+                radius = Dimen8,
+                spread = Dimen1,
+                color = hrButtonRedDropShadowColor,
+                offset = TOP_SHADOW_OFFSET,
+                alpha = alpha
+            )
+        ).dropShadow(
+            shape = shape,
+            shadow = Shadow(
+                radius = Dimen8,
+                spread = Dimen1,
+                color = hrButtonDarkRedDropShadowColor,
+                offset = SECOND_SHADOW_OFFSET,
+                alpha = alpha
+            )
+        )
+    }
+    return shadowModifier.background(background, shape)
 }
 
 @Preview
