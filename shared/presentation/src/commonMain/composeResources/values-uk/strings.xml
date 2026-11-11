@@ -11,6 +11,9 @@
     <string name="settings_item_data_storage">Дані, сховище та інтеграції</string>
     <string name="settings_item_about">Про додаток</string>
 
+    <!-- Record Screen -->
+    <string name="record_calories_burnt">Спалено калорій: %1$d ккал</string>
+
     <!-- Record Screen - Dialogs -->
     <string name="dialog_device_connected_title">Пристрій підключено</string>
     <string name="dialog_device_connected_message">%1$s (%2$s) успішно підключено</string>

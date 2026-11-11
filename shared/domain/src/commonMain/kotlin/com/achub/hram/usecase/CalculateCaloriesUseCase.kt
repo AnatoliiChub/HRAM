@@ -59,19 +59,28 @@ class CalculateCaloriesUseCase {
 
         val currentYear = now().toLocalDateTime(TimeZone.currentSystemDefault()).year
         val age = max(1, currentYear - settings.birthYear)
-        val maxHr = MAX_HR_BASE - age
-        val activeThreshold = maxHr * ACTIVE_THRESHOLD_PERCENT
         val isMale = settings.biologicalSex == BiologicalSex.Male
 
         val bucketDurationMinutes = (totalDurationSeconds.toDouble() / BUCKET_COUNT_FOR_RATIO) / SECONDS_IN_MINUTE
 
         return buckets.sumOf { bucket ->
-            if (bucket.avgHr <= activeThreshold) {
-                calculateRestingKcal(settings, age, isMale, bucketDurationMinutes)
-            } else {
-                calculateActiveKcal(bucket.avgHr, age, settings.weightKg, isMale, bucketDurationMinutes)
-            }
+            calculateInterval(settings, bucket.avgHr, age, isMale, bucketDurationMinutes)
         }.coerceAtLeast(0.0)
+    }
+
+    private fun calculateInterval(
+        settings: UserSettings,
+        heartRate: Float,
+        age: Int,
+        isMale: Boolean,
+        durationMinutes: Double
+    ): Double {
+        val activeThreshold = (MAX_HR_BASE - age) * ACTIVE_THRESHOLD_PERCENT
+        return if (heartRate <= activeThreshold) {
+            calculateRestingKcal(settings, age, isMale, durationMinutes)
+        } else {
+            calculateActiveKcal(heartRate, age, settings.weightKg, isMale, durationMinutes)
+        }
     }
 
     private fun calculateRestingKcal(

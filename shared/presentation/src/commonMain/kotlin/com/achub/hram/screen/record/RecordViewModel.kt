@@ -8,13 +8,13 @@ import com.achub.hram.ActivityNameErrorMapper
 import com.achub.hram.ext.BlePermissionController
 import com.achub.hram.ext.cancelAndClear
 import com.achub.hram.ext.launchIn
+import com.achub.hram.ext.tickerFlow
 import com.achub.hram.models.BleNotificationModel
 import com.achub.hram.models.BleState
 import com.achub.hram.models.DeviceModel
-import com.achub.hram.models.HrBucket
 import com.achub.hram.models.SCAN_DURATION_MS
 import com.achub.hram.models.ScanError
-import com.achub.hram.models.UserSettings
+import com.achub.hram.tracking.SessionRecorder
 import com.achub.hram.tracking.TrackingController
 import com.achub.hram.usecase.CalculateCaloriesUseCase
 import com.achub.hram.usecase.ObserveBleStateUseCase
@@ -22,20 +22,32 @@ import com.achub.hram.usecase.ObserveTrackingStateUseCase
 import com.achub.hram.usecase.ObserveUserSettingsUseCase
 import com.achub.hram.view.section.RecordingState
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.InjectedParam
 import org.koin.core.component.KoinComponent
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 
+private const val MILLIS_IN_SECOND = 1_000L
+private val CALORIE_REFRESH_INTERVAL = 5.seconds
+
+@OptIn(ExperimentalCoroutinesApi::class)
 class RecordViewModel(
     val activityNameErrorMapper: ActivityNameErrorMapper,
     val dispatcher: CoroutineDispatcher,
@@ -44,6 +56,7 @@ class RecordViewModel(
     val observeTrackingState: ObserveTrackingStateUseCase,
     val observeUserSettings: ObserveUserSettingsUseCase,
     val calculateCalories: CalculateCaloriesUseCase,
+    val sessionRecorder: SessionRecorder,
     @InjectedParam val permissionController: BlePermissionController,
 ) : ViewModel(), KoinComponent {
     private val _uiState = MutableStateFlow(RecordScreenState())
@@ -51,24 +64,41 @@ class RecordViewModel(
     private var jobs = mutableListOf<Job>()
     private val scanDuration = SCAN_DURATION_MS.milliseconds
 
-    private var userSettings: UserSettings = UserSettings.Default
-    private val currentBuckets = mutableListOf<HrBucket>()
-
     init {
-        observeUserSettings().onEach {
-            userSettings = it
-        }.flowOn(dispatcher).launchIn(viewModelScope).let { jobs.add(it) }
+        combine(
+            uiState.map { it.recordingState }.distinctUntilChanged(),
+            observeUserSettings().flowOn(dispatcher)
+        ) { recordingState, settings -> recordingState to settings }
+            .flatMapLatest { (recordingState, settings) ->
+                if (recordingState == RecordingState.Init) {
+                    emptyFlow()
+                } else {
+                    tickerFlow(CALORIE_REFRESH_INTERVAL)
+                        .mapNotNull {
+                            sessionRecorder.currentBuckets()?.let { session ->
+                                calculateCalories(settings, session.buckets, session.durationMillis / MILLIS_IN_SECOND)
+                            }
+                        }
+                        .flowOn(dispatcher)
+                }
+            }
+            .onEach { calories ->
+                _uiState.update { state ->
+                    if (state.recordingState == RecordingState.Init) state else state.copy(kcalBurnt = calories)
+                }
+            }
+            .launchIn(viewModelScope)
+            .let { jobs.add(it) }
 
-        observeTrackingState().onEach { state ->
+        observeTrackingState().flowOn(dispatcher).onEach { state ->
             val recordingState = state.toRecordingState()
             if (recordingState == RecordingState.Init) {
-                currentBuckets.clear()
                 _uiState.update { it.copy(kcalBurnt = 0.0) }
             }
             _uiState.update { it.copy(recordingState = recordingState) }
-        }.flowOn(dispatcher).launchIn(viewModelScope).let { jobs.add(it) }
+        }.launchIn(viewModelScope).let { jobs.add(it) }
 
-        observeBleState().onEach { state ->
+        observeBleState().flowOn(dispatcher).onEach { state ->
             when (state) {
                 is BleState.Scanning -> handleScanning(state)
                 is BleState.Connecting -> _uiState.connectingProgressDialog()
@@ -76,7 +106,7 @@ class RecordViewModel(
                 is BleState.NotificationUpdate -> handleNotificationUpdate(state)
                 is BleState.Disconnected -> handleDisconnected()
             }
-        }.flowOn(dispatcher).launchIn(viewModelScope).let { jobs.add(it) }
+        }.launchIn(viewModelScope).let { jobs.add(it) }
     }
 
     fun toggleRecording() {
@@ -87,7 +117,6 @@ class RecordViewModel(
     fun stopRecording(name: String?) = _uiState.stop().also {
         trackingController.finishTracking(name ?: "Temporary name")
         _uiState.update { it.copy(dialog = null, kcalBurnt = 0.0) }
-        currentBuckets.clear()
     }
 
     fun showNameActivityDialog() =
@@ -159,14 +188,6 @@ class RecordViewModel(
             if (state.bleNotification.isBleConnected) _uiState.update { it.copy(connectedDevice = device) }
         }
 
-        if (uiState.value.recordingState == RecordingState.Recording) {
-            state.bleNotification.hrNotification?.let { hr ->
-                // Approximate calorie burn increment
-                val bucket = HrBucket(1, hr.hrBpm.toFloat(), 1)
-                val kcal = calculateCalories(userSettings, listOf(bucket), 1)
-                _uiState.update { it.copy(kcalBurnt = it.kcalBurnt + kcal) }
-            }
-        }
     }
 
     private fun handleConnectedState(state: BleState.Connected) = if (state.error != null) {

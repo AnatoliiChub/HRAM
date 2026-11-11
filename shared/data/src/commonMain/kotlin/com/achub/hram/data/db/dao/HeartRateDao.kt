@@ -38,6 +38,21 @@ interface HeartRateDao {
     )
     suspend fun getAllAggregatedHeartRates(): List<HrBucketEntity>
 
+    @Query(
+        """
+    SELECT
+        hr.activityId,
+        CAST((hr.elapsedTime * 100.0) / :durationMillis AS INT) AS bucketNumber,
+        AVG(hr.heartRate) AS avgHr,
+        MIN(hr.elapsedTime) AS elapsedTime
+    FROM HeartRateBleEntity hr
+    WHERE hr.activityId = :activityId AND :durationMillis > 0
+    GROUP BY hr.activityId, bucketNumber
+    ORDER BY bucketNumber
+"""
+    )
+    suspend fun getAggregatedHeartRates(activityId: String, durationMillis: Long): List<HrBucketEntity>
+
     @Query("SELECT activityId, COUNT(*) as totalRecords FROM HeartRateBleEntity GROUP BY activityId")
     suspend fun getActivityCounts(): List<ActivityCount>
 

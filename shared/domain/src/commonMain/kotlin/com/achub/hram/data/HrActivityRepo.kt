@@ -3,6 +3,7 @@ package com.achub.hram.data
 import com.achub.hram.models.ActivityInfo
 import com.achub.hram.models.ActivityRecord
 import com.achub.hram.models.HeartRateRecord
+import com.achub.hram.models.HrBucket
 import kotlinx.coroutines.flow.Flow
 
 interface HrActivityRepo {
@@ -19,6 +20,8 @@ interface HrActivityRepo {
     fun getActivities(limit: Int): Flow<List<ActivityInfo>>
 
     suspend fun getHeartRatesForActivity(activityId: String): List<HeartRateRecord>
+
+    suspend fun getHeartRateBuckets(activityId: String, durationMillis: Long): List<HrBucket>
 
     suspend fun deleteActivitiesById(ids: Set<String>)
 }

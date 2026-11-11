@@ -88,5 +88,12 @@ class HramSessionRecorder(
 
     override fun elapsedTime() = stopWatch.elapsedTime()
 
+    override suspend fun currentBuckets(): ActiveSessionBuckets? {
+        val activityId = currentActId ?: return null
+        val duration = stopWatch.elapsedTime()
+        if (duration <= 0) return ActiveSessionBuckets(duration, emptyList())
+        return ActiveSessionBuckets(duration, hrActivityRepo.getHeartRateBuckets(activityId, duration))
+    }
+
     override fun cancelJobs() = jobs.cancelAndClear()
 }

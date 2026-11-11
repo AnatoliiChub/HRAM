@@ -10,6 +10,9 @@
     <string name="settings_item_session_settings">Session Settings</string>
     <string name="settings_item_data_storage">Data, Storage &amp; Integrations</string>
     <string name="settings_item_about">About</string>
+    <!-- Record Screen -->
+    <string name="record_calories_burnt">Calories burned: %1$d kcal</string>
+
     <!-- Record Screen - Dialogs -->
     <string name="dialog_device_connected_title">Device Connected</string>
     <string name="dialog_device_connected_message">%1$s from %2$s successfully connected</string>

@@ -8,6 +8,7 @@ import com.achub.hram.screen.record.RecordViewModel
 import com.achub.hram.screen.settings.display.DisplaySettingsViewModel
 import com.achub.hram.screen.settings.profile.UserProfileViewModel
 import com.achub.hram.tracking.TrackingController
+import com.achub.hram.tracking.SessionRecorder
 import com.achub.hram.usecase.DeleteActivitiesUseCase
 import com.achub.hram.usecase.ExportCsvUseCase
 import com.achub.hram.usecase.ObserveActivitiesUseCase
@@ -33,6 +34,7 @@ class ViewModelModule {
         observeTrackingState: ObserveTrackingStateUseCase,
         observeUserSettings: com.achub.hram.usecase.ObserveUserSettingsUseCase,
         calculateCalories: com.achub.hram.usecase.CalculateCaloriesUseCase,
+        sessionRecorder: SessionRecorder,
         @InjectedParam permissionsController: BlePermissionController,
         @WorkerThread dispatcher: CoroutineDispatcher,
     ) = RecordViewModel(
@@ -43,6 +45,7 @@ class ViewModelModule {
         observeTrackingState = observeTrackingState,
         observeUserSettings = observeUserSettings,
         calculateCalories = calculateCalories,
+        sessionRecorder = sessionRecorder,
         trackingController = trackingController,
     )
 

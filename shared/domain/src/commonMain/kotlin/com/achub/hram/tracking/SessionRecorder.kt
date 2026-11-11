@@ -1,6 +1,9 @@
 package com.achub.hram.tracking
 
 import com.achub.hram.models.BleNotificationModel
+import com.achub.hram.models.HrBucket
+
+data class ActiveSessionBuckets(val durationMillis: Long, val buckets: List<HrBucket>)
 
 interface SessionRecorder {
     fun startTracking()
@@ -18,6 +21,8 @@ interface SessionRecorder {
     suspend fun isTracking(): Boolean
 
     fun elapsedTime(): Long
+
+    suspend fun currentBuckets(): ActiveSessionBuckets?
 
     fun cancelJobs()
 }
