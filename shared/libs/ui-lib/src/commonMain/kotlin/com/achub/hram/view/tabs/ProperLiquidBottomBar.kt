@@ -2,6 +2,7 @@ package com.achub.hram.view.tabs
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,7 +30,7 @@ fun ProperLiquidBottomBar(
         modifier = Modifier
             .fillMaxWidth()
             .onGloballyPositioned { layoutPosition = it.positionInRoot() }
-            .liquidRipple(center = rippleCenter)
+            .liquidRipple(center = rippleCenter, baseColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
     ) {
         tabs.forEachIndexed { index, tab ->
             ImageTab(tab, index == selectedTabIndex) { offset ->

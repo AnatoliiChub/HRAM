@@ -3,6 +3,7 @@ package com.achub.hram.view.shader
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,7 +19,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import com.achub.hram.style.DarkRed
 import com.achub.hram.view.shader
 
 /**
@@ -29,9 +29,11 @@ private const val RIPPLE_DURATION_MS = 1500
 
 fun Modifier.liquidRipple(
     center: Offset = Offset.Unspecified,
-    baseColor: Color = DarkRed,
+    baseColor: Color? = null,
     minRadius: Dp = 0.dp
 ): Modifier = composed {
+    val rippleColor = baseColor ?: MaterialTheme.colorScheme.primary
+
     // Track size so we can provide rects to the shader and center calculations if needed
     var size by remember { mutableStateOf(IntSize.Zero) }
 
@@ -59,7 +61,7 @@ fun Modifier.liquidRipple(
             time = animatedProgress,
             density = density,
             center = if (center != Offset.Unspecified) center else Offset(size.width / 2f, size.height / 2f),
-            baseColor = baseColor,
+            baseColor = rippleColor,
             resolution = size,
             minRadius = minRadiusPx
         )

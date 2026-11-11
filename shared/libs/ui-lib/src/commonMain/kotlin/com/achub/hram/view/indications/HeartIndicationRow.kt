@@ -4,8 +4,11 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -24,11 +27,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.achub.hram.models.BleNotificationUi
 import com.achub.hram.models.HrNotificationUi
-import com.achub.hram.style.Dimen32
+import com.achub.hram.style.Dimen24
+import com.achub.hram.style.Dimen4
 import com.achub.hram.style.HeadingMediumBold
 import com.achub.hram.style.LabelMedium
 import com.achub.hram.style.Red
-import com.achub.hram.style.White
 import com.achub.hram.view.components.HeartBeatingAnimView
 import hram.ui_lib.generated.resources.Res
 import hram.ui_lib.generated.resources.heart3d
@@ -125,7 +128,8 @@ private fun HeartDataColumn(
     bleNotification: BleNotificationUi,
     isContactOn: Boolean
 ) {
-    val secondaryLabelColor = if (bleNotification.isEmpty()) Red else White
+    val onBackground = MaterialTheme.colorScheme.onBackground
+    val secondaryLabelColor = if (bleNotification.isEmpty()) Red else onBackground
     val maxHeartLabel = stringResource(Res.string.heart_indication_bpm, MAX_BPM_STUB)
     val textMeasurer = rememberTextMeasurer()
     val maxWidthPx = remember {
@@ -138,7 +142,8 @@ private fun HeartDataColumn(
             modifier = Modifier.align(Alignment.CenterHorizontally).widthIn(min = maxWidth),
             text = hrLabel,
             textAlign = TextAlign.Center,
-            style = HeadingMediumBold
+            style = HeadingMediumBold,
+            color = onBackground
         )
         SecondaryLabelRow(secondaryLabel, secondaryLabelColor, bleNotification.isBleConnected && isContactOn)
     }
@@ -153,11 +158,12 @@ private fun SecondaryLabelRow(
     Row(verticalAlignment = CenterVertically) {
         AnimatedVisibility(showBatteryIcon) {
             Image(
-                modifier = Modifier.size(Dimen32),
+                modifier = Modifier.size(Dimen24),
                 imageVector = vectorResource(Res.drawable.ic_battery_full),
-                colorFilter = ColorFilter.tint(White),
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant),
                 contentDescription = null
             )
+            Spacer(Modifier.width(Dimen4))
         }
         Text(
             text = text,

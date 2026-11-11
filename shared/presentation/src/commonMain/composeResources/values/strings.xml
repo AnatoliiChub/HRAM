@@ -10,6 +10,9 @@
     <string name="settings_item_session_settings">Session Settings</string>
     <string name="settings_item_data_storage">Data, Storage &amp; Integrations</string>
     <string name="settings_item_about">About</string>
+    <!-- Record Screen -->
+    <string name="record_calories_burnt">Calories burned: %1$d kcal</string>
+
     <!-- Record Screen - Dialogs -->
     <string name="dialog_device_connected_title">Device Connected</string>
     <string name="dialog_device_connected_message">%1$s from %2$s successfully connected</string>
@@ -37,7 +40,7 @@
 
     <!-- Activity Card -->
     <string name="activity_card_kcal_burnt">Kcal burnt</string>
-    <string name="activity_card_kcal_info">Your burnt calories are currently being estimated using default values. For an accurate calculation, please set your age, weight, height, and sex in your User Profile Settings.</string>
+    <string name="activity_card_kcal_info">Your calorie estimate uses default values when profile details are missing. Update your age, weight, height, and biological sex in Profile Settings for a more accurate estimate.</string>
 
     <!-- Activity Name Validation -->
     <string name="activity_screen_name_validation_empty">Activity name cannot be empty</string>
@@ -54,5 +57,9 @@
     <string name="sex_female">Female</string>
     <string name="sex_other">Other</string>
 
-</resources>
+    <!-- Theme Settings -->
+    <string name="theme_system">System</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_light">Light</string>
 
+</resources>

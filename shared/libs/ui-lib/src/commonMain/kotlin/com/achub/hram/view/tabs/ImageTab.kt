@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,7 +28,6 @@ import com.achub.hram.style.Dimen32
 import com.achub.hram.style.Dimen4
 import com.achub.hram.style.LabelMediumBold
 import com.achub.hram.style.Red
-import com.achub.hram.style.White
 import hram.ui_lib.generated.resources.Res
 import hram.ui_lib.generated.resources.dialog_info_ok
 import hram.ui_lib.generated.resources.ic_edit
@@ -59,7 +59,7 @@ fun RowScope.ImageTab(
             },
         horizontalAlignment = CenterHorizontally,
     ) {
-        val color = if (isSelected) Red else White
+        val color = if (isSelected) Red else MaterialTheme.colorScheme.onSurfaceVariant
         Image(
             modifier = Modifier.size(Dimen32),
             imageVector = vectorResource(tab.icon),
@@ -87,5 +87,3 @@ private fun ImageTabPreview() {
         )
     }
 }
-
-

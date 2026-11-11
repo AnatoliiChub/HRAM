@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,13 +29,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.draw.innerShadow
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.achub.hram.style.Black
-import com.achub.hram.style.Dark
-import com.achub.hram.style.DarkGray
+import com.achub.hram.style.Dimen1
 import com.achub.hram.style.Dimen12
 import com.achub.hram.style.Dimen120
 import com.achub.hram.style.Dimen16
@@ -44,7 +42,6 @@ import com.achub.hram.style.Dimen48
 import com.achub.hram.style.Dimen8
 import com.achub.hram.style.GradientLightRed
 import com.achub.hram.style.GradientRed
-import com.achub.hram.style.White
 
 val Gradient = listOf(
     GradientRed,
@@ -60,7 +57,7 @@ private const val BLINKING_ANIMATION_DURATION = 3000
 
 // extracted magic numbers
 private const val INNER_SHADOW_RADIUS = 80f
-private const val BORDER_ALPHA = 0.3f
+private const val BORDER_ALPHA = 0.1f
 private const val SPREAD_ALPHA_DIVISOR = 4f
 private const val SECOND_KEYFRAME_RATIO = 0.5f
 private const val MIDDLE_OF_ANIMATION = BLINKING_ANIMATION_DURATION * SECOND_KEYFRAME_RATIO
@@ -69,7 +66,6 @@ private const val STATIC_ALPHA = 0.5f
 @Composable
 fun DialogElevatedCard(
     modifier: Modifier = Modifier,
-    backgroundCardColor: Color = DarkGray,
     animate: Boolean = false,
     content: @Composable (ColumnScope) -> Unit
 ) {
@@ -83,8 +79,9 @@ fun DialogElevatedCard(
         )
     )
 
-    val dropShadowShape = RoundedCornerShape(Dimen12)
-    val innerShadowShape = RoundedCornerShape(Dimen8)
+    val colorScheme = MaterialTheme.colorScheme
+    val dropShadowShape = RoundedCornerShape(Dimen8)
+    val innerShadowShape = RoundedCornerShape(Dimen12)
 
     Box(Modifier.padding(vertical = Dimen48), contentAlignment = Center) {
         ElevatedCard(
@@ -100,23 +97,23 @@ fun DialogElevatedCard(
                     )
                 ).clip(dropShadowShape),
             colors = CardColors(
-                contentColor = White,
-                containerColor = backgroundCardColor,
-                disabledContainerColor = backgroundCardColor,
-                disabledContentColor = White
+                contentColor = colorScheme.onSurface,
+                containerColor = colorScheme.surface,
+                disabledContainerColor = colorScheme.surface,
+                disabledContentColor = colorScheme.onSurface.copy(alpha = 0.4f)
             ),
         ) {
             Column(
-                modifier.fillMaxWidth()
-                    .padding(Dimen2)
+                modifier = Modifier.fillMaxWidth()
+                    .padding(Dimen1)
                     .clip(innerShadowShape)
-                    .background(color = DarkGray, shape = innerShadowShape)
-                    .border(Dimen2, Dark.copy(alpha = BORDER_ALPHA), innerShadowShape)
+                    .background(color = colorScheme.surface, shape = innerShadowShape)
+                    .border(Dimen2, colorScheme.onSurface.copy(alpha = BORDER_ALPHA), innerShadowShape)
                     .innerShadow(
                         shape = innerShadowShape,
                         block = {
                             radius = INNER_SHADOW_RADIUS
-                            color = Black
+                            color = colorScheme.background
                         },
                     ).clip(innerShadowShape),
                 content = content
@@ -142,7 +139,7 @@ fun DialogCardPreview() {
         DialogElevatedCard(animate = true) {
             Text(
                 modifier = Modifier.padding(Dimen16).width(Dimen120),
-                text = "Short med assd d asasdd a d  da sa sd asd  dasas dda  dads a ads addad ada dasssage"
+                text = "Short message"
             )
         }
     }

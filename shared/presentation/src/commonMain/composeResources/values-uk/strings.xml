@@ -11,6 +11,9 @@
     <string name="settings_item_data_storage">Дані, сховище та інтеграції</string>
     <string name="settings_item_about">Про додаток</string>
 
+    <!-- Record Screen -->
+    <string name="record_calories_burnt">Спалено калорій: %1$d ккал</string>
+
     <!-- Record Screen - Dialogs -->
     <string name="dialog_device_connected_title">Пристрій підключено</string>
     <string name="dialog_device_connected_message">%1$s (%2$s) успішно підключено</string>
@@ -38,7 +41,7 @@
 
     <!-- Activity Card -->
     <string name="activity_card_kcal_burnt">Спалено ккал</string>
-    <string name="activity_card_kcal_info">Наразі спалені калорії оцінюються за стандартними показниками. Для точного розрахунку вкажіть ваш вік, вагу, зріст та стать у Налаштуваннях профілю користувача.</string>
+    <string name="activity_card_kcal_info">Якщо в профілі бракує даних, витрачені калорії оцінюються за стандартними значеннями. Щоб отримати точнішу оцінку, вкажіть вік, вагу, зріст і біологічну стать у налаштуваннях профілю.</string>
 
     <!-- Activity Name Validation -->
     <string name="activity_screen_name_validation_empty">Назва активності не може бути порожньою</string>
@@ -55,5 +58,9 @@
     <string name="sex_female">Жін</string>
     <string name="sex_other">Інше</string>
 
-</resources>
+    <!-- Theme Settings -->
+    <string name="theme_system">Системна</string>
+    <string name="theme_dark">Темна</string>
+    <string name="theme_light">Світла</string>
 
+</resources>

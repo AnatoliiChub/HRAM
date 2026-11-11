@@ -11,6 +11,7 @@ import com.achub.hram.usecase.ExportCsvUseCase
 import com.achub.hram.usecase.ObserveActivitiesUseCase
 import com.achub.hram.usecase.ObserveBleStateUseCase
 import com.achub.hram.usecase.ObserveTrackingStateUseCase
+import com.achub.hram.usecase.ObserveUserSettingsUseCase
 import com.achub.hram.usecase.RenameActivityUseCase
 import org.koin.core.annotation.Configuration
 import org.koin.core.annotation.Factory
@@ -34,6 +35,9 @@ class UseCaseModule {
         settingsRepo: SettingsStateRepo,
         calculateCaloriesUseCase: CalculateCaloriesUseCase
     ) = ObserveActivitiesUseCase(repo, settingsRepo, calculateCaloriesUseCase)
+
+    @Factory
+    fun observeUserSettings(repo: SettingsStateRepo) = ObserveUserSettingsUseCase(repo)
 
     @Factory
     fun deleteActivities(repo: HrActivityRepo) = DeleteActivitiesUseCase(repo)

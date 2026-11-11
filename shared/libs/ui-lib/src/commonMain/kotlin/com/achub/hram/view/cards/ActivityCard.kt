@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,7 +34,6 @@ import com.achub.hram.ext.formatTime
 import com.achub.hram.ext.fromEpochSeconds
 import com.achub.hram.models.GraphLimitsUi
 import com.achub.hram.models.HighlightedItemUi
-import com.achub.hram.style.DarkGray
 import com.achub.hram.style.Dimen12
 import com.achub.hram.style.Dimen16
 import com.achub.hram.style.Dimen2
@@ -41,12 +41,9 @@ import com.achub.hram.style.Dimen24
 import com.achub.hram.style.Dimen32
 import com.achub.hram.style.Dimen320
 import com.achub.hram.style.Dimen8
-import com.achub.hram.style.Gray40
 import com.achub.hram.style.LabelBigBold
 import com.achub.hram.style.LabelMedium
 import com.achub.hram.style.LabelMediumBold
-import com.achub.hram.style.White
-import com.achub.hram.style.White80
 import com.achub.hram.view.chart.AreaChart
 import com.achub.hram.view.chart.ChartBubble
 import com.achub.hram.view.chart.ChartData
@@ -97,13 +94,19 @@ fun ActivityCard(
 
     var showKcalInfo by remember { mutableStateOf(false) }
 
+    val containerColor = if (selected) {
+        MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f)
+    } else {
+        MaterialTheme.colorScheme.surface
+    }
+
     Card(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
             .shadow(Dimen2, RoundedCornerShape(Dimen12))
             .clip(RoundedCornerShape(Dimen12)),
-        colors = CardDefaults.cardColors(containerColor = if (selected) Gray40 else DarkGray)
+        colors = CardDefaults.cardColors(containerColor = containerColor)
     ) {
         val secondsLabel = stringResource(Res.string.activity_screen_seconds_unit)
         val elapsedTime = formatTime(activityInfo.duration, secondsLabel)
@@ -119,7 +122,8 @@ fun ActivityCard(
             Spacer(Modifier.height(Dimen8))
             Text(
                 text = stringResource(Res.string.activity_screen_created_at, date),
-                style = LabelMedium
+                style = LabelMedium,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
             )
             Spacer(Modifier.height(Dimen8))
             Text(
@@ -127,7 +131,8 @@ fun ActivityCard(
                     Res.string.activity_screen_elapsed_time,
                     elapsedTime
                 ),
-                style = LabelMedium
+                style = LabelMedium,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
             )
             Spacer(Modifier.height(Dimen16))
             HeartRateLabel(Res.string.activity_screen_avg_hr, activityInfo.avgHr)
@@ -168,19 +173,24 @@ private fun KcalBurntRow(kcal: Double, onInfoClick: () -> Unit) = Row(
             .padding(top = Dimen8, bottom = Dimen8, end = Dimen16),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = stringResource(Res.string.activity_screen_kcal_burnt), style = LabelMedium)
+        Text(
+            text = stringResource(Res.string.activity_screen_kcal_burnt),
+            style = LabelMedium,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+        )
         Spacer(Modifier.width(Dimen8))
         Icon(
             painter = painterResource(Res.drawable.ic_info),
             contentDescription = null,
             modifier = Modifier.size(Dimen24),
-            tint = White
+            tint = MaterialTheme.colorScheme.onBackground
         )
     }
     Spacer(Modifier.weight(1f))
     Text(
         text = kcal.roundToInt().toString(),
-        style = LabelMediumBold
+        style = LabelMediumBold,
+        color = MaterialTheme.colorScheme.onBackground
     )
 }
 
@@ -194,6 +204,7 @@ private fun RowScope.ActivityTitle(name: String) {
             stringResource(Res.string.activity_screen_unnamed_act)
         },
         style = LabelBigBold,
+        color = MaterialTheme.colorScheme.onBackground
     )
 }
 
@@ -205,20 +216,25 @@ private fun SelectionIndication(selected: Boolean) {
         modifier = Modifier.size(Dimen32),
         painter = painterResource(iconRes),
         contentDescription = null,
-        tint = White80
+        tint = MaterialTheme.colorScheme.primary
     )
 }
 
 @Composable
 fun HeartRateLabel(stringRes: StringResource, value: Int) = Row {
-    Text(text = stringResource(stringRes), style = LabelMedium)
+    Text(
+        text = stringResource(stringRes),
+        style = LabelMedium,
+        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+    )
     Spacer(Modifier.weight(1f))
     Text(
         text = stringResource(
             Res.string.activity_screen_heart_indication_bpm,
             value
         ),
-        style = LabelMediumBold
+        style = LabelMediumBold,
+        color = MaterialTheme.colorScheme.onBackground
     )
 }
 

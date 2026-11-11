@@ -14,15 +14,15 @@ val TextSizeLabelMedium = 16.sp
 val TextSizeLabelSmall = 14.sp
 val TextSizeLabelTiny = 12.sp
 
-val Heading3 = TextStyle(fontSize = TextHeading3, color = White, letterSpacing = 1.5.sp, fontWeight = Bold)
-val HeadingLarge = TextStyle(fontSize = TextSizeHeadingLarge, color = White, letterSpacing = 1.2.sp)
-val HeadingMedium = TextStyle(fontSize = TextSizeHeadingMedium, color = White, letterSpacing = 1.2.sp)
+val Heading3 = TextStyle(fontSize = TextHeading3, letterSpacing = 1.5.sp, fontWeight = Bold)
+val HeadingLarge = TextStyle(fontSize = TextSizeHeadingLarge, letterSpacing = 1.2.sp)
+val HeadingMedium = TextStyle(fontSize = TextSizeHeadingMedium, letterSpacing = 1.2.sp)
 val HeadingMediumBold = HeadingMedium.copy(fontWeight = Bold)
-val HeadingSmall = TextStyle(fontSize = TextSizeHeadingSmall, color = White, letterSpacing = 1.2.sp)
-val LabelLarge = TextStyle(fontSize = TextSizeLabelLarge, color = White)
-val LabelBig = TextStyle(fontSize = TextSizeLabelBig, color = White)
+val HeadingSmall = TextStyle(fontSize = TextSizeHeadingSmall, letterSpacing = 1.2.sp)
+val LabelLarge = TextStyle(fontSize = TextSizeLabelLarge)
+val LabelBig = TextStyle(fontSize = TextSizeLabelBig)
 val LabelBigBold = LabelBig.copy(fontWeight = Bold)
-val LabelMedium = TextStyle(fontSize = TextSizeLabelMedium, color = White)
+val LabelMedium = TextStyle(fontSize = TextSizeLabelMedium)
 val LabelMediumBold = LabelMedium.copy(fontWeight = Bold)
 
-val LabelSmall = TextStyle(fontSize = TextSizeLabelSmall, color = White)
+val LabelSmall = TextStyle(fontSize = TextSizeLabelSmall)

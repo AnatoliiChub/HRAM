@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,11 +31,13 @@ import com.achub.hram.models.DeviceModel
 import com.achub.hram.style.Dimen16
 import com.achub.hram.style.Dimen24
 import com.achub.hram.style.Dimen32
+import com.achub.hram.style.LabelMedium
 import com.achub.hram.view.dialogs.InfoDialog
 import com.achub.hram.view.dialogs.NameActivityDialog
 import com.achub.hram.view.dialogs.choosedevice.HrConnectDialog
 import com.achub.hram.view.section.DeviceSection
 import com.achub.hram.view.section.RecordSection
+import com.achub.hram.view.section.RecordingState
 import com.achub.hram.view.section.TrackingIndicationsSection
 import com.achub.hram.view.shader.ProperLiquidWaveEffect
 import hram.composeapp.generated.resources.Res
@@ -47,10 +50,12 @@ import hram.composeapp.generated.resources.dialog_name_activity_title
 import hram.composeapp.generated.resources.dialog_open_setting_button_text
 import hram.composeapp.generated.resources.dialog_open_setting_message
 import hram.composeapp.generated.resources.dialog_open_setting_title
+import hram.composeapp.generated.resources.record_calories_burnt
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import kotlin.math.roundToInt
 
 private const val DOUBLE_HAPTIC_INTERVAL = 150L
 private const val COLUMN_SPACER_WEIGHT = 0.5f
@@ -76,7 +81,8 @@ fun RecordScreen() {
             ProperLiquidWaveEffect(
                 center = heartIconCenter(heartGlobalCenter, boxGlobalPosition),
                 apply = hrNotification?.hrBpm != null && hrNotification.isContactOn,
-                minRadius = Dimen24
+                minRadius = Dimen24,
+                baseColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
             ) {
                 Column(
                     modifier = Modifier.fillMaxSize().padding(Dimen16),
@@ -84,6 +90,13 @@ fun RecordScreen() {
                 ) {
                     Spacer(Modifier.weight(COLUMN_SPACER_WEIGHT))
                     TrackingIndicationsSection(indications, heartPosUpdated = { heartGlobalCenter = it })
+                    if (state.recordingState != RecordingState.Init) {
+                        Text(
+                            text = stringResource(Res.string.record_calories_burnt, state.kcalBurnt.roundToInt()),
+                            style = LabelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                     Spacer(Modifier.size(Dimen32))
                     DeviceSection(device, onConnectClick = { requestScanning() }, onDisconnectClick = { disconnect() })
                     Spacer(Modifier.weight(COLUMN_MIDDLE_SPACER_WEIGHT))

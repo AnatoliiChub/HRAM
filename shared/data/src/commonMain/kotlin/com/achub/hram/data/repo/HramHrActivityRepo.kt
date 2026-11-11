@@ -85,6 +85,11 @@ class HramHrActivityRepo(
     override suspend fun getHeartRatesForActivity(activityId: String): List<HeartRateRecord> =
         hrDao.getAllForActivity(activityId).map { it.toDomain() }
 
+    override suspend fun getHeartRateBuckets(activityId: String, durationMillis: Long): List<HrBucket> =
+        hrDao.getAggregatedHeartRates(activityId, durationMillis).map { bucket ->
+            HrBucket(bucket.bucketNumber, bucket.avgHr, bucket.elapsedTime / MILLIS_IN_SECOND)
+        }
+
     override suspend fun deleteActivitiesById(ids: Set<String>) {
         actDao.deleteByIds(ids)
         hrDao.deleteRecordsByIds(ids)

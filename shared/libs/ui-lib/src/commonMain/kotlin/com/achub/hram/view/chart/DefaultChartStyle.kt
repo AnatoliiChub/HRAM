@@ -1,5 +1,6 @@
 package com.achub.hram.view.chart
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import com.achub.hram.ext.dpToPx
 import com.achub.hram.ext.formatTime
@@ -11,8 +12,6 @@ import com.achub.hram.style.Dimen8
 import com.achub.hram.style.LabelSmall
 import com.achub.hram.style.Red
 import com.achub.hram.style.Red20
-import com.achub.hram.style.White10
-import com.achub.hram.style.White30
 import hram.ui_lib.generated.resources.Res
 import hram.ui_lib.generated.resources.seconds_unit
 import org.jetbrains.compose.resources.stringResource
@@ -23,6 +22,8 @@ const val X_LABEL_COUNT = 4
 @Composable
 fun defaultChartStyle(): ChartStyle {
     val secondsLabel = stringResource(Res.string.seconds_unit)
+    val onBackground = MaterialTheme.colorScheme.onBackground
+
     return ChartStyle(
         bubbleXOverlap = Dimen16.dpToPx(),
         bubbleYOffset = Dimen8.dpToPx(),
@@ -31,11 +32,11 @@ fun defaultChartStyle(): ChartStyle {
         gridLineDashLength = Dimen8.dpToPx(),
         xAxisOffset = Dimen4.dpToPx(),
         yAxisOffset = Dimen4.dpToPx(),
-        axisTextStyle = LabelSmall,
+        axisTextStyle = LabelSmall.copy(color = onBackground.copy(alpha = 0.6f)),
         yLabelCount = Y_LABEL_COUNT,
         xLabelCount = X_LABEL_COUNT,
-        gridLineColor = White10,
-        axisLineColor = White30,
+        gridLineColor = onBackground.copy(alpha = 0.1f),
+        axisLineColor = onBackground.copy(alpha = 0.3f),
         pathColor = Red,
         areaColor = Red20,
         yLabelFormatter = { "${it.toInt()}" },

@@ -3,6 +3,7 @@ package com.achub.hram.screen
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -46,16 +47,16 @@ import com.achub.hram.ext.permissionController
 import com.achub.hram.ext.requestBluetooth
 import com.achub.hram.ext.toDto
 import com.achub.hram.screen.activities.ActivitiesScreen
+import com.achub.hram.screen.main.MainViewModel
 import com.achub.hram.screen.record.Dialogs
 import com.achub.hram.screen.record.RecordViewModel
 import com.achub.hram.screen.record.heartIconCenter
 import com.achub.hram.screen.settings.SettingsScreen
-import com.achub.hram.style.Black
 import com.achub.hram.style.Dimen16
 import com.achub.hram.style.Dimen24
 import com.achub.hram.style.Dimen8
 import com.achub.hram.style.Dimen96
-import com.achub.hram.style.White
+import com.achub.hram.style.HramTheme
 import com.achub.hram.view.section.DeviceSection
 import com.achub.hram.view.section.RecordSection
 import com.achub.hram.view.section.TrackingIndicationsSection
@@ -80,7 +81,16 @@ private const val RECORD_SCREEN_ANIM_DURATION = 600
 
 @Composable
 fun MainScreenDesktop() {
-    MaterialTheme {
+    val viewModel = koinViewModel<MainViewModel>()
+    val mainState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val darkTheme = when (mainState.theme) {
+        com.achub.hram.models.AppTheme.System -> isSystemInDarkTheme()
+        com.achub.hram.models.AppTheme.Dark -> true
+        com.achub.hram.models.AppTheme.Light -> false
+    }
+
+    HramTheme(darkTheme = darkTheme) {
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
         val scope = rememberCoroutineScope()
 
@@ -90,8 +100,8 @@ fun MainScreenDesktop() {
                 drawerContent = {
                     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                         ModalDrawerSheet(
-                            modifier = Modifier.background(Black),
-                            drawerContainerColor = Black
+                            modifier = Modifier.background(MaterialTheme.colorScheme.background),
+                            drawerContainerColor = MaterialTheme.colorScheme.background
                         ) {
                             SettingsScreen()
                         }
@@ -101,7 +111,7 @@ fun MainScreenDesktop() {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                     Box(
                         modifier = Modifier
-                            .background(color = Black)
+                            .background(color = MaterialTheme.colorScheme.background)
                             .windowInsetsPadding(WindowInsets.safeDrawing)
                             .fillMaxSize()
                     ) {
@@ -122,7 +132,7 @@ fun MainScreenDesktop() {
                             Icon(
                                 painter = painterResource(Res.drawable.ic_settings),
                                 contentDescription = "Settings",
-                                tint = White
+                                tint = MaterialTheme.colorScheme.onBackground
                             )
                         }
                     }
@@ -153,18 +163,20 @@ fun RecordScreen(modifier: Modifier = Modifier) {
                 .onGloballyPositioned { boxGlobalPosition = it.positionOnScreen() }
         ) {
             val hrNotification = indications.hrNotification
+            val backgroundColor = MaterialTheme.colorScheme.background
             ProperLiquidWaveEffect(
                 center = heartIconCenter(heartGlobalCenter, boxGlobalPosition),
                 apply = hrNotification?.hrBpm != null && hrNotification.isContactOn,
-                minRadius = Dimen24
+                minRadius = Dimen24,
+                baseColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
             ) {
                 Box(
                     modifier = Modifier.fillMaxWidth().background(
                         Brush.verticalGradient(
                             colorStops = arrayOf(
                                 GRADIENT_START_STOP to Color.Transparent,
-                                GRADIENT_MIDDLE_STOP to Black,
-                                GRADIENT_END_STOP to Black,
+                                GRADIENT_MIDDLE_STOP to backgroundColor,
+                                GRADIENT_END_STOP to backgroundColor,
                             )
                         )
                     )
